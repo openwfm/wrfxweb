@@ -1,0 +1,31 @@
+
+<script>
+  document.body.style.overflow = "hidden";
+</script>
+
+<div id="map-fd">
+
+<div id="select-dialog" title="Select simulation ...">
+  <div id="catalog-content"></div>
+</div>
+
+<div id="time-slider"></div>
+
+<div id="time-valid" class="ui big label"></div>
+
+<img id="raster-colorbar"/>
+
+<button id="play-control-button" class="ui labeled icon button" onclick="toggle_play();">
+  <i class="play icon"></i>
+  <span>Play</span>
+</button>
+
+<button id="catalog-select-button" class="ui labeled icon button" onclick="select_catalog();">
+  <i class="database icon"></i>
+  <span>Catalog</span>
+</div>
+
+<script src="js/leaflet.js"></script>
+<script src="js/leaflet.groupedlayercontrol.min.js"></script>
+<script src="js/leaflet-sidebar.min.js"></script>
+<script src="js/partial1.js"></script>

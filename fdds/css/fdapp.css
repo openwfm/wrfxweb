@@ -1,0 +1,165 @@
+/* app css stylesheet */
+
+#map-fd {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#map-domains {
+  height: 400px;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+
+#map-patch-springs {
+  height: 500px;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+h1 {
+  text-align: center;
+  font-family: helvetica;
+}
+
+
+h2 {
+  font-family: helvetica;
+}
+
+
+li.menu {
+  display:inline;
+  font-family: helvetica;
+}
+
+ul.menu {
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div {
+  font-family: helvetica;
+}
+
+div.note {
+  text-align: center;
+  font-size: 90%;
+  margin-top: 10px;
+}
+
+p {
+  font-family: helvetica;
+  font-size: 120%;
+}
+
+.ui.button {
+  font-family: helvetica;
+}
+
+.ui.button.control-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ui.button.layer-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.ui.button.last-control {
+  margin-bottom: 20px;
+}
+
+.ui.buttons.layer-group {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+div.control-column {
+  background: #eef7f7;
+  height: 600px;
+}
+
+.ui.segment.wt-text {
+  min-width: 800px;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+html, body {
+  height: 100vh;
+}
+
+a.dead-link {
+	pointer-events: none;
+}
+
+ul.catalog-list {
+  padding: 0px;
+}
+
+li.catalog-entry {
+  list-style-type: none;
+  padding: 0px;
+}
+
+li.catalog-entry-sel {
+  background-color: #fdfd96;
+}
+
+#catalog-content {
+  cursor: pointer;
+}
+
+#time-valid {
+  position: fixed;
+  left: 140px;
+  bottom: 40px;
+  z-index: 1000;
+}
+
+#raster-colorbar {
+  position: fixed;
+  left: 20px;
+  bottom: 80px;
+  width: 200px;
+  height: 400px;
+  z-index: 2000;
+  display: none;
+}
+
+#raster-colorbar[src] {
+  display: block;
+}
+
+#time-slider {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 300px;
+  z-index: 1000;
+}
+
+#play-control-button {
+  position: fixed;
+  left: 20px;
+  bottom: 40px;
+  z-index: 1000;
+}
+
+#catalog-select-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}

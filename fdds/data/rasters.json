@@ -1,0 +1,35 @@
+{
+  "ut_valid" : "2016-02-07T18:00:00.000Z",
+  "rasters" : [
+    {
+      "name": "1-hr",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/fmc-1hr.png"
+    },
+    {
+      "name": "10-hr",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/fmc-10hr.png"
+    },
+    {
+      "name": "100-hr",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/fmc-100hr.png"
+    },
+    {
+      "name": "Wetting FME",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/wetting-fme.png"
+    },
+    {
+      "name": "Relative Humidity",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/rel-humidity.png"
+    },
+    {
+      "name": "Temperature 2m",
+      "bounds": [ [ 36.5463, -109.632], [ 41.4543, -101.711 ] ],
+      "url": "rasters/temp-2m.png"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+<script>
+  document.body.style.overflow = "auto";
+</script>
+
+<div class="ui horizontal green tiered menu">
+    <div class="menu">
+      <a class="item" href="#/view1">
+        Maps
+      </a>
+      <a class="item" href="#/view2">
+        System status <span class="ui green label">OK</span>
+      </a>
+      <a class="active item" href="#/view3">
+        What's this?
+      </a>
+      <a class="item" href="#/view4">
+        Contact us
+      </a>
+      <div class="right borderless item">UC Denver Fire Danger Mapping</div>
+    </div>
+  </div>
+
+  <div class="ui segment wt-text">
+
+    <h1>UC Denver Fire Danger Mapping</h1>
+    <p>This website is a technology demo for the NASA ROSES-#11 project whereby the
+       Wildland fire group demonstrates its technical ability to conduct routine
+       forecasts of fire danger using fire modelling and data assimilation technology
+       developed at UC Denver.</p>
+
+    <h2>NOTICE</h2>
+    <p>This system is a work in progress.  Currently, the cycling system uses NOAA RTMA
+       (<a href="http://www.nco.ncep.noaa.gov/pmb/products/rtma/">Real-Time Mesoscale Analysis</a>)
+       instead of running WRF on the server. Also, only fuel moisture is computed at this time with
+       spread rate and energy output components scheduled for implementation.</p>
+
+    <h2> Weather forecast </h2>
+    <p> The system computes a 2-day weather forecast for Colorado every day based on
+    initial conditions supplied by NOAA (<a href="http://www.nco.ncep.noaa.gov/pmb/products/nam/">NAM_218 </a>
+    North American Mesoscale 12km grid).
+    WRF-SFIRE is run in a three domain configuration as shown on the map below.
+    The outermost domain exists to resolve synoptic weather structures that affect
+    weather in the domain of interest - Colorado.</p>
+
+    <div id="map-domains"></div>
+
+    <h2>Observation ingest</h2>
+    <p>The system regularly ingests observations from Remote Automatic Weather Stations
+      (RAWS) and satellite fire detections.</p>
+
+    <p> The RAWS are retrieved hourly from the
+    <a href="http://mesowest.utah.edu" target="_blank">Mesowest<a>
+    servers of the <a href="http://www.utah.edu" target="_blank">University of Utah<a>
+    <a href="http://api.mesowest.net" target="_blank">web API</a> and are fed into
+    a fuel moisture data assimilation algorithm.</p>
+
+    <p>The fire detections are obtained from the US Forest Service
+    <a href="http://activefiremaps.fs.fed.us" target="_blank">Active fire maps</a> website and
+    are directly displayed on the map.</p>
+
+    <h2>Data assimilation</h2>
+    <p>The fire detections are stored for potential use in fire simulations at adjust the
+       state of the fire forecast.  Below is an example of fire detections obtained from the
+       <a href="http://npp.gsfc.nasa.gov/viirs.html">VIIRS</a> platform for the Patch Springs fire
+       in Utah.</p>
+
+    <div id="map-patch-springs"></div>
+
+</div>
+
+<script src="js/leaflet.js"></script>
+<script src="js/KML.js"></script>
+<script src="js/partial3.js"></script>
