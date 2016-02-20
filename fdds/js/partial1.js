@@ -30,9 +30,9 @@ var base_layer_dict = { 'MapQuest': mpq_layer,
 
 /* construct map with the base layers */
 var map = L.map('map-fd', {center: [39,-106],
-            	            zoom: 7,
-              	          layers: [mpq_layer],
-												  zoomControl: false
+            	             zoom: 7,
+              	           layers: [mpq_layer],
+												   zoomControl: false
                   	     });
 zoomOut();
 
@@ -55,10 +55,6 @@ $.when(
         $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
     });
 
-    $('ul.catalog-list > li.catalog-entry').mouseleave(function () {
-      $(this).removeClass('catalog-entry-sel');
-    });
-
     /* auto-opens the dialog */
     $('#select-dialog').dialog();
 
@@ -76,41 +72,44 @@ L.control.scale({ position: 'bottomright' }).addTo(map);
 /* Map control declarations */
 var layer_ctrl = null;
 
-/* function that loads a simulation and sets up the UI to display it */
+/* Functions that handle display logic */
 var rasters = null;
 var sorted_timestamps = null;
 var raster_base = null;
 var raster_dict = {};
-var current_display = null;
+var overlay_dict = {};
+var all_dict = {};
+var current_display = {};
 var current_timestamp = null;
+var preloaded = {};
+
+var overlay_list = [ 'WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FIRE_HFX'];
 
 map.on('overlayadd', function (e) {
-  current_display = e.name;
-  console.log('on add: ' + current_display);
-
-  // remove all other rasters now
-  if(e.name in raster_dict) {
-    for(var n2 in raster_dict) {
-      if(n2 != e.name) {
-        map.removeLayer(raster_dict[n2]);
-      }
-      layer_ctrl._update();
-    }
-  }
-
-  // extract current raster
+  current_display[e.name] = all_dict[e.name];
   var rasters_now = rasters[current_timestamp];
-
-  // get the colorbar url
-  var cb_url = '';
   if('colorbar' in rasters_now[e.name]) {
-      cb_url = raster_base + rasters_now[e.name].colorbar;
+      var cb_url = raster_base + rasters_now[e.name].colorbar;
+      $('#raster-colorbar').attr('src', cb_url);
   }
-  $('#raster-colorbar').attr('src', cb_url);
+
+  // preload all images from this variable
+  if(!(e.name in preloaded)) {
+    console.log('Preloading ' + e.name);
+    for(var timestamp in rasters) {
+        var var_info = rasters[timestamp][e.name];
+        $('<img />').attr('src', raster_base + var_info.raster);
+        if('colorbar' in var_info) {
+          $('<img />').attr('src', raster_base + var_info.colorbar);
+        }
+    }
+    // flag this as preloaded
+    preloaded[e.name] = 1;
+  }
 });
 
 map.on('overlayremove', function (e) {
-  current_display = null;
+  current_display[e.name] = null;
   $('#raster-colorbar').attr('src', '');
 });
 
@@ -120,38 +119,59 @@ function setup_for_time(timestamp) {
     $('#time-valid').text(timestamp);
 
     // undisplay any existing raster
-    var cd_memory = current_display;
-    if(current_display != null) {
-        map.removeLayer(raster_dict[cd_memory]);
+    var cd_memory = {};
+    for(var layer_name in current_display) {
+      var layer = current_display[layer_name];
+      if(layer != null) {
+        map.removeLayer(layer);
+        cd_memory[layer_name] = null;
+      }
     }
 
     raster_dict = {};
+    overlay_dict = {};
+    all_dict = {};
     $.each(rasters[timestamp], function (r) {
-      var raster = rasters[timestamp][r];
-      var cs = raster.coords;
-      var bounds = [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]];
-      raster_dict[r] = L.imageOverlay(raster_base + raster.raster,
-                                      bounds,
-                                      {attribution: 'UC Denver Wildfire Group',
-                                       opacity: 0.5});
+        var raster = rasters[timestamp][r];
+        var cs = raster.coords;
+        var bounds = [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]];
+        var target_dict = raster_dict;
+        if(overlay_list.indexOf(r) >= 0) {
+            target_dict = overlay_dict;
+        }
+        var layer = L.imageOverlay(raster_base + raster.raster,
+                                        bounds,
+                                        {attribution: 'UC Denver Wildfire Group',
+                                         opacity: 0.5});
+        all_dict[r] = layer;
+        target_dict[r] = layer;
     });
 
     if(layer_ctrl != null) {
         layer_ctrl.removeFrom(map);
     }
 
-    layer_ctrl = L.control.layers(base_layer_dict, raster_dict, {"collapsed" : false}).addTo(map);
+    layer_ctrl = L.control.groupedLayers(base_layer_dict,
+                                        {'Rasters' : raster_dict,
+                                         'Overlays' : overlay_dict},
+                                        {exclusiveGroups : [ 'Rasters'],
+                                         collapsed: false
+                                       }).addTo(map);
 
-    if (cd_memory != null) {
-        map.addLayer(raster_dict[cd_memory]);
+    for(var layer_name in cd_memory) {
+      cd_memory[layer_name] = all_dict[layer_name];
+      map.addLayer(cd_memory[layer_name]);
     }
+    current_display = cd_memory;
 
     current_timestamp = timestamp;
 }
 
 
 function handle_select_click(path) {
+  // close dialog
   $('#select-dialog').dialog("close");
+  preloaded = {};
   $.getJSON(path, function (catalog) {
       rasters = catalog;
       var to = path.lastIndexOf('/');
@@ -163,20 +183,28 @@ function handle_select_click(path) {
       // populate jquery slider
       $('#time-slider').slider({min: 0,
                                 max: sorted_timestamps.length-1,
-                                slide: function(event, ui) {
-                                  setup_for_time(sorted_timestamps[ui.value]);
-                                  current_frame = ui.value;
-                                },
                                 change: function(event, ui) {
                                   setup_for_time(sorted_timestamps[ui.value]);
                                   current_frame = ui.value;
+                                },
+                                slide: function(event, ui) {
                                 }});
+
+      $('.slider-ui-handle').on('mousedown', function (e) { e.stopPropagation(); });
 
       // setup for time first frame
       setup_for_time(sorted_timestamps[0]);
+      current_frame = 0;
 
   });
 }
+
+function open_catalog() {
+    $('#select-dialog').dialog("open");
+}
+
+
+/* Code that handles playback of frames */
 
 var playing = false;
 var current_frame = 0;
@@ -192,27 +220,13 @@ function next_frame() {
 
 function toggle_play() {
   if(!playing) {
-    if(current_display != null) {
-      $('#play-control-button > span').text('Pause');
-      $('#play-control-button > i').attr('class', 'pause icon');
-
-      playing = true;
-      next_frame();
-    }
+    $('#play-control-button > span').text('Pause');
+    $('#play-control-button > i').attr('class', 'pause icon');
+    playing = true;
+    next_frame();
   } else {
     $('#play-control-button > span').text('Play');
     $('#play-control-button > i').attr('class', 'play icon');
-
     playing = false;
   }
-}
-
-$('#time-slider').mousedown(function (e) {
-    $('#time-slider').trigger('slidechange');
-    e.stopPropagation();
-});
-
-function select_catalog() {
-  /* auto-opens the dialog */
-  $('#select-dialog').dialog("open");
 }

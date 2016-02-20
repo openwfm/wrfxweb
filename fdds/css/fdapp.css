@@ -157,9 +157,13 @@ li.catalog-entry-sel {
   z-index: 1000;
 }
 
-#catalog-select-button {
+#catalog-button {
   position: fixed;
-  top: 20px;
   left: 20px;
+  top: 20px;
   z-index: 1000;
+}
+
+.ui-slider-handle {
+  background-color: #e0e040;
 }
