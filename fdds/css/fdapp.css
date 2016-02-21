@@ -135,10 +135,6 @@ li.catalog-entry-sel {
   width: 200px;
   height: 400px;
   z-index: 2000;
-  display: none;
-}
-
-#raster-colorbar[src] {
   display: block;
 }
 
