@@ -105,12 +105,12 @@ map.on('overlayadd', function(e) {
   }
 
 	if(!playing || (display_colorbar == null) || (display_colorbar == e.name)) {
-  var rasters_now = rasters[current_timestamp];
-  if ('colorbar' in rasters_now[e.name]) {
-    var cb_url = raster_base + rasters_now[e.name].colorbar;
-    $('#raster-colorbar').attr('src', cb_url);
-		display_colorbar = e.name;
-  }
+    var rasters_now = rasters[current_timestamp];
+    if ('colorbar' in rasters_now[e.name]) {
+      var cb_url = raster_base + rasters_now[e.name].colorbar;
+      $('#raster-colorbar').attr('src', cb_url);
+  		display_colorbar = e.name;
+    }
 	}
 
   // preload all images from this variable
@@ -121,6 +121,9 @@ map.on('overlayremove', function(e) {
   current_display[e.name] = null;
   if(!playing) {
 		$('#raster-colorbar').attr('src', '');
+  }
+  if(display_colorbar == e.name) {
+    display_colorbar = null;
   }
 });
 
@@ -214,7 +217,8 @@ function handle_select_click(path) {
       slide: function(event, ui) {}
     });
 
-    $('.slider-ui-handle').on('mousedown', function(e) {
+    $('#time-slider').mousedown(function(e) {
+      if(playing) toggle_play();
       e.stopPropagation();
     });
 
