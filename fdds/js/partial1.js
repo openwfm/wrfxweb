@@ -91,6 +91,7 @@ var all_dict = {};
 var current_display = {};
 var current_timestamp = null;
 var preloaded = {};
+var display_colorbar = null;
 
 // the top layer of the map
 var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT'];
@@ -102,11 +103,15 @@ map.on('overlayadd', function(e) {
   } else {
     e.layer.bringToBack();
   }
+
+	if(!playing || (display_colorbar == null) || (display_colorbar == e.name)) {
   var rasters_now = rasters[current_timestamp];
   if ('colorbar' in rasters_now[e.name]) {
     var cb_url = raster_base + rasters_now[e.name].colorbar;
     $('#raster-colorbar').attr('src', cb_url);
+		display_colorbar = e.name;
   }
+	}
 
   // preload all images from this variable
   preload_variable(e.name);
@@ -114,7 +119,9 @@ map.on('overlayadd', function(e) {
 
 map.on('overlayremove', function(e) {
   current_display[e.name] = null;
-  $('#raster-colorbar').attr('src', '');
+  if(!playing) {
+		$('#raster-colorbar').attr('src', '');
+  }
 });
 
 function setup_for_time(timestamp) {
