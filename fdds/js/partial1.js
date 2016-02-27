@@ -94,7 +94,7 @@ var preloaded = {};
 var display_colorbar = null;
 
 // the top layer of the map
-var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT'];
+var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
 map.on('overlayadd', function(e) {
   current_display[e.name] = e.layer;
