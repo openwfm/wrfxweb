@@ -37,7 +37,6 @@ var map = L.map('map-fd', {
   layers: [mpq_layer],
   zoomControl: false
 });
-zoomOut();
 
 
 $.when(
@@ -65,13 +64,6 @@ $.when(
 
 });
 
-
-function zoomOut() {
-  map.fitBounds([
-    [36.8, -109.2],
-    [41.2, -101.8]
-  ]);
-}
 
 /* add scale & zoom controls to the map */
 L.control.scale({
@@ -113,8 +105,8 @@ map.on('overlayadd', function(e) {
     }
 	}
 
-  // preload all images from this variable
-  preload_variable(e.name);
+  // preload all displayed variables
+  preload_variables(8);
 });
 
 map.on('overlayremove', function(e) {
@@ -127,7 +119,10 @@ map.on('overlayremove', function(e) {
   }
 });
 
-function setup_for_time(timestamp) {
+function setup_for_time(frame_ndx) {
+
+  var timestamp = sorted_timestamps[frame_ndx];
+  current_frame = frame_ndx;
 
   // set current time
   $('#time-valid').text(timestamp);
@@ -173,7 +168,6 @@ function setup_for_time(timestamp) {
     'Rasters': raster_dict,
     'Overlays': overlay_dict
   }, {
-    exclusiveGroups: ['Rasters'],
     collapsed: false
   }).addTo(map);
 
@@ -211,8 +205,7 @@ function handle_select_click(path) {
       min: 0,
       max: sorted_timestamps.length - 1,
       change: function(event, ui) {
-        setup_for_time(sorted_timestamps[ui.value]);
-        current_frame = ui.value;
+        setup_for_time(ui.value);
       },
       slide: function(event, ui) {}
     });
@@ -231,10 +224,9 @@ function handle_select_click(path) {
     map.fitBounds(extent);
 
     // setup for time first frame
-    setup_for_time(sorted_timestamps[0]);
     current_frame = 0;
     playing = false;
-
+    setup_for_time(0);
   });
 }
 
@@ -247,16 +239,62 @@ function open_catalog() {
 var playing = false;
 var current_frame = 0;
 
+function frame_ready(frame_ndx) {
+  // for all layers currently displayed
+  for(var key in current_display) {
+    // if the current frame is not preloaded yet
+    if(!(frame_ndx in preloaded[key])) {
+      console.log('Frame ' + frame_ndx + ' not ready for var ' + key);
+      preload_variables(1);
+      return false;
+    }
+    // check if the raster has a colorbar
+    var cb_key = key + '_cb';
+    if(cb_key in preloaded) {
+      // it does, is it preloaded?
+      if (!(frame_ndx in preloaded[cb_key])) {
+        console.log('Frame ' + frame_ndx + ' (colorbar) not ready for var ' + key);
+        preload_variables(1);
+        return false;
+      }
+    }
+  }
+  console.log('Frame ' + frame_ndx + ' is ready for display.');
+  return true;
+}
+
+function schedule_next_frame() {
+  if(current_frame == sorted_timestamps.length-1){
+    window.setTimeout(next_frame, 1000);
+  } else {
+    window.setTimeout(next_frame, 330);
+  }
+}
+
 function next_frame() {
   if (playing) {
     current_frame = (current_frame + 1) % sorted_timestamps.length;
-    $('#time-slider').slider('value', current_frame);
-    if(current_frame == sorted_timestamps.length-1){
-      window.setTimeout(next_frame, 1000);
+    if(frame_ready(current_frame)) {
+      $('#time-slider').slider('value', current_frame);
+      schedule_next_frame();
     } else {
-      window.setTimeout(next_frame, 330);
-
+      window.setTimeout(wait_for_frame, 100);
     }
+  }
+}
+
+function wait_for_frame() {
+  // don't do anything if playing has been cancelled
+  if(!playing) {
+    return
+  }
+  // wait until current frame is loaded
+  if(frame_ready(current_frame)) {
+    $('#time-slider').slider('value', current_frame);
+    schedule_next_frame();
+  } else {
+    // keep waiting until all parts of frame are loaded
+    window.setTimeout(wait_for_frame, 250);
   }
 }
 
@@ -275,18 +313,39 @@ function toggle_play() {
 
 
 /* Code handling auxiliary tasks */
-function preload_variable(var_name) {
-  if (!(var_name in preloaded)) {
-    for (var timestamp in rasters) {
+function preload_variables(preload_count) {
+  var n_rasters = Object.keys(rasters).length;
+  for(var counter=0; counter < preload_count; counter++) {
+    var i = (current_frame + counter) % n_rasters;
+    var timestamp = sorted_timestamps[i];
+    for(var var_name in current_display) {
+      if(current_display[var_name] == null) {
+        // skip layers that are not visible
+        continue;
+      }
       if(var_name in rasters[timestamp]) {
-        var var_info = rasters[timestamp][var_name];
-        $('<img />').attr('src', raster_base + var_info.raster);
-        if ('colorbar' in var_info) {
-          $('<img />').attr('src', raster_base + var_info.colorbar);
+        // have we already preloaded this variable? If not indicate nothing is preloaded.
+        if(!(var_name in preloaded)) {
+          preloaded[var_name] = {};
+        }
+
+        if(!(i in preloaded[var_name])) {
+          //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
+          var var_info = rasters[timestamp][var_name];
+          var img = new Image();
+          img.onload = function(ndx, var_name, img) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img);
+          img.src = raster_base + var_info.raster;
+          if ('colorbar' in var_info) {
+            var cb_key = var_name + '_cb';
+            if(!(cb_key in preloaded)) {
+              preloaded[cb_key] = {};
+            }
+            var cb_img = new Image();
+            cb_img.onload = function(ndx, cb_key, cb_img) { return function() { preloaded[cb_key][ndx] = cb_img; } } (i, cb_key, cb_img);
+            cb_img.src = raster_base + var_info.colorbar;
+          }
         }
       }
     }
-    // flag this as preloaded
-    preloaded[var_name] = 1;
   }
 }
