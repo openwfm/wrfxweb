@@ -106,7 +106,7 @@ map.on('overlayadd', function(e) {
 
 
 map.on('overlayremove', function(e) {
-  current_display[e.name] = null;
+  delete current_display[e.name];
 
   if(displayed_colorbar == e.name) {
     $('#raster-colorbar').attr('src', '');
@@ -183,7 +183,6 @@ function handle_select_click(path) {
     raster_dict = {};
     overlay_dict = {};    
     $.each(rasters[sorted_timestamps[0]], function(r) {
-      console.log(r);
       var raster_info = rasters[sorted_timestamps[0]][r];
       var cs = raster_info.coords;
       var layer = L.imageOverlay(raster_base + raster_info.raster,
@@ -306,10 +305,6 @@ function preload_variables(preload_count) {
     var i = (current_frame + counter) % n_rasters;
     var timestamp = sorted_timestamps[i];
     for(var var_name in current_display) {
-      if(current_display[var_name] == null) {
-        // skip layers that are not visible
-        continue;
-      }
       if(var_name in rasters[timestamp]) {
         // have we already preloaded this variable? If not indicate nothing is preloaded.
         if(!(var_name in preloaded)) {
