@@ -1,6 +1,6 @@
 "use strict";
 
-/* load resources */
+// load resources
 var fire_icon = L.icon({
   iconUrl: 'images/hot_fire.gif',
   iconSize: [15, 15],
@@ -8,33 +8,24 @@ var fire_icon = L.icon({
 });
 
 
-/*  initialize base layers & build map */
-var osm_layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-});
-
-var mpq_layer = L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-  attribution: 'Data and imagery by MapQuest',
-  subdomains: ['otile1', 'otile2', 'otile3', 'otile4']
-});
-
-var mpq_sat_layer = L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-  attribution: 'Data and imagery by MapQuest',
-  subdomains: ['otile1', 'otile2', 'otile3', 'otile4']
-});
-
+//  initialize base layers & build map
 var base_layer_dict = {
-  'MapQuest': mpq_layer,
-  'MQ Satellite': mpq_sat_layer,
-  'OSM': osm_layer
+  'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+                          attribution: 'Data and imagery by MapQuest',
+                          subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+  'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+                              attribution: 'Data and imagery by MapQuest',
+                              subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+  'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
 };
 
 
-/* construct map with the base layers */
+// construct map with the base layers
 var map = L.map('map-fd', {
   center: [39, -106],
   zoom: 7,
-  layers: [mpq_layer],
+  layers: [base_layer_dict['MapQuest']],
   zoomControl: false
 });
 
@@ -53,42 +44,45 @@ $.when(
       var load_cmd = '"handle_select_click(\'simulations/' + cat_entry.manifest_path + '\');"';
       list.append('<li class="catalog-entry" onclick=' + load_cmd + '><b>' + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>');
     });
+    
   })).then(function() {
 
-  $('ul.catalog-list > li.catalog-entry').mouseenter(function() {
-    $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
-  });
+    $('ul.catalog-list > li.catalog-entry').mouseenter(function() {
+        $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
+    });
 
-  /* auto-opens the dialog */
-  $('#select-dialog').dialog();
+    /* auto-opens the dialog */
+    $('#select-dialog').dialog();
 
 });
 
 
-/* add scale & zoom controls to the map */
-L.control.scale({
-  position: 'bottomright'
-}).addTo(map);
+// add scale & zoom controls to the map
+L.control.scale({ position: 'bottomright' }).addTo(map);
 
-/* Map control declarations */
-var layer_ctrl = null;
+// list of layers which automatically become overlay rasters instead of regular rasters
+var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
-/* Functions that handle display logic */
+// Variables containing input data
 var rasters = null;
 var sorted_timestamps = null;
 var raster_base = null;
-var raster_dict = {};
-var overlay_dict = {};
-var all_dict = {};
-var current_display = {};
-var current_timestamp = null;
-var preloaded = {};
-var display_colorbar = null;
+var raster_dict = {};  // rasters that can't be overlaid on other rasters
+var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
 
-// the top layer of the map
-var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
+// Display context
+var layer_ctrl = null;
+var current_display = {}; // dictionary of layer name -> layer of currently displayed data
+var current_timestamp = null; // currently displayed timestamp
+var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
+var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
+
+// Variables storing animation/playback context
+var playing = false;
+var current_frame = 0;
 
 map.on('overlayadd', function(e) {
+  // register in currently displayed layers and bring to front if it's an overlay
   current_display[e.name] = e.layer;
   if(overlay_list.indexOf(e.name) >= 0) {
     e.layer.bringToFront();
@@ -96,111 +90,77 @@ map.on('overlayadd', function(e) {
     e.layer.bringToBack();
   }
 
-	if(!playing || (display_colorbar == null) || (display_colorbar == e.name)) {
+  // if the overlay being added now has a colorbar and there is none displayed, show it
+  if(displayed_colorbar == null) {
     var rasters_now = rasters[current_timestamp];
-    if ('colorbar' in rasters_now[e.name]) {
-      var cb_url = raster_base + rasters_now[e.name].colorbar;
-      $('#raster-colorbar').attr('src', cb_url);
-  		display_colorbar = e.name;
+    if('colorbar' in rasters_now[e.name]) {
+        var cb_url = raster_base + rasters_now[e.name].colorbar;
+        $('#raster-colorbar').attr('src', cb_url);
+        displayed_colorbar = e.name;
     }
-	}
+  }
 
-  // preload all displayed variables
+  // preload all displayed variables for eight frames
   preload_variables(8);
 });
 
+
 map.on('overlayremove', function(e) {
   current_display[e.name] = null;
-  if(!playing) {
-		$('#raster-colorbar').attr('src', '');
-  }
-  if(display_colorbar == e.name) {
-    display_colorbar = null;
+
+  if(displayed_colorbar == e.name) {
+    $('#raster-colorbar').attr('src', '');
+    displayed_colorbar = null;
   }
 });
 
+// this function should assume that the correct layers are already displayed
 function setup_for_time(frame_ndx) {
 
   var timestamp = sorted_timestamps[frame_ndx];
+  var rasters_now = rasters[timestamp];
   current_frame = frame_ndx;
 
   // set current time
   $('#time-valid').text(timestamp);
 
-  // undisplay any existing raster
-  var cd_memory = {};
+  // modify the URL each displayed cluster is pointing to
+  // so that the current timestamp is reflected
   for (var layer_name in current_display) {
     var layer = current_display[layer_name];
-    if (layer != null) {
-      map.removeLayer(layer);
-      cd_memory[layer_name] = null;
+    if(layer != null) {
+      var raster_info = rasters_now[layer_name];
+      var cs = raster_info.coords;
+      layer.setUrl(raster_base + raster_info.raster,
+                  [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
+                  { attribution: 'UC Denver Wildfire Group', opacity: 0.5 });
     }
   }
-
-  raster_dict = {};
-  overlay_dict = {};
-  all_dict = {};
-  $.each(rasters[timestamp], function(r) {
-    var raster = rasters[timestamp][r];
-    var cs = raster.coords;
-    var bounds = [
-      [cs[0][1], cs[0][0]],
-      [cs[2][1], cs[2][0]]
-    ];
-    var target_dict = raster_dict;
-    if (overlay_list.indexOf(r) >= 0) {
-      target_dict = overlay_dict;
-    }
-    var layer = L.imageOverlay(raster_base + raster.raster,
-      bounds, {
-        attribution: 'UC Denver Wildfire Group',
-        opacity: 0.5
-      });
-    all_dict[r] = layer;
-    target_dict[r] = layer;
-  });
-
-  if (layer_ctrl != null) {
-    layer_ctrl.removeFrom(map);
-  }
-
-  layer_ctrl = L.control.groupedLayers(base_layer_dict, {
-    'Rasters': raster_dict,
-    'Overlays': overlay_dict
-  }, {
-    collapsed: false
-  }).addTo(map);
-
-  for (var layer_name in cd_memory) {
-    cd_memory[layer_name] = all_dict[layer_name];
-    map.addLayer(cd_memory[layer_name]);
-  }
-  current_display = cd_memory;
 
   current_timestamp = timestamp;
 }
 
 
 function handle_select_click(path) {
-  // close dialog
+  // close selection dialog
   $('#select-dialog').dialog("close");
 
-  // hide all layers
-  for (var layer_name in current_display) {
+  // remove any existing layers from map
+  for(var layer_name in current_display) {
     map.removeLayer(current_display[layer_name]);
   }
   preloaded = {};
   current_display = {};
 
-  $.getJSON(path, function(catalog) {
-    rasters = catalog;
-    var to = path.lastIndexOf('/');
-    raster_base = path.substring(0, to + 1);
+  $.getJSON(path, function(selected_simulation) {
+    // store in global state
+    rasters = selected_simulation;
+    raster_base = path.substring(0, path.lastIndexOf('/') + 1);
 
     // retrieve all times
     sorted_timestamps = Object.keys(rasters).sort();
 
-    // populate jquery slider
+    // populate jquery time slider
     $('#time-slider').slider({
       min: 0,
       max: sorted_timestamps.length - 1,
@@ -215,29 +175,56 @@ function handle_select_click(path) {
       e.stopPropagation();
     });
 
-    // zoom in to the raster region
+    // zoom in to the raster region, FIXME: can't rely on T2 being there all the time
     var cs = rasters[sorted_timestamps[0]]['T2'].coords;
-    var extent = [
-      [cs[0][1], cs[0][0]],
-      [cs[2][1], cs[2][0]]
-    ];
-    map.fitBounds(extent);
-
-    // setup for time first frame
-    current_frame = 0;
-    playing = false;
-    setup_for_time(0);
+    map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+    
+    // build the layer groups
+    raster_dict = {};
+    overlay_dict = {};    
+    $.each(rasters[sorted_timestamps[0]], function(r) {
+      console.log(r);
+      var raster_info = rasters[sorted_timestamps[0]][r];
+      var cs = raster_info.coords;
+      var layer = L.imageOverlay(raster_base + raster_info.raster,
+                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
+                                 {
+                                    attribution: 'UC Denver Wildfire Group',
+                                    opacity: 0.5
+                                 });
+      if(overlay_list.indexOf(r) >= 0) {
+          overlay_dict[r] = layer;
+      } else {
+          raster_dict[r] = layer;
+      }
   });
+
+  // remove any existing layer control
+  if (layer_ctrl != null) {
+    layer_ctrl.removeFrom(map);
+  }
+
+  // add a new layer control to the map
+  layer_ctrl = L.control.groupedLayers(base_layer_dict, {
+    'Rasters': raster_dict,
+    'Overlays': overlay_dict
+  }, {
+    collapsed: false
+  }).addTo(map);
+
+  // setup for time first frame
+  current_frame = 0;
+  playing = false;
+  setup_for_time(0);
+});
+
 }
 
 function open_catalog() {
   $('#select-dialog').dialog("open");
 }
 
-
-/* Code that handles playback of frames */
-var playing = false;
-var current_frame = 0;
+// Section containing animation/playback code
 
 function frame_ready(frame_ndx) {
   // for all layers currently displayed
