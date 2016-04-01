@@ -138,6 +138,7 @@ function setup_for_time(frame_ndx) {
   }
 
   current_timestamp = timestamp;
+  preload_variables(8);
 }
 
 
@@ -231,7 +232,6 @@ function frame_ready(frame_ndx) {
     // if the current frame is not preloaded yet
     if(!(frame_ndx in preloaded[key])) {
       console.log('Frame ' + frame_ndx + ' not ready for var ' + key);
-      preload_variables(1);
       return false;
     }
     // check if the raster has a colorbar
@@ -240,7 +240,6 @@ function frame_ready(frame_ndx) {
       // it does, is it preloaded?
       if (!(frame_ndx in preloaded[cb_key])) {
         console.log('Frame ' + frame_ndx + ' (colorbar) not ready for var ' + key);
-        preload_variables(1);
         return false;
       }
     }
@@ -264,7 +263,9 @@ function next_frame() {
       $('#time-slider').slider('value', current_frame);
       schedule_next_frame();
     } else {
-      window.setTimeout(wait_for_frame, 100);
+      // if the next frame is not ready, preload further and wait longer
+      window.setTimeout(wait_for_frame, 500);
+      preload_variables(8);
     }
   }
 }
@@ -305,6 +306,7 @@ function preload_variables(preload_count) {
     var i = (current_frame + counter) % n_rasters;
     var timestamp = sorted_timestamps[i];
     for(var var_name in current_display) {
+      // it could happen that a timestamp is missing the variable
       if(var_name in rasters[timestamp]) {
         // have we already preloaded this variable? If not indicate nothing is preloaded.
         if(!(var_name in preloaded)) {
@@ -314,17 +316,13 @@ function preload_variables(preload_count) {
         if(!(i in preloaded[var_name])) {
           //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
           var var_info = rasters[timestamp][var_name];
-          var img = new Image();
-          img.onload = function(ndx, var_name, img) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img);
-          img.src = raster_base + var_info.raster;
+          $.get(raster_base + var_info.raster, function(ndx, var_name) { return function(img) { preloaded[var_name][ndx] = img; } } (i, var_name));
           if ('colorbar' in var_info) {
             var cb_key = var_name + '_cb';
             if(!(cb_key in preloaded)) {
               preloaded[cb_key] = {};
             }
-            var cb_img = new Image();
-            cb_img.onload = function(ndx, cb_key, cb_img) { return function() { preloaded[cb_key][ndx] = cb_img; } } (i, cb_key, cb_img);
-            cb_img.src = raster_base + var_info.colorbar;
+            $.get(raster_base + var_info.colorbar, function(ndx, cb_key) { return function(img) { preloaded[cb_key][ndx] = img; } } (i, cb_key));
           }
         }
       }
