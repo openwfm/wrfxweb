@@ -3,12 +3,32 @@
   document.body.style.overflow = "hidden";
 </script>
 
-<div id="map-fd">
+<div id="map-fd" />
 
 <button id="catalog-button" class="ui labeled icon button" onclick="open_catalog();">
   <i class="database icon"></i>
   <span>Catalog</span>
 </button>
+
+<div id="domain-selector" class="ui form">
+  <div class="ui grey label">
+    <div id="domain-checkboxes" class="grouped inline fields">
+      <label>Active domain</label><br/>
+      <div class="field">
+        <div class="ui radio checkbox">
+          <input type="radio" name="domains" id="domain_1" checked="checked"/>
+          <label for="domain_1">1</label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio checkbox">
+          <input type="radio" name="domains" id="domain_2"/>
+          <label for="domain_2">2</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="select-dialog" title="Select simulation ...">
   <div id="catalog-content"></div>

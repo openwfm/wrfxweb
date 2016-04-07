@@ -160,6 +160,14 @@ li.catalog-entry-sel {
   z-index: 1000;
 }
 
+#domain-selector {
+  position: fixed;
+  left: 20px;
+  top: 70px;
+  z-index: 1000;
+  display: none;
+}
+
 .ui-slider-handle {
   background-color: #e0e040;
 }

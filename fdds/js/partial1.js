@@ -7,7 +7,6 @@ var fire_icon = L.icon({
   iconAnchor: [7, 7]
 });
 
-
 //  initialize base layers & build map
 var base_layer_dict = {
   'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
@@ -41,7 +40,7 @@ $.when(
       var desc = cat_entry.description;
       var from = cat_entry.from_utc;
       var to = cat_entry.to_utc;
-      var load_cmd = '"handle_select_click(\'simulations/' + cat_entry.manifest_path + '\');"';
+      var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
       list.append('<li class="catalog-entry" onclick=' + load_cmd + '><b>' + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>');
     });
     
@@ -65,12 +64,14 @@ var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
 // Variables containing input data
 var rasters = null;
+var domains = null;
 var sorted_timestamps = null;
 var raster_base = null;
 var raster_dict = {};  // rasters that can't be overlaid on other rasters
 var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
 
 // Display context
+var current_domain = 0;
 var layer_ctrl = null;
 var current_display = {}; // dictionary of layer name -> layer of currently displayed data
 var current_timestamp = null; // currently displayed timestamp
@@ -92,7 +93,7 @@ map.on('overlayadd', function(e) {
 
   // if the overlay being added now has a colorbar and there is none displayed, show it
   if(displayed_colorbar == null) {
-    var rasters_now = rasters[current_timestamp];
+    var rasters_now = rasters[current_domain][current_timestamp];
     if('colorbar' in rasters_now[e.name]) {
         var cb_url = raster_base + rasters_now[e.name].colorbar;
         $('#raster-colorbar').attr('src', cb_url);
@@ -114,11 +115,57 @@ map.on('overlayremove', function(e) {
   }
 });
 
+
+function setup_for_domain(dom_id) {
+  // set the current domain
+  current_domain = dom_id;
+
+  // zoom into raster region
+  var first_rasters = rasters[dom_id][sorted_timestamps[0]];
+  var vars = Object.keys(first_rasters);
+  var cs = first_rasters[vars[0]].coords;
+  map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+  
+  // build the layer groups
+  raster_dict = {};
+  overlay_dict = {};    
+  var current_rasters = rasters[dom_id][current_timestamp];
+  $.each(current_rasters, function(r) {
+    var raster_info = current_rasters[r];
+    var cs = raster_info.coords;
+    var layer = L.imageOverlay(raster_base + raster_info.raster,
+                                [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
+                                {
+                                  attribution: 'UC Denver Wildfire Group',
+                                  opacity: 0.5
+                                });
+    if(overlay_list.indexOf(r) >= 0) {
+        overlay_dict[r] = layer;
+    } else {
+        raster_dict[r] = layer;
+    }
+  });
+  
+  // remove any existing layer control
+  if (layer_ctrl != null) {
+    layer_ctrl.removeFrom(map);
+  }
+
+  // add a new layer control to the map
+  layer_ctrl = L.control.groupedLayers(base_layer_dict, {
+    'Rasters': raster_dict,
+    'Overlays': overlay_dict
+  }, {
+    collapsed: false
+  }).addTo(map);
+
+  setup_for_time(current_frame);
+}
+
 // this function should assume that the correct layers are already displayed
 function setup_for_time(frame_ndx) {
-
   var timestamp = sorted_timestamps[frame_ndx];
-  var rasters_now = rasters[timestamp];
+  var rasters_now = rasters[current_domain][timestamp];
   current_frame = frame_ndx;
 
   // set current time
@@ -142,7 +189,7 @@ function setup_for_time(frame_ndx) {
 }
 
 
-function handle_select_click(path) {
+function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
 
@@ -157,9 +204,25 @@ function handle_select_click(path) {
     // store in global state
     rasters = selected_simulation;
     raster_base = path.substring(0, path.lastIndexOf('/') + 1);
+    
+    // retrieve all domains
+    domains = Object.keys(rasters);
+    current_domain = domains[0];
 
-    // retrieve all times
-    sorted_timestamps = Object.keys(rasters).sort();
+    // update the domain radio buttons
+    $('#domain-checkboxes').empty();
+    $('#domain-checkboxes').append('<label>Active domain</label><br/>');
+    for(var dom in domains) {
+      var dom_id = domains[dom];
+      var checked = '';
+      if(dom_id == '1') { checked = ' checked="yes"'}
+      console.log(dom_id);
+      $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + '/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
+    }
+    $('#domain-selector').css('display', 'block');
+
+    // retrieve all times (we assume the 
+    sorted_timestamps = Object.keys(rasters[domains[0]]).sort();
 
     // populate jquery time slider
     $('#time-slider').slider({
@@ -176,48 +239,13 @@ function handle_select_click(path) {
       e.stopPropagation();
     });
 
-    // zoom in to the raster region, FIXME: can't rely on T2 being there all the time
-    var cs = rasters[sorted_timestamps[0]]['T2'].coords;
-    map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
-    
-    // build the layer groups
-    raster_dict = {};
-    overlay_dict = {};    
-    $.each(rasters[sorted_timestamps[0]], function(r) {
-      var raster_info = rasters[sorted_timestamps[0]][r];
-      var cs = raster_info.coords;
-      var layer = L.imageOverlay(raster_base + raster_info.raster,
-                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
-                                 {
-                                    attribution: 'UC Denver Wildfire Group',
-                                    opacity: 0.5
-                                 });
-      if(overlay_list.indexOf(r) >= 0) {
-          overlay_dict[r] = layer;
-      } else {
-          raster_dict[r] = layer;
-      }
+    // setup for time first frame
+    current_frame = 0;
+    current_timestamp = sorted_timestamps[current_frame];
+    playing = false;
+
+    setup_for_domain(current_domain);
   });
-
-  // remove any existing layer control
-  if (layer_ctrl != null) {
-    layer_ctrl.removeFrom(map);
-  }
-
-  // add a new layer control to the map
-  layer_ctrl = L.control.groupedLayers(base_layer_dict, {
-    'Rasters': raster_dict,
-    'Overlays': overlay_dict
-  }, {
-    collapsed: false
-  }).addTo(map);
-
-  // setup for time first frame
-  current_frame = 0;
-  playing = false;
-  setup_for_time(0);
-});
-
 }
 
 function open_catalog() {
