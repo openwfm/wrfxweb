@@ -120,6 +120,37 @@ function setup_for_domain(dom_id) {
   // set the current domain
   current_domain = dom_id;
 
+  // remove any existing layers from map
+  for(var layer_name in current_display) {
+    map.removeLayer(current_display[layer_name]);
+  }
+  preloaded = {};
+  current_display = {};
+
+	// retrieve all times (we assume the first domain is selected)
+	sorted_timestamps = Object.keys(rasters[current_domain]).sort();
+
+	// setup for time first frame
+	current_frame = 0;
+	current_timestamp = sorted_timestamps[0];
+	playing = false;
+
+	// populate jquery time slider
+	$('#time-slider').slider({
+		min: 0,
+		value: 0,
+		max: sorted_timestamps.length - 1,
+		change: function(event, ui) {
+			setup_for_time(ui.value);
+		},
+		slide: function(event, ui) {}
+	});
+
+	$('#time-slider').mousedown(function(e) {
+		if(playing) toggle_play();
+		e.stopPropagation();
+	});
+
   // zoom into raster region
   var first_rasters = rasters[dom_id][sorted_timestamps[0]];
   var vars = Object.keys(first_rasters);
@@ -129,9 +160,8 @@ function setup_for_domain(dom_id) {
   // build the layer groups
   raster_dict = {};
   overlay_dict = {};    
-  var current_rasters = rasters[dom_id][current_timestamp];
-  $.each(current_rasters, function(r) {
-    var raster_info = current_rasters[r];
+  $.each(first_rasters, function(r) {
+    var raster_info = first_rasters[r];
     var cs = raster_info.coords;
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
@@ -159,7 +189,7 @@ function setup_for_domain(dom_id) {
     collapsed: false
   }).addTo(map);
 
-  setup_for_time(current_frame);
+  setup_for_time(0);
 }
 
 // this function should assume that the correct layers are already displayed
@@ -193,13 +223,6 @@ function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
 
-  // remove any existing layers from map
-  for(var layer_name in current_display) {
-    map.removeLayer(current_display[layer_name]);
-  }
-  preloaded = {};
-  current_display = {};
-
   $.getJSON(path, function(selected_simulation) {
     // store in global state
     rasters = selected_simulation;
@@ -217,32 +240,9 @@ function handle_catalog_click(path) {
       var checked = '';
       if(dom_id == '1') { checked = ' checked="yes"'}
       console.log(dom_id);
-      $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + '/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
+      $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
     }
     $('#domain-selector').css('display', 'block');
-
-    // retrieve all times (we assume the 
-    sorted_timestamps = Object.keys(rasters[domains[0]]).sort();
-
-    // populate jquery time slider
-    $('#time-slider').slider({
-      min: 0,
-      max: sorted_timestamps.length - 1,
-      change: function(event, ui) {
-        setup_for_time(ui.value);
-      },
-      slide: function(event, ui) {}
-    });
-
-    $('#time-slider').mousedown(function(e) {
-      if(playing) toggle_play();
-      e.stopPropagation();
-    });
-
-    // setup for time first frame
-    current_frame = 0;
-    current_timestamp = sorted_timestamps[current_frame];
-    playing = false;
 
     setup_for_domain(current_domain);
   });
@@ -284,6 +284,7 @@ function schedule_next_frame() {
   }
 }
 
+
 function next_frame() {
   if (playing) {
     current_frame = (current_frame + 1) % sorted_timestamps.length;
@@ -297,6 +298,7 @@ function next_frame() {
     }
   }
 }
+
 
 function wait_for_frame() {
   // don't do anything if playing has been cancelled
@@ -312,6 +314,7 @@ function wait_for_frame() {
     window.setTimeout(wait_for_frame, 250);
   }
 }
+
 
 function toggle_play() {
   if (!playing) {
