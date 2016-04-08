@@ -71,7 +71,7 @@ var raster_dict = {};  // rasters that can't be overlaid on other rasters
 var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
 
 // Display context
-var current_domain = 0;
+var current_domain = null;
 var layer_ctrl = null;
 var current_display = {}; // dictionary of layer name -> layer of currently displayed data
 var current_timestamp = null; // currently displayed timestamp
@@ -329,13 +329,14 @@ function toggle_play() {
 
 /* Code handling auxiliary tasks */
 function preload_variables(preload_count) {
-  var n_rasters = Object.keys(rasters).length;
+  var rasters_dom = rasters[current_domain];
+  var n_rasters = Object.keys(rasters_dom).length;
   for(var counter=0; counter < preload_count; counter++) {
     var i = (current_frame + counter) % n_rasters;
     var timestamp = sorted_timestamps[i];
     for(var var_name in current_display) {
       // it could happen that a timestamp is missing the variable
-      if(var_name in rasters[timestamp]) {
+      if(var_name in rasters_dom[timestamp]) {
         // have we already preloaded this variable? If not indicate nothing is preloaded.
         if(!(var_name in preloaded)) {
           preloaded[var_name] = {};
@@ -343,7 +344,7 @@ function preload_variables(preload_count) {
 
         if(!(i in preloaded[var_name])) {
           //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
-          var var_info = rasters[timestamp][var_name];
+          var var_info = rasters_dom[timestamp][var_name];
           $.get(raster_base + var_info.raster, function(ndx, var_name) { return function(img) { preloaded[var_name][ndx] = img; } } (i, var_name));
           if ('colorbar' in var_info) {
             var cb_key = var_name + '_cb';
