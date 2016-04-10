@@ -133,7 +133,7 @@ function setup_for_domain(dom_id) {
 	// setup for time first frame
 	current_frame = 0;
 	current_timestamp = sorted_timestamps[0];
-	playing = false;
+	if(playing) toggle_play();
 
 	// populate jquery time slider
 	$('#time-slider').slider({
@@ -348,7 +348,7 @@ function preload_variables(preload_count) {
           //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
           var var_info = rasters_dom[timestamp][var_name];
 					var img = new Image();
-					img.onload = function (ndx, var_name, img) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img);
+					img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);
 					img.src = raster_base + var_info.raster;
           if ('colorbar' in var_info) {
             var cb_key = var_name + '_cb';
@@ -356,7 +356,7 @@ function preload_variables(preload_count) {
               preloaded[cb_key] = {};
             }
 						var img = new Image();
-						img.onload = function(ndx, cb_key, img) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img);
+						img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, preloaded);
 						img.src = raster_base + var_info.colorbar;
           }
         }
