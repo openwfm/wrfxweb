@@ -258,7 +258,7 @@ function frame_ready(frame_ndx) {
   for(var key in current_display) {
     // if the current frame is not preloaded yet
     if(!(frame_ndx in preloaded[key])) {
-      console.log('Frame ' + frame_ndx + ' not ready for var ' + key);
+      //console.log('Frame ' + frame_ndx + ' not ready for var ' + key);
       return false;
     }
     // check if the raster has a colorbar
@@ -266,12 +266,12 @@ function frame_ready(frame_ndx) {
     if(cb_key in preloaded) {
       // it does, is it preloaded?
       if (!(frame_ndx in preloaded[cb_key])) {
-        console.log('Frame ' + frame_ndx + ' (colorbar) not ready for var ' + key);
+        //console.log('Frame ' + frame_ndx + ' (colorbar) not ready for var ' + key);
         return false;
       }
     }
   }
-  console.log('Frame ' + frame_ndx + ' is ready for display.');
+  //console.log('Frame ' + frame_ndx + ' is ready for display.');
   return true;
 }
 
