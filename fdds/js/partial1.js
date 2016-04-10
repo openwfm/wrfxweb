@@ -194,12 +194,15 @@ function setup_for_domain(dom_id) {
 
 // this function should assume that the correct layers are already displayed
 function setup_for_time(frame_ndx) {
-  var timestamp = sorted_timestamps[frame_ndx];
-  var rasters_now = rasters[current_domain][timestamp];
   current_frame = frame_ndx;
+  var timestamp = sorted_timestamps[frame_ndx];
+  current_timestamp = timestamp;
+  var rasters_now = rasters[current_domain][timestamp];
 
   // set current time
   $('#time-valid').text(timestamp);
+
+  preload_variables(8);
 
   // modify the URL each displayed cluster is pointing to
   // so that the current timestamp is reflected
@@ -213,9 +216,6 @@ function setup_for_time(frame_ndx) {
                   { attribution: 'UC Denver Wildfire Group', opacity: 0.5 });
     }
   }
-
-  current_timestamp = timestamp;
-  preload_variables(8);
 }
 
 
@@ -239,7 +239,6 @@ function handle_catalog_click(path) {
       var dom_id = domains[dom];
       var checked = '';
       if(dom_id == '1') { checked = ' checked="yes"'}
-      console.log(dom_id);
       $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
     }
     $('#domain-selector').css('display', 'block');
@@ -348,13 +347,17 @@ function preload_variables(preload_count) {
         if(!(i in preloaded[var_name])) {
           //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
           var var_info = rasters_dom[timestamp][var_name];
-          $.get(raster_base + var_info.raster, function(ndx, var_name) { return function(img) { preloaded[var_name][ndx] = img; } } (i, var_name));
+					var img = new Image();
+					img.onload = function (ndx, var_name, img) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img);
+					img.src = raster_base + var_info.raster;
           if ('colorbar' in var_info) {
             var cb_key = var_name + '_cb';
             if(!(cb_key in preloaded)) {
               preloaded[cb_key] = {};
             }
-            $.get(raster_base + var_info.colorbar, function(ndx, cb_key) { return function(img) { preloaded[cb_key][ndx] = img; } } (i, cb_key));
+						var img = new Image();
+						img.onload = function(ndx, cb_key, img) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img);
+						img.src = raster_base + var_info.colorbar;
           }
         }
       }
