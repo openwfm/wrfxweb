@@ -82,28 +82,31 @@ var displayed_colorbar = null; // name of layer currently displaying its colorba
 var playing = false;
 var current_frame = 0;
 
-map.on('overlayadd', function(e) {
+function handle_overlayadd(name, layer) {
   // register in currently displayed layers and bring to front if it's an overlay
-  current_display[e.name] = e.layer;
-  if(overlay_list.indexOf(e.name) >= 0) {
-    e.layer.bringToFront();
+  console.log('name ' + name + ' layer ' + layer);
+  current_display[name] = layer;
+  if(overlay_list.indexOf(name) >= 0) {
+    layer.bringToFront();
   } else {
-    e.layer.bringToBack();
+    layer.bringToBack();
   }
 
   // if the overlay being added now has a colorbar and there is none displayed, show it
   if(displayed_colorbar == null) {
     var rasters_now = rasters[current_domain][current_timestamp];
-    if('colorbar' in rasters_now[e.name]) {
-        var cb_url = raster_base + rasters_now[e.name].colorbar;
+    if('colorbar' in rasters_now[name]) {
+        var cb_url = raster_base + rasters_now[name].colorbar;
         $('#raster-colorbar').attr('src', cb_url);
-        displayed_colorbar = e.name;
+        displayed_colorbar = name;
     }
   }
 
   // preload all displayed variables for eight frames
   preload_variables(8);
-});
+}
+
+map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
 
 
 map.on('overlayremove', function(e) {
@@ -121,6 +124,7 @@ function setup_for_domain(dom_id) {
   current_domain = dom_id;
 
   // remove any existing layers from map
+  var displayed_layers = Object.keys(current_display);
   for(var layer_name in current_display) {
     map.removeLayer(current_display[layer_name]);
   }
@@ -189,6 +193,20 @@ function setup_for_domain(dom_id) {
     collapsed: false
   }).addTo(map);
 
+  $.each(first_rasters, function(r) {
+  	if(displayed_layers.indexOf(r) >= 0) {
+      var layer = null;
+      if(r in raster_dict) {
+        layer = raster_dict[r];
+      } else {
+        layer = overlay_dict[r];
+      }
+			map.addLayer(layer);
+      handle_overlayadd(r, layer);
+		}
+  });
+  layer_ctrl._update();
+
   setup_for_time(0);
 }
 
@@ -234,7 +252,7 @@ function handle_catalog_click(path) {
 
     // update the domain radio buttons
     $('#domain-checkboxes').empty();
-    $('#domain-checkboxes').append('<label>Active domain</label><br/>');
+    $('#domain-checkboxes').append('<div class="ui large label">Active domain</div><br/>');
     for(var dom in domains) {
       var dom_id = domains[dom];
       var checked = '';
