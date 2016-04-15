@@ -32,6 +32,7 @@ var map = L.map('map-fd', {
 $.when(
 
   $.getJSON("simulations/catalog.json", function(data) {
+		catalog = data;
     var list = $('<ul/>', {
       'class': 'catalog-list'
     }).appendTo('#catalog-content');
@@ -50,14 +51,23 @@ $.when(
         $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
     });
 
-    /* auto-opens the dialog */
-    $('#select-dialog').dialog();
+    $('#select-dialog').dialog({ autoOpen: false });
 
+		var simid_ndx = window.location.hash.indexOf('sim_id');
+		var simid = window.location.hash.substring(simid_ndx+7);
+		if(simid_ndx >= 0 && simid in catalog) {
+			handle_catalog_click('simulations/' + catalog[simid].manifest_path);
+		} else {
+			open_catalog();
+		}
 });
 
 
 // add scale & zoom controls to the map
 L.control.scale({ position: 'bottomright' }).addTo(map);
+
+// the entire catalog
+var catalog = null;
 
 // list of layers which automatically become overlay rasters instead of regular rasters
 var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
@@ -382,3 +392,4 @@ function preload_variables(preload_count) {
     }
   }
 }
+
