@@ -107,7 +107,7 @@ function handle_overlayadd(name, layer) {
     var rasters_now = rasters[current_domain][current_timestamp];
     if('colorbar' in rasters_now[name]) {
         var cb_url = raster_base + rasters_now[name].colorbar;
-        $('#raster-colorbar').attr('src', cb_url);
+        $('#raster-colorbar').attr('src', cb_url).show();
         displayed_colorbar = name;
     }
   }
@@ -164,6 +164,14 @@ function setup_for_domain(dom_id) {
 		if(playing) toggle_play();
 		e.stopPropagation();
 	});
+
+	if(sorted_timestamps.length < 2) {
+		$('#time-slider').hide();
+		$('#play-control-button').hide();
+	} else {
+		$('#time-slider').show();
+		$('#play-control-button').show();
+	}
 
   // zoom into raster region
   var first_rasters = rasters[dom_id][sorted_timestamps[0]];
@@ -228,7 +236,7 @@ function setup_for_time(frame_ndx) {
   var rasters_now = rasters[current_domain][timestamp];
 
   // set current time
-  $('#time-valid').text(timestamp);
+  $('#time-valid').text(timestamp).show();
 
   preload_variables(8);
 

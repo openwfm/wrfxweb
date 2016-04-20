@@ -126,6 +126,7 @@ li.catalog-entry-sel {
   left: 140px;
   bottom: 40px;
   z-index: 1000;
+	display: none;
 }
 
 #raster-colorbar {
@@ -135,7 +136,7 @@ li.catalog-entry-sel {
   width: 200px;
   height: 400px;
   z-index: 2000;
-  display: block;
+  display: none;
 }
 
 #time-slider {
@@ -151,6 +152,7 @@ li.catalog-entry-sel {
   left: 20px;
   bottom: 40px;
   z-index: 1000;
+	display: none;
 }
 
 #catalog-button {
