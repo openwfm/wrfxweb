@@ -33,22 +33,34 @@ $.when(
 
   $.getJSON("simulations/catalog.json", function(data) {
 		catalog = data;
-    var list = $('<ul/>', {
-      'class': 'catalog-list'
-    }).appendTo('#catalog-content');
+		var list1 = $('#catalog-list-1');
+		var list2 = $('#catalog-list-2');
     $.each(data, function(cat_name) {
       var cat_entry = data[cat_name];
       var desc = cat_entry.description;
       var from = cat_entry.from_utc;
       var to = cat_entry.to_utc;
       var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
-      list.append('<li class="catalog-entry" onclick=' + load_cmd + '><b>' + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>');
+		  var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
+						   + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>';
+			if(desc.indexOf('GACC') >= 0) {
+				list2.append(html);
+			} else {
+				list1.append(html);
+			}
     });
     
   })).then(function() {
 
-    $('ul.catalog-list > li.catalog-entry').mouseenter(function() {
+    $('#catalog-list-1 > li.catalog-entry').mouseenter(function() {
         $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
+				$('#catalog-list-2 > li.catalog-entry').removeClass('catalog-entry-sel');
+    });
+
+
+    $('#catalog-list-2 > li.catalog-entry').mouseenter(function() {
+        $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
+				$('#catalog-list-1 > li.catalog-entry').removeClass('catalog-entry-sel');
     });
 
     $('#select-dialog').dialog({ autoOpen: false });
@@ -277,14 +289,18 @@ function handle_catalog_click(path) {
       if(dom_id == '1') { checked = ' checked="yes"'}
       $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
     }
-    $('#domain-selector').css('display', 'block');
+    $('#domain-selector').show();
 
     setup_for_domain(current_domain);
   });
 }
 
 function open_catalog() {
-  $('#select-dialog').dialog("open");
+	$('#select-dialog').dialog('option', 'width', 600);
+	$('#select-dialog').dialog('option', 'height', 400);
+  $('#select-dialog').dialog('open');
+	$('.ui-dialog-titlebar-close').blur();
+	$('#catalog-list-1').focus();
 }
 
 // Section containing animation/playback code

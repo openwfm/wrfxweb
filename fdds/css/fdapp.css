@@ -117,8 +117,12 @@ li.catalog-entry-sel {
   background-color: #fdfd96;
 }
 
-#catalog-content {
+#catalog-list-1 {
   cursor: pointer;
+}
+
+#catalog-list-2 {
+	cursor: pointer;
 }
 
 #time-valid {
@@ -173,3 +177,4 @@ li.catalog-entry-sel {
 .ui-slider-handle {
   background-color: #e0e040;
 }
+
