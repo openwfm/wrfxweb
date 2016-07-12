@@ -1,31 +1,82 @@
 "use strict";
 
+// global vars
+var fire_icon = null;
+var base_layer_dict = null;
+var map = null;
+
+// the entire catalog
+var catalog = null;
+
+// list of layers which automatically become overlay rasters instead of regular rasters
+var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
+
+// Variables containing input data
+var rasters = null;
+var domains = null;
+var sorted_timestamps = null;
+var raster_base = null;
+var raster_dict = {};  // rasters that can't be overlaid on other rasters
+var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
+
+// Display context
+var current_domain = null;
+var layer_ctrl = null;
+var current_display = {}; // dictionary of layer name -> layer of currently displayed data
+var current_timestamp = null; // currently displayed timestamp
+var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
+var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
+
+// Variables storing animation/playback context
+var playing = false;
+var current_frame = 0;
+
+function initialize_fdds() {
+
 // load resources
-var fire_icon = L.icon({
+fire_icon = L.icon({
   iconUrl: 'images/hot_fire.gif',
   iconSize: [15, 15],
   iconAnchor: [7, 7]
 });
 
 //  initialize base layers & build map
-var base_layer_dict = {
-  'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-                          attribution: 'Data and imagery by MapQuest',
-                          subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
-  'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-                              attribution: 'Data and imagery by MapQuest',
-                              subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
-  'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
+base_layer_dict = {
+/*
+	'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+													attribution: 'Data and imagery by MapQuest',
+													subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+*/
+	'MapQuest' : MQ.mapLayer(),
+	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+															attribution: 'Data and imagery by MapQuest',
+															subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+	'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+										 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
 };
 
 
 // construct map with the base layers
-var map = L.map('map-fd', {
-  center: [39, -106],
-  zoom: 7,
-  layers: [base_layer_dict['MapQuest']],
-  zoomControl: false
+map = L.map('map-fd', {
+	center: [39, -106],
+	zoom: 7,
+	layers: [base_layer_dict['MapQuest']],
+	zoomControl: false
+});
+
+
+// add scale & zoom controls to the map
+L.control.scale({ position: 'bottomright' }).addTo(map);
+
+map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
+
+map.on('overlayremove', function(e) {
+	delete current_display[e.name];
+
+	if(displayed_colorbar == e.name) {
+		$('#raster-colorbar').attr('src', '');
+		displayed_colorbar = null;
+	}
 });
 
 
@@ -72,37 +123,11 @@ $.when(
 		} else {
 			open_catalog();
 		}
+
 });
 
+}
 
-// add scale & zoom controls to the map
-L.control.scale({ position: 'bottomright' }).addTo(map);
-
-// the entire catalog
-var catalog = null;
-
-// list of layers which automatically become overlay rasters instead of regular rasters
-var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
-
-// Variables containing input data
-var rasters = null;
-var domains = null;
-var sorted_timestamps = null;
-var raster_base = null;
-var raster_dict = {};  // rasters that can't be overlaid on other rasters
-var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
-
-// Display context
-var current_domain = null;
-var layer_ctrl = null;
-var current_display = {}; // dictionary of layer name -> layer of currently displayed data
-var current_timestamp = null; // currently displayed timestamp
-var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
-var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
-
-// Variables storing animation/playback context
-var playing = false;
-var current_frame = 0;
 
 function handle_overlayadd(name, layer) {
   // register in currently displayed layers and bring to front if it's an overlay
@@ -127,18 +152,6 @@ function handle_overlayadd(name, layer) {
   // preload all displayed variables for eight frames
   preload_variables(8);
 }
-
-map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
-
-
-map.on('overlayremove', function(e) {
-  delete current_display[e.name];
-
-  if(displayed_colorbar == e.name) {
-    $('#raster-colorbar').attr('src', '');
-    displayed_colorbar = null;
-  }
-});
 
 
 function setup_for_domain(dom_id) {
