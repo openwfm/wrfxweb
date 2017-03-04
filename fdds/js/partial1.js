@@ -213,7 +213,7 @@ function setup_for_domain(dom_id) {
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                 {
-                                  attribution: 'UC Denver Wildfire Group',
+                                  attribution: 'CU Denver Wildfire Group',
                                   opacity: 0.5
                                 });
     if(overlay_list.indexOf(r) >= 0) {
@@ -274,7 +274,7 @@ function setup_for_time(frame_ndx) {
       var cs = raster_info.coords;
       layer.setUrl(raster_base + raster_info.raster,
                   [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: 'UC Denver Wildfire Group', opacity: 0.5 });
+                  { attribution: 'CU Denver Wildfire Group', opacity: 0.5 });
     }
   }
 }
