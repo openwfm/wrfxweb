@@ -1,7 +1,7 @@
 import json,glob,logging
 import os.path as osp
 import collections
-import lock
+from utils import lock
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,7 +17,7 @@ for f in files:
 
 catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))
 
-l=lock.lock(lock_path)
+l=lock(lock_path)
 l.acquire()
 json.dump(catalog_sorted, open(catalog_path, 'w'), indent=1, separators=(',',':'))
 l.release()
