@@ -6,6 +6,7 @@ import logging
 from utils import update_nested_dict, load_sys_cfg
 from urlparse import urljoin
 import posixpath as pxp
+import requests
 
 sys_cfg = load_sys_cfg()
 sys_cfg.sims_path = 'fdds/simulations'
@@ -90,8 +91,17 @@ def make_kmz(job_id, mode, only_vars):
     kmz_path = osp.join(job_path,kmz_filename)
     logging.info('make_kmz: creating file %s' % kmz_path) 
     doc.savekmz(kmz_path)
-    logging.info('make_kmz: file accessible at %s' % pxp.join(url_prefix,kmz_filename)) 
-  
+    url = pxp.join(url_prefix,kmz_filename)
+    logging.info('make_kmz: file created at %s' % url) 
+    try:
+        r = requests.get(url, stream=True)
+        content_size = int(r.headers['Content-Length'])
+        logging.info('make_kmz: file size is %s' % content_size) 
+    except:
+        logging.warning('make_kmz: accessing the file over the web failed') 
+       
+
+ 
 
                  
                  
