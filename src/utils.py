@@ -1,8 +1,29 @@
-import fcntl
-import errno
-import logging
+import fcntl, errno, logging, json, os
+import os.path as osp
+
+class Dict(dict):
+    """
+    A dictionary that allows member access to its keys.
+    A convenience class.
+    """
+
+    def __init__(self, d):
+        """
+        Updates itself with d.
+        """
+        self.update(d)
+
+    def __getattr__(self, item):
+        return self[item]
+
+    def __setattr__(self, item, value):
+        self[item] = value
+
 
 class lock():
+    """
+    Lock file for exclusive access
+    """
 
     def __init__(self,path):
         self.lock_path = path
@@ -82,4 +103,16 @@ def update_nested_dict(d,u,level=0):
             # print ('update_nested_dict: level %s got updated d=%s' % (level,d))
     # print ('update_nested_dict: level %s exiting with updated d=%s' % (level,d))
 
+
+def load_sys_cfg():
+    # load the system configuration
+    sys_cfg = None
+    try:
+        sys_cfg = Dict(json.load(open('etc/conf.json')))
+    except IOError:
+        logging.critical('Cannot find system configuration, have you created etc/conf.json?')
+        sys.exit(2)
+    # set defaults
+    sys = sys_cfg.sys_install_path = sys_cfg.get('sys_install_path',os.getcwd())
+    return sys_cfg
 

@@ -3,37 +3,43 @@ import os.path as osp
 import json
 import sys
 import logging
-from utils import update_nested_dict
+from utils import update_nested_dict, load_sys_cfg
 from urlparse import urljoin
 import posixpath as pxp
 
-sims_path = 'fdds/simulations/'
+sys_cfg = load_sys_cfg()
+sys_cfg.sims_path = 'fdds/simulations'
+sys_cfg.sims_url_path = 'simulations'
 
-def make_kmz(job_id, url_prefix, only_vars):
+def make_kmz(job_id, mode, only_vars):
 
     logging.info('make_kmz: job_id=%s' % job_id)
-    job_path = osp.join(osp.abspath(sims_path),job_id)
+    job_path = osp.join(osp.abspath(sys_cfg.sims_path),job_id)
+    url_prefix = pxp.join(sys_cfg.url_root,sys_cfg.sims_url_path,job_id)
+    logging.info('make_kmz: job_path %s' % job_path)
+    logging.info('make_kmz: url_prefix %s' % url_prefix)
   
-    if url_prefix == '':
+    if mode == '' or mode == "inc":
         kmz_filename = job_id + '_inc.kmz'
         href_prefix = osp.abspath(job_path)
         href_join = osp.join
         logging.info('make_kmz: kmz file will include images from %s' % href_prefix)
-    else:
+    elif mode == "ref":
         kmz_filename = job_id + '_ref.kmz'    
-        href_prefix = pxp.join(url_prefix,job_id)
+        href_prefix = url_prefix
         href_join = pxp.join
         logging.info('make_kmz: kmz file will link images from %s' % href_prefix)
-        
- 
-
+    else:
+        logging.error('make_kmz: arg 2 must be "inc" or "ref" or omitted')
+        exit(1)
+   
     # read the catalog and the manifest
     cat = json.load(open(osp.join(job_path,'catalog.json')))
     if job_id not in cat:
          logging.error('job id %s not in the catalog' % job_id)
          sys.exit(1)
     cat = cat[job_id]
-    mf = json.load(open(osp.join(sims_path,cat['manifest_path'])))
+    mf = json.load(open(osp.join(sys_cfg.sims_path,cat['manifest_path'])))
 
     description = cat['description']
     logging.info('make_kmz: job description: %s' % description)
@@ -84,8 +90,9 @@ def make_kmz(job_id, url_prefix, only_vars):
     kmz_path = osp.join(job_path,kmz_filename)
     logging.info('make_kmz: creating file %s' % kmz_path) 
     doc.savekmz(kmz_path)
-    logging.info('make_kmz: created file %s' % href_join(href_prefix,kmz_filename)) 
+    logging.info('make_kmz: file accessible at %s' % pxp.join(url_prefix,kmz_filename)) 
   
+
                  
                  
 if __name__ == '__main__':
