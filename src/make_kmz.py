@@ -17,19 +17,21 @@ def make_kmz(job_id, mode, only_vars):
     logging.info('make_kmz: job_id=%s' % job_id)
     job_path = osp.join(osp.abspath(sys_cfg.sims_path),job_id)
     url_prefix = pxp.join(sys_cfg.url_root,sys_cfg.sims_url_path,job_id)
-    logging.info('make_kmz: job_path %s' % job_path)
-    logging.info('make_kmz: url_prefix %s' % url_prefix)
+    logging.debug('make_kmz: job_path %s' % job_path)
+    logging.debug('make_kmz: url_prefix %s' % url_prefix)
   
     if mode == '' or mode == "inc":
         kmz_filename = job_id + '_inc.kmz'
         href_prefix = osp.abspath(job_path)
         href_join = osp.join
-        logging.info('make_kmz: kmz file will include images from %s' % href_prefix)
+        logging.debug('make_kmz: kmz file will include images from %s' % href_prefix)
+        logging.info('make_kmz: kmz file will include images')
     elif mode == "ref":
         kmz_filename = job_id + '_ref.kmz'    
         href_prefix = url_prefix
         href_join = pxp.join
-        logging.info('make_kmz: kmz file will link images from %s' % href_prefix)
+        logging.debug('make_kmz: kmz file will link to images from %s' % href_prefix)
+        logging.info('make_kmz: kmz file will link to images')
     else:
         logging.error('make_kmz: arg 2 must be "inc" or "ref" or omitted')
         exit(1)
