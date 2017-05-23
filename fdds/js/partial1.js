@@ -91,9 +91,12 @@ $.when(
       var desc = cat_entry.description;
       var from = cat_entry.from_utc;
       var to = cat_entry.to_utc;
+      var job_id = cat_entry.job_id;
       var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
 		  var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
-						   + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>';
+						   + desc + '</b><br/>' 
+                                                   + 'from: ' + from + '<br/>to: ' + to  
+                                                   + '<br/>' + 'job id: ' + job_id + '</li>';
 			if(desc.indexOf('GACC') >= 0) {
 				list2.append(html);
 			} else {
