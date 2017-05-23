@@ -17,8 +17,10 @@ for f in files:
 
 # add blank fields if not present
 for i in catalog:
-    catalog[i]['processed_utc']=catalog[i].get('processed_utc','')
-    catalog[i]['run_utc']=catalog[i].get('run_utc','')
+    catalog[i]['processed_utc']=catalog[i].get('processed_utc',None)
+    catalog[i]['run_utc']=catalog[i].get('run_utc',None)
+    catalog[i]['kml_url']=catalog[i].get('kml_url',None)
+    catalog[i]['kml_size']=catalog[i].get('kml_size',None)
     catalog[i]['job_id']=i
 
 catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))

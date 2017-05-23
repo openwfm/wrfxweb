@@ -37,14 +37,15 @@ def make_kmz(job_id, mode, only_vars):
         exit(1)
    
     # read the catalog and the manifest
-    cat = json.load(open(osp.join(job_path,'catalog.json')))
+    cat_path = osp.join(job_path,'catalog.json')
+    cat = json.load(open(cat_path))
     if job_id not in cat:
          logging.error('job id %s not in the catalog' % job_id)
          sys.exit(1)
-    cat = cat[job_id]
-    mf = json.load(open(osp.join(sys_cfg.sims_path,cat['manifest_path'])))
+    cat_entry = cat[job_id]
+    mf = json.load(open(osp.join(sys_cfg.sims_path,cat_entry['manifest_path'])))
 
-    description = cat['description']
+    description = cat_entry['description']
     logging.info('make_kmz: job description: %s' % description)
     
     # transpose var and time in manifest, output to frame
@@ -99,6 +100,9 @@ def make_kmz(job_id, mode, only_vars):
         r = requests.get(url, stream=True)
         content_size = int(r.headers['Content-Length'])
         logging.info('make_kmz: file size is %s' % content_size) 
+        cat[job_id]['kml_url']=url
+        cat[job_id]['kml_size']=content_size
+        json.dump(cat, open(cat_path,'w'), indent=4, separators=(',', ': '))
     except:
         logging.warning('make_kmz: accessing the file over the web failed') 
        

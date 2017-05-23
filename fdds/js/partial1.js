@@ -92,11 +92,21 @@ $.when(
       var from = cat_entry.from_utc;
       var to = cat_entry.to_utc;
       var job_id = cat_entry.job_id;
+      var kml_url = cat_entry.kml_url;
+      var kml_size = cat_entry.kml_size;
       var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
 		  var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
 						   + desc + '</b><br/>' 
-                                                   + 'from: ' + from + '<br/>to: ' + to  
-                                                   + '<br/>' + 'job id: ' + job_id + '</li>';
+                                                   + 'from: ' + from + '<br/>to: ' + to  + '<br/>';
+			if(job_id) {
+				html = html  + 'job id: ' + job_id + '<br/>';
+			}
+			html = html + '</li>';
+                        if(kml_url) {
+                                var mb = Math.round(10*kml_size/1048576.0)/10;
+				html = html + '<a href="' + kml_url + '" download>Download KML ' + mb.toString() +' MB</a><br/>' ;
+                        }
+
 			if(desc.indexOf('GACC') >= 0) {
 				list2.append(html);
 			} else {
