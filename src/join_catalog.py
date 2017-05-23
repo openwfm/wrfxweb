@@ -15,6 +15,12 @@ catalog = {}
 for f in files:
     catalog.update(json.load(open(f)))
 
+# add blank fields if not present
+for i in catalog:
+    catalog[i]['processing_utc']=catalog[i].get('processing_utc','')
+    catalog[i]['run_utc']=catalog[i].get('run_utc','')
+    catalog[i]['job_id']=i
+
 catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))
 
 l=lock(lock_path)
