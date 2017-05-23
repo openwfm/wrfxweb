@@ -17,7 +17,7 @@ for f in files:
 
 # add blank fields if not present
 for i in catalog:
-    catalog[i]['processing_utc']=catalog[i].get('processing_utc','')
+    catalog[i]['processed_utc']=catalog[i].get('processed_utc','')
     catalog[i]['run_utc']=catalog[i].get('run_utc','')
     catalog[i]['job_id']=i
 
