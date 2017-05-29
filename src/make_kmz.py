@@ -13,6 +13,13 @@ sys_cfg.sims_path = 'fdds/simulations'
 sys_cfg.sims_url_path = 'simulations'
 
 def make_kmz(job_id, steps, mode, only_vars):
+    """
+    Create KMZ file from visualization stored in wrfxweb.
+    :param job_id: string, the name of job directory
+    :param steps: string '1,1,1,3' takes every 3rd frame in domain 4, etc. Default: all 1
+    :param mode: string, 'inc', ' to include image files (default), 'ref' to use links only
+    :param only_var: list of strings variables to include or None to include  all
+    """
 
     logging.info('make_kmz: job_id=%s' % job_id)
     job_path = osp.join(osp.abspath(sys_cfg.sims_path),job_id)
