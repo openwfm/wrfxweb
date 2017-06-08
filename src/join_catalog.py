@@ -13,7 +13,11 @@ lock_path=catalog_path + '.lock'
 
 catalog = {}
 for f in files:
-    catalog.update(json.load(open(f)))
+    try:
+        f_json = json.load(open(f))
+    except:
+        logging.error('loading file %s failed, ignoring' % f)
+    catalog.update(f_json)
 
 # add blank fields if not present
 for i in catalog:
