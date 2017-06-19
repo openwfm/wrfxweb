@@ -297,6 +297,12 @@ function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
 
+  // show job description
+  $.getJSON("simulations/catalog.json", function(data) {
+    var title = cat_entry.description;
+	console.log(title);
+	});
+
   $.getJSON(path, function(selected_simulation) {
     // store in global state
     rasters = selected_simulation;
@@ -320,7 +326,7 @@ function handle_catalog_click(path) {
     setup_for_domain(current_domain);
   });
 }
-
+ 
 function open_catalog() {
 	$('#select-dialog').dialog('option', 'width', 600);
 	$('#select-dialog').dialog('option', 'height', 400);
