@@ -297,8 +297,9 @@ function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
 
+ // show job description
   var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
-  // show job description
+ 
   $.getJSON(catPath, function(data) {
 	catalog = data;
     $.each(data, function(cat_name) {
