@@ -297,11 +297,18 @@ function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
 
+  var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
   // show job description
-  $.getJSON("simulations/catalog.json", function(data) {
-    var title = cat_entry.description;
-	console.log(title);
-	});
+  $.getJSON(catPath, function(data) {
+	catalog = data;
+    $.each(data, function(cat_name) {
+      var cat_entry = data[cat_name];
+      var desc = cat_entry.description;
+      $("#displayTest").show();
+      $("#displayTest").html(desc);
+
+    });
+  });
 
   $.getJSON(path, function(selected_simulation) {
     // store in global state

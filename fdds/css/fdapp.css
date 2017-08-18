@@ -166,6 +166,19 @@ li.catalog-entry-sel {
   z-index: 1000;
 }
 
+#displayTest {
+  position: fixed;
+  top: 20px;
+  margin: auto;
+  width: 50%;
+  text-align: right;
+  z-index: 1000;
+  backgroung-color: #e0e040;
+  font-family: helvetica;
+  font-size: 150%;
+  font-weight: bold;
+}
+
 #domain-selector {
   position: fixed;
   left: 20px;
@@ -182,3 +195,5 @@ li.catalog-entry-sel {
 	display: none;
 }
 
+
+      
