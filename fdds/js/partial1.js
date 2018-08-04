@@ -9,7 +9,7 @@ var map = null;
 var catalog = null;
 
 // list of layers which automatically become overlay rasters instead of regular rasters
-var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
+var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
 // Variables containing input data
 var rasters = null;
