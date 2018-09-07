@@ -9,7 +9,7 @@ var map = null;
 var catalog = null;
 
 // list of layers which automatically become overlay rasters instead of regular rasters
-var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
+var overlay_list = ['WINDVEC', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
 // Variables containing input data
 var rasters = null;
@@ -48,9 +48,6 @@ base_layer_dict = {
 													subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
 */
 	'MapQuest' : MQ.mapLayer(),
-	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-															attribution: 'Data and imagery by MapQuest',
-															subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
 	'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 										 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
 };
@@ -91,22 +88,9 @@ $.when(
       var desc = cat_entry.description;
       var from = cat_entry.from_utc;
       var to = cat_entry.to_utc;
-      var job_id = cat_entry.job_id;
-      var kml_url = cat_entry.kml_url;
-      var kml_size = cat_entry.kml_size;
       var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
 		  var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
-						   + desc + '</b><br/>' 
-                                                   + 'from: ' + from + '<br/>to: ' + to  + '<br/>';
-			if(job_id) {
-				html = html  + 'job id: ' + job_id + '<br/>';
-			}
-			html = html + '</li>';
-                        if(kml_url) {
-                                var mb = Math.round(10*kml_size/1048576.0)/10;
-				html = html + '<a href="' + kml_url + '" download>Download KML ' + mb.toString() +' MB</a><br/>' ;
-                        }
-
+						   + desc + '</b><br/>' + 'from: ' + from + '<br/>to: ' + to + '</li>';
 			if(desc.indexOf('GACC') >= 0) {
 				list2.append(html);
 			} else {
@@ -226,7 +210,7 @@ function setup_for_domain(dom_id) {
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                 {
-                                  attribution: 'CU Denver Wildfire Group',
+                                  attribution: ' ',
                                   opacity: 0.5
                                 });
     if(overlay_list.indexOf(r) >= 0) {
@@ -287,7 +271,7 @@ function setup_for_time(frame_ndx) {
       var cs = raster_info.coords;
       layer.setUrl(raster_base + raster_info.raster,
                   [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: 'CU Denver Wildfire Group', opacity: 0.5 });
+                  { attribution: ' ', opacity: 0.5 });
     }
   }
 }
@@ -296,20 +280,6 @@ function setup_for_time(frame_ndx) {
 function handle_catalog_click(path) {
   // close selection dialog
   $('#select-dialog').dialog("close");
-
- // show job description
-  var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
- 
-  $.getJSON(catPath, function(data) {
-	catalog = data;
-    $.each(data, function(cat_name) {
-      var cat_entry = data[cat_name];
-      var desc = cat_entry.description;
-      $("#displayTest").show();
-      $("#displayTest").html(desc);
-
-    });
-  });
 
   $.getJSON(path, function(selected_simulation) {
     // store in global state
@@ -334,7 +304,7 @@ function handle_catalog_click(path) {
     setup_for_domain(current_domain);
   });
 }
- 
+
 function open_catalog() {
 	$('#select-dialog').dialog('option', 'width', 600);
 	$('#select-dialog').dialog('option', 'height', 400);
