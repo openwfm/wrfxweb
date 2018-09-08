@@ -48,9 +48,9 @@ base_layer_dict = {
 													subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
 */
 	'MapQuest' : MQ.mapLayer(),
-	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+/*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
 															attribution: 'Data and imagery by MapQuest',
-															subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+															subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
 	'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 										 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
 };
@@ -226,7 +226,7 @@ function setup_for_domain(dom_id) {
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                 {
-                                  attribution: 'CU Denver Wildfire Group',
+                                  attribution: '',
                                   opacity: 0.5
                                 });
     if(overlay_list.indexOf(r) >= 0) {
@@ -287,7 +287,7 @@ function setup_for_time(frame_ndx) {
       var cs = raster_info.coords;
       layer.setUrl(raster_base + raster_info.raster,
                   [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: 'CU Denver Wildfire Group', opacity: 0.5 });
+                  { attribution: '', opacity: 0.5 });
     }
   }
 }
