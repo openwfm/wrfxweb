@@ -4,7 +4,7 @@ import json
 import sys
 import logging
 from utils import update_nested_dict, load_sys_cfg
-from urlparse import urljoin
+from urllib.parse import urljoin
 import posixpath as pxp
 import requests
 
@@ -53,11 +53,11 @@ def make_kmz(job_id, steps, mode, only_vars):
     cat_entry = cat[job_id]
     mf = json.load(open(osp.join(sys_cfg.sims_path,cat_entry['manifest_path'])))
 
-    mdomain = max(map(int, mf.keys()))
+    mdomain = max(list(map(int, list(mf.keys()))))
     if steps=='':
         step=[1]
     else:
-        step=map(int, steps.split(','))
+        step=list(map(int, steps.split(',')))
     if len(step) == 1:
         step = step*mdomain
     elif len(step) != mdomain:
@@ -139,7 +139,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 2:
         print('usage: make_kmz.sh job_id steps mode only_vars variable1 variable2 ...')
-        print('job_id: the name of job directory in ' + sys_cfg.sims_path)
+        print(('job_id: the name of job directory in ' + sys_cfg.sims_path))
         print("steps: '1,1,1,3' takes every 3rd frame in domain 4, etc. Default: all 1") 
         print("mode: inc to include image files (default), ref to use links only") 
         print('variable (optional): variables to include; if absent all will be included')

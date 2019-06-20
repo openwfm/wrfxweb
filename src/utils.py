@@ -87,7 +87,7 @@ def update_nested_dict(d,u,level=0):
     # print ('update_nested_dict: level %s entering with d=%s u=%s' % (level,d,u))
     if type(d) is not dict or type(u) is not dict:
         raise ValueError ('update_nested_dict: level %s: both arguments must be dictionaries' % level)
-    for k in u.keys():
+    for k in list(u.keys()):
         # print ('update_nested_dict: level %s found key %s in u' % (level,k))
         if k in d:
             # print ('update_nested_dict: level %s key %s in both u and d' % (level,k))

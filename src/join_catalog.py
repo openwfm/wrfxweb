@@ -27,7 +27,7 @@ for i in catalog:
     catalog[i]['kml_size']=catalog[i].get('kml_size',None)
     catalog[i]['job_id']=i
 
-catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))
+catalog_sorted=collections.OrderedDict(sorted(list(catalog.items()), reverse=True))
 
 l=lock(lock_path)
 l.acquire()
