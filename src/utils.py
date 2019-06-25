@@ -28,7 +28,7 @@ class lock():
     def __init__(self,path):
         self.lock_path = path
         logging.info('Initializing lock on %s' % self.lock_path)
-        self.lock_file=open(self.lock_path,'w',0)
+        self.lock_file=open(self.lock_path,'wb',0)
         self.locked=False
 
     def islocked(self):
