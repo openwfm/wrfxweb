@@ -304,7 +304,7 @@ function handle_catalog_click(path) {
 	catalog = data;
     $.each(data, function(cat_name) {
       var cat_entry = data[cat_name];
-      var desc = cat_entry.description;
+      var desc = cat_entry.description + ' - Experimental forecast ONLY';
       $("#displayTest").show();
       $("#displayTest").html(desc);
 
