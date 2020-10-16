@@ -125,8 +125,8 @@ def make_kmz(job_id, steps, mode, only_vars):
         cat[job_id]['kml_url']=url
         cat[job_id]['kml_size']=content_size
         json.dump(cat, open(cat_path,'w'), indent=4, separators=(',', ': '))
-    except:
-        logging.warning('make_kmz: accessing the file over the web failed') 
+    except Exception as e:
+        logging.warning('make_kmz: accessing the file over the web failed with exception %s' % e) 
        
 
  
