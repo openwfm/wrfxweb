@@ -25,6 +25,8 @@ for i in catalog:
     catalog[i]['run_utc']=catalog[i].get('run_utc',None)
     catalog[i]['kml_url']=catalog[i].get('kml_url',None)
     catalog[i]['kml_size']=catalog[i].get('kml_size',None)
+    catalog[i]['zip_url']=catalog[i].get('zip_url',None)
+    catalog[i]['zip_size']=catalog[i].get('zip_size',None)
     catalog[i]['job_id']=i
 
 catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))

@@ -94,6 +94,8 @@ $.when(
       var job_id = cat_entry.job_id;
       var kml_url = cat_entry.kml_url;
       var kml_size = cat_entry.kml_size;
+      var zip_url = cat_entry.zip_url;
+      var zip_size = cat_entry.zip_size;
       var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
 		  var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
 						   + desc + '</b><br/>' 
@@ -104,7 +106,11 @@ $.when(
 			html = html + '</li>';
                         if(kml_url) {
                                 var mb = Math.round(10*kml_size/1048576.0)/10;
-				html = html + '<a href="' + kml_url + '" download>Download KML ' + mb.toString() +' MB</a><br/>' ;
+				html = html + '<a href="' + kml_url + '" download>Download KMZ ' + mb.toString() +' MB</a><br/>' ;
+                        }
+                        if(zip_url) {
+                                var mb = Math.round(10*zip_size/1048576.0)/10;
+				html = html + '<a href="' + zip_url + '" download>Download ZIP ' + mb.toString() +' MB</a><br/>' ;
                         }
 
 			if(desc.indexOf('GACC') >= 0) {
@@ -226,7 +232,7 @@ function setup_for_domain(dom_id) {
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                 {
-                                  attribution: '',
+                                  attribution: 'SJSU WIRC',
                                   opacity: 0.5
                                 });
     if(overlay_list.indexOf(r) >= 0) {
@@ -287,7 +293,7 @@ function setup_for_time(frame_ndx) {
       var cs = raster_info.coords;
       layer.setUrl(raster_base + raster_info.raster,
                   [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: '', opacity: 0.5 });
+                  { attribution: 'SJSU WIRC', opacity: 0.5 });
     }
   }
 }
@@ -304,7 +310,7 @@ function handle_catalog_click(path) {
 	catalog = data;
     $.each(data, function(cat_name) {
       var cat_entry = data[cat_name];
-      var desc = cat_entry.description + ' - Experimental forecast ONLY';
+      var desc = cat_entry.description + ' Experimental forecast ONLY';
       $("#displayTest").show();
       $("#displayTest").html(desc);
 
