@@ -58,10 +58,11 @@ base_layer_dict = {
 
 // construct map with the base layers
 map = L.map('map-fd', {
-	center: [39, -106],
+	center: [37.34, -121.89],
 	zoom: 7,
 	layers: [base_layer_dict['MapQuest']],
-	zoomControl: false
+  zoomControl: false,
+  minZoom: 2
 });
 
 
