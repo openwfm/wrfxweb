@@ -305,6 +305,7 @@ function handle_catalog_click(path) {
       var cat_entry = data[cat_name];
       var desc = cat_entry.description + ' Experimental forecast ONLY';
       $("#displayTest").show();
+      $("#displayTest2").show();
       $("#displayTest").html(desc);
 
     });

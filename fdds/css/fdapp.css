@@ -164,10 +164,10 @@ li.catalog-entry:hover {
   z-index: 1000;
 }
 
-#displayTest {
+.displayTest {
   color: #555555;
   position: fixed;
-  top: 27px;
+  /* top: 27px; */
   left: 200px;
   padding-right: 10px;
   padding-left: 10px;
@@ -177,6 +177,7 @@ li.catalog-entry:hover {
   font-size: 125%;
   font-weight: bold;
   border-radius: 5px;
+  display: none;
 }
 
 #domain-selector {
