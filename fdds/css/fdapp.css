@@ -113,16 +113,14 @@ li.catalog-entry {
   padding: 0px;
 }
 
-li.catalog-entry-sel {
+li.catalog-entry:hover {
   background-color: #fdfd96;
 }
 
-#catalog-list-1 {
+.catalog-list {
+  padding: 0px;
+  word-wrap: break-word;
   cursor: pointer;
-}
-
-#catalog-list-2 {
-	cursor: pointer;
 }
 
 #time-valid {

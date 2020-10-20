@@ -122,17 +122,6 @@ $.when(
     
   })).then(function() {
 
-    $('#catalog-list-1 > li.catalog-entry').mouseenter(function() {
-        $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
-				$('#catalog-list-2 > li.catalog-entry').removeClass('catalog-entry-sel');
-    });
-
-
-    $('#catalog-list-2 > li.catalog-entry').mouseenter(function() {
-        $(this).addClass('catalog-entry-sel').siblings().removeClass('catalog-entry-sel');
-				$('#catalog-list-1 > li.catalog-entry').removeClass('catalog-entry-sel');
-    });
-
     $('#select-dialog').dialog({ autoOpen: false });
 
 		var simid_ndx = window.location.hash.indexOf('sim_id');
