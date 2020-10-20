@@ -85,7 +85,8 @@ $.when(
   $.getJSON("simulations/catalog.json", function(data) {
 		catalog = data;
 		var list1 = $('#catalog-list-1');
-		var list2 = $('#catalog-list-2');
+    var list2 = $('#catalog-list-2');
+    var list3 = $('#catalog-list-3');
     $.each(data, function(cat_name) {
       var cat_entry = data[cat_name];
       var desc = cat_entry.description;
@@ -114,7 +115,9 @@ $.when(
                         }
 
 			if(desc.indexOf('GACC') >= 0) {
-				list2.append(html);
+        list2.append(html);
+      } else if(desc.indexOf('SAT') >= 0) {
+        list3.append(html);
 			} else {
 				list1.append(html);
 			}
