@@ -75,7 +75,8 @@ map.on('overlayremove', function(e) {
 	delete current_display[e.name];
 
 	if(displayed_colorbar == e.name) {
-		$('#raster-colorbar').attr('src', '');
+    $('#raster-colorbar').attr('src', '');
+    $('#raster-colorbar').hide();
 		displayed_colorbar = null;
 	}
 });
@@ -152,14 +153,14 @@ function handle_overlayadd(name, layer) {
   }
 
   // if the overlay being added now has a colorbar and there is none displayed, show it
-  if(displayed_colorbar == null) {
+  // if(displayed_colorbar == null) {
     var rasters_now = rasters[current_domain][current_timestamp];
     if('colorbar' in rasters_now[name]) {
         var cb_url = raster_base + rasters_now[name].colorbar;
         $('#raster-colorbar').attr('src', cb_url).show();
         displayed_colorbar = name;
     }
-  }
+  // }
 
   // preload all displayed variables for eight frames
   preload_variables(8);
