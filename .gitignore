@@ -2,6 +2,8 @@ logs/*
 !.gitkeep
 node_modules/
 bower_components/
+fdds/simulations/
+package-lock.json
 tmp
 .DS_Store
 .idea
