@@ -1,7 +1,6 @@
 "use strict";
 
 // global vars
-var fire_icon = null;
 var base_layer_dict = null;
 var map = null;
 
@@ -33,13 +32,6 @@ var current_frame = 0;
 
 function initialize_fdds() {
 
-// load resources
-fire_icon = L.icon({
-  iconUrl: 'images/hot_fire.gif',
-  iconSize: [15, 15],
-  iconAnchor: [7, 7]
-});
-
 //  initialize base layers & build map
 base_layer_dict = {
 /*
@@ -60,7 +52,7 @@ base_layer_dict = {
 map = L.map('map-fd', {
 	center: [37.34, -121.89],
 	zoom: 7,
-	layers: [base_layer_dict['MapQuest']],
+	layers: [base_layer_dict['OSM']],
   zoomControl: false,
   minZoom: 3
 });
@@ -310,7 +302,6 @@ function handle_catalog_click(path) {
       $("#displayTest").show();
       $("#displayTest2").show();
       $("#displayTest").html(desc);
-
     });
   });
 
@@ -345,6 +336,7 @@ function handle_catalog_click(path) {
 function open_catalog() {
 	$('#select-dialog').dialog('option', 'width', 600);
 	$('#select-dialog').dialog('option', 'height', 400);
+	$('#select-dialog').dialog('option', 'z-index', 1400);
   $('#select-dialog').dialog('open');
 	$('.ui-dialog-titlebar-close').blur();
 	$('#catalog-list-1').focus();
