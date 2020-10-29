@@ -1,3 +1,6 @@
+/**
+ * A Component that builds the CatalogMenu. 
+ */
 class CatalogMenu extends HTMLElement {
     constructor() {
         super();
@@ -22,6 +25,10 @@ class CatalogMenu extends HTMLElement {
         `;
     }
 
+    /**
+     * This function is called once the HTML Element has been added to the DOM. This is when the json 
+     * needs to be fetched and the lists built 
+     */
     connectedCallback() {
         $.when(
             $.getJSON("simulations/catalog.json", function(data) {

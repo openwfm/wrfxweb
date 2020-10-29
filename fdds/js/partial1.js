@@ -274,17 +274,7 @@ function handle_catalog_click(path) {
   });
 }
  
-function open_catalog() {
-	$('#select-dialog').dialog('option', 'width', 600);
-	$('#select-dialog').dialog('option', 'height', 400);
-	$('#select-dialog').dialog('option', 'z-index', 1400);
-  $('#select-dialog').dialog('open');
-	$('.ui-dialog-titlebar-close').blur();
-	$('#catalog-list-1').focus();
-}
-
 // Section containing animation/playback code
-
 function frame_ready(frame_ndx) {
   // for all layers currently displayed
   for(var key in current_display) {

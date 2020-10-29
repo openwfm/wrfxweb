@@ -27,10 +27,6 @@
   <!-- WRF Fire Display Server; Copyright 2016, University of Colorado Denver,
        Department of Mathematical and Statistical Sciences -->
 
-	<button id="catalog-button" class="ui labeled icon button" onclick="open_catalog();">
-		<i class="database icon"></i>
-		<span>Catalog</span>
-	</button>
 	<div id="displayTest" class="displayTest" style="top:27px"></div>
 	<div id="displayTest2" class="displayTest" style="top:55px"><span>USE AT OWN RISK</span></div>
 
@@ -41,6 +37,7 @@
 		</div>
 	</div>
 	<catalog-menu></catalog-menu>
+	<catalog-button></catalog-button>
 
 	<div id="time-slider"></div>
 
@@ -53,9 +50,7 @@
 		<span>Play</span>
 	</button>
 
-	<script>
-		document.body.style.overflow = "hidden";
-	</script>
 	<script src="js/components/catalogMenu.js" type="text/javascript"></script>
+	<script src="js/components/catalogButton.js" type="text/javascript"></script>
 </body>
 </html>
