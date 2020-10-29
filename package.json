@@ -10,7 +10,7 @@
     "shelljs": "^0.2.6"
   },
   "scripts": {
-    "prestart": "npm install && gzip -f --keep fdds/js/partial1.js",
+    "prestart": "npm install",
     "start": "http-server -g -a localhost -p 8000 -c-1"
   }
 }

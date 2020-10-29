@@ -3,6 +3,7 @@ logs/*
 node_modules/
 bower_components/
 fdds/simulations/
+*.gz
 package-lock.json
 tmp
 .DS_Store
