@@ -228,7 +228,7 @@ function setup_for_time(frame_ndx) {
 
 function handle_catalog_click(path) {
   // close selection dialog
-  $('#select-dialog').dialog("close");
+  $('.catalog-menu').hide();
 
  // show job description
   var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";

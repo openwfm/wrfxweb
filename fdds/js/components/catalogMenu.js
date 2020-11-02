@@ -8,7 +8,7 @@ class CatalogMenu extends HTMLElement {
             <div class="catalog-menu">
                 <div class="menu-title">
                     <h3>Select Simulation...</h3>
-                    <button id="menu-close">x</button>
+                    <span id="menu-close">x</span>
                 </div>
                 <div class="menu-columns">
                     <div class="column">
@@ -36,6 +36,7 @@ class CatalogMenu extends HTMLElement {
         this.querySelector('#menu-close').addEventListener('click', () => {
             this.querySelector('.catalog-menu').style.display = 'none';
         });
+
         L.DomEvent.disableScrollPropagation(this.querySelector(".catalog-menu"));
         
         $.getJSON("simulations/catalog.json", function(data) {
@@ -72,9 +73,14 @@ class CatalogMenu extends HTMLElement {
 
                 if(desc.indexOf('GACC') >= 0) {
                     list2.append(html);
+                    list2.append(html);
                 } else if(desc.indexOf('SAT') >= 0) {
                     list3.append(html);
+                    list3.append(html);
+                    list2.append(html);
+                    list2.append(html);
                 } else {
+                    list1.append(html);
                     list1.append(html);
                 }
             });
