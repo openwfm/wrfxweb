@@ -297,6 +297,15 @@ function frame_ready(frame_ndx) {
   return true;
 }
 
+function open_catalog() {
+  $('#select-dialog').dialog('option', 'width', 600);
+  $('#select-dialog').dialog('option', 'height', 400);
+  $('#select-dialog').dialog('option', 'z-index', 1400);
+  $('#select-dialog').dialog('open');
+  $('.ui-dialog-titlebar-close').blur();
+  $('#catalog-list-1').focus();
+}
+
 function schedule_next_frame() {
   if(current_frame == sorted_timestamps.length-1){
     window.setTimeout(next_frame, 1000);
