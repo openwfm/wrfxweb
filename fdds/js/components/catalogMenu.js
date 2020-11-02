@@ -5,8 +5,12 @@ class CatalogMenu extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id="select-dialog" title="Select simulation ...">
-                <div class="ui three column grid">
+            <div class="catalog-menu">
+                <div class="menu-title">
+                    <h3>Select Simulation...</h3>
+                    <button id="menu-close">x</button>
+                </div>
+                <div class="menu-columns">
                     <div class="column">
                             <h3>Fires</h3>
                             <ul id="catalog-list-1" class="catalog-list"> </ul>
@@ -19,7 +23,6 @@ class CatalogMenu extends HTMLElement {
                             <h3>Satellite Data</h3>
                             <ul id="catalog-list-3" class="catalog-list"> </ul>
                     </div>
-                    </div>
                 </div>
             </div>
         `;
@@ -30,13 +33,17 @@ class CatalogMenu extends HTMLElement {
      * needs to be fetched and the lists built 
      */
     connectedCallback() {
-        $.when(
-            $.getJSON("simulations/catalog.json", function(data) {
-                catalog = data;
-                var list1 = $('#catalog-list-1');
-                var list2 = $('#catalog-list-2');
-                var list3 = $('#catalog-list-3');
-                $.each(data, function(cat_name) {
+        this.querySelector('#menu-close').addEventListener('click', () => {
+            this.querySelector('.catalog-menu').style.display = 'none';
+        });
+        L.DomEvent.disableScrollPropagation(this.querySelector(".catalog-menu"));
+        
+        $.getJSON("simulations/catalog.json", function(data) {
+            catalog = data;
+            var list1 = $('#catalog-list-1');
+            var list2 = $('#catalog-list-2');
+            var list3 = $('#catalog-list-3');
+            $.each(data, function(cat_name) {
                 var cat_entry = data[cat_name];
                 var desc = cat_entry.description;
                 var from = cat_entry.from_utc;
@@ -71,15 +78,6 @@ class CatalogMenu extends HTMLElement {
                     list1.append(html);
                 }
             });
-        })).then(function() {
-            $('#select-dialog').dialog({ autoOpen: false });
-            var simid_ndx = window.location.hash.indexOf('sim_id');
-            var simid = window.location.hash.substring(simid_ndx+7);
-            if(simid_ndx >= 0 && simid in catalog) {
-                handle_catalog_click('simulations/' + catalog[simid].manifest_path);
-            } else {
-                open_catalog();
-            }
         });
     }
 }

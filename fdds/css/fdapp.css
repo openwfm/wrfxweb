@@ -104,25 +104,6 @@ a.dead-link {
 	pointer-events: none;
 }
 
-ul.catalog-list {
-  padding: 0px;
-}
-
-li.catalog-entry {
-  list-style-type: none;
-  padding: 0px;
-}
-
-li.catalog-entry:hover {
-  background-color: #fdfd96;
-}
-
-.catalog-list {
-  padding: 0px;
-  word-wrap: break-word;
-  cursor: pointer;
-}
-
 #time-valid {
   position: fixed;
   left: 140px;

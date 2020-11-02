@@ -18,12 +18,7 @@ class CatalogButton extends HTMLElement {
     }
 
     openCatalog() {
-        $('#select-dialog').dialog('option', 'width', 600);
-        $('#select-dialog').dialog('option', 'height', 400);
-        $('#select-dialog').dialog('option', 'z-index', 1400);
-        $('#select-dialog').dialog('open');
-        $('.ui-dialog-titlebar-close').blur();
-        $('#catalog-list-1').focus();
+        document.querySelector('.catalog-menu').style.display = "block";
     }
 }
 
