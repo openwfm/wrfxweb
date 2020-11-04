@@ -73,18 +73,17 @@ class CatalogMenu extends HTMLElement {
 
                 if(desc.indexOf('GACC') >= 0) {
                     list2.append(html);
-                    list2.append(html);
                 } else if(desc.indexOf('SAT') >= 0) {
                     list3.append(html);
-                    list3.append(html);
-                    list2.append(html);
-                    list2.append(html);
                 } else {
-                    list1.append(html);
                     list1.append(html);
                 }
             });
         });
+    }
+
+    disconnectedCallback() {
+        this.querySelector('#menu-close').removeEventListener();
     }
 }
 
