@@ -1,9 +1,14 @@
 /**
- * A Component that builds the CatalogMenu. 
+ * A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
+ * 
+ * Includes three different columns for data related to fires, fuel moisture, and satellite data. 
+ * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
+ * supports searching columns for data that matches a description.
  */
 class CatalogMenu extends HTMLElement {
     constructor() {
         super();
+        // Arrays of catalog entries based on their descriptions.
         this.firesList = [];
         this.fuelMoistureList = [];
         this.satelliteList = [];
@@ -40,25 +45,33 @@ class CatalogMenu extends HTMLElement {
      */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
+        // Makes sure that map events like zooming and panning are disabled from within menu div
         L.DomEvent.disableScrollPropagation(catalogMenu);
         L.DomEvent.disableClickPropagation(catalogMenu);
+        // Closes the menu when the x is clicked
         this.querySelector('#menu-close').addEventListener('click', () => {
             catalogMenu.style.display = 'none';
         });
+        // Implements repositioning menu
         this.dragElement(catalogMenu);
 
         const menuSearch = this.querySelector('#menu-search');
+        // Make sure the menu can't be dragged from the search input box
         menuSearch.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
+        // Sets up search functionality
         menuSearch.oninput = () => this.searchCatalog();
 
+        // needed for proper function scoping
         var parentComponent = this;
+        // fetch catalog
         $.getJSON("simulations/catalog.json", function(data) {
             catalog = data;
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
+            // build html for list item for each catalog entry and add it to the proper list depending on its description
             $.each(data, function(cat_name) {
                 var cat_entry = data[cat_name];
                 let desc = cat_entry.description;
@@ -77,6 +90,7 @@ class CatalogMenu extends HTMLElement {
         });
     }
 
+    /** Returns <li> html from a given catalog entry */
     buildListItem(cat_entry) {
         var job_id = cat_entry.job_id;
         var kml_url = cat_entry.kml_url;
@@ -100,6 +114,10 @@ class CatalogMenu extends HTMLElement {
         return html;
     }
 
+    /** Called each time a character is entered into the search input. Clears each catalog column on the DOM,
+     * filters the stored array of catalog entries by its description for whether there is a match with the searched
+     * text. Builds <li> html for filtered catalog entries and adds them to the columns
+    */
     searchCatalog() {
         const searchText = this.querySelector('#menu-search').value.toLowerCase();
         const firesListDOM = this.querySelector('#catalog-fires');
@@ -118,6 +136,7 @@ class CatalogMenu extends HTMLElement {
         });
     }
 
+    /** Makes given element draggable */
     dragElement(elmnt) {
         var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
@@ -154,8 +173,10 @@ class CatalogMenu extends HTMLElement {
         }
       }
 
+    /** Called when Component is removed from the DOM. Remove EventListners */
     disconnectedCallback() {
         this.querySelector('#menu-close').removeEventListener();
+        this.querySelector('#menu-search').removeEventListener();
     }
 }
 
