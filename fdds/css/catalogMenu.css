@@ -1,7 +1,7 @@
 .catalog-menu {
     position:absolute;
     padding: 5px;
-    z-index:100;
+    z-index:1000;
     width: 600px;
     height: 400px;
     top: 140px;

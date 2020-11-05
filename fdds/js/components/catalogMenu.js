@@ -39,34 +39,39 @@ class CatalogMenu extends HTMLElement {
      * needs to be fetched and the lists built 
      */
     connectedCallback() {
+        const catalogMenu = this.querySelector('.catalog-menu');
+        L.DomEvent.disableScrollPropagation(catalogMenu);
+        L.DomEvent.disableClickPropagation(catalogMenu);
         this.querySelector('#menu-close').addEventListener('click', () => {
-            this.querySelector('.catalog-menu').style.display = 'none';
+            catalogMenu.style.display = 'none';
         });
-        this.dragElement(this.querySelector(".catalog-menu"));
+        this.dragElement(catalogMenu);
+
         const menuSearch = this.querySelector('#menu-search');
         menuSearch.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
         menuSearch.oninput = (input) => this.searchCatalog(input);
-        L.DomEvent.disableScrollPropagation(this.querySelector(".catalog-menu"));
-        L.DomEvent.disableClickPropagation(this.querySelector(".catalog-menu"));
+
         var parentComponent = this;
-        
         $.getJSON("simulations/catalog.json", function(data) {
             catalog = data;
-            const list1 = $('#catalog-fires');
-            const list2 = $('#catalog-fuel-moisture');
-            const list3 = $('#catalog-satellite-data');
+            const firesListDOM = $('#catalog-fires');
+            const fuelMoistureListDOM = $('#catalog-fuel-moisture');
+            const satelliteListDOM = $('#catalog-satellite-data');
             $.each(data, function(cat_name) {
                 var cat_entry = data[cat_name];
                 let desc = cat_entry.description;
                 var html = parentComponent.buildListItem(cat_entry);
                 if(desc.indexOf('GACC') >= 0) {
-                    list2.append(html);
+                    parentComponent.fuelMoistureList.push(cat_entry);
+                    fuelMoistureListDOM.append(html);
                 } else if(desc.indexOf('SAT') >= 0) {
-                    list3.append(html);
+                    parentComponent.satelliteList.push(cat_entry);
+                    satelliteListDOM.append(html);
                 } else {
-                    list1.append(html);
+                    parentComponent.firesList.push(cat_entry);
+                    firesListDOM.append(html);
                 }
             });
         });
