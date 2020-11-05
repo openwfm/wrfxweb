@@ -4,6 +4,9 @@
 class CatalogMenu extends HTMLElement {
     constructor() {
         super();
+        this.list1 = [];
+        this.list2 = [];
+        this.list3 = [];
         this.innerHTML = `
             <div class="catalog-menu">
                 <div id="menu-title" class="menu-title">
@@ -13,18 +16,24 @@ class CatalogMenu extends HTMLElement {
                         <span id="menu-close">x</span>
                     </div>
                 </div>
-                <div class="menu-columns">
+                <div class="menu-columns" id="default-menu">
                     <div class="column">
-                            <h3>Fires</h3>
-                            <ul id="catalog-list-1" class="catalog-list"> </ul>
+                        <h3>Fires</h3>
+                        <ul id="catalog-list-1" class="catalog-list"> </ul>
                     </div>
                     <div class="column">
-                            <h3>Fuel moisture</h3>
-                            <ul id="catalog-list-2" class="catalog-list"> </ul>
+                        <h3>Fuel moisture</h3>
+                        <ul id="catalog-list-2" class="catalog-list"> </ul>
                     </div>
                     <div class="column">
-                            <h3>Satellite Data</h3>
-                            <ul id="catalog-list-3" class="catalog-list"> </ul>
+                        <h3>Satellite Data</h3>
+                        <ul id="catalog-list-3" class="catalog-list"> </ul>
+                    </div>
+                </div>
+                <div class="menu-columns" id="search-menu" style="display:none">
+                    <div class="column">
+                        <h3>Search Result</h3>
+                        <ul id="catalog-list-search" class="catalog-list"></ul>
                     </div>
                 </div>
             </div>
@@ -40,9 +49,12 @@ class CatalogMenu extends HTMLElement {
             this.querySelector('.catalog-menu').style.display = 'none';
         });
         this.dragElement(this.querySelector(".catalog-menu"));
-        this.querySelector('#menu-search').addEventListener('mousedown', (e) => {
+        const menuSearch = this.querySelector('#menu-search');
+        menuSearch.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
+        menuSearch.oninput = (input) => this.searchCatalog(input);
+
 
         L.DomEvent.disableScrollPropagation(this.querySelector(".catalog-menu"));
         L.DomEvent.disableClickPropagation(this.querySelector(".catalog-menu"));
@@ -88,6 +100,14 @@ class CatalogMenu extends HTMLElement {
                 }
             });
         });
+    }
+
+    searchCatalog(input) {
+        console.log(input);
+        const defaultMenu = this.querySelector("#default-menu");
+        const searchMenu = this.querySelector("#search-menu");
+        defaultMenu.style.display = "none";
+        searchMenu.style.display = "block";
     }
 
     dragElement(elmnt) {
