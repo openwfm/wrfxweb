@@ -16,7 +16,7 @@ class CatalogMenu extends HTMLElement {
                         <span id="menu-close">x</span>
                     </div>
                 </div>
-                <div class="menu-columns" id="default-menu">
+                <div class="menu-columns">
                     <div class="column">
                         <h3>Fires</h3>
                         <ul id="catalog-fires" class="catalog-list"> </ul>
@@ -51,27 +51,27 @@ class CatalogMenu extends HTMLElement {
         menuSearch.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
-        menuSearch.oninput = (input) => this.searchCatalog(input);
+        menuSearch.oninput = () => this.searchCatalog();
 
         var parentComponent = this;
         $.getJSON("simulations/catalog.json", function(data) {
             catalog = data;
-            const firesListDOM = $('#catalog-fires');
-            const fuelMoistureListDOM = $('#catalog-fuel-moisture');
-            const satelliteListDOM = $('#catalog-satellite-data');
+            const firesListDOM = parentComponent.querySelector('#catalog-fires');
+            const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
+            const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
             $.each(data, function(cat_name) {
                 var cat_entry = data[cat_name];
                 let desc = cat_entry.description;
                 var html = parentComponent.buildListItem(cat_entry);
                 if(desc.indexOf('GACC') >= 0) {
                     parentComponent.fuelMoistureList.push(cat_entry);
-                    fuelMoistureListDOM.append(html);
+                    fuelMoistureListDOM.innerHTML += html;
                 } else if(desc.indexOf('SAT') >= 0) {
                     parentComponent.satelliteList.push(cat_entry);
-                    satelliteListDOM.append(html);
+                    satelliteListDOM.innerHTML += html;
                 } else {
                     parentComponent.firesList.push(cat_entry);
-                    firesListDOM.append(html);
+                    firesListDOM.innerHTML += html;
                 }
             });
         });
@@ -100,8 +100,22 @@ class CatalogMenu extends HTMLElement {
         return html;
     }
 
-    searchCatalog(input) {
-        console.log(input);
+    searchCatalog() {
+        const searchText = this.querySelector('#menu-search').value.toLowerCase();
+        const firesListDOM = this.querySelector('#catalog-fires');
+        const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
+        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
+        catalogColumns.map(columnArray => {
+            let listDOM = columnArray[0];
+            let list = columnArray[1];
+            listDOM.innerHTML = '';
+            let filteredList = list.filter(catalogEntry => catalogEntry.description.toLowerCase().includes(searchText));
+            filteredList.map(catalogEntry => {
+                let liHTML = this.buildListItem(catalogEntry);
+                listDOM.innerHTML += liHTML;
+            });
+        });
     }
 
     dragElement(elmnt) {
