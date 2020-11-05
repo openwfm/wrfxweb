@@ -6,9 +6,12 @@ class CatalogMenu extends HTMLElement {
         super();
         this.innerHTML = `
             <div class="catalog-menu">
-                <div class="menu-title">
+                <div id="menu-title" class="menu-title">
                     <h3>Select Simulation...</h3>
-                    <span id="menu-close">x</span>
+                    <div> 
+                        <input id="menu-search" type="text" placeholder="Search for Simulation..."></input>
+                        <span id="menu-close">x</span>
+                    </div>
                 </div>
                 <div class="menu-columns">
                     <div class="column">
@@ -36,8 +39,13 @@ class CatalogMenu extends HTMLElement {
         this.querySelector('#menu-close').addEventListener('click', () => {
             this.querySelector('.catalog-menu').style.display = 'none';
         });
+        this.dragElement(this.querySelector(".catalog-menu"));
+        this.querySelector('#menu-search').addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
 
         L.DomEvent.disableScrollPropagation(this.querySelector(".catalog-menu"));
+        L.DomEvent.disableClickPropagation(this.querySelector(".catalog-menu"));
         
         $.getJSON("simulations/catalog.json", function(data) {
             catalog = data;
@@ -81,6 +89,42 @@ class CatalogMenu extends HTMLElement {
             });
         });
     }
+
+    dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        document.getElementById(elmnt.id + "menu-title").onmousedown = dragMouseDown;
+      
+        function dragMouseDown(e) {
+          e = e || window.event;
+          e.preventDefault();
+          // get the mouse cursor position at startup:
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = closeDragElement;
+          // call a function whenever the cursor moves:
+          document.onmousemove = elementDrag;
+        }
+      
+        function elementDrag(e) {
+          e = e || window.event;
+          e.preventDefault();
+          // calculate the new cursor position:
+          pos1 = pos3 - e.clientX;
+          pos2 = pos4 - e.clientY;
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          // set the element's new position:
+          elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+          elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+      
+        function closeDragElement() {
+          // stop moving when mouse button is released:
+          document.onmouseup = null;
+          document.onmousemove = null;
+        }
+      }
 
     disconnectedCallback() {
         this.querySelector('#menu-close').removeEventListener();
