@@ -232,10 +232,8 @@ function handle_catalog_click(path) {
  // show job description
   var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
  
-  //REVERT THIS BEFORE COMMITTING
-  $.getJSON(catPath.replaceAll(":", "_"), function(data) {
-  // $.getJSON(catPath, function(data) {
-	catalog = data;
+  $.getJSON(catPath, function(data) {
+    catalog = data;
     $.each(data, function(cat_name) {
       var cat_entry = data[cat_name];
       var desc = cat_entry.description + ' Experimental forecast ONLY';
@@ -245,14 +243,10 @@ function handle_catalog_click(path) {
     });
   });
 
-  // REVERT THIS
-  $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
-  // $.getJSON(path, function(selected_simulation) {
+  $.getJSON(path, function(selected_simulation) {
     // store in global state
     rasters = selected_simulation;
-    // REVERT THIS
-    raster_base = "https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1);
-    // raster_base = path.substring(0, path.lastIndexOf('/') + 1);
+    raster_base = path.substring(0, path.lastIndexOf('/') + 1);
     
     // retrieve all domains
     domains = Object.keys(rasters);
