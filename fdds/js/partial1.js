@@ -32,48 +32,47 @@ var current_frame = 0;
 
 function initialize_fdds() {
 
-//  initialize base layers & build map
-base_layer_dict = {
-/*
-	'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-													attribution: 'Data and imagery by MapQuest',
-													subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
-*/
-	'MapQuest' : MQ.mapLayer(),
-/*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-															attribution: 'Data and imagery by MapQuest',
-															subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
-	'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-										 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
-};
+  //  initialize base layers & build map
+  base_layer_dict = {
+  /*
+    'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+                            attribution: 'Data and imagery by MapQuest',
+                            subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+  */
+    'MapQuest' : MQ.mapLayer(),
+  /*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+                                attribution: 'Data and imagery by MapQuest',
+                                subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
+    'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
+  };
 
 
-// construct map with the base layers
-map = L.map('map-fd', {
-	center: [37.34, -121.89],
-	zoom: 7,
-	layers: [base_layer_dict['OSM']],
-  zoomControl: false,
-  minZoom: 3
-});
+  // construct map with the base layers
+  map = L.map('map-fd', {
+    center: [37.34, -121.89],
+    zoom: 7,
+    layers: [base_layer_dict['OSM']],
+    zoomControl: false,
+    minZoom: 3
+  });
 
 
-// add scale & zoom controls to the map
-L.control.scale({ position: 'bottomright' }).addTo(map);
+  // add scale & zoom controls to the map
+  L.control.scale({ position: 'bottomright' }).addTo(map);
 
-map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
+  map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
 
-map.on('overlayremove', function(e) {
-	delete current_display[e.name];
+  map.on('overlayremove', function(e) {
+    delete current_display[e.name];
 
-	if(displayed_colorbar == e.name) {
-    $('#raster-colorbar').attr('src', '');
-    $('#raster-colorbar').hide();
-		displayed_colorbar = null;
-	}
-});
+    if(displayed_colorbar == e.name) {
+      $('#raster-colorbar').attr('src', '');
+      $('#raster-colorbar').hide();
+      displayed_colorbar = null;
+    }
+  });
 }
-
 
 function handle_overlayadd(name, layer) {
   // register in currently displayed layers and bring to front if it's an overlay
