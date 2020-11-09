@@ -75,43 +75,45 @@ class CatalogMenu extends HTMLElement {
             $.each(data, function(cat_name) {
                 var cat_entry = data[cat_name];
                 let desc = cat_entry.description;
-                var html = parentComponent.buildListItem(cat_entry);
+                var newLI = parentComponent.buildListItem(cat_entry);
                 if(desc.indexOf('GACC') >= 0) {
                     parentComponent.fuelMoistureList.push(cat_entry);
-                    fuelMoistureListDOM.innerHTML += html;
+                    fuelMoistureListDOM.appendChild(newLI);
                 } else if(desc.indexOf('SAT') >= 0) {
                     parentComponent.satelliteList.push(cat_entry);
-                    satelliteListDOM.innerHTML += html;
+                    satelliteListDOM.appendChild(newLI);
                 } else {
                     parentComponent.firesList.push(cat_entry);
-                    firesListDOM.innerHTML += html;
+                    firesListDOM.appendChild(newLI);
                 }
             });
         });
     }
 
-    /** Returns <li> html from a given catalog entry */
+    /** Returns <li> html element from a given catalog entry */
     buildListItem(cat_entry) {
+        var newLI = document.createElement('li');
         var job_id = cat_entry.job_id;
         var kml_url = cat_entry.kml_url;
         var zip_url = cat_entry.zip_url;
-        var load_cmd = '"handle_catalog_click(\'simulations/' + cat_entry.manifest_path + '\');"';
-        var html = '<li class="catalog-entry" onclick=' + load_cmd + '><b>' 
-                    + cat_entry.description + '</b><br/>' 
-                                            + 'from: ' + cat_entry.from_utc + '<br/>to: ' + cat_entry.to_utc  + '<br/>';
+        var innerHTML = '<b>' + cat_entry.description + '</b><br/>'
+                        + 'from: ' + cat_entry.from_utc + '<br/>'
+                        + 'to: ' + cat_entry.to_utc + '<br/>';
         if(job_id) {
-            html = html  + 'job id: ' + job_id + '<br/>';
+            innerHTML += 'job id: ' + job_id + '<br/>';
         }
-        html = html + '</li>';
+        newLI.onclick = () => this.handle_catalog_click(job_id, 'simulations/' + cat_entry.manifest_path);
+        newLI.className = 'catalog-entry';
         if(kml_url) {
             let mb = Math.round(10*cat_entry.kml_size/1048576.0)/10;
-            html = html + '<a href="' + kml_url + '" download>Download KMZ ' + mb.toString() +' MB</a><br/>' ;
+            innerHTML += '<a href="' + kml_url + '" download>Download KMZ ' + mb.toString() +' MB</a><br/>' ;
         }
         if(zip_url) {
             let mb = Math.round(10*cat_entry.zip_size/1048576.0)/10;
-            html = html + '<a href="' + zip_url + '" download>Download ZIP ' + mb.toString() +' MB</a><br/>' ;
+            innerHTML += '<a href="' + zip_url + '" download>Download ZIP ' + mb.toString() +' MB</a><br/>' ;
         }
-        return html;
+        newLI.innerHTML = innerHTML;
+        return newLI;
     }
 
     /** Called each time a character is entered into the search input. Clears each catalog column on the DOM,
@@ -171,7 +173,58 @@ class CatalogMenu extends HTMLElement {
           document.onmouseup = null;
           document.onmousemove = null;
         }
-      }
+    }
+
+    handle_catalog_click(entryID, path) {
+        // close selection dialog
+
+        this.querySelector('.catalog-menu').style.display = "none";
+        console.log(entryID);
+        // history.pushState({id: entryID}, 'Data', entryID)
+
+        // show job description
+        var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
+        
+        //REVERT THIS BEFORE COMMITTING
+        $.getJSON(catPath.replaceAll(":", "_"), function(data) {
+            // $.getJSON(catPath, function(data) {
+            catalog = data;
+            $.each(data, function(cat_name) {
+                var cat_entry = data[cat_name];
+                var desc = cat_entry.description + ' Experimental forecast ONLY';
+                $("#displayTest").show();
+                $("#displayTest2").show();
+                $("#displayTest").html(desc);
+            });
+            });
+
+        // REVERT THIS
+        $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
+        // $.getJSON(path, function(selected_simulation) {
+            // store in global state
+            rasters = selected_simulation;
+            // REVERT THIS
+            raster_base = "https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1);
+            // raster_base = path.substring(0, path.lastIndexOf('/') + 1);  
+
+            // retrieve all domains
+            domains = Object.keys(rasters);
+            current_domain = domains[0];
+
+            // update the domain radio buttons
+            $('#domain-checkboxes').empty();
+            $('#domain-checkboxes').append('<div class="ui large label">Active domain</div><br/>');
+            for(var dom in domains) {
+            var dom_id = domains[dom];
+            var checked = '';
+            if(dom_id == '1') { checked = ' checked="yes"'}
+            $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
+            }
+            $('#domain-selector').show();
+
+            setup_for_domain(current_domain);
+        });
+    }
 
     /** Called when Component is removed from the DOM. Remove EventListners */
     disconnectedCallback() {

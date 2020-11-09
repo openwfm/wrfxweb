@@ -223,49 +223,6 @@ function setup_for_time(frame_ndx) {
     }
   }
 }
-
-
-function handle_catalog_click(path) {
-  // close selection dialog
-  $('.catalog-menu').hide();
-
- // show job description
-  var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
- 
-  $.getJSON(catPath, function(data) {
-    catalog = data;
-    $.each(data, function(cat_name) {
-      var cat_entry = data[cat_name];
-      var desc = cat_entry.description + ' Experimental forecast ONLY';
-      $("#displayTest").show();
-      $("#displayTest2").show();
-      $("#displayTest").html(desc);
-    });
-  });
-
-  $.getJSON(path, function(selected_simulation) {
-    // store in global state
-    rasters = selected_simulation;
-    raster_base = path.substring(0, path.lastIndexOf('/') + 1);
-    
-    // retrieve all domains
-    domains = Object.keys(rasters);
-    current_domain = domains[0];
-
-    // update the domain radio buttons
-    $('#domain-checkboxes').empty();
-    $('#domain-checkboxes').append('<div class="ui large label">Active domain</div><br/>');
-    for(var dom in domains) {
-      var dom_id = domains[dom];
-      var checked = '';
-      if(dom_id == '1') { checked = ' checked="yes"'}
-      $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
-    }
-    $('#domain-selector').show();
-
-    setup_for_domain(current_domain);
-  });
-}
  
 // Section containing animation/playback code
 function frame_ready(frame_ndx) {
