@@ -132,8 +132,8 @@ class CatalogMenu extends HTMLElement {
             listDOM.innerHTML = '';
             let filteredList = list.filter(catalogEntry => catalogEntry.description.toLowerCase().includes(searchText));
             filteredList.map(catalogEntry => {
-                let liHTML = this.buildListItem(catalogEntry);
-                listDOM.innerHTML += liHTML;
+                let matchedLI = this.buildListItem(catalogEntry);
+                listDOM.appendChild(matchedLI);
             });
         });
     }
@@ -180,7 +180,7 @@ class CatalogMenu extends HTMLElement {
 
         this.querySelector('.catalog-menu').style.display = "none";
         console.log(entryID);
-        // history.pushState({id: entryID}, 'Data', entryID)
+        // history.pushState(id: entryID}, 'Data', entryID)
 
         // show job description
         var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
