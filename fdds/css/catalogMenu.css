@@ -72,11 +72,6 @@
     font-size: 1rem;
 }
 
-.column a {
-    color: black;
-    text-decoration: none;
-}
-
 .catalog-list {
     padding: 0px;
     word-wrap: break-word;

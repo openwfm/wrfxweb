@@ -87,10 +87,6 @@ html, body {
   height: 100vh;
 }
 
-a.dead-link {
-	pointer-events: none;
-}
-
 #time-valid {
   position: fixed;
   left: 140px;
