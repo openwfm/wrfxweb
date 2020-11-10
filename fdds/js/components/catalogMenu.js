@@ -66,7 +66,7 @@ class CatalogMenu extends HTMLElement {
         // needed for proper function scoping
         var parentComponent = this;
         // fetch catalog
-        $.getJSON("simulations/catalog.json", function(data) {
+        fetch("simulations/catalog.json").then(response => response.json()).then(function(data) { 
             catalog = data;
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
@@ -87,32 +87,27 @@ class CatalogMenu extends HTMLElement {
                     firesListDOM.appendChild(newLI);
                 }
             });
+        }).catch(error => {
+            console.log(error);
         });
     }
 
     /** Returns <li> html element from a given catalog entry */
     buildListItem(cat_entry) {
-        var newLI = document.createElement('li');
-        var job_id = cat_entry.job_id;
-        var kml_url = cat_entry.kml_url;
-        var zip_url = cat_entry.zip_url;
-        var innerHTML = '<b>' + cat_entry.description + '</b><br/>'
-                        + 'from: ' + cat_entry.from_utc + '<br/>'
-                        + 'to: ' + cat_entry.to_utc + '<br/>';
-        if(job_id) {
-            innerHTML += 'job id: ' + job_id + '<br/>';
+        const newLI = document.createElement('catalog-item');
+        newLI.setAttribute('description', cat_entry.description);
+        newLI.setAttribute('manifestPath', cat_entry.manifest_path);
+        newLI.setAttribute('jobId', cat_entry.job_id);
+        newLI.setAttribute('to', cat_entry.to_utc);
+        newLI.setAttribute('from', cat_entry.from_utc);
+        if (cat_entry.kml_url) {
+            newLI.setAttribute('kmlURL', cat_entry.kml_url);
+            newLI.setAttribute('kmlSize', cat_entry.kml_size);
         }
-        newLI.onclick = () => this.handle_catalog_click(job_id, 'simulations/' + cat_entry.manifest_path);
-        newLI.className = 'catalog-entry';
-        if(kml_url) {
-            let mb = Math.round(10*cat_entry.kml_size/1048576.0)/10;
-            innerHTML += '<a href="' + kml_url + '" download>Download KMZ ' + mb.toString() +' MB</a><br/>' ;
+        if (cat_entry.zip_url) {
+            newLI.setAttribute('zipURL', cat_entry.zip_url);
+            newLI.setAttribute('zipSize', cat_entry.zip_size);
         }
-        if(zip_url) {
-            let mb = Math.round(10*cat_entry.zip_size/1048576.0)/10;
-            innerHTML += '<a href="' + zip_url + '" download>Download ZIP ' + mb.toString() +' MB</a><br/>' ;
-        }
-        newLI.innerHTML = innerHTML;
         return newLI;
     }
 
@@ -173,57 +168,6 @@ class CatalogMenu extends HTMLElement {
           document.onmouseup = null;
           document.onmousemove = null;
         }
-    }
-
-    handle_catalog_click(entryID, path) {
-        // close selection dialog
-
-        this.querySelector('.catalog-menu').style.display = "none";
-        console.log(entryID);
-        // history.pushState(id: entryID}, 'Data', entryID)
-
-        // show job description
-        var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
-        
-        //REVERT THIS BEFORE COMMITTING
-        $.getJSON(catPath.replaceAll(":", "_"), function(data) {
-            // $.getJSON(catPath, function(data) {
-            catalog = data;
-            $.each(data, function(cat_name) {
-                var cat_entry = data[cat_name];
-                var desc = cat_entry.description + ' Experimental forecast ONLY';
-                $("#displayTest").show();
-                $("#displayTest2").show();
-                $("#displayTest").html(desc);
-            });
-            });
-
-        // REVERT THIS
-        $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
-        // $.getJSON(path, function(selected_simulation) {
-            // store in global state
-            rasters = selected_simulation;
-            // REVERT THIS
-            raster_base = "https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1);
-            // raster_base = path.substring(0, path.lastIndexOf('/') + 1);  
-
-            // retrieve all domains
-            domains = Object.keys(rasters);
-            current_domain = domains[0];
-
-            // update the domain radio buttons
-            $('#domain-checkboxes').empty();
-            $('#domain-checkboxes').append('<div class="ui large label">Active domain</div><br/>');
-            for(var dom in domains) {
-            var dom_id = domains[dom];
-            var checked = '';
-            if(dom_id == '1') { checked = ' checked="yes"'}
-            $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
-            }
-            $('#domain-selector').show();
-
-            setup_for_domain(current_domain);
-        });
     }
 
     /** Called when Component is removed from the DOM. Remove EventListners */
