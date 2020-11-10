@@ -72,8 +72,7 @@ class CatalogMenu extends HTMLElement {
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
             // build html for list item for each catalog entry and add it to the proper list depending on its description
-            $.each(data, function(cat_name) {
-                var cat_entry = data[cat_name];
+            for (const [cat_name, cat_entry] of Object.entries(data)) {
                 let desc = cat_entry.description;
                 var newLI = parentComponent.buildListItem(cat_entry);
                 if(desc.indexOf('GACC') >= 0) {
@@ -86,7 +85,7 @@ class CatalogMenu extends HTMLElement {
                     parentComponent.firesList.push(cat_entry);
                     firesListDOM.appendChild(newLI);
                 }
-            });
+            }
         }).catch(error => {
             console.log(error);
         });

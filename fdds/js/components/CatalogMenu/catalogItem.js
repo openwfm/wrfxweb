@@ -100,7 +100,7 @@ class CatalogItem extends HTMLElement {
                 $("#displayTest2").show();
                 $("#displayTest").html(desc);
             });
-            });
+        });
 
         // REVERT THIS
         $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
