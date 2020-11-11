@@ -1,30 +1,6 @@
 const template = document.createElement('template');
 template.innerHTML = `
-    <style>
-        li.catalog-entry {
-            list-style-type: none;
-            padding: 0px;
-        }
-
-        li.catalog-entry:hover {
-            background-color: #fdfd96;
-        }
-        h3 { 
-            padding: 0px;
-            margin: 0px;
-            font-size: 1rem;
-        }
-        p {
-            margin: 0px;
-        }
-        a {
-            color: black;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel='stylesheet' href='css/catalogItem.css'>
     <li class='catalog-entry'>
         <div id='entry'>
             <h3></h3>
@@ -83,8 +59,8 @@ class CatalogItem extends HTMLElement {
         // close selection dialog
 
         document.querySelector('.catalog-menu').style.display = "none";
-        console.log(entryID);
-        // history.pushState(id: entryID}, 'Data', entryID)
+        // console.log(entryID);
+        history.pushState({id: entryID}, 'Data', entryID)
 
         // show job description
         var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
