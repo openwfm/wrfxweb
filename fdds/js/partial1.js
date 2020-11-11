@@ -98,7 +98,6 @@ function handle_overlayadd(name, layer) {
   preload_variables(8);
 }
 
-
 function setup_for_domain(dom_id) {
   // set the current domain
   current_domain = dom_id;
@@ -247,15 +246,6 @@ function frame_ready(frame_ndx) {
   return true;
 }
 
-function open_catalog() {
-  $('#select-dialog').dialog('option', 'width', 600);
-  $('#select-dialog').dialog('option', 'height', 400);
-  $('#select-dialog').dialog('option', 'z-index', 1400);
-  $('#select-dialog').dialog('open');
-  $('.ui-dialog-titlebar-close').blur();
-  $('#catalog-list-1').focus();
-}
-
 function schedule_next_frame() {
   if(current_frame == sorted_timestamps.length-1){
     window.setTimeout(next_frame, 1000);
@@ -263,7 +253,6 @@ function schedule_next_frame() {
     window.setTimeout(next_frame, 330);
   }
 }
-
 
 function next_frame() {
   if (playing) {
@@ -278,7 +267,6 @@ function next_frame() {
     }
   }
 }
-
 
 function wait_for_frame() {
   // don't do anything if playing has been cancelled
@@ -295,7 +283,6 @@ function wait_for_frame() {
   }
 }
 
-
 function toggle_play() {
   if (!playing) {
     $('#play-control-button > span').text('Pause');
@@ -308,7 +295,6 @@ function toggle_play() {
     playing = false;
   }
 }
-
 
 /* Code handling auxiliary tasks */
 function preload_variables(preload_count) {
@@ -336,4 +322,3 @@ function preload_variables(preload_count) {
     }
   }
 }
-
