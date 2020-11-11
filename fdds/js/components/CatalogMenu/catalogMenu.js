@@ -63,6 +63,9 @@ class CatalogMenu extends HTMLElement {
         // Sets up search functionality
         menuSearch.oninput = () => this.searchCatalog();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const navJobId = urlParams.get('job_id');
+
         // needed for proper function scoping
         var parentComponent = this;
         // fetch catalog
@@ -74,7 +77,7 @@ class CatalogMenu extends HTMLElement {
             // build html for list item for each catalog entry and add it to the proper list depending on its description
             for (const [cat_name, cat_entry] of Object.entries(data)) {
                 let desc = cat_entry.description;
-                var newLI = parentComponent.buildListItem(cat_entry);
+                var newLI = parentComponent.buildListItem(cat_entry, navJobId);
                 if(desc.indexOf('GACC') >= 0) {
                     parentComponent.fuelMoistureList.push(cat_entry);
                     fuelMoistureListDOM.appendChild(newLI);
@@ -92,13 +95,14 @@ class CatalogMenu extends HTMLElement {
     }
 
     /** Returns <li> html element from a given catalog entry */
-    buildListItem(cat_entry) {
+    buildListItem(cat_entry, navJobId) {
         const newLI = document.createElement('catalog-item');
         newLI.setAttribute('description', cat_entry.description);
         newLI.setAttribute('manifestPath', cat_entry.manifest_path);
         newLI.setAttribute('jobId', cat_entry.job_id);
         newLI.setAttribute('to', cat_entry.to_utc);
         newLI.setAttribute('from', cat_entry.from_utc);
+        newLI.setAttribute('navJobId', navJobId);
         if (cat_entry.kml_url) {
             newLI.setAttribute('kmlURL', cat_entry.kml_url);
             newLI.setAttribute('kmlSize', cat_entry.kml_size);

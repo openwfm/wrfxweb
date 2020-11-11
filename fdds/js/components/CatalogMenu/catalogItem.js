@@ -30,7 +30,7 @@ class CatalogItem extends HTMLElement {
         let kmlSize = this.getAttribute('kmlSize');
         let zipURL = this.getAttribute('zipURL');
         let zipSize = this.getAttribute('zipSize');
-        let manifestPath = this.getAttribute("manifestPath");
+        let manifestPath = this.getAttribute('manifestPath');
 
         this.shadowRoot.querySelector('h3').innerText = description;
         this.shadowRoot.querySelector('#jobID').innerText += ' ' + jobId;
@@ -50,6 +50,7 @@ class CatalogItem extends HTMLElement {
         }
 
         this.shadowRoot.querySelector('#entry').onclick = () => this.handle_catalog_click(jobId, 'simulations/' + manifestPath);
+        if (this.getAttribute('navJobId') == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath);
     }
 
     /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated
@@ -59,8 +60,7 @@ class CatalogItem extends HTMLElement {
         // close selection dialog
 
         document.querySelector('.catalog-menu').style.display = "none";
-        // console.log(entryID);
-        history.pushState({id: entryID}, 'Data', entryID)
+        history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
         // show job description
         var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
