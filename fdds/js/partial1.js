@@ -317,6 +317,15 @@ function preload_variables(preload_count) {
 					var img = new Image();
 					img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);
 					img.src = raster_base + var_info.raster;
+          if ('colorbar' in var_info) {
+            var cb_key = var_name + '_cb';
+            if(!(cb_key in preloaded)) {
+              preloaded[cb_key] = {};
+            }
+            var img = new Image();
+            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, preloaded);
+            img.src = raster_base + var_info.colorbar;
+          }
         }
       }
     }
