@@ -25,6 +25,7 @@ var current_display = {}; // dictionary of layer name -> layer of currently disp
 var current_timestamp = null; // currently displayed timestamp
 var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
 var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
+var displayed_colorbars = [];
 
 // Variables storing animation/playback context
 var playing = false;
@@ -66,10 +67,15 @@ function initialize_fdds() {
   map.on('overlayremove', function(e) {
     delete current_display[e.name];
 
-    if(displayed_colorbar == e.name) {
+    displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != e.name);
+    if (displayed_colorbars.length == 0) {
       $('#raster-colorbar').attr('src', '');
       $('#raster-colorbar').hide();
       displayed_colorbar = null;
+    } else {
+      let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
+      $('#raster-colorbar').attr('src', mostRecentColorBar.url);
+      displayed_colorbar = mostRecentColorBar.name;
     }
   });
 }
@@ -85,14 +91,13 @@ function handle_overlayadd(name, layer) {
   }
 
   // if the overlay being added now has a colorbar and there is none displayed, show it
-  // if(displayed_colorbar == null) {
-    var rasters_now = rasters[current_domain][current_timestamp];
-    if('colorbar' in rasters_now[name]) {
-        var cb_url = raster_base + rasters_now[name].colorbar;
-        $('#raster-colorbar').attr('src', cb_url).show();
-        displayed_colorbar = name;
-    }
-  // }
+  var rasters_now = rasters[current_domain][current_timestamp];
+  if('colorbar' in rasters_now[name]) {
+      var cb_url = raster_base + rasters_now[name].colorbar;
+      $('#raster-colorbar').attr('src', cb_url).show();
+      displayed_colorbar = name;
+      displayed_colorbars.push({name: name, url: cb_url});
+  }
 
   // preload all displayed variables for eight frames
   preload_variables(8);
