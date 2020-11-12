@@ -1,6 +1,30 @@
 const template = document.createElement('template');
 template.innerHTML = `
-    <link rel='stylesheet' href='css/catalogItem.css'>
+    <style>
+        li.catalog-entry {
+            list-style-type: none;
+            padding: 0px;
+        }
+
+        li.catalog-entry:hover {
+            background-color: #fdfd96;
+        }
+        h3 { 
+            padding: 0px;
+            margin: 0px;
+            font-size: 1rem;
+        }
+        p {
+            margin: 0px;
+        }
+        a {
+            color: black;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
     <li class='catalog-entry'>
         <div id='entry'>
             <h3></h3>
