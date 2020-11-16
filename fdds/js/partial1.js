@@ -82,7 +82,7 @@ function initialize_fdds() {
 }
 
 function loadConfig() {
-  fetch("../etc/conf.json").then(response => response.json()).then(function(data) { 
+  fetch("/etc/conf.json").then(response => response.json()).then(function(data) { 
     let organization = data.organization;
 
     if (!organization.includes("SJSU")) {
