@@ -58,6 +58,7 @@ function initialize_fdds() {
     minZoom: 3
   });
 
+  loadConfig();
 
   // add scale & zoom controls to the map
   L.control.scale({ position: 'bottomright' }).addTo(map);
@@ -77,6 +78,27 @@ function initialize_fdds() {
       $('#raster-colorbar').attr('src', mostRecentColorBar.url);
       displayed_colorbar = mostRecentColorBar.name;
     }
+  });
+}
+
+function loadConfig() {
+  fetch("/etc/conf.json").then(response => response.json()).then(function(data) { 
+    let organization = data.organization;
+
+    if (!organization.includes("SJSU")) {
+      map.panTo([39.7392, -104.9903]);
+    }
+    let flags = data.flags;
+    document.title = organization;
+    const simulationFlags = document.querySelector("#simulation-flags");
+    flags.map(flag => {
+      var spanElement = document.createElement("span");
+      spanElement.className = "displayTest";
+      spanElement.innerText = flag;
+      simulationFlags.appendChild(spanElement);
+    });
+  }).catch(error => {
+    console.log("Error getting conf.json " + error);
   });
 }
 
