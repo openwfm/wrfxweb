@@ -94,11 +94,9 @@ class CatalogItem extends HTMLElement {
         // $.getJSON(catPath, function(data) {
             catalog = data;
             $.each(data, function(cat_name) {
-                var cat_entry = data[cat_name];
-                var desc = cat_entry.description + ' Experimental forecast ONLY';
-                $("#displayTest").show();
-                $("#displayTest2").show();
-                $("#displayTest").html(desc);
+                // var cat_entry = data[cat_name];
+                // var desc = cat_entry.description + ' Experimental forecast ONLY';
+                $("#simulation-flags").show();
             });
         });
 
