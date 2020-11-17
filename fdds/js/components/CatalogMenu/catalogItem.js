@@ -88,8 +88,10 @@ class CatalogItem extends HTMLElement {
 
         // show job description
         var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
-        
-        $.getJSON(catPath, function(data) {
+
+        //REVERT THIS BEFORE COMMITTING
+        $.getJSON(catPath.replaceAll(":", "_"), function(data) {
+        // $.getJSON(catPath, function(data) { 
             catalog = data;
             $.each(data, function(cat_name) {
                 // var cat_entry = data[cat_name];
@@ -98,10 +100,15 @@ class CatalogItem extends HTMLElement {
             });
         });
 
-        $.getJSON(path, function(selected_simulation) {
+        // REVERT THIS
+        $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
+        // $.getJSON(path, function(selected_simulation) {
             // store in global state
             rasters = selected_simulation;
-            raster_base = path.substring(0, path.lastIndexOf('/') + 1);
+
+            // REVERT THIS
+            raster_base = "https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1);
+            // raster_base = path.substring(0, path.lastIndexOf('/') + 1);
 
             // retrieve all domains
             domains = Object.keys(rasters);
