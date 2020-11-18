@@ -27,6 +27,10 @@ class SimulationController extends HTMLElement {
 
     connectedCallback() {
         const container = this.querySelector('.slider-container');
+        const sliderHead = this.querySelector('#slider-head');
+        const sliderBar = this.querySelector('#slider-bar');
+        sliderHead.onmousedown = (e) => this.dragMouseDown(e);
+        sliderBar.onclick = (e) => this.clickBar(e);
         container.addEventListener('dblclick', (e) => {
             e.stopPropagation();
         });
@@ -45,7 +49,7 @@ class SimulationController extends HTMLElement {
     updateSlider() {
         setup_for_time(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
-        let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 100);
+        let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 95);
         sliderHead.style.left = percentage + '%';
     }
 
@@ -120,6 +124,35 @@ class SimulationController extends HTMLElement {
             }
         }
         return true;
+    }
+
+    dragMouseDown(e) {
+          e = e || window.event;
+          e.stopPropagation();
+          // get the mouse cursor position at startup:
+          var pos3 = e.clientX;
+          var originalFrame = this.currentFrame;
+          document.onmouseup = () => {
+            document.onmouseup = null;
+            document.onmousemove = null;
+          };
+          // call a function whenever the cursor moves:
+          document.onmousemove = (e2) => {
+            e2 = e2 || window.event;
+            e2.preventDefault();
+            // calculate the new cursor position:
+            let diff = Math.floor((e2.clientX - pos3) / 300 * sorted_timestamps.length);
+
+            let newFrame = originalFrame + diff;
+            this.currentFrame = Math.max(Math.min(sorted_timestamps.length-1, newFrame), 0);
+
+            this.updateSlider();
+            // set the element's new position:
+          }
+    }
+
+    clickBar(e) {
+        console.log("clickedBar");
     }
 }
 

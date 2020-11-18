@@ -68,6 +68,10 @@ button[disabled] {
     border-color: #cccccc;
 }
 
+#slider-bar:hover {
+    cursor: pointer;
+}
+
 #slider-head {
     position: absolute;
     top: 0; bottom: 0; left: 0; right: 0;
