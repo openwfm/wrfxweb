@@ -1,3 +1,9 @@
+/**
+ * A Componet that builds the animation controller for the simulation. Creates a UI component that 
+ * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
+ * slider bar with a head that indicates relative position in animation that can be dragged to a 
+ * specific location. Bar itself can also be clicked to seek to a specific position.
+ */
 class SimulationController extends HTMLElement {
     constructor() {
         super();
@@ -25,11 +31,12 @@ class SimulationController extends HTMLElement {
         this.playing = false;
     }
 
+    /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
         const sliderHead = this.querySelector('#slider-head');
         const sliderBar = this.querySelector('#slider-bar');
-        sliderHead.onmousedown = (e) => this.dragMouseDown(e);
+        sliderHead.onmousedown = (e) => this.dragSliderHead(e);
         sliderBar.onclick = (e) => this.clickBar(e);
         container.addEventListener('dblclick', (e) => {
             e.stopPropagation();
@@ -42,10 +49,7 @@ class SimulationController extends HTMLElement {
         this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
     }
     
-    disconnectedCallback() {
-        this.querySelector('.slider-container').removeEventListener();
-    }
-
+    /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
         setup_for_time(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
@@ -53,6 +57,8 @@ class SimulationController extends HTMLElement {
         sliderHead.style.left = percentage + '%';
     }
 
+    /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
+     * changes play icon to pause icon. */
     playPause() {
         const playPauseButton = document.querySelector('#slider-play-pause');
         const prevButton = document.querySelector('#slider-prev');
@@ -70,6 +76,7 @@ class SimulationController extends HTMLElement {
         }
     }
 
+    /** Iterates to next frame while still playing */
     play() {
         if (this.playing) {
             this.nextFrame(5);
@@ -81,6 +88,7 @@ class SimulationController extends HTMLElement {
         }
     }
 
+    /** Moves one frame to the right. */
     nextFrame(recursionDepth) {
         if (recursionDepth == 0) return;
         let nextFrame = (this.currentFrame + 1) % sorted_timestamps.length;
@@ -95,6 +103,7 @@ class SimulationController extends HTMLElement {
         }
     }
 
+    /** Moves one frame to the left. */
     prevFrame(recursionDepth) {
         if (recursionDepth == 0) return;
         let prevFrame = (this.currentFrame - 1) % sorted_timestamps.length;
@@ -109,6 +118,7 @@ class SimulationController extends HTMLElement {
         }
     }
 
+    /** Returns boolean indicating if frame_ndx has been loaded */
     frameReady(frame_ndx) {
     // for all layers currently displayed
         for(var key in current_display) {
@@ -126,7 +136,10 @@ class SimulationController extends HTMLElement {
         return true;
     }
 
-    dragMouseDown(e) {
+    /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
+     * currentFrame according to the offset. 
+     */
+    dragSliderHead(e) {
           e = e || window.event;
           e.stopPropagation();
           // get the mouse cursor position at startup:
@@ -150,11 +163,19 @@ class SimulationController extends HTMLElement {
           }
     }
 
+    /** Called when the slider bar is cicked. Calculates distance between slider-head and click
+     * location. Updates the currentFrame accordingly and calls updateSlider
+     */
     clickBar(e) {
         const head = this.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / 300 * sorted_timestamps.length - 1);
         this.currentFrame += diff;
         this.updateSlider();
+    }
+
+    /** Called when Component is removed from the DOM. Remove EventListners */
+    disconnectedCallback() {
+        this.querySelector('.slider-container').removeEventListener();
     }
 }
 
