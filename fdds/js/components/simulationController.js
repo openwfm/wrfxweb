@@ -141,18 +141,20 @@ class SimulationController extends HTMLElement {
             e2 = e2 || window.event;
             e2.preventDefault();
             // calculate the new cursor position:
-            let diff = Math.floor((e2.clientX - pos3) / 300 * sorted_timestamps.length);
+            let diff = Math.floor((e2.clientX - pos3) / 300 * sorted_timestamps.length - 1);
 
             let newFrame = originalFrame + diff;
             this.currentFrame = Math.max(Math.min(sorted_timestamps.length-1, newFrame), 0);
 
             this.updateSlider();
-            // set the element's new position:
           }
     }
 
     clickBar(e) {
-        console.log("clickedBar");
+        const head = this.querySelector('#slider-head').getBoundingClientRect();
+        let diff = Math.floor((e.clientX - head.left) / 300 * sorted_timestamps.length - 1);
+        this.currentFrame += diff;
+        this.updateSlider();
     }
 }
 
