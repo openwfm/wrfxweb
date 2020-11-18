@@ -1,7 +1,7 @@
 .slider-container {
     position: fixed;
     left: 20px;
-    bottom: 100px;
+    bottom: 20px;
     width: 320px;
     z-index: 5000;
     border-radius: 4px;

@@ -123,7 +123,7 @@ function handle_overlayadd(name, layer) {
   }
 
   // preload all displayed variables for eight frames
-  preload_variables(current_frame, 8);
+  preload_variables(0, 8);
 }
 
 function setup_for_domain(dom_id) {
@@ -254,84 +254,6 @@ function setup_for_time(frame_ndx) {
   }
 }
  
-// REMOVE
-// Section containing animation/playback code
-function frame_ready(frame_ndx) {
-  // for all layers currently displayed
-  for(var key in current_display) {
-    // if the current frame is not preloaded yet
-    if(!(frame_ndx in preloaded[key])) {
-      //console.log('Frame ' + frame_ndx + ' not ready for var ' + key);
-      return false;
-    }
-    // check if the raster has a colorbar
-    var cb_key = key + '_cb';
-    if(cb_key in preloaded) {
-      // it does, is it preloaded?
-      if (!(frame_ndx in preloaded[cb_key])) {
-        //console.log('Frame ' + frame_ndx + ' (colorbar) not ready for var ' + key);
-        return false;
-      }
-    }
-  }
-  //console.log('Frame ' + frame_ndx + ' is ready for display.');
-  return true;
-}
-
-// Remove
-function schedule_next_frame() {
-  if(current_frame == sorted_timestamps.length-1){
-    window.setTimeout(next_frame, 1000);
-  } else {
-    window.setTimeout(next_frame, 330);
-  }
-}
-
-// Can remove
-function next_frame() {
-  if (playing) {
-    current_frame = (current_frame + 1) % sorted_timestamps.length;
-    if(frame_ready(current_frame)) {
-      $('#time-slider').slider('value', current_frame);
-      schedule_next_frame();
-    } else {
-      // if the next frame is not ready, preload further and wait longer
-      window.setTimeout(wait_for_frame, 500);
-      preload_variables(8);
-    }
-  }
-}
-
-// Remove
-function wait_for_frame() {
-  // don't do anything if playing has been cancelled
-  if(!playing) {
-    return
-  }
-  // wait until current frame is loaded
-  if(frame_ready(current_frame)) {
-    $('#time-slider').slider('value', current_frame);
-    schedule_next_frame();
-  } else {
-    // keep waiting until all parts of frame are loaded
-    window.setTimeout(wait_for_frame, 250);
-  }
-}
-
-// remove
-function toggle_play() {
-  if (!playing) {
-    $('#play-control-button > span').text('Pause');
-    $('#play-control-button > i').attr('class', 'pause icon');
-    playing = true;
-    next_frame();
-  } else {
-    $('#play-control-button > span').text('Play');
-    $('#play-control-button > i').attr('class', 'play icon');
-    playing = false;
-  }
-}
-
 /* Code handling auxiliary tasks */
 function preload_variables(frame, preload_count) {
   var rasters_dom = rasters[current_domain];

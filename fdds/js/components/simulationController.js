@@ -44,6 +44,9 @@ class SimulationController extends HTMLElement {
 
     updateSlider() {
         setup_for_time(this.currentFrame);
+        const sliderHead = this.querySelector('#slider-head');
+        let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 100);
+        sliderHead.style.left = percentage + '%';
     }
 
     playPause() {

@@ -105,22 +105,6 @@ html, body {
   display: none;
 }
 
-#time-slider {
-  position: fixed;
-  left: 20px;
-  bottom: 20px;
-  width: 300px;
-  z-index: 1000;
-}
-
-#play-control-button {
-  position: fixed;
-  left: 20px;
-  bottom: 40px;
-  z-index: 1000;
-	display: none;
-}
-
 #catalog-button {
   position: fixed;
   left: 20px;
@@ -151,10 +135,6 @@ html, body {
   top: 70px;
   z-index: 3000;
   display: none;
-}
-
-.ui-slider-handle {
-  background-color: #e0e040;
 }
 
 .mq-logo-control {
