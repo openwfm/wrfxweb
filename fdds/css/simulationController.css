@@ -3,13 +3,30 @@
     left: 20px;
     bottom: 100px;
     width: 320px;
-    z-index: 1000;
+    z-index: 5000;
     border-radius: 4px;
     background:#e8e8e8;
     padding: 6px;
+    display: none;
+    font-size: 1.15rem;
+}
+
+#slider-header {
+    position: relative;
+    height: 30px;
+    width: 100%;
+}
+
+#timestamp {
+    position: fixed;
+    margin: auto 0;
+    left: 11%;
+    font-weight: bold;
+    color: #5d5d5d;
 }
 
 .slider-container button {
+    display: inline-block;
     background:#d6d6d6;
     border: none;
     padding: 2px;

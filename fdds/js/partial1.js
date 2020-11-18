@@ -3,6 +3,7 @@
 // global vars
 var base_layer_dict = null;
 var map = null;
+var organization;
 
 // the entire catalog
 var catalog = null;
@@ -83,7 +84,7 @@ function initialize_fdds() {
 
 function loadConfig() {
   fetch("/etc/conf.json").then(response => response.json()).then(function(data) { 
-    let organization = data.organization;
+    organization = data.organization;
 
     if (!organization.includes("SJSU")) {
       map.panTo([39.7392, -104.9903]);
@@ -122,7 +123,7 @@ function handle_overlayadd(name, layer) {
   }
 
   // preload all displayed variables for eight frames
-  preload_variables(8);
+  preload_variables(current_frame, 8);
 }
 
 function setup_for_domain(dom_id) {
@@ -162,11 +163,13 @@ function setup_for_domain(dom_id) {
 	});
 
 	if(sorted_timestamps.length < 2) {
-		$('#time-slider').hide();
+    $('.slider-container').hide()
 		$('#play-control-button').hide();
+		$('#time-slider').hide();
 	} else {
-		$('#time-slider').show();
+    $('.slider-container').show()
 		$('#play-control-button').show();
+		$('#time-slider').show();
 	}
 
   // zoom into raster region
@@ -184,7 +187,7 @@ function setup_for_domain(dom_id) {
     var layer = L.imageOverlay(raster_base + raster_info.raster,
                                 [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                 {
-                                  attribution: 'SJSU WIRC',
+                                  attribution: organization,
                                   opacity: 0.5
                                 });
     if(overlay_list.indexOf(r) >= 0) {
@@ -232,9 +235,10 @@ function setup_for_time(frame_ndx) {
   var rasters_now = rasters[current_domain][timestamp];
 
   // set current time
-  $('#time-valid').text(timestamp).show();
+  // $('#time-valid').text(timestamp).show();
+  document.querySelector('#timestamp').innerText = timestamp;
 
-  preload_variables(8);
+  preload_variables(frame_ndx, 8);
 
   // modify the URL each displayed cluster is pointing to
   // so that the current timestamp is reflected
@@ -245,11 +249,12 @@ function setup_for_time(frame_ndx) {
       var cs = raster_info.coords;
       layer.setUrl(raster_base + raster_info.raster,
                   [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: 'SJSU WIRC', opacity: 0.5 });
+                  { attribution: organization, opacity: 0.5 });
     }
   }
 }
  
+// REMOVE
 // Section containing animation/playback code
 function frame_ready(frame_ndx) {
   // for all layers currently displayed
@@ -273,6 +278,7 @@ function frame_ready(frame_ndx) {
   return true;
 }
 
+// Remove
 function schedule_next_frame() {
   if(current_frame == sorted_timestamps.length-1){
     window.setTimeout(next_frame, 1000);
@@ -281,6 +287,7 @@ function schedule_next_frame() {
   }
 }
 
+// Can remove
 function next_frame() {
   if (playing) {
     current_frame = (current_frame + 1) % sorted_timestamps.length;
@@ -295,6 +302,7 @@ function next_frame() {
   }
 }
 
+// Remove
 function wait_for_frame() {
   // don't do anything if playing has been cancelled
   if(!playing) {
@@ -310,6 +318,7 @@ function wait_for_frame() {
   }
 }
 
+// remove
 function toggle_play() {
   if (!playing) {
     $('#play-control-button > span').text('Pause');
@@ -324,11 +333,11 @@ function toggle_play() {
 }
 
 /* Code handling auxiliary tasks */
-function preload_variables(preload_count) {
+function preload_variables(frame, preload_count) {
   var rasters_dom = rasters[current_domain];
   var n_rasters = Object.keys(rasters_dom).length;
   for(var counter=0; counter < preload_count; counter++) {
-    var i = (current_frame + counter) % n_rasters;
+    var i = (frame + counter) % n_rasters;
     var timestamp = sorted_timestamps[i];
     for(var var_name in current_display) {
       // it could happen that a timestamp is missing the variable
