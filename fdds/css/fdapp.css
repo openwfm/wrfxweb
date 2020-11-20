@@ -27,31 +27,6 @@
   margin-right: auto;
 }
 
-
-h1 {
-  text-align: center;
-}
-
-li.menu {
-  display:inline;
-}
-
-ul.menu {
-  width: 300px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-div.note {
-  text-align: center;
-  font-size: 90%;
-  margin-top: 10px;
-}
-
-p {
-  font-size: 120%;
-}
-
 .ui.button.control-button {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -87,14 +62,6 @@ html, body {
   height: 100vh;
 }
 
-#time-valid {
-  position: fixed;
-  left: 140px;
-  bottom: 40px;
-  z-index: 1000;
-	display: none;
-}
-
 #raster-colorbar {
   position: fixed;
   left: 20px;
@@ -103,13 +70,6 @@ html, body {
   height: 400px;
   z-index: 2000;
   display: none;
-}
-
-#catalog-button {
-  position: fixed;
-  left: 20px;
-  top: 20px;
-  z-index: 1000;
 }
 
 .displayTest {
@@ -127,14 +87,6 @@ html, body {
   font-size: 125%;
   font-weight: bold;
   border-radius: 5px;
-}
-
-#domain-selector {
-  position: fixed;
-  left: 20px;
-  top: 70px;
-  z-index: 3000;
-  display: none;
 }
 
 .mq-logo-control {

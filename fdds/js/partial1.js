@@ -5,9 +5,6 @@ var base_layer_dict = null;
 var map = null;
 var organization;
 
-// the entire catalog
-var catalog = null;
-
 // list of layers which automatically become overlay rasters instead of regular rasters
 var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
@@ -29,7 +26,6 @@ var displayed_colorbar = null; // name of layer currently displaying its colorba
 var displayed_colorbars = [];
 
 // Variables storing animation/playback context
-var playing = false;
 var current_frame = 0;
 
 function initialize_fdds() {
@@ -144,32 +140,11 @@ function setup_for_domain(dom_id) {
 	// setup for time first frame
 	current_frame = 0;
 	current_timestamp = sorted_timestamps[0];
-	if(playing) toggle_play();
-
-	// populate jquery time slider
-	$('#time-slider').slider({
-		min: 0,
-		value: 0,
-		max: sorted_timestamps.length - 1,
-		change: function(event, ui) {
-			setup_for_time(ui.value);
-		},
-		slide: function(event, ui) {}
-	});
-
-	$('#time-slider').mousedown(function(e) {
-		if(playing) toggle_play();
-		e.stopPropagation();
-	});
 
 	if(sorted_timestamps.length < 2) {
     $('.slider-container').hide()
-		$('#play-control-button').hide();
-		$('#time-slider').hide();
 	} else {
     $('.slider-container').show()
-		$('#play-control-button').show();
-		$('#time-slider').show();
 	}
 
   // zoom into raster region
@@ -270,7 +245,6 @@ function preload_variables(frame, preload_count) {
         }
 
         if(!(i in preloaded[var_name])) {
-          //console.log('Frame ' + i + ' not preloaded for ' + var_name + ' (current_frame = ' + current_frame + ')');
           var var_info = rasters_dom[timestamp][var_name];
 					var img = new Image();
 					img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);

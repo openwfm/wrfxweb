@@ -1,0 +1,7 @@
+#domain-selector {
+  position: fixed;
+  left: 20px;
+  top: 70px;
+  z-index: 3000;
+  display: none;
+}
