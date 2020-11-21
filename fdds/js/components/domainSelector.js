@@ -10,12 +10,9 @@ class DomainSelector extends HTMLElement {
     }
 
     buildDomains() {
-        console.log("buildDomains");
         current_domain = domains[0];
-        // update the domain radio buttons
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
-        // $('#domain-checkboxes').empty();
         for(var dom in domains) {
             var dom_id = domains[dom];
             var checked = dom_id == '1' ? 'checked=yes' : '';
