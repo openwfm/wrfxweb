@@ -27,25 +27,6 @@
   margin-right: auto;
 }
 
-.ui.button.control-button {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.ui.button.layer-button {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.ui.button.last-control {
-  margin-bottom: 20px;
-}
-
-.ui.buttons.layer-group {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
 div.control-column {
   background: #eef7f7;
   height: 600px;
