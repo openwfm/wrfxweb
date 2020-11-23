@@ -88,9 +88,7 @@ class CatalogItem extends HTMLElement {
 
         document.querySelector('#simulation-flags').style.display = 'block';
 
-        // REVERT THIS
-        fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selected_simulation) { 
-        // fetch(path).then(response => response.json()).then(function(selected_simulation) { 
+        fetch(path).then(response => response.json()).then(function(selected_simulation) { 
             // store in global state
             rasters = selected_simulation;
 
