@@ -89,8 +89,8 @@ class CatalogItem extends HTMLElement {
         document.querySelector('#simulation-flags').style.display = 'block';
 
         // REVERT THIS
-        $.getJSON(path.replaceAll(":", "_"), function(selected_simulation) {
-        // $.getJSON(path, function(selected_simulation) {
+        fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selected_simulation) { 
+        // fetch(path).then(response => response.json()).then(function(selected_simulation) { 
             // store in global state
             rasters = selected_simulation;
 
@@ -102,6 +102,8 @@ class CatalogItem extends HTMLElement {
             domains = Object.keys(rasters);
             const domainSelector = document.querySelector('domain-selector');
             domainSelector.buildDomains();
+        }).catch(error => {
+            console.log(error);
         });
     }
 }
