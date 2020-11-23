@@ -2,10 +2,12 @@ class CatalogButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <button id="catalog-button" class="ui labeled icon button">
-                <i class="database icon"></i>
-                <span>Catalog</span>
-            </button>
+            <div id='catalog-button'>
+                <div id='menu-button-icon-container'>
+                    <img src='icons/menu-24px.svg'></img>
+                </div>
+                <span id='menu-label'>Catalog</span>
+            </div>
         `;
     }
 

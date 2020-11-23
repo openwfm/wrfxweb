@@ -70,7 +70,6 @@ class CatalogMenu extends HTMLElement {
         var parentComponent = this;
         // fetch catalog
         fetch("simulations/catalog.json").then(response => response.json()).then(function(data) { 
-            catalog = data;
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');

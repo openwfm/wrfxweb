@@ -86,19 +86,11 @@ class CatalogItem extends HTMLElement {
         document.querySelector('.catalog-menu').style.display = "none";
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
-        // show job description
-        var catPath = path.substring(0,path.lastIndexOf("/") + 1) + "catalog.json";
+        document.querySelector('#simulation-flags').style.display = 'block';
 
-        $.getJSON(catPath, function(data) { 
-            catalog = data;
-            $.each(data, function(cat_name) {
-                // var cat_entry = data[cat_name];
-                // var desc = cat_entry.description + ' Experimental forecast ONLY';
-                $("#simulation-flags").show();
-            });
-        });
-
-        $.getJSON(path, function(selected_simulation) {
+        // REVERT THIS
+        fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selected_simulation) { 
+        // fetch(path).then(response => response.json()).then(function(selected_simulation) { 
             // store in global state
             rasters = selected_simulation;
 
@@ -106,20 +98,10 @@ class CatalogItem extends HTMLElement {
 
             // retrieve all domains
             domains = Object.keys(rasters);
-            current_domain = domains[0];
-            // const domainCheckboxes = document.querySelector('#domain-checkboxes');
-
-            // update the domain radio buttons
-            $('#domain-checkboxes').empty();
-            $('#domain-checkboxes').append('<div class="ui large label">Active domain</div><br/>');
-            for(var dom in domains) {
-                var dom_id = domains[dom];
-                var checked = dom_id == '1' ? 'checked=yes' : '';
-                $('#domain-checkboxes').append('<div class="field"><div class="ui radio checkbox"><input type="radio" name="domains" id="' + dom_id + '"' + checked + ' onclick="setup_for_domain(\''+dom_id+'\');"/><label for="' + dom_id + '">' + dom_id + '</label></div></div>');
-            }
-            $('#domain-selector').show();
-
-            setup_for_domain(current_domain);
+            const domainSelector = document.querySelector('domain-selector');
+            domainSelector.buildDomains();
+        }).catch(error => {
+            console.log(error);
         });
     }
 }
