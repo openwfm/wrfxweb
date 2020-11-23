@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="css/domainSelector.css"/>
   <link rel="stylesheet" href="css/simulationController.css"/>
   <link rel="stylesheet" href="css/leaflet.groupedlayercontrol.min.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css"/>
 </head>
 <body onload="initialize_fdds();">
 
@@ -31,7 +29,7 @@
   <!-- WRF Fire Display Server; Copyright 2016, University of Colorado Denver,
        Department of Mathematical and Statistical Sciences -->
 
-	<div id="simulation-flags" style="top:27px; display:none"></div>
+	<div id="simulation-flags" style="position: fixed; top:15px; display:none; z-index:1000;"></div>
 
 	<catalog-menu></catalog-menu>
 	<catalog-button></catalog-button>

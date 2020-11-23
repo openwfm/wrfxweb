@@ -6,7 +6,7 @@
   display: none;
   color: #5d5d5d;
   background: #e8e8e8;
-  padding: 5px;
+  padding: 7px;
   border-radius: .4rem;
   font-weight: bold;
   line-height: 12px;
@@ -25,12 +25,15 @@
 #domain-checkboxes {
     display: block;
     height: 20px;
-    margin-top: 15px;
     padding: 0px 5px;
 }
 
 .domain-checkbox {
     display: inline-block;
+}
+
+.domain-checkbox input:hover {
+    cursor: pointer;
 }
 
 .domain-checkbox label {
