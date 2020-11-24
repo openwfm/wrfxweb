@@ -120,37 +120,10 @@ function handle_overlayadd(name, layer) {
       displayed_colorbar = name;
       displayed_colorbars.push({name: name, url: cb_url});
   }
-
-  // preload all displayed variables for eight frames
-  preload_variables(0, 8);
+  const simulationController = document.querySelector('simulation-controller');
+  simulationController.updateSlider();
 }
 
-// this function should assume that the correct layers are already displayed
-function setup_for_time(frame_ndx) {
-  current_frame = frame_ndx;
-  var timestamp = sorted_timestamps[frame_ndx];
-  current_timestamp = timestamp;
-  var rasters_now = rasters[current_domain][timestamp];
-
-  // set current time
-  document.querySelector('#timestamp').innerText = timestamp;
-
-  preload_variables(frame_ndx, 8);
-
-  // modify the URL each displayed cluster is pointing to
-  // so that the current timestamp is reflected
-  for (var layer_name in current_display) {
-    var layer = current_display[layer_name];
-    if(layer != null) {
-      var raster_info = rasters_now[layer_name];
-      var cs = raster_info.coords;
-      layer.setUrl(raster_base + raster_info.raster,
-                  [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                  { attribution: organization, opacity: 0.5 });
-    }
-  }
-}
- 
 /* Code handling auxiliary tasks */
 function preload_variables(frame, preload_count) {
   var rasters_dom = rasters[current_domain];

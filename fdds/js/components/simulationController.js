@@ -51,7 +51,7 @@ class SimulationController extends HTMLElement {
     
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
-        setup_for_time(this.currentFrame);
+        this.setupForTime(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
         let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 95);
         sliderHead.style.left = percentage + '%';
@@ -135,6 +135,32 @@ class SimulationController extends HTMLElement {
         }
         return true;
     }
+    
+    // this function should assume that the correct layers are already displayed
+    setupForTime(frame_ndx) {
+        var timestamp = sorted_timestamps[frame_ndx];
+        current_timestamp = timestamp;
+        var rasters_now = rasters[current_domain][timestamp];
+
+        // set current time
+        document.querySelector('#timestamp').innerText = timestamp;
+
+        preload_variables(frame_ndx, 8);
+
+        // modify the URL each displayed cluster is pointing to
+        // so that the current timestamp is reflected
+        for (var layer_name in current_display) {
+            var layer = current_display[layer_name];
+            if(layer != null) {
+            var raster_info = rasters_now[layer_name];
+            var cs = raster_info.coords;
+            layer.setUrl(raster_base + raster_info.raster,
+                        [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
+                        { attribution: organization, opacity: 0.5 });
+            }
+        }
+    }
+
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 

@@ -118,8 +118,8 @@ class DomainSelector extends HTMLElement {
             }
         });
         layer_ctrl._update();
-
-        setup_for_time(0);
+        const simulationController = document.querySelector('simulation-controller');
+        simulationController.updateSlider();
     }
 }
 
