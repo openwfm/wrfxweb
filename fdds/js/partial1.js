@@ -25,9 +25,6 @@ var preloaded = {}; // dictionary containing information on what frames have bee
 var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
 var displayed_colorbars = [];
 
-// Variables storing animation/playback context
-var current_frame = 0;
-
 function initialize_fdds() {
 
   //  initialize base layers & build map
@@ -122,39 +119,4 @@ function handle_overlayadd(name, layer) {
   }
   const simulationController = document.querySelector('simulation-controller');
   simulationController.updateSlider();
-}
-
-/* Code handling auxiliary tasks */
-function preload_variables(frame, preload_count) {
-  var rasters_dom = rasters[current_domain];
-  var n_rasters = Object.keys(rasters_dom).length;
-  for(var counter=0; counter < preload_count; counter++) {
-    var i = (frame + counter) % n_rasters;
-    var timestamp = sorted_timestamps[i];
-    for(var var_name in current_display) {
-      // it could happen that a timestamp is missing the variable
-      if(var_name in rasters_dom[timestamp]) {
-        // have we already preloaded this variable? If not indicate nothing is preloaded.
-        if(!(var_name in preloaded)) {
-          preloaded[var_name] = {};
-        }
-
-        if(!(i in preloaded[var_name])) {
-          var var_info = rasters_dom[timestamp][var_name];
-					var img = new Image();
-					img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);
-					img.src = raster_base + var_info.raster;
-          if ('colorbar' in var_info) {
-            var cb_key = var_name + '_cb';
-            if(!(cb_key in preloaded)) {
-              preloaded[cb_key] = {};
-            }
-            var img = new Image();
-            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, preloaded);
-            img.src = raster_base + var_info.colorbar;
-          }
-        }
-      }
-    }
-  }
 }

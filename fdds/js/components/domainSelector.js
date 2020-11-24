@@ -65,7 +65,6 @@ class DomainSelector extends HTMLElement {
         sorted_timestamps = Object.keys(rasters[current_domain]).sort();
 
         // setup for time first frame
-        current_frame = 0;
         current_timestamp = sorted_timestamps[0];
 
         const sliderContainer = document.querySelector('.slider-container');
