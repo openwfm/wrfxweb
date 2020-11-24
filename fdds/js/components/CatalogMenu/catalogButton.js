@@ -1,3 +1,6 @@
+/**
+ * A Component that builds the button in the top left corner of the map that opens the catalog menu
+ */
 class CatalogButton extends HTMLElement {
     constructor() {
         super();

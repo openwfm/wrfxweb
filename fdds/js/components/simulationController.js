@@ -51,7 +51,7 @@ class SimulationController extends HTMLElement {
     
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
-        setup_for_time(this.currentFrame);
+        this.setupForTime(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
         let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 95);
         sliderHead.style.left = percentage + '%';
@@ -99,7 +99,7 @@ class SimulationController extends HTMLElement {
         } else {
             // if the next frame is not ready, preload further and wait longer
             window.setTimeout(() => this.nextFrame(recursionDepth - 1), 500);
-            preload_variables(nextFrame, 8);
+            this.preloadVariables(nextFrame, 8);
         }
     }
 
@@ -114,7 +114,7 @@ class SimulationController extends HTMLElement {
             this.updateSlider();
         } else {
             window.setTimeout(() => this.prevFrame(recursionDepth - 1), 500);
-            preload_variables(prevFrame, 1);
+            this.preloadVariables(prevFrame, 1);
         }
     }
 
@@ -126,14 +126,67 @@ class SimulationController extends HTMLElement {
             if(!(frame_ndx in preloaded[key])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';
-            if(cb_key in preloaded) {
-                // it does, is it preloaded?
-                if (!(frame_ndx in preloaded[cb_key])) {
-                    return false;
+            if(cb_key in preloaded && !(frame_ndx in preloaded[cb_key])) return false;
+        }
+        return true;
+    }
+    
+    // this function should assume that the correct layers are already displayed
+    setupForTime(frame_ndx) {
+        var timestamp = sorted_timestamps[frame_ndx];
+        current_timestamp = timestamp;
+        var rasters_now = rasters[current_domain][timestamp];
+
+        // set current time
+        document.querySelector('#timestamp').innerText = timestamp;
+
+        this.preloadVariables(frame_ndx, 8);
+
+        // modify the URL each displayed cluster is pointing to
+        // so that the current timestamp is reflected
+        for (var layer_name in current_display) {
+            var layer = current_display[layer_name];
+            if(layer != null) {
+                var raster_info = rasters_now[layer_name];
+                var cs = raster_info.coords;
+                layer.setUrl(raster_base + raster_info.raster,
+                            [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
+                            { attribution: organization, opacity: 0.5 });
+            }
+        }
+    }
+
+    /* Code handling auxiliary tasks */
+    preloadVariables(frame, preload_count) {
+        var rasters_dom = rasters[current_domain];
+        var n_rasters = Object.keys(rasters_dom).length;
+        for(var counter=0; counter < preload_count; counter++) {
+            var i = (frame + counter) % n_rasters;
+            var timestamp = sorted_timestamps[i];
+            for(var var_name in current_display) {
+                // it could happen that a timestamp is missing the variable
+                if(var_name in rasters_dom[timestamp]) {
+                    // have we already preloaded this variable? If not indicate nothing is preloaded.
+                    if(!(var_name in preloaded)) {
+                    preloaded[var_name] = {};
+                    }
+
+                    if(!(i in preloaded[var_name])) {
+                        var var_info = rasters_dom[timestamp][var_name];
+                                    var img = new Image();
+                                    img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);
+                                    img.src = raster_base + var_info.raster;
+                        if ('colorbar' in var_info) {
+                            var cb_key = var_name + '_cb';
+                            if(!(cb_key in preloaded)) preloaded[cb_key] = {};
+                            var img = new Image();
+                            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, preloaded);
+                            img.src = raster_base + var_info.colorbar;
+                        }
+                    }
                 }
             }
         }
-        return true;
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
