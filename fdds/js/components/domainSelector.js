@@ -1,4 +1,4 @@
-/** Component for the Active Domain selection bar.  */
+/** Component for the Active Domain selection bar. */
 class DomainSelector extends HTMLElement {
     constructor() {
         super();
@@ -10,6 +10,7 @@ class DomainSelector extends HTMLElement {
         `;
     }
 
+    /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
         current_domain = domains[0];
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
@@ -24,6 +25,9 @@ class DomainSelector extends HTMLElement {
         this.setUpForDomain(current_domain);
     }
 
+    /** Create a div element for each domain checkbox. When clicked an element is clicked, 
+     * it should call setUpForDomain
+     */
     buildDomainCheckbox(dom_id) {
         var div = document.createElement('div');
         div.className = 'domain-checkbox';
@@ -44,6 +48,7 @@ class DomainSelector extends HTMLElement {
         return div;
     }
 
+    /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
         // set the current domain
         current_domain = dom_id;
