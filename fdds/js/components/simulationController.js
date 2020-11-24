@@ -126,12 +126,7 @@ class SimulationController extends HTMLElement {
             if(!(frame_ndx in preloaded[key])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';
-            if(cb_key in preloaded) {
-                // it does, is it preloaded?
-                if (!(frame_ndx in preloaded[cb_key])) {
-                    return false;
-                }
-            }
+            if(cb_key in preloaded && !(frame_ndx in preloaded[cb_key])) return false;
         }
         return true;
     }
@@ -152,15 +147,14 @@ class SimulationController extends HTMLElement {
         for (var layer_name in current_display) {
             var layer = current_display[layer_name];
             if(layer != null) {
-            var raster_info = rasters_now[layer_name];
-            var cs = raster_info.coords;
-            layer.setUrl(raster_base + raster_info.raster,
-                        [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                        { attribution: organization, opacity: 0.5 });
+                var raster_info = rasters_now[layer_name];
+                var cs = raster_info.coords;
+                layer.setUrl(raster_base + raster_info.raster,
+                            [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
+                            { attribution: organization, opacity: 0.5 });
             }
         }
     }
-
 
     /* Code handling auxiliary tasks */
     preloadVariables(frame, preload_count) {
