@@ -53,7 +53,7 @@ class SimulationController extends HTMLElement {
     updateSlider() {
         this.setupForTime(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
-        let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 95);
+        let percentage = Math.floor((this.currentFrame / sorted_timestamps.length) * 92);
         sliderHead.style.left = percentage + '%';
     }
 
@@ -222,7 +222,9 @@ class SimulationController extends HTMLElement {
     clickBar(e) {
         const head = this.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / 300 * sorted_timestamps.length - 1);
-        this.currentFrame += diff;
+
+        let newFrame = this.currentFrame + diff;
+        this.currentFrame = Math.max(Math.min(sorted_timestamps.length-1, newFrame), 0);
         this.updateSlider();
     }
 
