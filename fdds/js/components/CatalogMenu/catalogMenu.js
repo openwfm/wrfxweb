@@ -16,34 +16,31 @@ class CatalogMenu extends HTMLElement {
             <div class="catalog-menu">
                 <div id="menu-title" class="menu-title">
                     <h3>Select Simulation...</h3>
-                    <div> 
-                        <input id="menu-search" type="text" placeholder="Search for Simulation..."></input>
+                    <div id="menu-title-ui"> 
+                        <input id="menu-search" class="menu-search" type="text" placeholder="Search for Simulation..."></input>
                         <span id="menu-close">x</span>
                     </div>
                 </div>
                 <div class="menu-columns">
-                    <div class="column">
-                        <h3>Fires</h3>
-                        <ul id="catalog-fires" class="catalog-list"> </ul>
-                    </div>
-                    <div class="column">
-                        <h3>Fuel moisture</h3>
-                        <ul id="catalog-fuel-moisture" class="catalog-list"> </ul>
-                    </div>
-                    <div class="column">
-                        <h3>Satellite Data</h3>
-                        <ul id="catalog-satellite-data" class="catalog-list"> </ul>
-                    </div>
-                </div>
-                <div class="menu-columns-mobile">
-                    <div class="column">
+                    <div class="column-header-mobile">
                         <select id="mobile-selector">
                             <option value="Fires">Fires</option>
                             <option value="Fuel Moisture">Fuel Moisture</option>
                             <option value="Satellite Data">Satellite Data</option>
                         </select>
-                        <div id="catalog-mobile-list">
-                        </div>
+                        <input class="menu-search" type="text" placeholder="Search..."></input>
+                    </div>
+                    <div id="fires-column" class="column">
+                        <h3 class="column-header">Fires</h3>
+                        <ul id="catalog-fires" class="catalog-list"> </ul>
+                    </div>
+                    <div id="fuel-moisture-column" class="column">
+                        <h3 class="column-header">Fuel moisture</h3>
+                        <ul id="catalog-fuel-moisture" class="catalog-list"> </ul>
+                    </div>
+                    <div id="satellite-column" class="column">
+                        <h3 class="column-header">Satellite Data</h3>
+                        <ul id="catalog-satellite-data" class="catalog-list"> </ul>
                     </div>
                 </div>
             </div>
@@ -66,13 +63,15 @@ class CatalogMenu extends HTMLElement {
         // Implements repositioning menu
         this.dragElement(catalogMenu);
 
-        const menuSearch = this.querySelector('#menu-search');
-        // Make sure the menu can't be dragged from the search input box
-        menuSearch.addEventListener('mousedown', (e) => {
+        this.querySelector('#menu-search').addEventListener('mousedown', (e) => {
             e.stopPropagation();
+        })
+
+        const menuSearchList = this.querySelectorAll('.menu-search');
+        menuSearchList.forEach(menuSearch => {
+            // Sets up search functionality
+            menuSearch.oninput = () => this.searchCatalog(menuSearch.value);
         });
-        // Sets up search functionality
-        menuSearch.oninput = () => this.searchCatalog();
 
         const menuSelect = this.querySelector('#mobile-selector');
         menuSelect.onchange = () => this.selectCategory(menuSelect.value);
@@ -87,7 +86,6 @@ class CatalogMenu extends HTMLElement {
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
-            const mobileListDOM = parentComponent.querySelector('#catalog-mobile-list');
             // build html for list item for each catalog entry and add it to the proper list depending on its description
             for (const [cat_name, cat_entry] of Object.entries(data)) {
                 let desc = cat_entry.description;
@@ -103,8 +101,6 @@ class CatalogMenu extends HTMLElement {
                     firesListDOM.appendChild(newLI);
                 }
             }
-            mobileListDOM.appendChild(firesListDOM.cloneNode(true));
-            
         }).catch(error => {
             console.log(error);
         });
@@ -134,8 +130,7 @@ class CatalogMenu extends HTMLElement {
      * filters the stored array of catalog entries by its description for whether there is a match with the searched
      * text. Builds <li> html for filtered catalog entries and adds them to the columns
     */
-    searchCatalog() {
-        const searchText = this.querySelector('#menu-search').value.toLowerCase();
+    searchCatalog(searchText) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
@@ -153,18 +148,18 @@ class CatalogMenu extends HTMLElement {
     }
 
     selectCategory(selection) {
-        console.log(selection);
-        const mobileListDOM = this.querySelector('#catalog-mobile-list');
-        mobileListDOM.innerHTML = '';
+        const firesListDOM = this.querySelector('#fires-column');
+        firesListDOM.style.display = "none";
+        const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
+        fuelMoistureListDOM.style.display = "none";
+        const satelliteListDOM = this.querySelector('#satellite-column');
+        satelliteListDOM.style.display = "none";
         if (selection == 'Fires') {
-            const firesListDOM = this.querySelector('#catalog-fires');
-            mobileListDOM.appendChild(firesListDOM.cloneNode(true));
+            firesListDOM.style.display = 'block';
         } else if (selection == 'Fuel Moisture') {
-            const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
-            mobileListDOM.appendChild(fuelMoistureListDOM.cloneNode(true));
+            fuelMoistureListDOM.style.display = 'block';
         } else {
-            const satelliteListDOM = this.querySelector('#catalog-satellite-data');
-            mobileListDOM.appendChild(satelliteListDOM.cloneNode(true));
+            satelliteListDOM.style.display = 'block';
         }
     }
 
