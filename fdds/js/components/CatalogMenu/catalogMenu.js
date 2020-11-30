@@ -35,6 +35,17 @@ class CatalogMenu extends HTMLElement {
                         <ul id="catalog-satellite-data" class="catalog-list"> </ul>
                     </div>
                 </div>
+                <div class="menu-columns-mobile">
+                    <div class="column">
+                        <select id="mobile-selector">
+                            <option value="Fires">Fires</option>
+                            <option value="Fuel Moisture">Fuel Moisture</option>
+                            <option value="Satellite Data">Satellite Data</option>
+                        </select>
+                        <div id="catalog-mobile-list">
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -63,6 +74,9 @@ class CatalogMenu extends HTMLElement {
         // Sets up search functionality
         menuSearch.oninput = () => this.searchCatalog();
 
+        const menuSelect = this.querySelector('#mobile-selector');
+        menuSelect.onchange = () => this.selectCategory(menuSelect.value);
+
         const urlParams = new URLSearchParams(window.location.search);
         const navJobId = urlParams.get('job_id');
 
@@ -73,6 +87,7 @@ class CatalogMenu extends HTMLElement {
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
+            const mobileListDOM = parentComponent.querySelector('#catalog-mobile-list');
             // build html for list item for each catalog entry and add it to the proper list depending on its description
             for (const [cat_name, cat_entry] of Object.entries(data)) {
                 let desc = cat_entry.description;
@@ -88,6 +103,8 @@ class CatalogMenu extends HTMLElement {
                     firesListDOM.appendChild(newLI);
                 }
             }
+            mobileListDOM.appendChild(firesListDOM.cloneNode(true));
+            
         }).catch(error => {
             console.log(error);
         });
@@ -135,26 +152,44 @@ class CatalogMenu extends HTMLElement {
         });
     }
 
+    selectCategory(selection) {
+        console.log(selection);
+        const mobileListDOM = this.querySelector('#catalog-mobile-list');
+        mobileListDOM.innerHTML = '';
+        if (selection == 'Fires') {
+            const firesListDOM = this.querySelector('#catalog-fires');
+            mobileListDOM.appendChild(firesListDOM.cloneNode(true));
+        } else if (selection == 'Fuel Moisture') {
+            const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
+            mobileListDOM.appendChild(fuelMoistureListDOM.cloneNode(true));
+        } else {
+            const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+            mobileListDOM.appendChild(satelliteListDOM.cloneNode(true));
+        }
+    }
+
     /** Makes given element draggable */
     dragElement(elmnt) {
         var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-        document.getElementById(elmnt.id + "menu-title").onmousedown = dragMouseDown;
+        document.getElementById(elmnt.id + "menu-title").onpointerdown = dragMouseDown;
       
         function dragMouseDown(e) {
           e = e || window.event;
           e.preventDefault();
+          e.stopPropagation();
           // get the mouse cursor position at startup:
           pos3 = e.clientX;
           pos4 = e.clientY;
-          document.onmouseup = closeDragElement;
+          document.onpointerup = closeDragElement;
           // call a function whenever the cursor moves:
-          document.onmousemove = elementDrag;
+          document.onpointermove = elementDrag;
         }
       
         function elementDrag(e) {
           e = e || window.event;
           e.preventDefault();
+          e.stopPropagation();
           // calculate the new cursor position:
           pos1 = pos3 - e.clientX;
           pos2 = pos4 - e.clientY;
@@ -167,8 +202,8 @@ class CatalogMenu extends HTMLElement {
       
         function closeDragElement() {
           // stop moving when mouse button is released:
-          document.onmouseup = null;
-          document.onmousemove = null;
+          document.onpointerup = null;
+          document.onpointermove = null;
         }
     }
 

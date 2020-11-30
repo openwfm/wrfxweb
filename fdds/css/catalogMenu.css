@@ -61,6 +61,20 @@
     overflow-y:auto;
 }
 
+.menu-columns-mobile {
+    display: none;
+    height: 310px;
+    padding: 5px;
+    margin-top:13px;
+    font-size:1rem;
+    overflow-y: auto;
+}
+
+.menu-columns-mobile select {
+    margin: 0px;
+    font-size: 1rem;
+}
+
 .menu-columns h3 {
     margin: 0px;
 }
@@ -76,4 +90,24 @@
     padding: 0px;
     word-wrap: break-word;
     cursor: pointer;
+}
+
+@media (max-width: 769px) {
+    .catalog-menu {
+        width: 300px;
+        left: 40px;
+    }
+
+    .menu-columns-mobile {
+        display: block;
+    }
+
+    .menu-columns {
+        display: none;
+    }
+    
+    .column {
+        width: 250px;
+    }
+
 }
