@@ -16,8 +16,8 @@ class CatalogMenu extends HTMLElement {
             <div class="catalog-menu">
                 <div id="menu-title" class="menu-title">
                     <h3>Select Simulation...</h3>
-                    <div id="menu-title-ui"> 
-                        <input id="menu-search" class="menu-search" type="text" placeholder="Search for Simulation..."></input>
+                    <div> 
+                        <input class="menu-search" type="text" placeholder="Search for Simulation..."></input>
                         <span id="menu-close">x</span>
                     </div>
                 </div>
@@ -63,12 +63,9 @@ class CatalogMenu extends HTMLElement {
         // Implements repositioning menu
         this.dragElement(catalogMenu);
 
-        this.querySelector('#menu-search').addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-        })
-
         const menuSearchList = this.querySelectorAll('.menu-search');
         menuSearchList.forEach(menuSearch => {
+            menuSearch.onpointerdown = (e) => e.stopPropagation();
             // Sets up search functionality
             menuSearch.oninput = () => this.searchCatalog(menuSearch.value);
         });
