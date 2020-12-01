@@ -3,7 +3,7 @@
     left: 20px;
     bottom: 20px;
     width: 320px;
-    z-index: 5000;
+    z-index: 1000;
     border-radius: 4px;
     background:#e8e8e8;
     padding: 6px;
@@ -12,7 +12,6 @@
 }
 
 #slider-header {
-    position: relative;
     display: block;
     height: 30px;
     width: 100%;
@@ -20,7 +19,6 @@
 
 #slider-play-bar {
     display: inline-block;
-    margin: auto;
 }
 
 #timestamp {
