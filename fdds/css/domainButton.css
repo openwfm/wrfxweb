@@ -1,0 +1,29 @@
+#domain-button-wrapper {
+    display: none;
+}
+
+#domain-button {
+    position: fixed;
+    display: none;
+    height: 40px;
+    left: 80px;
+    top: 20px;
+    z-index: 1000;
+    background:#e8e8e8;
+    border: none;
+    border-radius: .4rem;
+    font-size: 1.15rem;
+    text-align: center;
+    color: #5d5d5d;
+}
+
+#domain-button-label {
+    display: block;
+    padding: 5px;
+}
+
+@media (max-width: 769px) {
+    #domain-button-wrapper {
+        display: block;
+    }
+}

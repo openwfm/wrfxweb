@@ -40,3 +40,9 @@
     margin-left: 10px;
     margin-right: 20px;
 }
+
+@media (max-width: 769px) {
+    #domain-mobile-wrapper {
+        display: none;
+    }
+}
