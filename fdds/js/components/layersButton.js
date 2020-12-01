@@ -8,7 +8,7 @@ class LayersButton extends HTMLElement {
                 </div>
             </div>
         `;
-        this.visible = false;
+        this.visible = true;
     }
 
     connectedCallback() {

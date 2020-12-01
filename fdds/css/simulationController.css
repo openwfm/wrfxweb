@@ -13,14 +13,20 @@
 
 #slider-header {
     position: relative;
+    display: block;
     height: 30px;
     width: 100%;
 }
 
+#slider-play-bar {
+    display: inline-block;
+    margin: auto;
+}
+
 #timestamp {
-    position: fixed;
-    margin: auto 0;
-    left: 11%;
+    display: inline-block;
+    margin-left: 15px;
+    margin-bottom: 15px;
     font-weight: bold;
     color: #5d5d5d;
 }
@@ -50,6 +56,7 @@ button[disabled] {
 }
 
 #slider {
+    display: block;
     position: relative;
     height: 20px;
     width: 100%;
