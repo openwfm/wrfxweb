@@ -25,6 +25,7 @@ class DomainSelector extends HTMLElement {
 
         this.querySelector('#domain-selector').style.display = 'block';
         document.querySelector('#domain-button').style.display = 'inline-block';
+        document.querySelector('#layers-button').style.display = 'inline-block';
         this.setUpForDomain(current_domain);
     }
 
