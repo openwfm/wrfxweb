@@ -73,3 +73,15 @@ html, body {
 .mq-logo-control {
 	display: none;
 }
+
+@media (max-width: 769px) {
+  .leaflet-control-layers {
+    top: 75px;
+  }
+
+  .displayTest {
+    left: 20px;
+    top: 50px;
+    width: 300px;
+  }
+}

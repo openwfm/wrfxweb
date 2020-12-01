@@ -10,15 +10,17 @@ class SimulationController extends HTMLElement {
         this.innerHTML = `
             <div class='slider-container'>
                 <div id='slider-header'>
-                    <button id='slider-prev'>
-                        <img src='icons/arrow_left-24px.svg'></img>
-                    </button>
-                    <button id='slider-play-pause'>
-                        <img src='icons/play_arrow-24px.svg'></img>
-                    </button>
-                    <button id='slider-next'>
-                        <img src='icons/arrow_right-24px.svg'></img>
-                    </button>
+                    <div id='slider-play-bar'>
+                        <button id='slider-prev'>
+                            <img src='icons/arrow_left-24px.svg'></img>
+                        </button>
+                        <button id='slider-play-pause'>
+                            <img src='icons/play_arrow-24px.svg'></img>
+                        </button>
+                        <button id='slider-next'>
+                            <img src='icons/arrow_right-24px.svg'></img>
+                        </button>
+                    </div>
                     <span id='timestamp'></span>
                 </div>
                 <div id='slider'>
@@ -34,9 +36,11 @@ class SimulationController extends HTMLElement {
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
+        L.DomEvent.disableScrollPropagation(container);
+        L.DomEvent.disableClickPropagation(container);
         const sliderHead = this.querySelector('#slider-head');
         const sliderBar = this.querySelector('#slider-bar');
-        sliderHead.onmousedown = (e) => this.dragSliderHead(e);
+        sliderHead.onpointerdown = (e) => this.dragSliderHead(e);
         sliderBar.onclick = (e) => this.clickBar(e);
         container.addEventListener('dblclick', (e) => {
             e.stopPropagation();
@@ -195,17 +199,19 @@ class SimulationController extends HTMLElement {
     dragSliderHead(e) {
           e = e || window.event;
           e.stopPropagation();
+          e.preventDefault();
           // get the mouse cursor position at startup:
           var pos3 = e.clientX;
           var originalFrame = this.currentFrame;
-          document.onmouseup = () => {
-            document.onmouseup = null;
-            document.onmousemove = null;
+          document.onpointerup = () => {
+            document.onpointerup = null;
+            document.onpointermove = null;
           };
           // call a function whenever the cursor moves:
-          document.onmousemove = (e2) => {
+          document.onpointermove = (e2) => {
             e2 = e2 || window.event;
             e2.preventDefault();
+            e2.stopPropagation();
             // calculate the new cursor position:
             let diff = Math.floor((e2.clientX - pos3) / 300 * sorted_timestamps.length - 1);
 

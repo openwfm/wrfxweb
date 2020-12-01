@@ -44,3 +44,14 @@
     color: #5d5d5d;
     top: 2px;
 }
+
+@media (max-width: 769px) {
+    #menu-label {
+        display: none;
+    }
+
+    #menu-button-icon-container {
+        border-radius: .4rem;
+        background:#e8e8e8;
+    }
+}

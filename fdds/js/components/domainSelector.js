@@ -3,9 +3,11 @@ class DomainSelector extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id='domain-selector'>
-                <span id='domain-selector-label'>Active domain</span>
-                <div id='domain-checkboxes'></div>
+            <div id='domain-mobile-wrapper'>
+                <div id='domain-selector'>
+                    <span id='domain-selector-label'>Active domain</span>
+                    <div id='domain-checkboxes'></div>
+                </div>
             </div>
         `;
     }
@@ -22,6 +24,8 @@ class DomainSelector extends HTMLElement {
         }
 
         this.querySelector('#domain-selector').style.display = 'block';
+        document.querySelector('#domain-button').style.display = 'inline-block';
+        document.querySelector('#layers-button').style.display = 'inline-block';
         this.setUpForDomain(current_domain);
     }
 
