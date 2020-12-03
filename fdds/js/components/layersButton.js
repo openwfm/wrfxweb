@@ -15,7 +15,6 @@ class LayersButton extends HTMLElement {
         const layersButton = this.querySelector('#layers-button');
         L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
-            e.preventDefault();
             const layersSelector = document.querySelector('#layer-controller-container');
             this.visible = !this.visible;
             let display = (this.visible) ? 'block' : 'none';

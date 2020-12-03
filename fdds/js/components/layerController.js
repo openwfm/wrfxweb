@@ -25,8 +25,8 @@ class LayerController extends HTMLElement {
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
         dragElement(layerController, '');
-        // layerController.onpointerdown = (e) => e.stopPropagation();
         L.DomEvent.disableClickPropagation(layerController);
+        L.DomEvent.disableScrollPropagation(layerController);
     }
 
     buildMapBase() {
@@ -108,13 +108,13 @@ class LayerController extends HTMLElement {
         displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         if (displayed_colorbars.length == 0) {
-        rasterColorbar.src = '';
-        rasterColorbar.style.display = 'none';
-        displayed_colorbar = null;
+            rasterColorbar.src = '';
+            rasterColorbar.style.display = 'none';
+            displayed_colorbar = null;
         } else {
-        let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
-        rasterColorbar.src = mostRecentColorBar.url;
-        displayed_colorbar = mostRecentColorBar.name;
+            let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
+            rasterColorbar.src = mostRecentColorBar.url;
+            displayed_colorbar = mostRecentColorBar.name;
         }
     }
 }

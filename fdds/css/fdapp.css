@@ -80,4 +80,10 @@ html, body {
     top: 50px;
     width: 300px;
   }
+
+  #raster-colorbar {
+    height: 160px;
+    width: 80px;
+    bottom: 100px;
+  }
 }
