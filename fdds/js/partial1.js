@@ -1,5 +1,6 @@
 "use strict";
 
+// Many of these are only referenced now inside a singe component, find out which ones, and remove them from here
 // global vars
 var base_layer_dict = null;
 var map = null;
@@ -51,29 +52,14 @@ function initialize_fdds() {
     zoomControl: false,
     minZoom: 3
   });
+  
+  const layerController = document.querySelector('layer-controller');
+  layerController.buildMapBase();
 
   loadConfig();
 
   // add scale & zoom controls to the map
   L.control.scale({ position: 'bottomright' }).addTo(map);
-
-  map.on('overlayadd', function (e) { handle_overlayadd(e.name, e.layer) });
-
-  map.on('overlayremove', function(e) {
-    delete current_display[e.name];
-
-    displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != e.name);
-    const rasterColorbar = document.querySelector('#raster-colorbar');
-    if (displayed_colorbars.length == 0) {
-      rasterColorbar.src = '';
-      rasterColorbar.style.display = 'none';
-      displayed_colorbar = null;
-    } else {
-      let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
-      rasterColorbar.src = mostRecentColorBar.url;
-      displayed_colorbar = mostRecentColorBar.name;
-    }
-  });
 }
 
 function loadConfig() {
@@ -97,26 +83,41 @@ function loadConfig() {
   });
 }
 
-function handle_overlayadd(name, layer) {
-  // register in currently displayed layers and bring to front if it's an overlay
-  console.log('name ' + name + ' layer ' + layer);
-  current_display[name] = layer;
-  if(overlay_list.indexOf(name) >= 0) {
-    layer.bringToFront();
-  } else {
-    layer.bringToBack();
+/** Makes given element draggable from sub element with id "subID" */
+function dragElement(elmnt, subID) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    e.stopPropagation();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onpointerup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onpointermove = elementDrag;
   }
 
-  // if the overlay being added now has a colorbar and there is none displayed, show it
-  var rasters_now = rasters[current_domain][current_timestamp];
-  if('colorbar' in rasters_now[name]) {
-      var cb_url = raster_base + rasters_now[name].colorbar;
-      const rasterColorbar = document.querySelector('#raster-colorbar');
-      rasterColorbar.src = cb_url;
-      rasterColorbar.style.display = 'block';
-      displayed_colorbar = name;
-      displayed_colorbars.push({name: name, url: cb_url});
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    e.stopPropagation();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
-  const simulationController = document.querySelector('simulation-controller');
-  simulationController.updateSlider();
+
+  function closeDragElement() {
+    // stop moving when mouse button is released:
+    document.onpointerup = null;
+    document.onpointermove = null;
+  }
 }
+

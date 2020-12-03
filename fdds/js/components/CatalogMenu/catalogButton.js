@@ -15,15 +15,13 @@ class CatalogButton extends HTMLElement {
     }
 
     connectedCallback() {
-        this.querySelector('#catalog-button').addEventListener('click', () => this.openCatalog());
-    }
-
-    disconnectedCallback() {
-        this.querySelector('#catalog-button').removeEventListener();
-    }
-
-    openCatalog() {
-        document.querySelector('.catalog-menu').style.display = "block";
+        const catalogButton = this.querySelector('#catalog-button');
+        L.DomEvent.disableClickPropagation(catalogButton);
+        catalogButton.onpointerdown = () => {
+            const catalogMenu = document.querySelector('.catalog-menu');
+            var visible = catalogMenu.style.display == 'block';
+            catalogMenu.style.display = visible ? 'none' : 'block';
+        };
     }
 }
 

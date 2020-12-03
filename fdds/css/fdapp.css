@@ -75,13 +75,19 @@ html, body {
 }
 
 @media (max-width: 769px) {
-  .leaflet-control-layers {
-    top: 15px;
-  }
-
   .displayTest {
     left: 20px;
     top: 50px;
     width: 300px;
+  }
+
+  .leaflet-bottom .leaflet-control-scale {
+    margin-bottom: 70px !important;
+  }
+
+  #raster-colorbar {
+    height: 160px;
+    width: 80px;
+    bottom: 100px;
   }
 }

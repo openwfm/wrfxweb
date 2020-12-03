@@ -8,19 +8,21 @@ class LayersButton extends HTMLElement {
                 </div>
             </div>
         `;
-        this.visible = true;
     }
 
     connectedCallback() {
         const layersButton = this.querySelector('#layers-button');
-        layersButton.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-        });
+
+        L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
-            e.preventDefault();
-            const layersSelector = document.querySelector('.leaflet-control-layers');
-            this.visible = !this.visible;
-            let display = (this.visible) ? 'block' : 'none';
+            const layersSelector = document.querySelector('#layer-controller-container');
+            let visible = layersSelector.style.display == 'block';
+            var display = 'none';
+            if (!visible) {
+                document.querySelector('.catalog-menu').style.display = 'none';
+                document.querySelector('#domain-mobile-wrapper').style.display = 'none';
+                display = 'block';
+            }
             layersSelector.style.display = display;
         }
     }

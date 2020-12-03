@@ -42,12 +42,6 @@ class SimulationController extends HTMLElement {
         const sliderBar = this.querySelector('#slider-bar');
         sliderHead.onpointerdown = (e) => this.dragSliderHead(e);
         sliderBar.onclick = (e) => this.clickBar(e);
-        container.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-        });
-        container.addEventListener('mousedown', (e) => {
-            e.stopPropagation();
-        })
         this.querySelector('#slider-play-pause').onclick = () => this.playPause();
         this.querySelector('#slider-prev').onclick = () => this.prevFrame(5);
         this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
