@@ -24,8 +24,13 @@ class LayerController extends HTMLElement {
 
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
-        layerController.onpointerdown = (e) => e.stopPropagation();
+        dragElement(layerController, '');
+        // layerController.onpointerdown = (e) => e.stopPropagation();
         L.DomEvent.disableClickPropagation(layerController);
+    }
+
+    buildMapBase() {
+
     }
 
     buildLayerBox(name, layer) {
@@ -39,8 +44,10 @@ class LayerController extends HTMLElement {
         input.onclick = () => {
             if (input.checked) {
                 layer.addTo(map);
+                this.handleOverlayadd(name, layer);
             } else {
                 layer.remove(map);
+                this.handleOverlayRemove(name);
             }
         }
 
@@ -68,6 +75,47 @@ class LayerController extends HTMLElement {
                 layerDiv.appendChild(layerBox);
             });
         });
+    }
+
+    handleOverlayadd(name, layer) {
+        // register in currently displayed layers and bring to front if it's an overlay
+        console.log('name ' + name + ' layer ' + layer);
+        current_display[name] = layer;
+        if(overlay_list.indexOf(name) >= 0) {
+            layer.bringToFront();
+        } else {
+            layer.bringToBack();
+        }
+
+        // if the overlay being added now has a colorbar and there is none displayed, show it
+        var rasters_now = rasters[current_domain][current_timestamp];
+        if('colorbar' in rasters_now[name]) {
+            var cb_url = raster_base + rasters_now[name].colorbar;
+            const rasterColorbar = document.querySelector('#raster-colorbar');
+            rasterColorbar.src = cb_url;
+            rasterColorbar.style.display = 'block';
+            displayed_colorbar = name;
+            displayed_colorbars.push({name: name, url: cb_url});
+        }
+        // this should probably be removed at some point
+        const simulationController = document.querySelector('simulation-controller');
+        simulationController.updateSlider();
+    }
+
+    handleOverlayRemove(name) {
+        delete current_display[name];
+
+        displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != name);
+        const rasterColorbar = document.querySelector('#raster-colorbar');
+        if (displayed_colorbars.length == 0) {
+        rasterColorbar.src = '';
+        rasterColorbar.style.display = 'none';
+        displayed_colorbar = null;
+        } else {
+        let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
+        rasterColorbar.src = mostRecentColorBar.url;
+        displayed_colorbar = mostRecentColorBar.name;
+        }
     }
 }
 

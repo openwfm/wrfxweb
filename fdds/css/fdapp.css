@@ -75,10 +75,6 @@ html, body {
 }
 
 @media (max-width: 769px) {
-  .leaflet-control-layers {
-    top: 15px;
-  }
-
   .displayTest {
     left: 20px;
     top: 50px;

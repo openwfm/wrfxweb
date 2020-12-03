@@ -1,9 +1,10 @@
 #layer-controller-container {
-    position: fixed;
+    position: absolute;
     display: block;
     right: 140px;
     top: 20px;
     z-index: 1000;
+    width: 200px;
     background:#e8e8e8;
     border: none;
     border-radius: .4rem;

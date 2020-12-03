@@ -61,7 +61,7 @@ class CatalogMenu extends HTMLElement {
             catalogMenu.style.display = 'none';
         });
         // Implements repositioning menu
-        this.dragElement(catalogMenu);
+        dragElement(catalogMenu, "menu-title");
 
         const menuSearchList = this.querySelectorAll('.menu-search');
         menuSearchList.forEach(menuSearch => {
@@ -157,45 +157,6 @@ class CatalogMenu extends HTMLElement {
             fuelMoistureListDOM.style.display = 'block';
         } else {
             satelliteListDOM.style.display = 'block';
-        }
-    }
-
-    /** Makes given element draggable */
-    dragElement(elmnt) {
-        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-
-        document.getElementById(elmnt.id + "menu-title").onpointerdown = dragMouseDown;
-      
-        function dragMouseDown(e) {
-          e = e || window.event;
-          e.preventDefault();
-          e.stopPropagation();
-          // get the mouse cursor position at startup:
-          pos3 = e.clientX;
-          pos4 = e.clientY;
-          document.onpointerup = closeDragElement;
-          // call a function whenever the cursor moves:
-          document.onpointermove = elementDrag;
-        }
-      
-        function elementDrag(e) {
-          e = e || window.event;
-          e.preventDefault();
-          e.stopPropagation();
-          // calculate the new cursor position:
-          pos1 = pos3 - e.clientX;
-          pos2 = pos4 - e.clientY;
-          pos3 = e.clientX;
-          pos4 = e.clientY;
-          // set the element's new position:
-          elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-          elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-        }
-      
-        function closeDragElement() {
-          // stop moving when mouse button is released:
-          document.onpointerup = null;
-          document.onpointermove = null;
         }
     }
 
