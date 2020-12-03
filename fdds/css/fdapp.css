@@ -81,6 +81,10 @@ html, body {
     width: 300px;
   }
 
+  .leaflet-bottom .leaflet-control-scale {
+    margin-bottom: 70px !important;
+  }
+
   #raster-colorbar {
     height: 160px;
     width: 80px;
