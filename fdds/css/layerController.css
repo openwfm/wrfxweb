@@ -14,10 +14,19 @@
     padding: 8px;
 }
 
-.layer-group span {
+.layer-group {
     display: block;
-    float: left;
+    width: 100%;
+    text-align: left;
+}
+
+.layer-group span {
+    display: inline-block;
     font-weight: bold;
+}
+
+.layer-list {
+    margin-left: 50px;
 }
 
 
@@ -25,7 +34,7 @@
     #layer-controller-container {
         width: 300px;
         height: 400px;
-        top: 70px;
+        top: 80px;
         left: 30px;
         overflow-y: auto;
     }

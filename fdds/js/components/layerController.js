@@ -75,6 +75,7 @@ class LayerController extends HTMLElement {
                 layerDiv.appendChild(layerBox);
             });
         });
+        this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
     handleOverlayadd(name, layer) {
