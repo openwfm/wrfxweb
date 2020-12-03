@@ -12,11 +12,17 @@ class LayersButton extends HTMLElement {
 
     connectedCallback() {
         const layersButton = this.querySelector('#layers-button');
+
         L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
             const layersSelector = document.querySelector('#layer-controller-container');
-            this.visible = layersSelector.style.display == 'block';
-            let display = (this.visible) ? 'none' : 'block';
+            let visible = layersSelector.style.display == 'block';
+            var display = 'none';
+            if (!visible) {
+                document.querySelector('.catalog-menu').style.display = 'none';
+                document.querySelector('#domain-mobile-wrapper').style.display = 'none';
+                display = 'block';
+            }
             layersSelector.style.display = display;
         }
     }

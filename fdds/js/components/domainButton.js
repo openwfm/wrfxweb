@@ -8,19 +8,20 @@ class DomainButton extends HTMLElement {
                 </div>
             </div>
         `;
-        this.visible = false;
     }
 
     connectedCallback() {
         const domainButton = this.querySelector('#domain-button');
-        domainButton.addEventListener('dblclick', (e) => {
-            e.stopPropagation();
-        });
-        domainButton.onpointerdown = (e) => {
-            e.preventDefault();
+        L.DomEvent.disableClickPropagation(domainButton);
+        domainButton.onpointerdown = () => {
             const domainSelector = document.querySelector('#domain-mobile-wrapper');
-            this.visible = !this.visible;
-            let display = (this.visible) ? 'block' : 'none';
+            let visible = domainSelector.style.display == 'block';
+            var display = 'none';
+            if (!visible) {
+                display = 'block';
+                document.querySelector('.catalog-menu').style.display = 'none';
+                document.querySelector('#layer-controller-container').style.display = 'none';
+            }
             domainSelector.style.display = display;
         }
     }
