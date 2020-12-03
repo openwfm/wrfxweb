@@ -8,7 +8,6 @@ class LayersButton extends HTMLElement {
                 </div>
             </div>
         `;
-        this.visible = true;
     }
 
     connectedCallback() {
@@ -16,8 +15,8 @@ class LayersButton extends HTMLElement {
         L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
             const layersSelector = document.querySelector('#layer-controller-container');
-            this.visible = !this.visible;
-            let display = (this.visible) ? 'block' : 'none';
+            this.visible = layersSelector.style.display == 'block';
+            let display = (this.visible) ? 'none' : 'block';
             layersSelector.style.display = display;
         }
     }

@@ -30,27 +30,34 @@ class LayerController extends HTMLElement {
     }
 
     buildMapBase() {
-
+        const baseMapDiv = this.querySelector('#map-checkboxes');
+        Object.entries(base_layer_dict).map(entry => {
+                let name = entry[0];
+                let layer = entry[1]
+                let layerBox = this.buildLayerBox(name, layer, true);
+                baseMapDiv.appendChild(layerBox);
+        });
     }
 
-    buildLayerBox(name, layer) {
+    buildLayerBox(name, layer, base) {
         var div= document.createElement('div');
         div.className = 'layer-checkbox';
 
         const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.name = 'layers';
+        input.type = base ? 'radio' : 'checkbox';
+        input.name = base ? 'base' : 'layers';
+        if (base) input.checked = name == 'OSM';
         input.id = name;
         input.onclick = () => {
             if (input.checked) {
                 layer.addTo(map);
-                this.handleOverlayadd(name, layer);
+                if (!base) this.handleOverlayadd(name, layer);
+                else layer.bringToFront();
             } else {
                 layer.remove(map);
-                this.handleOverlayRemove(name);
+                if (!base) this.handleOverlayRemove(name, layer);
             }
         }
-
         var label = document.createElement('label');
         label.for = name;
         label.innerText = name;
@@ -70,8 +77,8 @@ class LayerController extends HTMLElement {
             let layerDict = layerArray[1];
             Object.entries(layerDict).map(entry => {
                 let name = entry[0];
-                let layer = entry[1]
-                let layerBox = this.buildLayerBox(name, layer);
+                let layer = entry[1];
+                let layerBox = this.buildLayerBox(name, layer, false);
                 layerDiv.appendChild(layerBox);
             });
         });
