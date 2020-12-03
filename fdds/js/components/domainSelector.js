@@ -101,7 +101,7 @@ class DomainSelector extends HTMLElement {
         });
         
         // remove any existing layer control
-        if (layer_ctrl != null) layer_ctrl.remove(map);
+        // if (layer_ctrl != null) layer_ctrl.remove(map);
 
         // add a new layer control to the map
         // layer_ctrl = L.control.layers(base_layer_dict, {
@@ -110,9 +110,10 @@ class DomainSelector extends HTMLElement {
         // }, {
         //     collapsed: false
         // }).addTo(map);
-        layer_ctrl = L.control.layers(base_layer_dict, raster_dict, {collapsed: false}).addTo(map);
+        // layer_ctrl = L.control.layers(base_layer_dict, raster_dict, {collapsed: false}).addTo(map);
         // layer_ctrl = L.control.layers(base_layer_dict, {}, {collapsed: false}).addTo(map);
 
+        // Can maybe remove this?
         Object.entries(first_rasters).map(entry => {
             var r = entry[0];
             if(displayed_layers.indexOf(r) >= 0) {overlay_dict
@@ -122,7 +123,9 @@ class DomainSelector extends HTMLElement {
                 handle_overlayadd(r, layer);
             }
         });
-        layer_ctrl._update();
+        // layer_ctrl._update();
+        const layerController = document.querySelector('layer-controller');
+        layerController.buildLayerBoxes();
         const simulationController = document.querySelector('simulation-controller');
         simulationController.updateSlider();
     }

@@ -1,0 +1,20 @@
+#layer-controller-container {
+    position: fixed;
+    display: block;
+    right: 140px;
+    top: 20px;
+    z-index: 1000;
+    background:#e8e8e8;
+    border: none;
+    border-radius: .4rem;
+    font-size: 1.15rem;
+    text-align: center;
+    color: #5d5d5d;
+    padding: 8px;
+}
+
+.layer-group span {
+    display: block;
+    float: left;
+    font-weight: bold;
+}
