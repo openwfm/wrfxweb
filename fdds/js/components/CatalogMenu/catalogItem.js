@@ -98,6 +98,9 @@ class CatalogItem extends HTMLElement {
 
             // retrieve all domains
             domains = Object.keys(rasters);
+
+            const simulationController = document.querySelector('simulation-controller');
+            simulationController.resetSlider();
             const domainSelector = document.querySelector('domain-selector');
             domainSelector.buildDomains();
             document.querySelector('#layer-controller-container').style.display = 'block';

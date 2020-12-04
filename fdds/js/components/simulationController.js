@@ -46,6 +46,10 @@ class SimulationController extends HTMLElement {
         this.querySelector('#slider-prev').onclick = () => this.prevFrame(5);
         this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
     }
+
+    resetSlider() {
+        this.currentFrame = 0;
+    }
     
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
