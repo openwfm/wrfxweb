@@ -100,6 +100,7 @@ class CatalogItem extends HTMLElement {
             domains = Object.keys(rasters);
             const domainSelector = document.querySelector('domain-selector');
             domainSelector.buildDomains();
+            document.querySelector('#layer-controller-container').style.display = 'block';
         }).catch(error => {
             console.log(error);
         });
