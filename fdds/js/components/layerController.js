@@ -20,6 +20,7 @@ class LayerController extends HTMLElement {
                 </div>
             </div>
         `;
+        this.activeLayers = new Set(["OSM"]);
     }
 
     connectedCallback() {
@@ -39,6 +40,13 @@ class LayerController extends HTMLElement {
         });
     }
 
+    resetLayers() {
+        let mapType = this.activeLayers.has("OSM") ? "OSM" : "MapQuest";
+        this.activeLayers.clear();
+        this.activeLayers.add(mapType);
+        this.querySelector('#layer-controller-container').style.display = 'block';
+    }
+
     buildLayerBox(name, layer, base) {
         var div= document.createElement('div');
         div.className = 'layer-checkbox';
@@ -46,15 +54,21 @@ class LayerController extends HTMLElement {
         const input = document.createElement('input');
         input.type = base ? 'radio' : 'checkbox';
         input.name = base ? 'base' : 'layers';
-        if (base) input.checked = name == 'OSM';
+        input.checked = this.activeLayers.has(name);
+        if (this.activeLayers.has(name) && !base) {
+            layer.addTo(map);
+            this.handleOverlayadd(name, layer);
+        }
         input.id = name;
         input.onclick = () => {
             if (input.checked) {
                 layer.addTo(map);
+                this.activeLayers.add(name);
                 if (!base) this.handleOverlayadd(name, layer);
                 else layer.bringToFront();
             } else {
                 layer.remove(map);
+                this.activeLayers.delete(name);
                 if (!base) this.handleOverlayRemove(name, layer);
             }
         }
@@ -82,7 +96,7 @@ class LayerController extends HTMLElement {
                 layerDiv.appendChild(layerBox);
             });
         });
-        this.querySelector('#layer-controller-container').style.display = 'block';
+        // this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
     handleOverlayadd(name, layer) {
