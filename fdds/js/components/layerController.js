@@ -20,6 +20,7 @@ class LayerController extends HTMLElement {
                 </div>
             </div>
         `;
+        this.activeLayers = new Set(["OSM"]);
     }
 
     connectedCallback() {
@@ -46,15 +47,22 @@ class LayerController extends HTMLElement {
         const input = document.createElement('input');
         input.type = base ? 'radio' : 'checkbox';
         input.name = base ? 'base' : 'layers';
-        if (base) input.checked = name == 'OSM';
+        // if (base) input.checked = name == 'OSM';
+        input.checked = this.activeLayers.has(name);
+        if (this.activeLayers.has(name) && !base) {
+            layer.addTo(map);
+            this.handleOverlayadd(name, layer);
+        }
         input.id = name;
         input.onclick = () => {
             if (input.checked) {
                 layer.addTo(map);
+                this.activeLayers.add(name);
                 if (!base) this.handleOverlayadd(name, layer);
                 else layer.bringToFront();
             } else {
                 layer.remove(map);
+                this.activeLayers.delete(name);
                 if (!base) this.handleOverlayRemove(name, layer);
             }
         }
