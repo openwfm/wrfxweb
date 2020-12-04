@@ -40,6 +40,13 @@ class LayerController extends HTMLElement {
         });
     }
 
+    resetLayers() {
+        let mapType = this.activeLayers.has("OSM") ? "OSM" : "MapQuest";
+        this.activeLayers.clear();
+        this.activeLayers.add(mapType);
+        this.querySelector('#layer-controller-container').style.display = 'block';
+    }
+
     buildLayerBox(name, layer, base) {
         var div= document.createElement('div');
         div.className = 'layer-checkbox';
@@ -47,7 +54,6 @@ class LayerController extends HTMLElement {
         const input = document.createElement('input');
         input.type = base ? 'radio' : 'checkbox';
         input.name = base ? 'base' : 'layers';
-        // if (base) input.checked = name == 'OSM';
         input.checked = this.activeLayers.has(name);
         if (this.activeLayers.has(name) && !base) {
             layer.addTo(map);
