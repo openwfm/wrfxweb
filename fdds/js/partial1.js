@@ -63,21 +63,25 @@ function initialize_fdds() {
 }
 
 function loadConfig() {
-  fetch("/etc/conf.json").then(response => response.json()).then(function(data) { 
-    organization = data.organization;
+  fetch("conf.json").then(response => response.json()).then(function(data) { 
+    if (data.organization) {
+      organization = data.organization;
 
-    if (!organization.includes("SJSU")) {
-      map.panTo([39.7392, -104.9903]);
+      if (!organization.includes("SJSU")) {
+        map.panTo([39.7392, -104.9903]);
+      }
+      document.title = organization;
     }
-    let flags = data.flags;
-    document.title = organization;
-    const simulationFlags = document.querySelector("#simulation-flags");
-    flags.map(flag => {
-      var spanElement = document.createElement("span");
-      spanElement.className = "displayTest";
-      spanElement.innerText = flag;
-      simulationFlags.appendChild(spanElement);
-    });
+    if (data.flags) {
+      let flags = data.flags;
+      const simulationFlags = document.querySelector("#simulation-flags");
+      flags.map(flag => {
+        var spanElement = document.createElement("span");
+        spanElement.className = "displayTest";
+        spanElement.innerText = flag;
+        simulationFlags.appendChild(spanElement);
+      });
+    }
   }).catch(error => {
     console.log("Error getting conf.json " + error);
   });
