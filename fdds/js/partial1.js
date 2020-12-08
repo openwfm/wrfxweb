@@ -61,6 +61,31 @@ function initialize_fdds() {
   L.control.scale({ position: 'bottomright' }).addTo(map);
 }
 
+function loadConfig() {
+  fetch('conf.json').then(response => response.json()).then(function(configData) { 
+    if (configData.organization) {
+      organization = configData.organization;
+      if (!organization.includes("SJSU")) {
+          map.panTo([39.7392, -104.9903]);
+      }
+      document.title = organization;
+    }
+
+    if (configData.flags) {
+      let flags = configData.flags;
+      const simulationFlags = document.querySelector("#simulation-flags");
+      flags.map(flag => {
+          var spanElement = document.createElement("span");
+          spanElement.className = "displayTest";
+          spanElement.innerText = flag;
+          simulationFlags.appendChild(spanElement);
+      });
+    }
+  }).catch(error => {
+    console.error(error);
+  });
+}
+
 /** Makes given element draggable from sub element with id "subID" */
 function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;

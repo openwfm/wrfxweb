@@ -151,12 +151,9 @@ class SimulationController extends HTMLElement {
             if(layer != null) {
                 var raster_info = rasters_now[layer_name];
                 var cs = raster_info.coords;
-                // layer.setUrl(raster_base + raster_info.raster,
-                //             [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                //             { attribution: organization, opacity: 0.5 });
                 layer.setUrl(raster_base + raster_info.raster,
                             [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                            { opacity: 0.5 });
+                            { attribution: organization, opacity: 0.5 });
             }
         }
     }
