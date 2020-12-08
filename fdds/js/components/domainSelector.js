@@ -90,7 +90,7 @@ class DomainSelector extends HTMLElement {
             var layer = L.imageOverlay(raster_base + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
-                                            attribution: organization,
+                                            // attribution: organization,
                                             opacity: 0.5
                                         });
             if(overlay_list.indexOf(r) >= 0) {

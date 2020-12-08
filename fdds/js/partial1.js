@@ -4,7 +4,6 @@
 // global vars
 var base_layer_dict = null;
 var map = null;
-var organization;
 
 // list of layers which automatically become overlay rasters instead of regular rasters
 var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
@@ -60,27 +59,6 @@ function initialize_fdds() {
 
   // add scale & zoom controls to the map
   L.control.scale({ position: 'bottomright' }).addTo(map);
-}
-
-function loadConfig() {
-  fetch("/etc/conf.json").then(response => response.json()).then(function(data) { 
-    organization = data.organization;
-
-    if (!organization.includes("SJSU")) {
-      map.panTo([39.7392, -104.9903]);
-    }
-    let flags = data.flags;
-    document.title = organization;
-    const simulationFlags = document.querySelector("#simulation-flags");
-    flags.map(flag => {
-      var spanElement = document.createElement("span");
-      spanElement.className = "displayTest";
-      spanElement.innerText = flag;
-      simulationFlags.appendChild(spanElement);
-    });
-  }).catch(error => {
-    console.log("Error getting conf.json " + error);
-  });
 }
 
 /** Makes given element draggable from sub element with id "subID" */
