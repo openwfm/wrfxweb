@@ -1,3 +1,6 @@
+/**
+ * Builds a button that can open and close the layer selection window. Only appears on mobile screens.
+ */
 class LayersButton extends HTMLElement {
     constructor() {
         super();
@@ -10,6 +13,7 @@ class LayersButton extends HTMLElement {
         `;
     }
 
+    /** After added to DOM should add callback to the button. */
     connectedCallback() {
         const layersButton = this.querySelector('#layers-button');
 

@@ -38,6 +38,10 @@ template.innerHTML = `
         </div>
     </li>
 `;
+/** Creates an Element for each Item of the CatalogMenu. Necessary for each element to have
+ * its own component because of how much information is stored within each and how much has to
+ * happen after one is clicked. 
+ */
 class CatalogItem extends HTMLElement {
     constructor() {
         super();

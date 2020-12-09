@@ -1,3 +1,7 @@
+/**
+ * Component that handles adding and removing layers to the map. Provides user with a window
+ * to choose different layers available to add. 
+ */
 class LayerController extends HTMLElement {
     constructor() {
         super();
@@ -23,6 +27,8 @@ class LayerController extends HTMLElement {
         this.activeLayers = new Set(["OSM"]);
     }
 
+    /** Disable map events from within the layer selection window to prevent unwanted zooming
+     * and panning. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
         dragElement(layerController, '');
@@ -30,6 +36,8 @@ class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
     }
 
+    /** Adds checkboxes for the different available map types. Should only be called once after
+     * the map has been initialized. */
     buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
         Object.entries(base_layer_dict).map(entry => {
@@ -40,6 +48,8 @@ class LayerController extends HTMLElement {
         });
     }
 
+    /** Called when new simulations are selected. Avoids the problem that layers that exist for one
+     * simulation are selected for a simulation that doesn't have those same layers.*/
     resetLayers() {
         let mapType = this.activeLayers.has("OSM") ? "OSM" : "MapQuest";
         this.activeLayers.clear();
@@ -47,6 +57,8 @@ class LayerController extends HTMLElement {
         this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
+    /** Creates the checkbox for a layer. Displays name and when clicked adds layer to the map. base is
+     * a boolean that indicates whether creating a checkbox for a map type or a layer.*/
     buildLayerBox(name, layer, base) {
         var div= document.createElement('div');
         div.className = 'layer-checkbox';
@@ -81,6 +93,7 @@ class LayerController extends HTMLElement {
         return div;
     }
 
+    /** Builds a checkbox for each raster layer and overlay layer */
     buildLayerBoxes() {
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
@@ -96,9 +109,9 @@ class LayerController extends HTMLElement {
                 layerDiv.appendChild(layerBox);
             });
         });
-        // this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
+    /** Called when a layer is selected. */
     handleOverlayadd(name, layer) {
         // register in currently displayed layers and bring to front if it's an overlay
         console.log('name ' + name + ' layer ' + layer);
@@ -124,6 +137,7 @@ class LayerController extends HTMLElement {
         simulationController.updateSlider();
     }
 
+    /** Called when a layer is de-selected. */
     handleOverlayRemove(name) {
         delete current_display[name];
 
