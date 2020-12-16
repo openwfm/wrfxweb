@@ -1,3 +1,5 @@
 {
-    "url_root" : "http://demo.openwfm.org/??"
+    "url_root" : "http://demo.openwfm.org/??",
+    "organization" : "Organization",
+    "flags" : ["Flag 1","Flag 2"]
 }
