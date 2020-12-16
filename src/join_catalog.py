@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import json,glob,logging
 import os.path as osp
 import collections
@@ -29,7 +30,7 @@ for i in catalog:
     catalog[i]['zip_size']=catalog[i].get('zip_size',None)
     catalog[i]['job_id']=i
 
-catalog_sorted=collections.OrderedDict(sorted(catalog.items(), reverse=True))
+catalog_sorted=collections.OrderedDict(sorted(list(catalog.items()), reverse=True))
 
 l=lock(lock_path)
 l.acquire()

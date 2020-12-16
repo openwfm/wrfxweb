@@ -1,12 +1,16 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import simplekml as kml
 import os.path as osp
 import json
 import sys
 import logging
 from utils import update_nested_dict, load_sys_cfg
-from urlparse import urljoin
+from six.moves.urllib.parse import urljoin
 import posixpath as pxp
 import requests
+from six.moves import map
+from six.moves import zip
 
 sys_cfg = load_sys_cfg()
 sys_cfg.sims_path = 'fdds/simulations'
@@ -53,11 +57,11 @@ def make_kmz(job_id, steps, mode, only_vars):
     cat_entry = cat[job_id]
     mf = json.load(open(osp.join(sys_cfg.sims_path,cat_entry['manifest_path'])))
 
-    mdomain = max(map(int, mf.keys()))
+    mdomain = max(list(map(int, list(mf.keys()))))
     if steps=='':
         step=[1]
     else:
-        step=map(int, steps.split(','))
+        step=list(map(int, steps.split(',')))
     if len(step) == 1:
         step = step*mdomain
     elif len(step) != mdomain:

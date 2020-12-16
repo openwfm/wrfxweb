@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import fcntl, errno, logging, json, os, sys
 import os.path as osp
 
