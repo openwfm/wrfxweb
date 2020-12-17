@@ -12,9 +12,13 @@ class DomainSelector extends HTMLElement {
         `;
     }
 
+    connectedCallback() {
+        domainInstance.subscribe(() => this.buildDomains());
+    }
+
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
-        current_domain = domains[0];
+        var domains = domainInstance.getValue();
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
         for(var dom in domains) {
@@ -26,7 +30,7 @@ class DomainSelector extends HTMLElement {
         this.querySelector('#domain-selector').style.display = 'block';
         document.querySelector('#domain-button').style.display = 'inline-block';
         document.querySelector('#layers-button').style.display = 'inline-block';
-        this.setUpForDomain(current_domain);
+        this.setUpForDomain(domains[0]);
     }
 
     /** Create a div element for each domain checkbox. When clicked an element is clicked, 
@@ -54,32 +58,21 @@ class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-        // set the current domain
-        current_domain = dom_id;
-
-        // remove any existing layers from map
-        var displayed_layers = Object.keys(current_display);
+        preloaded = {};
+        // retrieve all times (we assume the first domain is selected)
+        sorted_timestamps = Object.keys(rasters[dom_id]).sort();
+        // setup for time first frame
+        current_timestamp = sorted_timestamps[0];
         for(var layer_name in current_display) {
             map.removeLayer(current_display[layer_name]);
         }
-        preloaded = {};
+        var prevDisplay = current_display;
         current_display = {};
-
-        // retrieve all times (we assume the first domain is selected)
-        sorted_timestamps = Object.keys(rasters[current_domain]).sort();
-
-        // setup for time first frame
-        current_timestamp = sorted_timestamps[0];
-
-        const sliderContainer = document.querySelector('.slider-container');
-        sliderContainer.style.display = (sorted_timestamps.length < 2) ? 'none' : 'block';
-
-        // zoom into raster region
         var first_rasters = rasters[dom_id][sorted_timestamps[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
-        
+ 
         // build the layer groups
         raster_dict = {};
         overlay_dict = {};    
@@ -93,17 +86,16 @@ class DomainSelector extends HTMLElement {
                                             attribution: organization,
                                             opacity: 0.5
                                         });
+            if(r in prevDisplay) current_display[r] = layer;
             if(overlay_list.indexOf(r) >= 0) {
                 overlay_dict[r] = layer;
             } else {
                 raster_dict[r] = layer;
             }
         });
-        
-        const layerController = document.querySelector('layer-controller');
-        layerController.buildLayerBoxes();
-        const simulationController = document.querySelector('simulation-controller');
-        simulationController.updateSlider();
+
+        // set the current domain
+        currentDomain.setValue(dom_id);
     }
 }
 

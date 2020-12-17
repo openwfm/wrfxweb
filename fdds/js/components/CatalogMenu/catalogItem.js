@@ -38,6 +38,10 @@ template.innerHTML = `
         </div>
     </li>
 `;
+/** Creates an Element for each Item of the CatalogMenu. Necessary for each element to have
+ * its own component because of how much information is stored within each and how much has to
+ * happen after one is clicked. 
+ */
 class CatalogItem extends HTMLElement {
     constructor() {
         super();
@@ -82,7 +86,6 @@ class CatalogItem extends HTMLElement {
      */
     handle_catalog_click(entryID, path) {
         // close selection dialog
-
         document.querySelector('.catalog-menu').style.display = "none";
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
@@ -95,17 +98,7 @@ class CatalogItem extends HTMLElement {
             raster_base = path.substring(0, path.lastIndexOf('/') + 1);
 
             // retrieve all domains
-            domains = Object.keys(rasters);
-
-            // This section should change. ideally data is bound to each component, and they are in charge of updating themselves.
-            // There is also a timing issue here, for proper functioning, domainSelector.buildDomains must be called last. This is
-            // not ideal.
-            const layerController = document.querySelector('layer-controller');
-            layerController.resetLayers();
-            const simulationController = document.querySelector('simulation-controller');
-            simulationController.resetSlider();
-            const domainSelector = document.querySelector('domain-selector');
-            domainSelector.buildDomains();
+            domainInstance.setValue(Object.keys(rasters));
         }).catch(error => {
             console.log(error);
         });

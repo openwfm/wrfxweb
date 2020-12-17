@@ -1,3 +1,6 @@
+/** Builds a Button that displays or hides the domain selection bar. Only appears
+ * on mobile screens so that space can be saved.
+ */
 class DomainButton extends HTMLElement {
     constructor() {
         super();
@@ -10,6 +13,7 @@ class DomainButton extends HTMLElement {
         `;
     }
 
+    /** After added to the DOM add the callback to the button. */
     connectedCallback() {
         const domainButton = this.querySelector('#domain-button');
         L.DomEvent.disableClickPropagation(domainButton);
@@ -25,9 +29,6 @@ class DomainButton extends HTMLElement {
             domainSelector.style.display = display;
         }
     }
-
-
-
 }
 
 window.customElements.define('domain-button', DomainButton);
