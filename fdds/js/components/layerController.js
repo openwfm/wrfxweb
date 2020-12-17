@@ -67,33 +67,6 @@ class LayerController extends HTMLElement {
     /** Builds a checkbox for each raster layer and overlay layer */
     buildLayerBoxes() {
         // zoom into raster region
-        for(var layer_name in current_display) {
-            map.removeLayer(current_display[layer_name]);
-        }
-        var first_rasters = rasters[currentDomain.getValue()][sorted_timestamps[0]];
-        var vars = Object.keys(first_rasters);
-        var cs = first_rasters[vars[0]].coords;
-        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
- 
-        // build the layer groups
-        var raster_dict = {};
-        var overlay_dict = {};    
-        Object.entries(first_rasters).map(entry => {
-            var r = entry[0];
-            var raster_info = first_rasters[r];
-            var cs = raster_info.coords;
-            var layer = L.imageOverlay(raster_base + raster_info.raster,
-                                        [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
-                                        {
-                                            attribution: organization,
-                                            opacity: 0.5
-                                        });
-            if(overlay_list.indexOf(r) >= 0) {
-                overlay_dict[r] = layer;
-            } else {
-                raster_dict[r] = layer;
-            }
-        });
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
         const overlayDiv = this.querySelector('#overlay-checkboxes');

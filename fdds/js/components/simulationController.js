@@ -101,7 +101,6 @@ class SimulationController extends HTMLElement {
         let nextFrame = (this.currentFrame + 1) % sorted_timestamps.length;
         if(this.frameReady(nextFrame)) {
             this.currentFrame = nextFrame;
-            // current_frame = nextFrame;
             this.updateSlider();
         } else {
             // if the next frame is not ready, preload further and wait longer
