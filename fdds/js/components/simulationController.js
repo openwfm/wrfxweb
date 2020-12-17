@@ -45,12 +45,15 @@ class SimulationController extends HTMLElement {
         this.querySelector('#slider-play-pause').onclick = () => this.playPause();
         this.querySelector('#slider-prev').onclick = () => this.prevFrame(5);
         this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
+
+        currentDomain.subscribe(() => this.resetSlider());
     }
 
     resetSlider() {
         this.currentFrame = 0;
+        this.updateSlider();
     }
-    
+
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
         this.setupForTime(this.currentFrame);
@@ -137,7 +140,7 @@ class SimulationController extends HTMLElement {
     setupForTime(frame_ndx) {
         var timestamp = sorted_timestamps[frame_ndx];
         current_timestamp = timestamp;
-        var rasters_now = rasters[current_domain][timestamp];
+        var rasters_now = rasters[currentDomain.getValue()][timestamp];
 
         // set current time
         document.querySelector('#timestamp').innerText = timestamp;
@@ -160,7 +163,7 @@ class SimulationController extends HTMLElement {
 
     /* Code handling auxiliary tasks */
     preloadVariables(frame, preload_count) {
-        var rasters_dom = rasters[current_domain];
+        var rasters_dom = rasters[currentDomain.getValue()];
         var n_rasters = Object.keys(rasters_dom).length;
         for(var counter=0; counter < preload_count; counter++) {
             var i = (frame + counter) % n_rasters;

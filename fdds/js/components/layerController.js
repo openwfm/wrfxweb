@@ -34,6 +34,9 @@ class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
+
+        domainInstance.subscribe(() => this.resetLayers());
+        currentDomain.subscribe(() => this.buildLayerBoxes());
     }
 
     /** Adds checkboxes for the different available map types. Should only be called once after
@@ -123,7 +126,7 @@ class LayerController extends HTMLElement {
         }
 
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = rasters[current_domain][current_timestamp];
+        var rasters_now = rasters[currentDomain.getValue()][current_timestamp];
         if('colorbar' in rasters_now[name]) {
             var cb_url = raster_base + rasters_now[name].colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
