@@ -58,13 +58,7 @@ class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-
-        // remove any existing layers from map
-        for(var layer_name in current_display) {
-            map.removeLayer(current_display[layer_name]);
-        }
         preloaded = {};
-        current_display = {};
         // retrieve all times (we assume the first domain is selected)
         sorted_timestamps = Object.keys(rasters[dom_id]).sort();
 
