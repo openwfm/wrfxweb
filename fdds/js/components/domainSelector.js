@@ -65,42 +65,11 @@ class DomainSelector extends HTMLElement {
         }
         preloaded = {};
         current_display = {};
-
         // retrieve all times (we assume the first domain is selected)
         sorted_timestamps = Object.keys(rasters[dom_id]).sort();
 
         // setup for time first frame
         current_timestamp = sorted_timestamps[0];
-
-        const sliderContainer = document.querySelector('.slider-container');
-        sliderContainer.style.display = (sorted_timestamps.length < 2) ? 'none' : 'block';
-
-        // zoom into raster region
-        var first_rasters = rasters[dom_id][sorted_timestamps[0]];
-        var vars = Object.keys(first_rasters);
-        var cs = first_rasters[vars[0]].coords;
-        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
-        
-        // build the layer groups
-        raster_dict = {};
-        overlay_dict = {};    
-        Object.entries(first_rasters).map(entry => {
-            var r = entry[0];
-            var raster_info = first_rasters[r];
-            var cs = raster_info.coords;
-            var layer = L.imageOverlay(raster_base + raster_info.raster,
-                                        [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
-                                        {
-                                            attribution: organization,
-                                            opacity: 0.5
-                                        });
-            if(overlay_list.indexOf(r) >= 0) {
-                overlay_dict[r] = layer;
-            } else {
-                raster_dict[r] = layer;
-            }
-        });
-
         // set the current domain
         currentDomain.setValue(dom_id);
     }

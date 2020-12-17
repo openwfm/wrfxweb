@@ -11,12 +11,8 @@ var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT'
 
 // Variables containing input data
 var rasters = null;
-// var domains = null;
-// var current_domain = null;
 var sorted_timestamps = null;
 var raster_base = null;
-var raster_dict = {};  // rasters that can't be overlaid on other rasters
-var overlay_dict = {}; // rasters that can be overlaid on top of each other and on top of raster_dict rasters
 
 // Display context
 var layer_ctrl = null;

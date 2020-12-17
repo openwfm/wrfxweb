@@ -50,6 +50,8 @@ class SimulationController extends HTMLElement {
     }
 
     resetSlider() {
+        const sliderContainer = this.querySelector('.slider-container');
+        sliderContainer.style.display = (sorted_timestamps.length < 2) ? 'none' : 'block';
         this.currentFrame = 0;
         this.updateSlider();
     }
