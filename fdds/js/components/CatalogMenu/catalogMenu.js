@@ -67,7 +67,7 @@ class CatalogMenu extends HTMLElement {
         menuSearchList.forEach(menuSearch => {
             menuSearch.onpointerdown = (e) => e.stopPropagation();
             // Sets up search functionality
-            menuSearch.oninput = () => this.searchCatalog(menuSearch.value);
+            menuSearch.oninput = () => this.searchCatalog(menuSearch.value.toLowerCase());
         });
 
         const menuSelect = this.querySelector('#mobile-selector');

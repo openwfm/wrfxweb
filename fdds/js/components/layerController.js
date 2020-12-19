@@ -67,6 +67,12 @@ class LayerController extends HTMLElement {
     /** Builds a checkbox for each raster layer and overlay layer */
     buildLayerBoxes() {
         // zoom into raster region
+        const rasterRegion = this.querySelector('#raster-layers');
+        rasterRegion.style.display = 'block';
+        if (Object.keys(raster_dict).length == 0) rasterRegion.style.display = 'none';
+        const overlayRegion = this.querySelector('#overlay-layers');
+        overlayRegion.style.display = 'block';
+        if (Object.keys(overlay_dict).length == 0) overlayRegion.style.display = 'none';
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
         const overlayDiv = this.querySelector('#overlay-checkboxes');
