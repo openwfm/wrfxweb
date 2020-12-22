@@ -87,6 +87,7 @@ class CatalogItem extends HTMLElement {
     handle_catalog_click(entryID, path, description) {
         // close selection dialog
         currentSimulation = description;
+        document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').style.display = "none";
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 

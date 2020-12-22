@@ -70,6 +70,10 @@ html, body {
   border-radius: 5px;
 }
 
+#current-sim-label {
+  background-color: #c3fffb;
+}
+
 .mq-logo-control {
 	display: none;
 }
