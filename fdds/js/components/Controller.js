@@ -23,6 +23,7 @@ class Controller {
     }
 }
 
+var currentSimulation = '';
 const domainInstance = new Controller();
 const currentDomain = new Controller();
 const currentTimestamp = new Controller();

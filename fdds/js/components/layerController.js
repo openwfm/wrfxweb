@@ -25,6 +25,7 @@ class LayerController extends HTMLElement {
             </div>
         `;
         this.mapType = 'OSM';
+        this.currentSimulation = '';
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -43,6 +44,10 @@ class LayerController extends HTMLElement {
             this.handleOverlayRemove(layerName, current_display[layerName]);
         }
         var prevDisplay = current_display;
+        if (this.currentSimulation != currentSimulation) {
+            prevDisplay = {};
+            this.currentSimulation = currentSimulation;
+        }
         current_display = {};
         var first_rasters = rasters[currentDomain.getValue()][sorted_timestamps[0]];
         var vars = Object.keys(first_rasters);

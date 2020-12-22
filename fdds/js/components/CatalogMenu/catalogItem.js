@@ -77,15 +77,16 @@ class CatalogItem extends HTMLElement {
             zipLink.innerText = 'Download ZIP ' + mb.toString() + ' MB';
         }
 
-        this.shadowRoot.querySelector('#entry').onclick = () => this.handle_catalog_click(jobId, 'simulations/' + manifestPath);
-        if (this.getAttribute('navJobId') == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath);
+        this.shadowRoot.querySelector('#entry').onclick = () => this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+        if (this.getAttribute('navJobId') == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
     }
 
     /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated
      * with a run, 
      */
-    handle_catalog_click(entryID, path) {
+    handle_catalog_click(entryID, path, description) {
         // close selection dialog
+        currentSimulation = description;
         document.querySelector('.catalog-menu').style.display = "none";
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
