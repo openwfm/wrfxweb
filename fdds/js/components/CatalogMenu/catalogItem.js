@@ -95,7 +95,7 @@ class CatalogItem extends HTMLElement {
             // store in global state
             rasters = selected_simulation;
 
-            raster_base = "https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1);
+            raster_base = "https://demo.openwfm.org/sj/" + path.substring(0, path.lastIndexOf('/') + 1);
             // raster_base = path.substring(0, path.lastIndexOf('/') + 1);
 
             // retrieve all domains

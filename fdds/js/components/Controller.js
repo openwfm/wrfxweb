@@ -25,3 +25,4 @@ class Controller {
 
 const domainInstance = new Controller();
 const currentDomain = new Controller();
+const currentTimestamp = new Controller();

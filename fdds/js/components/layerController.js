@@ -35,8 +35,42 @@ class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
 
-        domainInstance.subscribe(() => this.resetLayers());
-        currentDomain.subscribe(() => this.buildLayerBoxes());
+        currentDomain.subscribe(() => this.domainSwitch());
+    }
+
+    domainSwitch() {
+        for(var layerName in current_display) {
+            this.handleOverlayRemove(layerName, current_display[layerName]);
+        }
+        var prevDisplay = current_display;
+        current_display = {};
+        var first_rasters = rasters[currentDomain.getValue()][sorted_timestamps[0]];
+        var vars = Object.keys(first_rasters);
+        var cs = first_rasters[vars[0]].coords;
+        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+ 
+        // build the layer groups
+        raster_dict = {};
+        overlay_dict = {};    
+        Object.entries(first_rasters).map(entry => {
+            var r = entry[0];
+            var raster_info = first_rasters[r];
+            var cs = raster_info.coords;
+            var layer = L.imageOverlay(raster_base + raster_info.raster,
+                                        [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
+                                        {
+                                            attribution: organization,
+                                            opacity: 0.5
+                                        });
+            if(r in prevDisplay) current_display[r] = layer;
+            if(overlay_list.indexOf(r) >= 0) {
+                overlay_dict[r] = layer;
+            } else {
+                raster_dict[r] = layer;
+            }
+        });
+        this.buildLayerBoxes();
+        this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
     /** Adds checkboxes for the different available map types. Should only be called once after
@@ -58,25 +92,27 @@ class LayerController extends HTMLElement {
             let name = entry[0];
             let layer = entry[1];
             this.handleOverlayRemove(name, layer);
+            delete current_display[name];
         });
         current_display = {};
         this.querySelector('#layer-controller-container').style.display = 'block';
-        this.buildLayerBoxes();
     }
 
     /** Builds a checkbox for each raster layer and overlay layer */
     buildLayerBoxes() {
-        // zoom into raster region
         const rasterRegion = this.querySelector('#raster-layers');
         rasterRegion.style.display = 'block';
         if (Object.keys(raster_dict).length == 0) rasterRegion.style.display = 'none';
+
         const overlayRegion = this.querySelector('#overlay-layers');
         overlayRegion.style.display = 'block';
         if (Object.keys(overlay_dict).length == 0) overlayRegion.style.display = 'none';
+
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
         const overlayDiv = this.querySelector('#overlay-checkboxes');
         overlayDiv.innerHTML = '';
+
         [[rasterDiv, raster_dict], [overlayDiv, overlay_dict]].map(layerArray => {
             let layerDiv = layerArray[0];
             let layerDict = layerArray[1];
@@ -119,7 +155,10 @@ class LayerController extends HTMLElement {
         input.id = name;
         input.onclick = () => {
             if (input.checked) this.handleOverlayadd(name, layer);
-            else this.handleOverlayRemove(name, layer);
+            else {
+                this.handleOverlayRemove(name, layer);
+                delete current_display[name];
+            }
         }
         return div;
     }
@@ -167,7 +206,6 @@ class LayerController extends HTMLElement {
     /** Called when a layer is de-selected. */
     handleOverlayRemove(name, layer) {
         layer.remove(map);
-        delete current_display[name];
 
         displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != name);
         const rasterColorbar = document.querySelector('#raster-colorbar');

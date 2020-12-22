@@ -53,7 +53,10 @@ class SimulationController extends HTMLElement {
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (sorted_timestamps.length < 2) ? 'none' : 'block';
         this.currentFrame = 0;
-        this.updateSlider();
+        // this.updateSlider();
+        var timestamp = sorted_timestamps[0];
+        this.querySelector('#timestamp').innerText = timestamp;
+        this.querySelector('#slider-head').style.left = "0%";
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
