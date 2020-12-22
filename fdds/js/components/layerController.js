@@ -82,25 +82,10 @@ class LayerController extends HTMLElement {
      * the map has been initialized. */
     buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
-        Object.entries(base_layer_dict).map(entry => {
-            let name = entry[0];
-            let layer = entry[1]
+        for (const [name, layer] of Object.entries(base_layer_dict)) {
             let mapCheckBox = this.buildMapCheckBox(name, layer);
             baseMapDiv.appendChild(mapCheckBox);
-        });
-    }
-
-    /** Called when new simulations are selected. Avoids the problem that layers that exist for one
-     * simulation are selected for a simulation that doesn't have those same layers.*/
-    resetLayers() {
-        Object.entries(current_display).map(entry => {
-            let name = entry[0];
-            let layer = entry[1];
-            this.handleOverlayRemove(name, layer);
-            delete current_display[name];
-        });
-        current_display = {};
-        this.querySelector('#layer-controller-container').style.display = 'block';
+        }
     }
 
     /** Builds a checkbox for each raster layer and overlay layer */
@@ -118,15 +103,11 @@ class LayerController extends HTMLElement {
         const overlayDiv = this.querySelector('#overlay-checkboxes');
         overlayDiv.innerHTML = '';
 
-        [[rasterDiv, raster_dict], [overlayDiv, overlay_dict]].map(layerArray => {
-            let layerDiv = layerArray[0];
-            let layerDict = layerArray[1];
-            Object.entries(layerDict).map(entry => {
-                let name = entry[0];
-                let layer = entry[1];
+        [[rasterDiv, raster_dict], [overlayDiv, overlay_dict]].map(([layerDiv, layerDict]) => {
+            for (const [name, layer] of Object.entries(layerDict)) {
                 let layerBox = this.buildLayerBox(name, layer);
                 layerDiv.appendChild(layerBox);
-            });
+            }
         });
     }
 
