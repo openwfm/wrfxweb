@@ -112,8 +112,15 @@ function dragElement(elmnt, subID) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    var windowWidth = document.body.clientWidth;
+    var windowHeight = document.body.clientHeight;
+    var boundingBox = elmnt.getBoundingClientRect();
+    if (boundingBox.right - pos1 < windowWidth && boundingBox.left - pos1 > 0) {
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
+    if (boundingBox.top - pos2 > 0 && boundingBox.bottom - pos2 < windowHeight) {
+      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    }
   }
 
   function closeDragElement() {
