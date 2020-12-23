@@ -47,6 +47,7 @@ class LayerController extends HTMLElement {
         if (this.currentSimulation != currentSimulation) {
             prevDisplay = {};
             this.currentSimulation = currentSimulation;
+            this.querySelector('#layer-controller-container').style.display = 'block';
         }
         current_display = {};
         var first_rasters = rasters[currentDomain.getValue()][sorted_timestamps[0]];
@@ -75,7 +76,6 @@ class LayerController extends HTMLElement {
             }
         });
         this.buildLayerBoxes();
-        this.querySelector('#layer-controller-container').style.display = 'block';
     }
 
     /** Adds checkboxes for the different available map types. Should only be called once after
