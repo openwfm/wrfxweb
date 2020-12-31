@@ -122,7 +122,6 @@
 @media (max-width: 769px) {
     .catalog-menu {
         width: 300px;
-        left: 35px;
         top: 85px;
     }
 

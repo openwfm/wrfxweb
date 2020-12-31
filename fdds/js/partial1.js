@@ -114,9 +114,11 @@ function dragElement(elmnt, subID) {
     pos4 = e.clientY;
     var windowWidth = document.body.clientWidth;
     var windowHeight = document.body.clientHeight;
-    if (elmntRight == 0) {
+    let calculatedRight = windowWidth - (getOffsetLeft(elmnt) + elmnt.clientWidth);
+    if (Math.abs(elmntRight  - calculatedRight) > 40) {
       elmntRight = windowWidth - (elmnt.offsetLeft + elmnt.clientWidth);
     }
+    // console.log(windowWidth + " " + elmntRight + " " + calculatedRight);
     let elmntBottom = windowHeight - (elmnt.offsetTop + elmnt.clientHeight);
     // set the element's new position:
     if (Math.abs(pos1) >= 1 && elmntRight + pos1 > 0 && elmnt.offsetLeft - pos1 > 0) {
@@ -125,7 +127,7 @@ function dragElement(elmnt, subID) {
         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
       } else {
         elmnt.style.left = "";
-        elmnt.style.right = (elmntRight) + "px";
+        elmnt.style.right = elmntRight + "px";
       }
     }
     if (pos2 != 0 && elmntBottom + pos2 > 0 && elmnt.offsetTop - pos2 > 0) {
@@ -138,5 +140,14 @@ function dragElement(elmnt, subID) {
     document.onpointerup = null;
     document.onpointermove = null;
   }
+}
+
+function getOffsetLeft(element) {
+  let offsetLeft = 0;
+  while (element) {
+    offsetLeft += element.offsetLeft;
+    element = element.offsetParent;
+  }
+  return offsetLeft;
 }
 

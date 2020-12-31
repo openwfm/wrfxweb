@@ -32,6 +32,7 @@ class LayerController extends HTMLElement {
      * and panning. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
+        const clientWidth = document.body.clientWidth;
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
