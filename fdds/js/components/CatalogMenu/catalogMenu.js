@@ -12,24 +12,39 @@ class CatalogMenu extends HTMLElement {
         this.firesList = [];
         this.fuelMoistureList = [];
         this.satelliteList = [];
+        this.addOrder = {};
         this.innerHTML = `
             <div class="catalog-menu">
                 <div id="menu-title" class="menu-title">
                     <h3>Select Simulation...</h3>
                     <div> 
-                        <input class="menu-search" type="text" placeholder="Search for Simulation..."></input>
                         <span id="menu-close">x</span>
                     </div>
                 </div>
-                <div class="menu-columns">
-                    <div class="column-header-mobile">
-                        <select id="mobile-selector">
-                            <option value="Fires">Fires</option>
-                            <option value="Fuel Moisture">Fuel Moisture</option>
-                            <option value="Satellite Data">Satellite Data</option>
+                <div class="search-header">
+                    <div class="search-header-block">
+                        <label for="sort-by" style="display: block; font-size:.75rem">order/search by</label>
+                        <select id="sort-by" class="selector">
+                            <option value="original-order">original order</option>
+                            <option value="description">description</option>
+                            <option value="start-date">start date</option>
+                            <option value="end-date">end date</option>
                         </select>
-                        <input class="menu-search" type="text" placeholder="Search..."></input>
                     </div>
+                    <div class="search-header-block">
+                        <label id="reverse-label" for="reverse-order">Reverse Order</label>
+                        <input type="checkbox" id="reverse-order" style="display:inline-block"></input>
+                    </div>
+                    <div class="search-header-block">
+                        <input id="search-for" class="menu-search" type="text"></input>
+                    </div>
+                </div>
+                <div class="menu-columns">
+                    <select id="mobile-selector">
+                        <option value="Fires">Fires</option>
+                        <option value="Fuel Moisture">Fuel Moisture</option>
+                        <option value="Satellite Data">Satellite Data</option>
+                    </select>
                     <div id="fires-column" class="column">
                         <h3 class="column-header">Fires</h3>
                         <ul id="catalog-fires" class="catalog-list"> </ul>
@@ -53,6 +68,15 @@ class CatalogMenu extends HTMLElement {
      */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
+        const clientWidth = document.body.clientWidth;
+        const sortBy = this.querySelector('#sort-by');
+        const reverseOrder = this.querySelector('#reverse-order');
+        const reverseLabel = this.querySelector('#reverse-label');
+        reverseLabel.innerText = (clientWidth < 769) ? "Reverse" : "Reverse Order";
+        sortBy.onchange = () => this.sortBy(sortBy.value, reverseOrder.checked);
+        reverseOrder.onclick = () => this.sortBy(sortBy.value, reverseOrder.checked);
+        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + "px";
+        var searchDescription = (clientWidth < 769) ? "Search..." : "Search for Simulation...";
         // Makes sure that map events like zooming and panning are disabled from within menu div
         L.DomEvent.disableScrollPropagation(catalogMenu);
         L.DomEvent.disableClickPropagation(catalogMenu);
@@ -62,13 +86,11 @@ class CatalogMenu extends HTMLElement {
         });
         // Implements repositioning menu
         dragElement(catalogMenu, "menu-title");
-
-        const menuSearchList = this.querySelectorAll('.menu-search');
-        menuSearchList.forEach(menuSearch => {
-            menuSearch.onpointerdown = (e) => e.stopPropagation();
-            // Sets up search functionality
-            menuSearch.oninput = () => this.searchCatalog(menuSearch.value.toLowerCase());
-        });
+        const menuSearch = this.querySelector('#search-for');
+        menuSearch.placeholder = searchDescription;
+        menuSearch.onpointerdown = (e) => e.stopPropagation();
+        // Sets up search functionality
+        menuSearch.oninput = () => this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value);
 
         const menuSelect = this.querySelector('#mobile-selector');
         menuSelect.onchange = () => this.selectCategory(menuSelect.value);
@@ -83,8 +105,11 @@ class CatalogMenu extends HTMLElement {
             const firesListDOM = parentComponent.querySelector('#catalog-fires');
             const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
             const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
+            let c = 0;
             // build html for list item for each catalog entry and add it to the proper list depending on its description
             for (const [cat_name, cat_entry] of Object.entries(data)) {
+                parentComponent.addOrder[cat_entry.job_id] = c;
+                c += 1;
                 let desc = cat_entry.description;
                 var newLI = parentComponent.buildListItem(cat_entry, navJobId);
                 if(desc.indexOf('GACC') >= 0) {
@@ -127,19 +152,46 @@ class CatalogMenu extends HTMLElement {
      * filters the stored array of catalog entries by its description for whether there is a match with the searched
      * text. Builds <li> html for filtered catalog entries and adds them to the columns
     */
-    searchCatalog(searchText) {
+    searchCatalog(searchText, sortBy) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
         let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
-        catalogColumns.map(columnArray => {
-            let listDOM = columnArray[0];
-            let list = columnArray[1];
+        var filterFunction = (catalogEntry) => {
+            if (sortBy == 'original-order' || sortBy == 'description') return catalogEntry.description.toLowerCase().includes(searchText);
+            if (sortBy.includes('start-date')) return catalogEntry.from_utc.toLowerCase().includes(searchText);
+            if (sortBy.includes('end-date')) return catalogEntry.to_utc.toLowerCase().includes(searchText);
+        }
+        catalogColumns.map(([listDOM, list]) => {
             listDOM.innerHTML = '';
-            let filteredList = list.filter(catalogEntry => catalogEntry.description.toLowerCase().includes(searchText));
+            let filteredList = list.filter(filterFunction);
             filteredList.map(catalogEntry => {
                 let matchedLI = this.buildListItem(catalogEntry);
                 listDOM.appendChild(matchedLI);
+            });
+        });
+    }
+
+    sortBy(sortBy, reverseOrder) {
+        const firesListDOM = this.querySelector('#catalog-fires');
+        const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
+        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        var sortingFunction = (listElem1, listElem2) => {
+            let result = false;
+            if (sortBy == "original-order") result = this.addOrder[listElem1.job_id] > this.addOrder[listElem2.job_id];
+            if (sortBy == "description") result = listElem1.description > listElem2.description; 
+            if (sortBy == "start-date") result = listElem1.from_utc > listElem2.from_utc;
+            if (sortBy == "end-date") result = listElem1.to_utc > listElem2.to_utc;
+            if (reverseOrder) return !result;
+            return result;
+        }
+        let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
+        catalogColumns.map(([listDOM, list]) => {
+            listDOM.innerHTML = '';
+            let filteredList = list.sort(sortingFunction);
+            filteredList.map(catalogEntry => {
+                let newLI = this.buildListItem(catalogEntry);
+                listDOM.append(newLI);
             });
         });
     }
