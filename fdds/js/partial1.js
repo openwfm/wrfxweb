@@ -88,6 +88,7 @@ function loadConfig() {
 /** Makes given element draggable from sub element with id "subID" */
 function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  var elmntRight = 0;
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
 
   function dragMouseDown(e) {
@@ -111,14 +112,23 @@ function dragElement(elmnt, subID) {
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    // set the element's new position:
     var windowWidth = document.body.clientWidth;
     var windowHeight = document.body.clientHeight;
-    var boundingBox = elmnt.getBoundingClientRect();
-    if (boundingBox.right - pos1 < windowWidth && boundingBox.left - pos1 > 0) {
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    if (elmntRight == 0) {
+      elmntRight = windowWidth - (elmnt.offsetLeft + elmnt.clientWidth);
     }
-    if (boundingBox.top - pos2 > 0 && boundingBox.bottom - pos2 < windowHeight) {
+    let elmntBottom = windowHeight - (elmnt.offsetTop + elmnt.clientHeight);
+    // set the element's new position:
+    if (Math.abs(pos1) >= 1 && elmntRight + pos1 > 0 && elmnt.offsetLeft - pos1 > 0) {
+      elmntRight += pos1;
+      if (elmnt.offsetLeft < (windowWidth / 2)) {
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      } else {
+        elmnt.style.left = "";
+        elmnt.style.right = (elmntRight) + "px";
+      }
+    }
+    if (pos2 != 0 && elmntBottom + pos2 > 0 && elmnt.offsetTop - pos2 > 0) {
       elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
     }
   }
