@@ -121,7 +121,7 @@ function dragElement(elmnt, subID) {
     // set the element's new position:
     if (Math.abs(pos1) >= 1 && elmntRight + pos1 > 0 && elmnt.offsetLeft - pos1 > 0) {
       elmntRight += pos1;
-      if (elmnt.offsetLeft < (windowWidth / 2)) {
+      if (elmnt.offsetLeft + (elmnt.clientWidth / 2) < (windowWidth / 2)) {
         elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
       } else {
         elmnt.style.left = "";
