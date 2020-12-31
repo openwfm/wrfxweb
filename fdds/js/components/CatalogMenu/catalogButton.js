@@ -19,8 +19,8 @@ class CatalogButton extends HTMLElement {
         L.DomEvent.disableClickPropagation(catalogButton);
         catalogButton.onpointerdown = () => {
             const catalogMenu = document.querySelector('.catalog-menu');
-            var visible = catalogMenu.style.display == 'block';
-            catalogMenu.style.display = visible ? 'none' : 'block';
+            var visible = catalogMenu.style.display == 'none';
+            catalogMenu.style.display = visible ? 'block' : 'none';
         };
     }
 }
