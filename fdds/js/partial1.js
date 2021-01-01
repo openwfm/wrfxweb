@@ -118,7 +118,6 @@ function dragElement(elmnt, subID) {
     if (Math.abs(elmntRight  - calculatedRight) > 40) {
       elmntRight = windowWidth - (elmnt.offsetLeft + elmnt.clientWidth);
     }
-    // console.log(windowWidth + " " + elmntRight + " " + calculatedRight);
     let elmntBottom = windowHeight - (elmnt.offsetTop + elmnt.clientHeight);
     // set the element's new position:
     if (Math.abs(pos1) >= 1 && elmntRight + pos1 > 0 && elmnt.offsetLeft - pos1 > 0) {
@@ -142,6 +141,7 @@ function dragElement(elmnt, subID) {
   }
 }
 
+/** Calculates the left offset of given element by going up the elements parents and summing offsets. */
 function getOffsetLeft(element) {
   let offsetLeft = 0;
   while (element) {
