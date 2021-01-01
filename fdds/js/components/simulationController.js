@@ -29,7 +29,9 @@ class SimulationController extends HTMLElement {
                 </div>
             </div>
         `;
+        this.currentSimulation = "";
         this.currentFrame = 0;
+        this.frameTotal = 1;
         this.playing = false;
     }
 
@@ -52,10 +54,17 @@ class SimulationController extends HTMLElement {
     resetSlider() {
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (sorted_timestamps.length < 2) ? 'none' : 'block';
-        this.currentFrame = 0;
-        var timestamp = sorted_timestamps[0];
+        let percentage = this.currentFrame / this.frameTotal;
+        this.currentFrame = Math.floor((sorted_timestamps.length) * percentage);
+        if (this.currentSimulation != currentSimulation) {
+            this.currentSimulation = currentSimulation;
+            percentage = 0;
+            this.currentFrame = 0;
+        }
+        this.frameTotal = sorted_timestamps.length;
+        var timestamp = sorted_timestamps[this.currentFrame];
         this.querySelector('#timestamp').innerText = timestamp;
-        this.querySelector('#slider-head').style.left = "0%";
+        this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + "%";
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
