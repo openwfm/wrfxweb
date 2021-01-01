@@ -88,8 +88,21 @@ function loadConfig() {
 /** Makes given element draggable from sub element with id "subID" */
 function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  var elmntRight = 0;
+  var elmntLeft = 0, elmntTop = 0;
+  var clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+  window.addEventListener("resize", () => {
+    if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2)) {
+      elmntLeft = elmntLeft - (clientWidth - document.body.clientWidth); 
+      elmnt.style.left = elmntLeft + "px";
+    }
+    if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2)) {
+      elmntTop = elmntTop - (clientHeight - document.body.clientHeight);
+      elmnt.style.top = elmntTop + "px";
+    }
+    clientWidth = document.body.clientWidth;
+    clientHeight = document.body.clientHeight;
+  })
 
   function dragMouseDown(e) {
     e = e || window.event;
@@ -112,25 +125,18 @@ function dragElement(elmnt, subID) {
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
-    var windowWidth = document.body.clientWidth;
-    var windowHeight = document.body.clientHeight;
-    let calculatedRight = windowWidth - (getOffsetLeft(elmnt) + elmnt.clientWidth);
-    if (Math.abs(elmntRight  - calculatedRight) > 40) {
-      elmntRight = windowWidth - (elmnt.offsetLeft + elmnt.clientWidth);
+    if (elmntLeft == 0) {
+      elmntLeft = elmnt.offsetLeft;
+      elmntTop = elmnt.offsetTop;
     }
-    let elmntBottom = windowHeight - (elmnt.offsetTop + elmnt.clientHeight);
     // set the element's new position:
-    if (Math.abs(pos1) >= 1 && elmntRight + pos1 > 0 && elmnt.offsetLeft - pos1 > 0) {
-      elmntRight += pos1;
-      if (elmnt.offsetLeft + (elmnt.clientWidth / 2) < (windowWidth / 2)) {
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-      } else {
-        elmnt.style.left = "";
-        elmnt.style.right = elmntRight + "px";
-      }
+    if (Math.abs(pos1) >= 1 && elmntLeft - pos1 > 0 && elmntLeft + elmnt.clientWidth - pos1 < clientWidth) {
+      elmntLeft = elmntLeft - pos1;
+      elmnt.style.left = elmntLeft + "px";
     }
-    if (pos2 != 0 && elmntBottom + pos2 > 0 && elmnt.offsetTop - pos2 > 0) {
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    if (Math.abs(pos2) >= 1 && elmntTop - pos2 > 0 && elmntTop + elmnt.clientHeight - pos2  < clientHeight) {
+      elmntTop = elmntTop - pos2;
+      elmnt.style.top = elmntTop + "px";
     }
   }
 
