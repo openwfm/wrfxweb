@@ -90,6 +90,7 @@ function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   var elmntLeft = 0, elmntTop = 0;
   var clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
+  if (clientWidth < 769) return;
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
   window.addEventListener("resize", () => {
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2)) {
