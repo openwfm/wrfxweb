@@ -92,18 +92,8 @@ class CatalogItem extends HTMLElement {
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
+        simulationService.getSimulation(path);
 
-        fetch(path).then(response => response.json()).then(function(selected_simulation) { 
-            // store in global state
-            rasters = selected_simulation;
-
-            raster_base = path.substring(0, path.lastIndexOf('/') + 1);
-
-            // retrieve all domains
-            domainInstance.setValue(Object.keys(rasters));
-        }).catch(error => {
-            console.log(error);
-        });
     }
 }
 

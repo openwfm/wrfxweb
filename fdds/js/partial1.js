@@ -11,13 +11,7 @@ var organization;
 // list of layers which automatically become overlay rasters instead of regular rasters
 var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 
-// Variables containing input data
-var rasters = null;
-var sorted_timestamps = null;
-var raster_base = null;
-
 // Display context
-var layer_ctrl = null;
 var current_display = {}; // dictionary of layer name -> layer of currently displayed data
 var current_timestamp = null; // currently displayed timestamp
 var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
@@ -147,14 +141,3 @@ function dragElement(elmnt, subID) {
     document.onpointermove = null;
   }
 }
-
-/** Calculates the left offset of given element by going up the elements parents and summing offsets. */
-function getOffsetLeft(element) {
-  let offsetLeft = 0;
-  while (element) {
-    offsetLeft += element.offsetLeft;
-    element = element.offsetParent;
-  }
-  return offsetLeft;
-}
-
