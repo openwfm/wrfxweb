@@ -1,5 +1,15 @@
+class Services {
+    async getCatalogEntries() {
+        let json = {};
+        try {
+            const response = await fetch("simulations/catalog.json");
+            json = response.json();
+        } catch(error) {
+            console.error("Error fetching catalog entries: " + error);
+        }
+        return json;
+    }
 
-class SimulationService {
     getSimulation(path) {
         fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selected_simulation) { 
         // fetch(path).then(response => response.json()).then(function(selected_simulation) { 
@@ -15,4 +25,4 @@ class SimulationService {
     }
 }
 
-const simulationService = new SimulationService();
+const services = new Services();

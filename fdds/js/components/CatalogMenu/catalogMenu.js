@@ -72,6 +72,7 @@ class CatalogMenu extends HTMLElement {
         const sortBy = this.querySelector('#sort-by');
         const reverseOrder = this.querySelector('#reverse-order');
         const reverseLabel = this.querySelector('#reverse-label');
+        const menuSearch = this.querySelector('#search-for');
         reverseLabel.innerText = (clientWidth < 769) ? "Reverse" : "Reverse Order";
         sortBy.onchange = () => this.sortBy(sortBy.value, reverseOrder.checked);
         reverseOrder.onclick = () => this.sortBy(sortBy.value, reverseOrder.checked);
@@ -86,7 +87,6 @@ class CatalogMenu extends HTMLElement {
         });
         // Implements repositioning menu
         dragElement(catalogMenu, "menu-title");
-        const menuSearch = this.querySelector('#search-for');
         menuSearch.placeholder = searchDescription;
         menuSearch.onpointerdown = (e) => e.stopPropagation();
         // Sets up search functionality
@@ -95,57 +95,34 @@ class CatalogMenu extends HTMLElement {
         const menuSelect = this.querySelector('#mobile-selector');
         menuSelect.onchange = () => this.selectCategory(menuSelect.value);
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const navJobId = urlParams.get('job_id');
-
-        // needed for proper function scoping
-        var parentComponent = this;
-        // fetch catalog
-        fetch("simulations/catalog.json").then(response => response.json()).then(function(data) { 
-            const firesListDOM = parentComponent.querySelector('#catalog-fires');
-            const fuelMoistureListDOM = parentComponent.querySelector('#catalog-fuel-moisture');
-            const satelliteListDOM = parentComponent.querySelector('#catalog-satellite-data');
-            let c = 0;
-            // build html for list item for each catalog entry and add it to the proper list depending on its description
-            for (const [cat_name, cat_entry] of Object.entries(data)) {
-                parentComponent.addOrder[cat_entry.job_id] = c;
-                c += 1;
-                let desc = cat_entry.description;
-                var newLI = parentComponent.buildListItem(cat_entry, navJobId);
-                if(desc.indexOf('GACC') >= 0) {
-                    parentComponent.fuelMoistureList.push(cat_entry);
-                    fuelMoistureListDOM.appendChild(newLI);
-                } else if(desc.indexOf('SAT') >= 0) {
-                    parentComponent.satelliteList.push(cat_entry);
-                    satelliteListDOM.appendChild(newLI);
-                } else {
-                    parentComponent.firesList.push(cat_entry);
-                    firesListDOM.appendChild(newLI);
-                }
-            }
-        }).catch(error => {
-            console.log(error);
-        });
+        this.buildMenu();
     }
 
-    /** Returns <li> html element from a given catalog entry */
-    buildListItem(cat_entry, navJobId) {
-        const newLI = document.createElement('catalog-item');
-        newLI.setAttribute('description', cat_entry.description);
-        newLI.setAttribute('manifestPath', cat_entry.manifest_path);
-        newLI.setAttribute('jobId', cat_entry.job_id);
-        newLI.setAttribute('to', cat_entry.to_utc);
-        newLI.setAttribute('from', cat_entry.from_utc);
-        newLI.setAttribute('navJobId', navJobId);
-        if (cat_entry.kml_url) {
-            newLI.setAttribute('kmlURL', cat_entry.kml_url);
-            newLI.setAttribute('kmlSize', cat_entry.kml_size);
+    async buildMenu() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const navJobId = urlParams.get('job_id');
+        const firesListDOM = this.querySelector('#catalog-fires');
+        const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
+        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        let c = 0;
+        // build html for list item for each catalog entry and add it to the proper list depending on its description
+        const catalogEntries = await services.getCatalogEntries();
+        for (const [cat_name, cat_entry] of Object.entries(catalogEntries)) {
+            this.addOrder[cat_entry.job_id] = c;
+            c += 1;
+            let desc = cat_entry.description;
+            var newLI = new CatalogItem(cat_entry, navJobId);
+            if(desc.indexOf('GACC') >= 0) {
+                this.fuelMoistureList.push(cat_entry);
+                fuelMoistureListDOM.appendChild(newLI);
+            } else if(desc.indexOf('SAT') >= 0) {
+                this.satelliteList.push(cat_entry);
+                satelliteListDOM.appendChild(newLI);
+            } else {
+                this.firesList.push(cat_entry);
+                firesListDOM.appendChild(newLI);
+            }
         }
-        if (cat_entry.zip_url) {
-            newLI.setAttribute('zipURL', cat_entry.zip_url);
-            newLI.setAttribute('zipSize', cat_entry.zip_size);
-        }
-        return newLI;
     }
 
     /** Called each time a character is entered into the search input. Clears each catalog column on the DOM,
@@ -166,7 +143,7 @@ class CatalogMenu extends HTMLElement {
             listDOM.innerHTML = '';
             let filteredList = list.filter(filterFunction);
             filteredList.map(catalogEntry => {
-                let matchedLI = this.buildListItem(catalogEntry);
+                let matchedLI = new CatalogItem(catalogEntry, null);
                 listDOM.appendChild(matchedLI);
             });
         });
@@ -190,7 +167,7 @@ class CatalogMenu extends HTMLElement {
             listDOM.innerHTML = '';
             let filteredList = list.sort(sortingFunction);
             filteredList.map(catalogEntry => {
-                let newLI = this.buildListItem(catalogEntry);
+                let newLI = new CatalogItem(catalogEntry, null);
                 listDOM.append(newLI);
             });
         });

@@ -43,22 +43,25 @@ template.innerHTML = `
  * happen after one is clicked. 
  */
 class CatalogItem extends HTMLElement {
-    constructor() {
+    constructor(catEntry, navJobId) {
         super();
         this.attachShadow({mode :'open'});
+        this.catEntry = catEntry;
+        this.navJobId = navJobId;
     }
 
     connectedCallback() {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
-        let description = this.getAttribute("description");
-        let jobId = this.getAttribute('jobId');
-        let to = this.getAttribute('to');
-        let from = this.getAttribute('from');
-        let kmlURL = this.getAttribute('kmlURL');
-        let kmlSize = this.getAttribute('kmlSize');
-        let zipURL = this.getAttribute('zipURL');
-        let zipSize = this.getAttribute('zipSize');
-        let manifestPath = this.getAttribute('manifestPath');
+
+        let description = this.catEntry.description;
+        let jobId = this.catEntry.job_id;
+        let to = this.catEntry.to_utc;
+        let from = this.catEntry.from_utc;
+        let kmlURL = this.catEntry.kml_url;
+        let kmlSize = this.catEntry.kml_size;
+        let zipURL = this.catEntry.zip_url;
+        let zipSize = this.catEntry.zip_size;
+        let manifestPath = this.catEntry.manifest_path;
 
         this.shadowRoot.querySelector('h3').innerText = description;
         this.shadowRoot.querySelector('#jobID').innerText += ' ' + jobId;
@@ -78,7 +81,7 @@ class CatalogItem extends HTMLElement {
         }
 
         this.shadowRoot.querySelector('#entry').onclick = () => this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
-        if (this.getAttribute('navJobId') == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+        if (this.navJobId == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
     }
 
     /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated
@@ -92,8 +95,7 @@ class CatalogItem extends HTMLElement {
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
-        simulationService.getSimulation(path);
-
+        services.getSimulation(path);
     }
 }
 
