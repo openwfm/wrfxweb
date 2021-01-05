@@ -26,6 +26,9 @@ class LayerController extends HTMLElement {
         `;
         this.mapType = 'OSM';
         this.currentSimulation = '';
+
+        this.displayedColorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
+        this.displayedColorbars = [];
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -39,6 +42,7 @@ class LayerController extends HTMLElement {
         currentDomain.subscribe(() => this.domainSwitch());
     }
 
+    /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         for(var layerName in current_display) {
             this.handleOverlayRemove(layerName, current_display[layerName]);
@@ -182,8 +186,8 @@ class LayerController extends HTMLElement {
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
-            displayed_colorbar = name;
-            displayed_colorbars.push({name: name, url: cb_url});
+            this.displayedColorbar = name;
+            this.displayedColorbars.push({name: name, url: cb_url});
         }
         // this should probably be removed at some point
         const simulationController = document.querySelector('simulation-controller');
@@ -194,16 +198,16 @@ class LayerController extends HTMLElement {
     handleOverlayRemove(name, layer) {
         layer.remove(map);
 
-        displayed_colorbars = displayed_colorbars.filter(colorbars => colorbars.name != name);
+        this.displayedColorbars = this.displayedColorbars.filter(colorbars => colorbars.name != name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        if (displayed_colorbars.length == 0) {
+        if (this.displayedColorbars.length == 0) {
             rasterColorbar.src = '';
             rasterColorbar.style.display = 'none';
-            displayed_colorbar = null;
+            this.displayedColorbar = null;
         } else {
-            let mostRecentColorBar = displayed_colorbars[displayed_colorbars.length - 1];
+            let mostRecentColorBar = this.displayedColorbars[this.displayedColorbars.length - 1];
             rasterColorbar.src = mostRecentColorBar.url;
-            displayed_colorbar = mostRecentColorBar.name;
+            this.displayedColorbar = mostRecentColorBar.name;
         }
     }
 }

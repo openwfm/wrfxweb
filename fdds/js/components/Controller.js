@@ -25,8 +25,9 @@ class Controller {
 
 var currentSimulation = '';
 var rasters = null;
-var sorted_timestamps = null;
 var raster_base = null;
+var sorted_timestamps = null;
+var current_timestamp = null; // currently displayed timestamp
 const domainInstance = new Controller();
 const currentDomain = new Controller();
 const currentTimestamp = new Controller();
