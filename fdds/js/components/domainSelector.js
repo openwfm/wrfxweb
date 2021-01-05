@@ -58,10 +58,7 @@ class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-        // preloaded = {};
-        // retrieve all times (we assume the first domain is selected)
-
-        // set the current domain
+        // set the current domain, must be updated in this order: sorted_timestamps, current_timestamp, currentDomain
         sorted_timestamps = Object.keys(rasters[dom_id]).sort();
         current_timestamp = sorted_timestamps[0];
         currentDomain.setValue(dom_id);

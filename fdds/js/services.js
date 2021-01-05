@@ -1,5 +1,17 @@
 /** Class that handles any required fetching or asynchronous requests. */
 class Services {
+    /** Service request for fetching the conf.json file. */
+    async getConfigurations() {
+        let json = {};
+        try {
+            const response = await fetch('conf.json');
+            json = response.json();
+        } catch(error) {
+            console.error("Error fetching conf.json: " + error);
+        }
+        return json;
+    }
+
     /** Service request for building the initial catalogMenu */
     async getCatalogEntries() {
         let json = {};

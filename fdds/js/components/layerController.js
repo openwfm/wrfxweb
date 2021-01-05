@@ -86,9 +86,9 @@ class LayerController extends HTMLElement {
 
     /** Adds checkboxes for the different available map types. Should only be called once after
      * the map has been initialized. */
-    buildMapBase() {
+    buildMapBase(baseLayerDict) {
         const baseMapDiv = this.querySelector('#map-checkboxes');
-        for (const [name, layer] of Object.entries(base_layer_dict)) {
+        for (const [name, layer] of Object.entries(baseLayerDict)) {
             let mapCheckBox = this.buildMapCheckBox(name, layer);
             baseMapDiv.appendChild(mapCheckBox);
         }

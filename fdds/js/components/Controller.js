@@ -23,11 +23,14 @@ class Controller {
     }
 }
 
+// global variables
 var currentSimulation = '';
 var rasters = null;
 var raster_base = null;
 var sorted_timestamps = null;
 var current_timestamp = null; // currently displayed timestamp
+// Display context
+var current_display = {}; // dictionary of layer name -> layer of currently displayed data
 const domainInstance = new Controller();
 const currentDomain = new Controller();
 const currentTimestamp = new Controller();
