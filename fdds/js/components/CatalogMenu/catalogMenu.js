@@ -63,8 +63,8 @@ class CatalogMenu extends HTMLElement {
     }
 
     /**
-     * This function is called once the HTML Element has been added to the DOM. This is when the json 
-     * needs to be fetched and the lists built 
+     * This function is called once the HTML Element has been added to the DOM. Add all the UI events and change some 
+     * presentation details based on whether on mobile. 
      */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
@@ -82,9 +82,7 @@ class CatalogMenu extends HTMLElement {
         L.DomEvent.disableScrollPropagation(catalogMenu);
         L.DomEvent.disableClickPropagation(catalogMenu);
         // Closes the menu when the x is clicked
-        this.querySelector('#menu-close').addEventListener('click', () => {
-            catalogMenu.style.display = 'none';
-        });
+        this.querySelector('#menu-close').onclick = () => catalogMenu.style.display = 'none';
         // Implements repositioning menu
         dragElement(catalogMenu, "menu-title");
         menuSearch.placeholder = searchDescription;
@@ -98,6 +96,9 @@ class CatalogMenu extends HTMLElement {
         this.buildMenu();
     }
 
+    /** Function that retrieves catalog Entries from services.js and builds a CatalogItem for each and adds it to the 
+     * appropriate category in the menu.
+     */
     async buildMenu() {
         const urlParams = new URLSearchParams(window.location.search);
         const navJobId = urlParams.get('job_id');
@@ -107,19 +108,19 @@ class CatalogMenu extends HTMLElement {
         let c = 0;
         // build html for list item for each catalog entry and add it to the proper list depending on its description
         const catalogEntries = await services.getCatalogEntries();
-        for (const [cat_name, cat_entry] of Object.entries(catalogEntries)) {
-            this.addOrder[cat_entry.job_id] = c;
+        for (const [catName, catEntry] of Object.entries(catalogEntries)) {
+            this.addOrder[catEntry.job_id] = c;
             c += 1;
-            let desc = cat_entry.description;
-            var newLI = new CatalogItem(cat_entry, navJobId);
+            let desc = catEntry.description;
+            var newLI = new CatalogItem(catEntry, navJobId);
             if(desc.indexOf('GACC') >= 0) {
-                this.fuelMoistureList.push(cat_entry);
+                this.fuelMoistureList.push(catEntry);
                 fuelMoistureListDOM.appendChild(newLI);
             } else if(desc.indexOf('SAT') >= 0) {
-                this.satelliteList.push(cat_entry);
+                this.satelliteList.push(catEntry);
                 satelliteListDOM.appendChild(newLI);
             } else {
-                this.firesList.push(cat_entry);
+                this.firesList.push(catEntry);
                 firesListDOM.appendChild(newLI);
             }
         }
@@ -149,6 +150,9 @@ class CatalogMenu extends HTMLElement {
         });
     }
 
+    /** Function that sorts the lists in the menu. Takes @sortBy the selected category to sortBy and @reverseOrder indicating if 
+     * the order should be reversed.
+     */
     sortBy(sortBy, reverseOrder) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
@@ -173,6 +177,9 @@ class CatalogMenu extends HTMLElement {
         });
     }
 
+    /** Function used only in mobile versions. Mobile shows only one column at a time and this function is called when a user switches between columns. 
+     * Hides all columns and then shows the selected column.
+     */
     selectCategory(selection) {
         const firesListDOM = this.querySelector('#fires-column');
         firesListDOM.style.display = "none";
@@ -187,12 +194,6 @@ class CatalogMenu extends HTMLElement {
         } else {
             satelliteListDOM.style.display = 'block';
         }
-    }
-
-    /** Called when Component is removed from the DOM. Remove EventListners */
-    disconnectedCallback() {
-        this.querySelector('#menu-close').removeEventListener();
-        this.querySelector('#menu-search').removeEventListener();
     }
 }
 
