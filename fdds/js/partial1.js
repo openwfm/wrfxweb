@@ -3,8 +3,6 @@
 // Many of these are only referenced now inside a singe component, find out which ones, and remove them from here
 // global vars
 var base_layer_dict = null;
-var raster_dict = {};
-var overlay_dict = {};
 var map = null;
 var organization;
 

@@ -26,6 +26,8 @@ class LayerController extends HTMLElement {
         `;
         this.mapType = 'OSM';
         this.currentSimulation = '';
+        this.overlayDict = {};
+        this.rasterDict = {};
 
         this.displayedColorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
         this.displayedColorbars = [];
@@ -60,8 +62,8 @@ class LayerController extends HTMLElement {
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
  
         // build the layer groups
-        raster_dict = {};
-        overlay_dict = {};    
+        this.rasterDict = {};
+        this.overlayDict = {};    
         Object.entries(first_rasters).map(entry => {
             var r = entry[0];
             var raster_info = first_rasters[r];
@@ -74,9 +76,9 @@ class LayerController extends HTMLElement {
                                         });
             if(r in prevDisplay) current_display[r] = layer;
             if(overlay_list.indexOf(r) >= 0) {
-                overlay_dict[r] = layer;
+                this.overlayDict[r] = layer;
             } else {
-                raster_dict[r] = layer;
+                this.rasterDict[r] = layer;
             }
         });
         this.buildLayerBoxes();
@@ -96,18 +98,18 @@ class LayerController extends HTMLElement {
     buildLayerBoxes() {
         const rasterRegion = this.querySelector('#raster-layers');
         rasterRegion.style.display = 'block';
-        if (Object.keys(raster_dict).length == 0) rasterRegion.style.display = 'none';
+        if (Object.keys(this.rasterDict).length == 0) rasterRegion.style.display = 'none';
 
         const overlayRegion = this.querySelector('#overlay-layers');
         overlayRegion.style.display = 'block';
-        if (Object.keys(overlay_dict).length == 0) overlayRegion.style.display = 'none';
+        if (Object.keys(this.overlayDict).length == 0) overlayRegion.style.display = 'none';
 
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
         const overlayDiv = this.querySelector('#overlay-checkboxes');
         overlayDiv.innerHTML = '';
 
-        [[rasterDiv, raster_dict], [overlayDiv, overlay_dict]].map(([layerDiv, layerDict]) => {
+        [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]].map(([layerDiv, layerDict]) => {
             for (const [name, layer] of Object.entries(layerDict)) {
                 let layerBox = this.buildLayerBox(name, layer);
                 layerDiv.appendChild(layerBox);
