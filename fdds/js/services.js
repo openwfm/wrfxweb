@@ -1,4 +1,6 @@
+/** Class that handles any required fetching or asynchronous requests. */
 class Services {
+    /** Service request for building the initial catalogMenu */
     async getCatalogEntries() {
         let json = {};
         try {
@@ -10,17 +12,18 @@ class Services {
         return json;
     }
 
+    /** Service request for fetching a selected simulation from the menu. */
     getSimulation(path) {
-        fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selected_simulation) { 
-        // fetch(path).then(response => response.json()).then(function(selected_simulation) { 
+        fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selectedSimulation) { 
+        // fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
             // store in global state
-            rasters = selected_simulation;
+            rasters = selectedSimulation;
             // raster_base = path.substring(0, path.lastIndexOf('/') + 1);
             raster_base = "https://demo.openwfm.org/sj/" + path.substring(0, path.lastIndexOf('/') + 1);
             // retrieve all domains
             domainInstance.setValue(Object.keys(rasters));
         }).catch(error => {
-            console.log(error);
+            console.error("Error fetching simulation at " + path + ": " + error);
         });
     }
 }

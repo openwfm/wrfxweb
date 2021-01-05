@@ -32,7 +32,6 @@ class LayerController extends HTMLElement {
      * and panning. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
-        const clientWidth = document.body.clientWidth;
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
@@ -112,6 +111,7 @@ class LayerController extends HTMLElement {
         });
     }
 
+    /** Builds a radio box for each map base that can be chosen */
     buildMapCheckBox(name, layer) {
         let [div, input] = this.buildCheckBox(name);
         input.type = 'radio';

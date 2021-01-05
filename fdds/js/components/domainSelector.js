@@ -58,7 +58,7 @@ class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-        preloaded = {};
+        // preloaded = {};
         // retrieve all times (we assume the first domain is selected)
 
         // set the current domain

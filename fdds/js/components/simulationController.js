@@ -29,6 +29,8 @@ class SimulationController extends HTMLElement {
                 </div>
             </div>
         `;
+
+        this.preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
         this.currentSimulation = "";
         this.currentFrame = 0;
         this.frameTotal = 1;
@@ -57,6 +59,7 @@ class SimulationController extends HTMLElement {
         let percentage = this.currentFrame / this.frameTotal;
         this.currentFrame = Math.floor((sorted_timestamps.length) * percentage);
         if (this.currentSimulation != currentSimulation) {
+            this.preloaded = {};
             this.currentSimulation = currentSimulation;
             percentage = 0;
             this.currentFrame = 0;
@@ -140,10 +143,10 @@ class SimulationController extends HTMLElement {
     // for all layers currently displayed
         for(var key in current_display) {
             // if the current frame is not preloaded yet
-            if(!(frame_ndx in preloaded[key])) return false;
+            if(!(frame_ndx in this.preloaded[key])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';
-            if(cb_key in preloaded && !(frame_ndx in preloaded[cb_key])) return false;
+            if(cb_key in this.preloaded && !(frame_ndx in this.preloaded[cb_key])) return false;
         }
         return true;
     }
@@ -184,20 +187,20 @@ class SimulationController extends HTMLElement {
                 // it could happen that a timestamp is missing the variable
                 if(var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.
-                    if(!(var_name in preloaded)) {
-                    preloaded[var_name] = {};
+                    if(!(var_name in this.preloaded)) {
+                    this.preloaded[var_name] = {};
                     }
 
-                    if(!(i in preloaded[var_name])) {
+                    if(!(i in this.preloaded[var_name])) {
                         var var_info = rasters_dom[timestamp][var_name];
                                     var img = new Image();
-                                    img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, preloaded);
+                                    img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, this.preloaded);
                                     img.src = raster_base + var_info.raster;
                         if ('colorbar' in var_info) {
                             var cb_key = var_name + '_cb';
-                            if(!(cb_key in preloaded)) preloaded[cb_key] = {};
+                            if(!(cb_key in this.preloaded)) this.preloaded[cb_key] = {};
                             var img = new Image();
-                            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, preloaded);
+                            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, this.preloaded);
                             img.src = raster_base + var_info.colorbar;
                         }
                     }

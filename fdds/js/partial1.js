@@ -14,7 +14,6 @@ var overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT'
 // Display context
 var current_display = {}; // dictionary of layer name -> layer of currently displayed data
 var current_timestamp = null; // currently displayed timestamp
-var preloaded = {}; // dictionary containing information on what frames have been preloaded for which rasters/layers
 var displayed_colorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
 var displayed_colorbars = [];
 
