@@ -1,5 +1,7 @@
+/** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
+ * then be called whenever the value in the controller is updated.
+ */
 class Controller {
-
     constructor() {
         this.listeners = [];
         this.value = null;
