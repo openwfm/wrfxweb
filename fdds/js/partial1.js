@@ -71,12 +71,14 @@ function dragElement(elmnt, subID) {
   if (clientWidth < 769) return;
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
   window.addEventListener("resize", () => {
-    if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2)) {
-      elmntLeft = elmntLeft - (clientWidth - document.body.clientWidth); 
+    let offsetLeft = clientWidth - document.body.clientWidth;
+    if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {
+      elmntLeft = elmntLeft - offsetLeft; 
       elmnt.style.left = elmntLeft + "px";
     }
-    if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2)) {
-      elmntTop = elmntTop - (clientHeight - document.body.clientHeight);
+    let offsetTop = clientHeight - document.body.clientHeight;
+    if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2) && (elmntTop - offsetTop) > 0) {
+      elmntTop = elmntTop - offsetTop;
       elmnt.style.top = elmntTop + "px";
     }
     clientWidth = document.body.clientWidth;
