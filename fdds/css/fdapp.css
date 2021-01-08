@@ -1,5 +1,11 @@
 /* app css stylesheet */
 
+html {
+  margin-top:0;
+  height: 100%;
+  overflow-y: hidden;
+}
+
 .body {
   font-family: helvetica;
 }
@@ -78,6 +84,14 @@ html, body {
 	display: none;
 }
 
+.leaflet-top {
+  margin-top: 160px !important;
+}
+
+.leaflet-left {
+  margin-left: 10px !important;
+}
+
 @media (max-width: 769px) {
   .displayTest {
     left: 20px;
@@ -87,6 +101,14 @@ html, body {
 
   .leaflet-bottom .leaflet-control-scale {
     margin-bottom: 70px !important;
+  }
+
+  .leaflet-top {
+    margin-top: 10px !important;
+  }
+
+  .leaflet-left {
+    margin-left: 303px !important;
   }
 
   #raster-colorbar {

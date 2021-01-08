@@ -27,9 +27,11 @@ function initialize_fdds() {
     center: [37.34, -121.89],
     zoom: 7,
     layers: [baseLayerDict['OSM']],
-    zoomControl: false,
+    zoomControl: true,
     minZoom: 3
   });
+  map.doubleClickZoom.disable();
+  map.scrollWheelZoom.disable();
   
   const layerController = document.querySelector('layer-controller');
   layerController.buildMapBase(baseLayerDict);
