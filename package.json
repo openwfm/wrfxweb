@@ -7,10 +7,12 @@
   "devDependencies": {
     "http-server": "^0.12.3",
     "jasmine-core": "^2.3.4",
+    "jest": "^26.6.3",
     "shelljs": "^0.2.6"
   },
   "scripts": {
     "prestart": "npm install",
-    "start": "http-server -g -a localhost -p 8000 -c-1"
+    "start": "http-server -g -a localhost -p 8000 -c-1",
+    "test": "jest"
   }
 }

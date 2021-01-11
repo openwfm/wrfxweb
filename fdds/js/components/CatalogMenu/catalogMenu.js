@@ -198,3 +198,4 @@ class CatalogMenu extends HTMLElement {
 }
 
 window.customElements.define('catalog-menu', CatalogMenu);
+module.exports = CatalogMenu;
