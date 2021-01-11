@@ -79,7 +79,7 @@ function dragElement(elmnt, subID) {
       elmnt.style.left = elmntLeft + "px";
     }
     let offsetTop = clientHeight - document.body.clientHeight;
-    if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2) && (elmntTop - offsetTop) > 0) {
+    if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2) && (elmntTop - offsetTop) > 0 && (elmntTop - offsetTop + elmnt.clientHeight) < document.body.clientHeight) {
       elmntTop = elmntTop - offsetTop;
       elmnt.style.top = elmntTop + "px";
     }
