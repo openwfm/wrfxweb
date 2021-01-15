@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
  * 
@@ -5,7 +7,7 @@
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
  * supports searching columns for data that matches a description.
  */
-class CatalogMenu extends HTMLElement {
+export class CatalogMenu extends HTMLElement {
     constructor() {
         super();
         // Arrays of catalog entries based on their descriptions.
