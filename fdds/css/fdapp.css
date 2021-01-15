@@ -51,8 +51,8 @@ html, body {
 
 #raster-colorbar {
   position: fixed;
-  left: 20px;
-  bottom: 80px;
+  left: 60px;
+  bottom: 100px;
   width: 200px;
   height: 400px;
   z-index: 2000;
@@ -86,6 +86,7 @@ html, body {
 
 .leaflet-top {
   margin-top: 160px !important;
+  z-index: 5000 !important;
 }
 
 .leaflet-left {
