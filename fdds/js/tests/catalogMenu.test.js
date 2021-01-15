@@ -18,7 +18,21 @@ describe('fetching data for catalogMenu', () => {
         return catalogMenu;
     });
 
-    test('catalogMenu initial test', () => {
-        expect(catalogMenu.firesList.length).toEqual(1);
+    test('List of Fire simulations is built properly', () => {
+        const firesList = catalogMenu.firesList;
+        expect(firesList.length).toEqual(1);
+        expect(firesList[0].job_id).toEqual(1);
+    });
+
+    test('List of GACC simulations is built properly', () => {
+        const fuelMoistureList = catalogMenu.fuelMoistureList;
+        expect(fuelMoistureList.length).toEqual(1);
+        expect(fuelMoistureList[0].job_id).toEqual(2);
+    });
+
+    test('List of SAT simulations is built properly', () => {
+        const satelliteList = catalogMenu.satelliteList;
+        expect(satelliteList.length).toEqual(1);
+        expect(satelliteList[0].job_id).toEqual(3);
     });
 });
