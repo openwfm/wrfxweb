@@ -1,3 +1,5 @@
+import {getSimulation} from '../../services.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
@@ -42,7 +44,7 @@ template.innerHTML = `
  * its own component because of how much information is stored within each and how much has to
  * happen after one is clicked. 
  */
-class CatalogItem extends HTMLElement {
+export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
         super();
         this.attachShadow({mode :'open'});
@@ -95,7 +97,7 @@ class CatalogItem extends HTMLElement {
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
-        services.getSimulation(path);
+        getSimulation(path);
     }
 }
 

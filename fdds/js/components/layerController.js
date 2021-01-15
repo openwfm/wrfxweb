@@ -1,3 +1,5 @@
+import {dragElement} from '../util.js';
+
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
  * to choose different layers available to add. 

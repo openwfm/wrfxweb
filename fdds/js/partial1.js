@@ -44,23 +44,24 @@ function initialize_fdds() {
 
 /** Function that retrieves conf.json and sets the document title and flags if they exist. */
 async function loadConfig() {
-  const configData = await services.getConfigurations();
-  if (configData.organization) {
-    organization = configData.organization;
-    if (!organization.includes("SJSU")) {
-        map.panTo([39.7392, -104.9903]);
+  fetch('conf.json').then(response => response.json()).then(configData => {
+    if (configData.organization) {
+      organization = configData.organization;
+      if (!organization.includes("SJSU")) {
+          map.panTo([39.7392, -104.9903]);
+      }
+      document.title = organization;
     }
-    document.title = organization;
-  }
 
-  if (configData.flags) {
-    let flags = configData.flags;
-    const simulationFlags = document.querySelector("#simulation-flags");
-    flags.map(flag => {
-        var spanElement = document.createElement("span");
-        spanElement.className = "displayTest";
-        spanElement.innerText = flag;
-        simulationFlags.appendChild(spanElement);
-    });
-  }
+    if (configData.flags) {
+      let flags = configData.flags;
+      const simulationFlags = document.querySelector("#simulation-flags");
+      flags.map(flag => {
+          var spanElement = document.createElement("span");
+          spanElement.className = "displayTest";
+          spanElement.innerText = flag;
+          simulationFlags.appendChild(spanElement);
+      });
+    }
+  })
 }

@@ -1,4 +1,6 @@
-"use strict";
+import {dragElement} from '../../util.js';
+import {getCatalogEntries} from '../../services.js';
+import {CatalogItem} from './catalogItem.js';
 
 /**
  * A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
@@ -109,7 +111,7 @@ export class CatalogMenu extends HTMLElement {
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
         let c = 0;
         // build html for list item for each catalog entry and add it to the proper list depending on its description
-        const catalogEntries = await services.getCatalogEntries();
+        const catalogEntries = await getCatalogEntries();
         for (const [catName, catEntry] of Object.entries(catalogEntries)) {
             this.addOrder[catEntry.job_id] = c;
             c += 1;
