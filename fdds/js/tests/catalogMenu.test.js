@@ -51,5 +51,45 @@ describe('fetching data for catalogMenu', () => {
         const firesDOM = document.querySelector('#catalog-fires');
         expect(firesDOM.innerHTML).toContain('Fire 1');
         expect(firesDOM.innerHTML).toContain('Fire 2');
+        expect(firesDOM.innerHTML).not.toContain('GACC');
+        expect(firesDOM.innerHTML).not.toContain('SAT');
+    });
+
+    test('DOM should render GACC simulation in Moisture Column', () => {
+        const fuelMoistureDOM = document.querySelector('#catalog-fuel-moisture');
+        expect(fuelMoistureDOM.innerHTML).toContain('GACC');
+        expect(fuelMoistureDOM.innerHTML).not.toContain('Fire');
+        expect(fuelMoistureDOM.innerHTML).not.toContain('SAT');
+    });
+
+    test('DOM should render SAT simulation in SAT Column', () => {
+        const satDOM = document.querySelector('#catalog-satellite-data');
+        expect(satDOM.innerHTML).toContain('SAT');
+        expect(satDOM.innerHTML).not.toContain('Fire');
+        expect(satDOM.innerHTML).not.toContain('GACC');
     });
 });
+
+// describe('sorting fetched data', () => {
+//     jest.spyOn(services, 'getCatalogEntries');
+//     services.getCatalogEntries.mockImplementation(() => {
+//         return {1: {job_id: 1, description: "mocked Fire 2"}, 
+//                 2: {job_id: 2, description: "mocked Fire 1"}, 
+//                 3: {job_id: 3, description: "mocked GACC 1", from_utc: "2020"}, 
+//                 4: {job_id: 3, description: "mocked GACC 2", from_utc: "2019"}, 
+//                 5: {job_id: 4, description: "mocked SAT 1", to_utc: "2020"},
+//                 6: {job_id: 4, description: "mocked SAT 2", to_utc: "2019"}};
+//     });
+
+//     var catalogMenu;
+//     beforeEach(async () => {
+//         catalogMenu = await document.body.appendChild(new CatalogMenu());
+//         return catalogMenu;
+//     });
+    
+//     test('DOM should be sorted by description', () => {
+
+//     });
+
+
+// });
