@@ -15,16 +15,16 @@ const catalogItemConstructor = (catEntry) => {
 CatalogItem.mockImplementation((catEntry, navJobId) => catalogItemConstructor(catEntry));
 
 describe('fetching data for catalogMenu', () => {
-    jest.spyOn(services, 'getCatalogEntries');
-    services.getCatalogEntries.mockImplementation(() => {
-        return {1: {job_id: 1, description: "mocked Fire 1"}, 
-                2: {job_id: 2, description: "mocked Fire 2"}, 
-                3: {job_id: 3, description: "mocked GACC"}, 
-                4: {job_id: 4, description: "mocked SAT"}};
-    });
-
     var catalogMenu;
     beforeEach(async () => {
+        jest.spyOn(services, 'getCatalogEntries');
+        services.getCatalogEntries.mockImplementation(() => {
+            return {1: {job_id: 1, description: "mocked Fire 1"}, 
+                    2: {job_id: 2, description: "mocked Fire 2"}, 
+                    3: {job_id: 3, description: "mocked GACC"}, 
+                    4: {job_id: 4, description: "mocked SAT"}};
+        });
+
         catalogMenu = await document.body.appendChild(new CatalogMenu());
         return catalogMenu;
     });
@@ -70,26 +70,27 @@ describe('fetching data for catalogMenu', () => {
     });
 });
 
-// describe('sorting fetched data', () => {
-//     jest.spyOn(services, 'getCatalogEntries');
-//     services.getCatalogEntries.mockImplementation(() => {
-//         return {1: {job_id: 1, description: "mocked Fire 2"}, 
-//                 2: {job_id: 2, description: "mocked Fire 1"}, 
-//                 3: {job_id: 3, description: "mocked GACC 1", from_utc: "2020"}, 
-//                 4: {job_id: 3, description: "mocked GACC 2", from_utc: "2019"}, 
-//                 5: {job_id: 4, description: "mocked SAT 1", to_utc: "2020"},
-//                 6: {job_id: 4, description: "mocked SAT 2", to_utc: "2019"}};
-//     });
+describe('sorting fetched data', () => {
+    var catalogMenu;
 
-//     var catalogMenu;
-//     beforeEach(async () => {
-//         catalogMenu = await document.body.appendChild(new CatalogMenu());
-//         return catalogMenu;
-//     });
+    beforeEach(async () => {
+        jest.spyOn(services, 'getCatalogEntries');
+        services.getCatalogEntries.mockImplementation(() => {
+            return {1: {job_id: 1, description: "mocked Fire 2"}, 
+                    2: {job_id: 2, description: "mocked Fire 1"}, 
+                    3: {job_id: 3, description: "mocked GACC 1", from_utc: "2020"}, 
+                    4: {job_id: 3, description: "mocked GACC 2", from_utc: "2019"}, 
+                    5: {job_id: 4, description: "mocked SAT 1", to_utc: "2020"},
+                    6: {job_id: 4, description: "mocked SAT 2", to_utc: "2019"}};
+        });
+        catalogMenu = await document.body.appendChild(new CatalogMenu());
+        return catalogMenu;
+    });
     
-//     test('DOM should be sorted by description', () => {
-
-//     });
-
-
-// });
+    test('DOM should be sorted by description', () => {
+        catalogMenu.sortBy("description", "false");
+        const firesDOM = document.querySelector('#catalog-fires');
+        let correctOrder = firesDOM.innerHTML.indexOf("mocked Fire 1") < firesDOM.innerHTML.indexOf("mocked Fire 2");
+        expect(correctOrder).toBe(true);
+    });
+});
