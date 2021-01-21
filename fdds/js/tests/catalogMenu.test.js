@@ -88,17 +88,17 @@ describe('sorting fetched data', () => {
     });
     
     test('DOM should support sort by description', () => {
-        // catalogMenu.sortBy("description", false);
-        // const firesDOM = document.querySelector('#catalog-fires');
-        // let correctOrder = firesDOM.innerHTML.indexOf("mocked Fire 1") < firesDOM.innerHTML.indexOf("mocked Fire 2");
-        // expect(correctOrder).toBe(true);
+        catalogMenu.sortBy("description", false);
+        expect(catalogMenu.innerHTML).toContain("mocked Fire 1");
+        expect(catalogMenu.innerHTML).toContain("mocked Fire 2");
+        let correctOrder = catalogMenu.innerHTML.indexOf("mocked Fire 1") < catalogMenu.innerHTML.indexOf("mocked Fire 2");
+        expect(correctOrder).toBe(true);
     });
 
     test('DOM should support sort by start date', () => {
-        console.log(catalogMenu.innerHTML);
         catalogMenu.sortBy("start-date", false);
-        const fuelMoistureDOM = document.querySelector('#fuel-moisture-column');
-        console.log(fuelMoistureDOM.innerHTML);
+        expect(catalogMenu.innerHTML).toContain("mocked GACC 1");
+        expect(catalogMenu.innerHTML).toContain("mocked GACC 2");
         let correctOrder = catalogMenu.innerHTML.indexOf("mocked GACC 2") < catalogMenu.innerHTML.indexOf("mocked GACC 1");
         expect(correctOrder).toBe(true);
     });
