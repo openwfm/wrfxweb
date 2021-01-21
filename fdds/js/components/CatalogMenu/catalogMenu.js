@@ -174,7 +174,6 @@ export class CatalogMenu extends HTMLElement {
         catalogColumns.map(([listDOM, list]) => {
             listDOM.innerHTML = '';
             let filteredList = list.sort(sortingFunction);
-            console.log(filteredList);
             filteredList.map(catalogEntry => {
                 let newLI = new CatalogItem(catalogEntry, null);
                 listDOM.append(newLI);
