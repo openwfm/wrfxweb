@@ -1,3 +1,4 @@
+import {rasters, raster_base, domainInstance} from './components/Controller.js';
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
     let json = {};
@@ -27,11 +28,11 @@ export function getSimulation(path) {
     fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selectedSimulation) { 
     // fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
         // store in global state
-        rasters = selectedSimulation;
-        raster_base = "https://demo.openwfm.org/sj/" + path.substring(0, path.lastIndexOf('/') + 1);
-        // raster_base = path.substring(0, path.lastIndexOf('/') + 1);
+        rasters.setValue(selectedSimulation);
+        raster_base.setValue("https://demo.openwfm.org/sj/" + path.substring(0, path.lastIndexOf('/') + 1));
+        // raster_base.setValue(path.substring(0, path.lastIndexOf('/') + 1));
         // retrieve all domains
-        domainInstance.setValue(Object.keys(rasters));
+        domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
         console.error("Error fetching simulation at " + path + ": " + error);
     });

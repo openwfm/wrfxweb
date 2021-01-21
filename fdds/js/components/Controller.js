@@ -2,9 +2,9 @@
  * then be called whenever the value in the controller is updated.
  */
 class Controller {
-    constructor() {
+    constructor(value=null) {
         this.listeners = [];
-        this.value = null;
+        this.value = value;
     }
 
     subscribe(callback) {
@@ -26,13 +26,14 @@ class Controller {
 }
 
 // global variables
-var currentSimulation = '';
-var rasters = null;
-var raster_base = null;
-var sorted_timestamps = null;
-var current_timestamp = null; // currently displayed timestamp
+export const currentSimulation = new Controller();
+export const rasters = new Controller();
+
+export const raster_base = new Controller();
+
+export const sorted_timestamps = new Controller();
+export const current_timestamp = new Controller(); // currently displayed timestamp
 // Display context
-var current_display = {}; // dictionary of layer name -> layer of currently displayed data
-const domainInstance = new Controller();
-const currentDomain = new Controller();
-const currentTimestamp = new Controller();
+export const current_display = new Controller({}); // dictionary of layer name -> layer of currently displayed data
+export const domainInstance = new Controller();
+export const currentDomain = new Controller();

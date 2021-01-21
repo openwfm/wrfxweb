@@ -1,10 +1,11 @@
 import {dragElement} from '../util.js';
+import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
  * to choose different layers available to add. 
  */
-class LayerController extends HTMLElement {
+export class LayerController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
@@ -48,17 +49,17 @@ class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        for(var layerName in current_display) {
-            this.handleOverlayRemove(layerName, current_display[layerName]);
+        for(var layerName in current_display.getValue()) {
+            this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
         }
-        var prevDisplay = current_display;
-        if (this.currentSimulation != currentSimulation) {
+        var prevDisplay = current_display.getValue();
+        if (this.currentSimulation != currentSimulation.getValue()) {
             prevDisplay = {};
-            this.currentSimulation = currentSimulation;
+            this.currentSimulation = currentSimulation.getValue();
             this.querySelector('#layer-controller-container').style.display = 'block';
         }
-        current_display = {};
-        var first_rasters = rasters[currentDomain.getValue()][sorted_timestamps[0]];
+        current_display.setValue({});
+        var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
@@ -70,13 +71,13 @@ class LayerController extends HTMLElement {
             var r = entry[0];
             var raster_info = first_rasters[r];
             var cs = raster_info.coords;
-            var layer = L.imageOverlay(raster_base + raster_info.raster,
+            var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
                                             attribution: organization,
                                             opacity: 0.5
                                         });
-            if(r in prevDisplay) current_display[r] = layer;
+            if(r in prevDisplay) current_display.getValue()[r] = layer;
             if(overlay_list.indexOf(r) >= 0) {
                 this.overlayDict[r] = layer;
             } else {
@@ -143,8 +144,8 @@ class LayerController extends HTMLElement {
         let [div, input] = this.buildCheckBox(name, layer);
         input.type = 'checkbox';
         input.name = 'layers';
-        input.checked = name in current_display;
-        if (name in current_display) {
+        input.checked = name in current_display.getValue();
+        if (name in current_display.getValue()) {
             this.handleOverlayadd(name, layer);
         }
         input.id = name;
@@ -152,7 +153,7 @@ class LayerController extends HTMLElement {
             if (input.checked) this.handleOverlayadd(name, layer);
             else {
                 this.handleOverlayRemove(name, layer);
-                delete current_display[name];
+                delete current_display.getValue()[name];
             }
         }
         return div;
@@ -176,7 +177,7 @@ class LayerController extends HTMLElement {
         // register in currently displayed layers and bring to front if it's an overlay
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
-        current_display[name] = layer;
+        current_display.getValue()[name] = layer;
         if(overlay_list.indexOf(name) >= 0) {
             layer.bringToFront();
         } else {
@@ -184,9 +185,9 @@ class LayerController extends HTMLElement {
         }
 
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = rasters[currentDomain.getValue()][current_timestamp];
+        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         if('colorbar' in rasters_now[name]) {
-            var cb_url = raster_base + rasters_now[name].colorbar;
+            var cb_url = raster_base.getValue() + rasters_now[name].colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
