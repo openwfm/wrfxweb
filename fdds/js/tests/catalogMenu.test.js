@@ -102,4 +102,12 @@ describe('sorting fetched data', () => {
         let correctOrder = catalogMenu.innerHTML.indexOf("mocked GACC 2") < catalogMenu.innerHTML.indexOf("mocked GACC 1");
         expect(correctOrder).toBe(true);
     });
+
+    test('DOM should support sort by end date', () => {
+        catalogMenu.sortBy("end-date", false);
+        expect(catalogMenu.innerHTML).toContain("mocked SAT 1");
+        expect(catalogMenu.innerHTML).toContain("mocked SAT 2");
+        let correctOrder = catalogMenu.innerHTML.indexOf("mocked SAT 2") < catalogMenu.innerHTML.indexOf("mocked SAT 1");
+        expect(correctOrder).toBe(true);
+    });
 });
