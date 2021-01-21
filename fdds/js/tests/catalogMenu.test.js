@@ -119,4 +119,12 @@ describe('sorting fetched data', () => {
         let correctOrder = catalogMenu.innerHTML.indexOf("mocked GACC 1") < catalogMenu.innerHTML.indexOf("mocked GACC 2");
         expect(correctOrder).toBe(true);
     });
+
+    test('DOM should support reversing order', () => {
+        catalogMenu.sortBy("original-order", true);
+        expect(catalogMenu.innerHTML).toContain("mocked Fire 1");
+        expect(catalogMenu.innerHTML).toContain("mocked Fire 2");
+        let correctOrder = catalogMenu.innerHTML.indexOf("mocked Fire 1") < catalogMenu.innerHTML.indexOf("mocked Fire 2");
+        expect(correctOrder).toBe(true);
+    });
 });
