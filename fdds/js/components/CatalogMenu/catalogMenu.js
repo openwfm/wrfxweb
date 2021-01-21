@@ -167,13 +167,14 @@ export class CatalogMenu extends HTMLElement {
             if (sortBy == "description") result = listElem1.description > listElem2.description; 
             if (sortBy == "start-date") result = listElem1.from_utc > listElem2.from_utc;
             if (sortBy == "end-date") result = listElem1.to_utc > listElem2.to_utc;
-            if (reverseOrder) return !result;
-            return result;
+            if (reverseOrder) result = !result;
+            return result ? 1 : -1;
         }
         let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
         catalogColumns.map(([listDOM, list]) => {
             listDOM.innerHTML = '';
             let filteredList = list.sort(sortingFunction);
+            console.log(filteredList);
             filteredList.map(catalogEntry => {
                 let newLI = new CatalogItem(catalogEntry, null);
                 listDOM.append(newLI);
