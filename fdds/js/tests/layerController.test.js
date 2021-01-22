@@ -22,7 +22,8 @@ describe('Setting up tests for layerController', () => {
 
     test('Layer Controller should initially not be visible', () => {
         const container = document.querySelector("#layer-controller-container");
-        console.log(container.style);
-        expect(container.style.display).toBe("none");
+        console.log(getComputedStyle(container).getPropertyValue("display"));
+        console.log(window.getComputedStyle(container).getPropertyValue("display"));
+        expect(getComputedStyle(container).getPropertyValue("right")).toBe("none");
     });
 });
