@@ -5,6 +5,7 @@ class CatalogButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
+            <link rel="stylesheet" href="css/catalogButton.css"/>
             <div id='catalog-button'>
                 <div id='menu-button-icon-container'>
                     <img src='icons/menu-24px.svg'></img>

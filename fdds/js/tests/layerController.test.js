@@ -4,6 +4,9 @@ jest.mock("../leaflet/leaflet.js");
 
 const controllers = require("../components/Controller.js");
 jest.mock('../components/Controller.js', () => ({
+    currentDomain: ({
+        subscribe: () => {}
+    }),
     currentSimulation: ({
         getValue: () => "test",
         subscribe: () => {}
@@ -17,7 +20,9 @@ describe('Setting up tests for layerController', () => {
         layerController = await document.body.appendChild(new LayerController());
     });
 
-    test('First test', () => {
-        expect(true).toBe(true);
+    test('Layer Controller should initially not be visible', () => {
+        const container = document.querySelector("#layer-controller-container");
+        console.log(container.style);
+        expect(container.style.display).toBe("none");
     });
 });
