@@ -1,3 +1,7 @@
+import {dragElement} from '../../util.js';
+import {getCatalogEntries} from '../../services.js';
+import {CatalogItem} from './catalogItem.js';
+
 /**
  * A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
  * 
@@ -5,7 +9,7 @@
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
  * supports searching columns for data that matches a description.
  */
-class CatalogMenu extends HTMLElement {
+export class CatalogMenu extends HTMLElement {
     constructor() {
         super();
         // Arrays of catalog entries based on their descriptions.
@@ -107,7 +111,7 @@ class CatalogMenu extends HTMLElement {
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
         let c = 0;
         // build html for list item for each catalog entry and add it to the proper list depending on its description
-        const catalogEntries = await services.getCatalogEntries();
+        const catalogEntries = await getCatalogEntries();
         for (const [catName, catEntry] of Object.entries(catalogEntries)) {
             this.addOrder[catEntry.job_id] = c;
             c += 1;
@@ -163,8 +167,8 @@ class CatalogMenu extends HTMLElement {
             if (sortBy == "description") result = listElem1.description > listElem2.description; 
             if (sortBy == "start-date") result = listElem1.from_utc > listElem2.from_utc;
             if (sortBy == "end-date") result = listElem1.to_utc > listElem2.to_utc;
-            if (reverseOrder) return !result;
-            return result;
+            if (reverseOrder) result = !result;
+            return result ? 1 : -1;
         }
         let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
         catalogColumns.map(([listDOM, list]) => {

@@ -5,6 +5,7 @@ class DomainButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
+            <link rel="stylesheet" href="css/domainButton.css"/>
             <div id='domain-button-wrapper'>
                 <div id='domain-button'>
                     <span id='domain-button-label'>domains</span>

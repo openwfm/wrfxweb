@@ -1,3 +1,6 @@
+import {getSimulation} from '../../services.js';
+import {currentSimulation} from '../Controller.js';
+
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
@@ -42,7 +45,7 @@ template.innerHTML = `
  * its own component because of how much information is stored within each and how much has to
  * happen after one is clicked. 
  */
-class CatalogItem extends HTMLElement {
+export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
         super();
         this.attachShadow({mode :'open'});
@@ -89,13 +92,13 @@ class CatalogItem extends HTMLElement {
      */
     handle_catalog_click(entryID, path, description) {
         // close selection dialog
-        currentSimulation = description;
+        currentSimulation.setValue(description);
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').style.display = "none";
         history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
-        services.getSimulation(path);
+        getSimulation(path);
     }
 }
 
