@@ -1,6 +1,7 @@
 const {LayerController} = require("../components/layerController");
 const {L} = require("../leaflet/leaflet.js");
 jest.mock("../leaflet/leaflet.js");
+const {partial} = require("../partial1.js");
 
 
 const controllers = require("../components/Controller.js");

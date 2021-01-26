@@ -1,4 +1,4 @@
-import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base} from './Controller.js';
+import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base, organization} from './Controller.js';
 /**
  * A Componet that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
@@ -173,7 +173,7 @@ export class SimulationController extends HTMLElement {
                 var cs = raster_info.coords;
                 layer.setUrl(raster_base.getValue() + raster_info.raster,
                             [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                            { attribution: organization, opacity: 0.5 });
+                            { attribution: organization.getValue(), opacity: 0.5 });
             }
         }
     }

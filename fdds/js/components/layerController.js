@@ -1,5 +1,6 @@
-import {dragElement} from '../util.js';
-import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps} from './Controller.js';
+import {map, baseLayerDict, dragElement} from '../util.js';
+import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {overlay_list} from '../util.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -46,6 +47,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
 
         currentDomain.subscribe(() => this.domainSwitch());
+        this.buildMapBase();
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -75,7 +77,7 @@ export class LayerController extends HTMLElement {
             var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
-                                            attribution: organization,
+                                            attribution: organization.getValue(),
                                             opacity: 0.5
                                         });
             if(r in prevDisplay) current_display.getValue()[r] = layer;
@@ -90,7 +92,7 @@ export class LayerController extends HTMLElement {
 
     /** Adds checkboxes for the different available map types. Should only be called once after
      * the map has been initialized. */
-    buildMapBase(baseLayerDict) {
+    buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
         for (const [name, layer] of Object.entries(baseLayerDict)) {
             let mapCheckBox = this.buildMapCheckBox(name, layer);
