@@ -50,7 +50,6 @@ export class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        console.log("here");
         for(var layerName in current_display.getValue()) {
             this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
         }
