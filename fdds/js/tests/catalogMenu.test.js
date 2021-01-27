@@ -5,7 +5,12 @@ const {L} = require("../leaflet/leaflet.js");
 jest.mock("../leaflet/leaflet.js");
 
 const {CatalogItem} = require('../components/CatalogMenu/catalogItem');
-jest.mock('../components/CatalogMenu/catalogItem')
+jest.mock('../components/CatalogMenu/catalogItem');
+
+const utils = require("../util.js");
+jest.mock("../util.js", () => ({
+    dragElement: jest.fn()
+}));
 
 const catalogItemConstructor = (catEntry) => {
     const span = document.createElement('span');
