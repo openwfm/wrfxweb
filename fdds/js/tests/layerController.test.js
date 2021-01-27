@@ -89,6 +89,6 @@ describe('Setting up tests for layerController', () => {
                                  }
                       };
         layerController.domainSwitch();
-        console.log(controllers.current_display.getValue());
+        expect("raster" in controllers.current_display.getValue()).toEqual(true);
     });
 });

@@ -66,6 +66,7 @@ export class SimulationController extends HTMLElement {
             percentage = 0;
             this.currentFrame = 0;
         }
+        this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
         var timestamp = sorted_timestamps.getValue()[this.currentFrame];
         this.querySelector('#timestamp').innerText = timestamp;
@@ -145,6 +146,7 @@ export class SimulationController extends HTMLElement {
     // for all layers currently displayed
         for(var key in current_display.getValue()) {
             // if the current frame is not preloaded yet
+            if(this.preloaded[key] == null) return false;
             if(!(frame_ndx in this.preloaded[key])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';

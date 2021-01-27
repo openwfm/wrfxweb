@@ -61,7 +61,7 @@ export class LayerController extends HTMLElement {
             this.querySelector('#layer-controller-container').style.display = 'block';
         }
         current_display.setValue({});
-        var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
+        var first_rasters = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
@@ -150,7 +150,6 @@ export class LayerController extends HTMLElement {
         if (name in current_display.getValue()) {
             this.handleOverlayadd(name, layer);
         }
-        input.id = name;
         input.onclick = () => {
             if (input.checked) this.handleOverlayadd(name, layer);
             else {
@@ -196,9 +195,6 @@ export class LayerController extends HTMLElement {
             this.displayedColorbar = name;
             this.displayedColorbars.push({name: name, url: cb_url});
         }
-        // this should probably be removed at some point
-        const simulationController = document.querySelector('simulation-controller');
-        simulationController.updateSlider();
     }
 
     /** Called when a layer is de-selected. */
