@@ -1,8 +1,6 @@
 const {LayerController} = require("../components/layerController");
 const {L} = require("../leaflet/leaflet.js");
 jest.mock("../leaflet/leaflet.js");
-const {partial} = require("../partial1.js");
-
 
 const controllers = require("../components/Controller.js");
 
@@ -31,11 +29,25 @@ jest.mock('../components/Controller.js', () => ({
     rasters: ({
         getValue: () => ({
             1: {
-                "2020": {T2: {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                       Overlay: {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+                "2020": {"raster": {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
+                       "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
             }
         })
+    }),
+    organization: ({
+        getValue: () => "SJSU"
     })
+}));
+
+const utils = require("../util.js");
+jest.mock('../util.js', () => ({
+    baseLayerDict: {},
+    map: {
+        addTo: jest.fn(),
+        fitBounds: jest.fn()
+    },
+    dragElement: jest.fn(),
+    overlay_list: ['overlay']
 }));
 
 describe('Setting up tests for layerController', () => {
@@ -45,10 +57,11 @@ describe('Setting up tests for layerController', () => {
         layerController = await document.body.appendChild(new LayerController());
     });
 
-    test('Layer Controller should poplute its raster and overlay layers correctly', () => {
+    test('Layer Controller should populate its raster and overlay layers correctly', () => {
         layerController.domainSwitch();
-        const rasterLayers = layerController.rasterLayers;
-        const overlayLayers = layerController.overlayLayers;
-        // expect(Object.entries)
+        const rasterDict = layerController.rasterDict;
+        const overlayDict = layerController.overlayDict;
+        expect(Object.entries(rasterDict).length).toEqual(1);
+        expect(Object.entries(overlayDict).length).toEqual(1);
     });
 });

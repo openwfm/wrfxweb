@@ -1,6 +1,5 @@
-import {map, baseLayerDict, dragElement} from '../util.js';
+import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
 import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
-import {overlay_list} from '../util.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
