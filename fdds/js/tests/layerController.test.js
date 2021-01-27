@@ -1,16 +1,19 @@
 const {LayerController} = require("../components/layerController");
-const {L} = require("../leaflet/leaflet.js");
+const {leaflet} = require("../leaflet/leaflet.js");
+// jest.mock("../leaflet/leaflet.js", () => ({
+//     imageOverlay: (a, b, c) => ({addTo: (map) => {}, bringToFront: () => {}, bringToBack: () => {}})
+// }));
 jest.mock("../leaflet/leaflet.js");
 
 const controllers = require("../components/Controller.js");
 
-const testDisplay = {};
+var testDisplay = {};
 jest.mock('../components/Controller.js', () => ({
     currentDomain: ({
         subscribe: () => {}
     }),
     current_display: ({
-        getValue: () => testDisplay,
+        getValue: () => ({}),
         setValue: jest.fn()
     }),
     currentSimulation: ({
@@ -54,6 +57,9 @@ describe('Setting up tests for layerController', () => {
     var layerController;
 
     beforeEach(async () => {
+        const div = document.createElement("div");
+        div.id = "raster-colorbar";
+        await document.body.appendChild(div);
         layerController = await document.body.appendChild(new LayerController());
     });
 
@@ -65,5 +71,18 @@ describe('Setting up tests for layerController', () => {
         expect("raster" in rasterDict).toEqual(true);
         expect(Object.entries(overlayDict).length).toEqual(1);
         expect("overlay" in overlayDict).toEqual(true);
+    });
+
+    test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
+        layerController.domainSwitch();
+        controllers.current_display.getValue = () => testDisplay;
+        testDisplay = {"raster": { addTo: (map) => {}, 
+                                   bringToFront: () => {}, 
+                                   bringToBack: () => {},
+                                   remove: (map) => {}
+                                 }
+                      };
+        layerController.domainSwitch();
+        console.log(controllers.current_display.getValue());
     });
 });
