@@ -1,9 +1,12 @@
 const {LayerController} = require("../components/layerController");
-const {leaflet} = require("../leaflet/leaflet.js");
 // jest.mock("../leaflet/leaflet.js", () => ({
-//     imageOverlay: (a, b, c) => ({addTo: (map) => {}, bringToFront: () => {}, bringToBack: () => {}})
 // }));
-jest.mock("../leaflet/leaflet.js");
+// jest.mock("../leaflet/leaflet.js", () => ({
+//     L: {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()}}
+// }));
+
+global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
+            imageOverlay: (a, b, c) => ({addTo: (map) => {}, bringToFront: () => {}, bringToBack: () => {}})};
 
 const controllers = require("../components/Controller.js");
 
@@ -28,6 +31,9 @@ jest.mock('../components/Controller.js', () => ({
     }),
     raster_base: ({
         getValue: () => "test_base"
+    }),
+    current_timestamp: ({
+        getValue: () => ["2020"]
     }),
     rasters: ({
         getValue: () => ({
