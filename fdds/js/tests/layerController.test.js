@@ -11,7 +11,7 @@ jest.mock('../components/Controller.js', () => ({
     }),
     current_display: ({
         getValue: () => testDisplay,
-        setValue: jest.fn(),
+        setValue: jest.fn()
     }),
     currentSimulation: ({
         getValue: () => "test",
@@ -62,6 +62,8 @@ describe('Setting up tests for layerController', () => {
         const rasterDict = layerController.rasterDict;
         const overlayDict = layerController.overlayDict;
         expect(Object.entries(rasterDict).length).toEqual(1);
+        expect("raster" in rasterDict).toEqual(true);
         expect(Object.entries(overlayDict).length).toEqual(1);
+        expect("overlay" in overlayDict).toEqual(true);
     });
 });
