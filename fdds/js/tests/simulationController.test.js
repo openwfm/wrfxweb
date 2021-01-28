@@ -51,10 +51,22 @@ describe('Setting up tests for Simulation Controller', () => {
     });
 
     test('Images and their colorbars should preload', () => {
-       simulationController.preloadVariables(0, 2);
-       expect("layer" in simulationController.preloaded).toEqual(true);
-       expect("layer_cb" in simulationController.preloaded).toEqual(true);
-       expect(Object.keys(simulationController.preloaded["layer"]).length).toEqual(2);
-       expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
+        simulationController.preloadVariables(0, 2);
+        expect("layer" in simulationController.preloaded).toEqual(true);
+        expect("layer_cb" in simulationController.preloaded).toEqual(true);
+        expect(Object.keys(simulationController.preloaded["layer"]).length).toEqual(2);
+        expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
+    });
+
+    test('Attempting to preload more images than exist should not crash', () => {
+        simulationController.preloadVariables(0, 5);
+        expect("layer" in simulationController.preloaded).toEqual(true);
+        expect("layer_cb" in simulationController.preloaded).toEqual(true);
+        expect(Object.keys(simulationController.preloaded["layer"]).length).toEqual(2);
+        expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
+    });
+
+    test('SetUp For Time should change the current timestamp and preload images', () => {
+
     });
 });
