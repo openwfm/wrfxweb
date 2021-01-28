@@ -184,6 +184,7 @@ export class SimulationController extends HTMLElement {
     preloadVariables(frame, preload_count) {
         var rasters_dom = rasters.getValue()[currentDomain.getValue()];
         var n_rasters = Object.keys(rasters_dom).length;
+        preload_count = Math.min(preload_count, n_rasters);
         for(var counter=0; counter < preload_count; counter++) {
             var i = (frame + counter) % n_rasters;
             var timestamp = sorted_timestamps.getValue()[i];
@@ -192,19 +193,18 @@ export class SimulationController extends HTMLElement {
                 if(var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.
                     if(!(var_name in this.preloaded)) {
-                    this.preloaded[var_name] = {};
+                        this.preloaded[var_name] = {};
                     }
-
                     if(!(i in this.preloaded[var_name])) {
                         var var_info = rasters_dom[timestamp][var_name];
-                                    var img = new Image();
-                                    img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, this.preloaded);
-                                    img.src = raster_base.getValue() + var_info.raster;
+                        var img = new Image();
+                        img.onload = this.preloaded[var_name][i] = img;
+                        img.src = raster_base.getValue() + var_info.raster;
                         if ('colorbar' in var_info) {
                             var cb_key = var_name + '_cb';
                             if(!(cb_key in this.preloaded)) this.preloaded[cb_key] = {};
                             var img = new Image();
-                            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, this.preloaded);
+                            img.onload = this.preloaded[cb_key][i] = img;
                             img.src = raster_base.getValue() + var_info.colorbar;
                         }
                     }
