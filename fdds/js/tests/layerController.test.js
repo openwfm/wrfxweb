@@ -5,8 +5,6 @@ global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagat
             imageOverlay: (raster, coordinates, settings) => ({addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}})};
 
 const controllers = require("../components/Controller.js");
-
-var testDisplay = {};
 jest.mock('../components/Controller.js', () => ({
     currentDomain: ({
         getValue: () => 1,
@@ -66,7 +64,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     var layerController;
 
     beforeEach(async () => {
-        testDisplay = {};
+        var testDisplay = {};
         globalMap = {};
         controllers.currentDomain.getValue = () => 1;
         controllers.current_timestamp.getValue = () => "2020";

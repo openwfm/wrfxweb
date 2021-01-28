@@ -253,11 +253,6 @@ export class SimulationController extends HTMLElement {
         this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
         this.updateSlider();
     }
-
-    /** Called when Component is removed from the DOM. Remove EventListners */
-    disconnectedCallback() {
-        this.querySelector('.slider-container').removeEventListener();
-    }
 }
 
 window.customElements.define('simulation-controller', SimulationController);
