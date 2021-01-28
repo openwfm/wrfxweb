@@ -5,8 +5,9 @@ const {LayerController} = require("../components/layerController");
 //     L: {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()}}
 // }));
 
+const globalMap = {};
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
-            imageOverlay: (a, b, c) => ({addTo: (map) => {}, bringToFront: () => {}, bringToBack: () => {}})};
+            imageOverlay: (raster, coordinates, settings) => ({addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}})};
 
 const controllers = require("../components/Controller.js");
 
@@ -59,18 +60,20 @@ jest.mock('../util.js', () => ({
     overlay_list: ['overlay']
 }));
 
-describe('Setting up tests for layerController', () => {
+describe('Tests for adding layers to menu and selecting layers', () => {
     var layerController;
 
     beforeEach(async () => {
+        testDisplay = {};
+        controllers.current_display.getValue = () => testDisplay;
         const div = document.createElement("div");
         div.id = "raster-colorbar";
         await document.body.appendChild(div);
         layerController = await document.body.appendChild(new LayerController());
+        layerController.domainSwitch();
     });
 
     test('Layer Controller should populate its raster and overlay layers correctly', () => {
-        layerController.domainSwitch();
         const rasterDict = layerController.rasterDict;
         const overlayDict = layerController.overlayDict;
         expect(Object.entries(rasterDict).length).toEqual(1);
@@ -79,9 +82,18 @@ describe('Setting up tests for layerController', () => {
         expect("overlay" in overlayDict).toEqual(true);
     });
 
+    test('Layers should be correctly added to the map when selected', () => {
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        expect("test_baseraster test" in globalMap).toEqual(true);
+        expect("raster" in controllers.current_display.getValue()).toEqual(true);
+    });
+
+    test('Layers should be correctly removed from the map when selected', () => {
+
+    });
+
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
-        layerController.domainSwitch();
-        controllers.current_display.getValue = () => testDisplay;
         testDisplay = {"raster": { addTo: (map) => {}, 
                                    bringToFront: () => {}, 
                                    bringToBack: () => {},

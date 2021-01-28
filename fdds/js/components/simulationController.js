@@ -1,6 +1,6 @@
 import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base, organization} from './Controller.js';
 /**
- * A Componet that builds the animation controller for the simulation. Creates a UI component that 
+ * A Component that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
  * slider bar with a head that indicates relative position in animation that can be dragged to a 
  * specific location. Bar itself can also be clicked to seek to a specific position.
