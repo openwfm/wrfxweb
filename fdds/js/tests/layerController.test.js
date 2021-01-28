@@ -129,10 +129,17 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
     });
 
-    test('Layer Controller should add any colobars', () => {
+    test('Layer Controller should add any colorbars', () => {
         const rasterDict = layerController.rasterDict;
         layerController.handleOverlayadd("raster", rasterDict["raster"]);
         expect(layerController.displayedColorbar).toEqual("raster");
+    });
+
+    test('Layer Controller should remove colorbars when layer deselected', () => {
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayRemove("raster", rasterDict["raster"]);
+        expect(layerController.displayedColorbar).toEqual(null);
     });
 
     test('Layer Controller should put most recent selected colorbar on top', () => {
@@ -144,7 +151,12 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 
     test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
-
+        const rasterDict = layerController.rasterDict;
+        const overlayDict = layerController.overlayDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("overlay", overlayDict["overlay"]);
+        layerController.handleOverlayRemove("overlay", overlayDict["overlay"]);
+        expect(layerController.displayedColorbar).toEqual("raster");
     });
 
 });
