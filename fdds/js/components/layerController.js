@@ -1,5 +1,5 @@
-import {dragElement} from '../util.js';
-import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps} from './Controller.js';
+import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
+import {currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -46,11 +46,11 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
 
         currentDomain.subscribe(() => this.domainSwitch());
+        this.buildMapBase();
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        console.log("here");
         for(var layerName in current_display.getValue()) {
             this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
         }
@@ -61,7 +61,7 @@ export class LayerController extends HTMLElement {
             this.querySelector('#layer-controller-container').style.display = 'block';
         }
         current_display.setValue({});
-        var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
+        var first_rasters = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
@@ -76,7 +76,7 @@ export class LayerController extends HTMLElement {
             var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
-                                            attribution: organization,
+                                            attribution: organization.getValue(),
                                             opacity: 0.5
                                         });
             if(r in prevDisplay) current_display.getValue()[r] = layer;
@@ -91,7 +91,7 @@ export class LayerController extends HTMLElement {
 
     /** Adds checkboxes for the different available map types. Should only be called once after
      * the map has been initialized. */
-    buildMapBase(baseLayerDict) {
+    buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
         for (const [name, layer] of Object.entries(baseLayerDict)) {
             let mapCheckBox = this.buildMapCheckBox(name, layer);
@@ -150,7 +150,6 @@ export class LayerController extends HTMLElement {
         if (name in current_display.getValue()) {
             this.handleOverlayadd(name, layer);
         }
-        input.id = name;
         input.onclick = () => {
             if (input.checked) this.handleOverlayadd(name, layer);
             else {
@@ -196,9 +195,6 @@ export class LayerController extends HTMLElement {
             this.displayedColorbar = name;
             this.displayedColorbars.push({name: name, url: cb_url});
         }
-        // this should probably be removed at some point
-        const simulationController = document.querySelector('simulation-controller');
-        simulationController.updateSlider();
     }
 
     /** Called when a layer is de-selected. */

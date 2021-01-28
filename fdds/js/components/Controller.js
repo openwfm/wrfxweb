@@ -37,3 +37,4 @@ export const current_timestamp = new Controller(); // currently displayed timest
 export const current_display = new Controller({}); // dictionary of layer name -> layer of currently displayed data
 export const domainInstance = new Controller();
 export const currentDomain = new Controller();
+export const organization = new Controller();

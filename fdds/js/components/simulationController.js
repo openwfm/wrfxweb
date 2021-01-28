@@ -1,6 +1,6 @@
-import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base} from './Controller.js';
+import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base, organization} from './Controller.js';
 /**
- * A Componet that builds the animation controller for the simulation. Creates a UI component that 
+ * A Component that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
  * slider bar with a head that indicates relative position in animation that can be dragged to a 
  * specific location. Bar itself can also be clicked to seek to a specific position.
@@ -66,6 +66,7 @@ export class SimulationController extends HTMLElement {
             percentage = 0;
             this.currentFrame = 0;
         }
+        this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
         var timestamp = sorted_timestamps.getValue()[this.currentFrame];
         this.querySelector('#timestamp').innerText = timestamp;
@@ -145,6 +146,7 @@ export class SimulationController extends HTMLElement {
     // for all layers currently displayed
         for(var key in current_display.getValue()) {
             // if the current frame is not preloaded yet
+            if(this.preloaded[key] == null) return false;
             if(!(frame_ndx in this.preloaded[key])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';
@@ -173,7 +175,7 @@ export class SimulationController extends HTMLElement {
                 var cs = raster_info.coords;
                 layer.setUrl(raster_base.getValue() + raster_info.raster,
                             [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                            { attribution: organization, opacity: 0.5 });
+                            { attribution: organization.getValue(), opacity: 0.5 });
             }
         }
     }
@@ -182,6 +184,7 @@ export class SimulationController extends HTMLElement {
     preloadVariables(frame, preload_count) {
         var rasters_dom = rasters.getValue()[currentDomain.getValue()];
         var n_rasters = Object.keys(rasters_dom).length;
+        preload_count = Math.min(preload_count, n_rasters);
         for(var counter=0; counter < preload_count; counter++) {
             var i = (frame + counter) % n_rasters;
             var timestamp = sorted_timestamps.getValue()[i];
@@ -190,19 +193,18 @@ export class SimulationController extends HTMLElement {
                 if(var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.
                     if(!(var_name in this.preloaded)) {
-                    this.preloaded[var_name] = {};
+                        this.preloaded[var_name] = {};
                     }
-
                     if(!(i in this.preloaded[var_name])) {
                         var var_info = rasters_dom[timestamp][var_name];
-                                    var img = new Image();
-                                    img.onload = function (ndx, var_name, img, preloaded) { return function() { preloaded[var_name][ndx] = img; } } (i, var_name, img, this.preloaded);
-                                    img.src = raster_base.getValue() + var_info.raster;
+                        var img = new Image();
+                        img.onload = this.preloaded[var_name][i] = img;
+                        img.src = raster_base.getValue() + var_info.raster;
                         if ('colorbar' in var_info) {
                             var cb_key = var_name + '_cb';
                             if(!(cb_key in this.preloaded)) this.preloaded[cb_key] = {};
                             var img = new Image();
-                            img.onload = function(ndx, cb_key, img, preloaded) { return function() { preloaded[cb_key][ndx] = img; } } (i, cb_key, img, this.preloaded);
+                            img.onload = this.preloaded[cb_key][i] = img;
                             img.src = raster_base.getValue() + var_info.colorbar;
                         }
                     }
@@ -250,11 +252,6 @@ export class SimulationController extends HTMLElement {
         let newFrame = this.currentFrame + diff;
         this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
         this.updateSlider();
-    }
-
-    /** Called when Component is removed from the DOM. Remove EventListners */
-    disconnectedCallback() {
-        this.querySelector('.slider-container').removeEventListener();
     }
 }
 
