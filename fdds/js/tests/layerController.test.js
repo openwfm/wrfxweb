@@ -1,9 +1,4 @@
 const {LayerController} = require("../components/layerController");
-// jest.mock("../leaflet/leaflet.js", () => ({
-// }));
-// jest.mock("../leaflet/leaflet.js", () => ({
-//     L: {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()}}
-// }));
 
 const globalMap = {};
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
@@ -90,7 +85,10 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 
     test('Layers should be correctly removed from the map when selected', () => {
-
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayRemove("raster", rasterDict["raster"]);
+        expect("raster" in globalMap).toEqual(false);
     });
 
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
