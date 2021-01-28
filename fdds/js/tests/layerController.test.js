@@ -66,6 +66,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     beforeEach(async () => {
         testDisplay = {};
         controllers.current_display.getValue = () => testDisplay;
+        controllers.current_display.setValue = (newDisplay) => {testDisplay = newDisplay};
         const div = document.createElement("div");
         div.id = "raster-colorbar";
         await document.body.appendChild(div);
@@ -107,6 +108,11 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 
     test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
-
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        controllers.currentSimulation.getValue = () => "new simulation";
+        layerController.domainSwitch();
+        expect(controllers.current_display.getValue()).toEqual({});
+        expect(globalMap).toEqual({});
     });
 });
