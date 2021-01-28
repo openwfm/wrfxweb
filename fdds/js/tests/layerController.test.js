@@ -35,8 +35,8 @@ jest.mock('../components/Controller.js', () => ({
     rasters: ({
         getValue: () => ({
             1: {
-                "2020": {"raster": {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                       "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }},
+                "2020": {"raster": {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "test colorbar raster"}, 
+                       "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "test colorbar overlay" }},
                 "2021": {"raster": {raster: "raster test current timestamp", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
                        "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
             },
@@ -69,6 +69,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         testDisplay = {};
         globalMap = {};
         controllers.currentDomain.getValue = () => 1;
+        controllers.current_timestamp.getValue = () => "2020";
         controllers.current_display.getValue = () => testDisplay;
         controllers.current_display.setValue = (newDisplay) => {testDisplay = newDisplay};
         const div = document.createElement("div");
@@ -127,4 +128,23 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         layerController.handleOverlayadd("raster", rasterDict["raster"]);
         expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
     });
+
+    test('Layer Controller should add any colobars', () => {
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        expect(layerController.displayedColorbar).toEqual("raster");
+    });
+
+    test('Layer Controller should put most recent selected colorbar on top', () => {
+        const rasterDict = layerController.rasterDict;
+        const overlayDict = layerController.overlayDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("overlay", overlayDict["overlay"]);
+        expect(layerController.displayedColorbar).toEqual("overlay");
+    });
+
+    test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
+
+    });
+
 });
