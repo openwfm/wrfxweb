@@ -128,6 +128,20 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         layerController.handleOverlayadd("raster", rasterDict["raster"]);
         expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
     });
+});
+
+describe('Tests for adding layers with colorbars', () => {
+    var layerController;
+
+    beforeEach(async () => {
+        controllers.currentDomain.getValue = () => 1;
+        controllers.current_timestamp.getValue = () => "2020";
+        const div = document.createElement("div");
+        div.id = "raster-colorbar";
+        await document.body.appendChild(div);
+        layerController = await document.body.appendChild(new LayerController());
+        layerController.domainSwitch();
+    });
 
     test('Layer Controller should add any colorbars', () => {
         const rasterDict = layerController.rasterDict;
@@ -159,4 +173,11 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         expect(layerController.displayedColorbar).toEqual("raster");
     });
 
+    test('Layer Controller should remove colorbar when switching to a domain without one', () => {
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        controllers.currentDomain.getValue = () => 2;
+        layerController.domainSwitch();
+        expect(layerController.displayedColorbar).toEqual(null);
+    });
 });
