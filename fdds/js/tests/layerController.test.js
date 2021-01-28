@@ -9,6 +9,7 @@ const controllers = require("../components/Controller.js");
 var testDisplay = {};
 jest.mock('../components/Controller.js', () => ({
     currentDomain: ({
+        getValue: () => 1,
         subscribe: () => {}
     }),
     current_display: ({
@@ -36,6 +37,10 @@ jest.mock('../components/Controller.js', () => ({
             1: {
                 "2020": {"raster": {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
                        "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+            },
+            2: {
+                "2020": {"raster": {raster: "raster test 2", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
+                       "overlay": {raster: "overlay test 2", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
             }
         })
     }),
@@ -88,17 +93,20 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         const rasterDict = layerController.rasterDict;
         layerController.handleOverlayadd("raster", rasterDict["raster"]);
         layerController.handleOverlayRemove("raster", rasterDict["raster"]);
-        expect("raster" in globalMap).toEqual(false);
+        expect("test_baseraster test" in globalMap).toEqual(false);
     });
 
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
-        testDisplay = {"raster": { addTo: (map) => {}, 
-                                   bringToFront: () => {}, 
-                                   bringToBack: () => {},
-                                   remove: (map) => {}
-                                 }
-                      };
+        const rasterDict = layerController.rasterDict;
+        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
         expect("raster" in controllers.current_display.getValue()).toEqual(true);
+        expect("test_baseraster test 2" in globalMap).toEqual(true);
+        expect("test_baseraster test" in globalMap).toEqual(false);
+    });
+
+    test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
+
     });
 });
