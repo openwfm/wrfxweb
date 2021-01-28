@@ -16,7 +16,7 @@ jest.mock('../components/Controller.js', () => ({
         setValue: jest.fn()
     }),
     current_display: ({
-        getValue: () => ({"layer": {}}),
+        getValue: () => ({"layer": {setUrl: jest.fn()}}),
         setValue: jest.fn()
     }),
     currentSimulation: ({
@@ -45,8 +45,15 @@ jest.mock('../components/Controller.js', () => ({
 
 describe('Setting up tests for Simulation Controller', () => {
     var simulationController;
+    var imgUrl;
+    var current_timestamp;
 
     beforeEach(async () => {
+        current_timestamp = "";
+        imgUrl = "";
+        controllers.current_display.getValue = () => ({"layer": {setUrl: (newUrl, coordinates, org) => imgUrl = newUrl}}),
+        controllers.current_timestamp.getValue = () => current_timestamp;
+        controllers.current_timestamp.setValue = (newTimeStamp) => current_timestamp = newTimeStamp;
         simulationController = await document.body.appendChild(new SimulationController());
     });
 
@@ -67,6 +74,12 @@ describe('Setting up tests for Simulation Controller', () => {
     });
 
     test('SetUp For Time should change the current timestamp and preload images', () => {
-
+        simulationController.setupForTime(0);
+        expect("layer" in simulationController.preloaded).toEqual(true);
+        expect("layer_cb" in simulationController.preloaded).toEqual(true);
+        expect(Object.keys(simulationController.preloaded["layer"]).length).toEqual(2);
+        expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
+        expect(controllers.current_timestamp.getValue()).toEqual("2020");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2020");
     });
 });
