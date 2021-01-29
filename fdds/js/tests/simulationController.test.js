@@ -44,7 +44,7 @@ jest.mock('../components/Controller.js', () => ({
     })
 }));
 
-describe('Setting up tests for Simulation Controller', () => {
+describe('Simulation Controller Tests', () => {
     var simulationController;
     var imgUrl;
     var current_timestamp;
