@@ -51,4 +51,12 @@ describe('Domain Selector Tests', () => {
         expect(current_timestamp).toEqual("2020");
         expect(currentDomain).toEqual(1);
     });
+
+    test('Tests calling setUpForDomain twice', () => {
+        domainSelector.setUpForDomain(1);
+        domainSelector.setUpForDomain(2);
+        expect(sorted_timestamps).toEqual(["2020", "2021"]);
+        expect(current_timestamp).toEqual("2020");
+        expect(currentDomain).toEqual(2);
+    });
 });
