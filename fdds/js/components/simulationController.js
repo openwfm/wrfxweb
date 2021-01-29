@@ -133,7 +133,6 @@ export class SimulationController extends HTMLElement {
         if (prevFrame < 0) prevFrame += sorted_timestamps.getValue().length;
         if(this.frameReady(prevFrame)) {
             this.currentFrame = prevFrame;
-            // current_frame = prevFrame;
             this.updateSlider();
         } else {
             window.setTimeout(() => this.prevFrame(recursionDepth - 1), 500);
