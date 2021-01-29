@@ -31,7 +31,8 @@ jest.mock('../components/Controller.js', () => ({
             2: {
                 "2020": {"layer": {raster: "raster test 2: 2020", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2020"}},
                 "2020.5": {"layer": {raster: "raster test 2: 2020.5", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2020.5"}},
-                "2021": {"layer": {raster: "raster test 2: 2021", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2021"}}
+                "2021": {"layer": {raster: "raster test 2: 2021", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2021"}},
+                "2021.5": {"layer": {raster: "raster test 2: 2021.5", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2021.5"}}
             }
         })
     }),
@@ -51,6 +52,8 @@ describe('Setting up tests for Simulation Controller', () => {
     beforeEach(async () => {
         current_timestamp = "";
         imgUrl = "";
+        controllers.currentDomain.getValue = () => 1;
+        controllers.sorted_timestamps.getValue = () => ["2020", "2021"];
         controllers.current_display.getValue = () => ({"layer": {setUrl: (newUrl, coordinates, org) => imgUrl = newUrl}}),
         controllers.current_timestamp.getValue = () => current_timestamp;
         controllers.current_timestamp.setValue = (newTimeStamp) => current_timestamp = newTimeStamp;
@@ -107,7 +110,12 @@ describe('Setting up tests for Simulation Controller', () => {
     });
 
     test('Switching domain should preserve relative current frame position', () => {
-
-
+        simulationController.resetSlider();
+        simulationController.currentFrame = 1;
+        controllers.currentDomain.getValue = () => 2;
+        controllers.sorted_timestamps.getValue = () => ["2020", "2020.5", "2021", "2021.5"];
+        simulationController.resetSlider();
+        expect(controllers.current_timestamp.getValue()).toEqual("2021");
+        expect(imgUrl).toEqual("test_base/raster test 2: 2021");
     });
 });
