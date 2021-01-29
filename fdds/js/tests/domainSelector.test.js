@@ -3,7 +3,8 @@ const {DomainSelector} = require("../components/domainSelector");
 const controllers = require("../components/Controller.js");
 jest.mock('../components/Controller.js', () => ({
     domainInstance: ({
-        subscribe: jest.fn()
+        subscribe: jest.fn(),
+        getValue: () => [1, 2]
     }),
     currentDomain: ({
         getValue: jest.fn(),
@@ -18,18 +19,36 @@ jest.mock('../components/Controller.js', () => ({
         setValue: jest.fn()
     }),
     rasters: ({
-        getValue: jest.fn(),
-        setValue: jest.fn()
+        getValue: () => ({
+            1: {
+                "2020": {"raster": {}}
+            },
+            2: {
+                "2020": {"raster": {}},
+                "2021": {"raster": {}}
+            }
+        })
     }),
 }));
 
 describe('Domain Selector Tests', () => {
     var domainSelector;
+    var sorted_timestamps;
+    var current_timestamp;
+    var currentDomain;
 
     beforeEach(async () => {
-        domainSelector = await document.body.append(new DomainSelector());
+        controllers.sorted_timestamps.setValue = (newSortedTimestamps) => sorted_timestamps = newSortedTimestamps;
+        controllers.sorted_timestamps.getValue = () => sorted_timestamps;
+        controllers.current_timestamp.setValue = (newTimestamp) => current_timestamp = newTimestamp;
+        controllers.currentDomain.setValue = (newDomain) => currentDomain = newDomain;
+        domainSelector = await document.body.appendChild(new DomainSelector());
     });
 
-    test('Setting up tests', () => {
+    test('Tests setUpForDomain', () => {
+        domainSelector.setUpForDomain(1);
+        expect(sorted_timestamps).toEqual(["2020"]);
+        expect(current_timestamp).toEqual("2020");
+        expect(currentDomain).toEqual(1);
     });
 });
