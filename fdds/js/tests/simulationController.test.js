@@ -55,6 +55,7 @@ describe('Setting up tests for Simulation Controller', () => {
         controllers.current_timestamp.getValue = () => current_timestamp;
         controllers.current_timestamp.setValue = (newTimeStamp) => current_timestamp = newTimeStamp;
         simulationController = await document.body.appendChild(new SimulationController());
+        simulationController.currentFrame = 0;
     });
 
     test('Images and their colorbars should preload', () => {
@@ -81,5 +82,32 @@ describe('Setting up tests for Simulation Controller', () => {
         expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
         expect(controllers.current_timestamp.getValue()).toEqual("2020");
         expect(imgUrl).toEqual("test_base/raster test 1: 2020");
+    });
+
+    test('updateSlider should set img and timestamp according to currentFrame', () => {
+        simulationController.currentFrame = 1;
+        simulationController.updateSlider();
+        expect(controllers.current_timestamp.getValue()).toEqual("2021");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2021");
+    });
+
+    test('Selecting nextFrame should advance frame', () => {
+        simulationController.updateSlider();
+        simulationController.nextFrame(3);
+        expect(controllers.current_timestamp.getValue()).toEqual("2021");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2021");
+    });
+
+    test('Selecting prevFrame should regress frame', () => {
+        simulationController.currentFrame = 1;
+        simulationController.updateSlider();
+        simulationController.prevFrame(3);
+        expect(controllers.current_timestamp.getValue()).toEqual("2020");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2020");
+    });
+
+    test('Switching domain should preserve relative current frame position', () => {
+
+
     });
 });
