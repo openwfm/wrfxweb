@@ -52,6 +52,7 @@ describe('Setting up tests for Simulation Controller', () => {
     beforeEach(async () => {
         current_timestamp = "";
         imgUrl = "";
+        controllers.currentSimulation.getValue = () => "currentSimulation";
         controllers.currentDomain.getValue = () => 1;
         controllers.sorted_timestamps.getValue = () => ["2020", "2021"];
         controllers.current_display.getValue = () => ({"layer": {setUrl: (newUrl, coordinates, org) => imgUrl = newUrl}}),
@@ -130,5 +131,16 @@ describe('Setting up tests for Simulation Controller', () => {
         controllers.sorted_timestamps.getValue = () => ["2020", "2021"];
         simulationController.resetSlider();
         expect(controllers.current_timestamp.getValue()).toEqual("2021");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2021");
+    });
+
+    test('Switching to a new simulation should reset the slider', () => {
+        simulationController.resetSlider();
+        simulationController.currentFrame = 1;
+        simulationController.resetSlider();
+        controllers.currentSimulation.getValue = () => "new Simulation";
+        simulationController.resetSlider();
+        expect(controllers.current_timestamp.getValue()).toEqual("2020");
+        expect(imgUrl).toEqual("test_base/raster test 1: 2020");
     });
 });
