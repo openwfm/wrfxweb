@@ -118,4 +118,17 @@ describe('Setting up tests for Simulation Controller', () => {
         expect(controllers.current_timestamp.getValue()).toEqual("2021");
         expect(imgUrl).toEqual("test_base/raster test 2: 2021");
     });
+
+    test('Switching from domain with more timestamps to less should preserve relative current frame position', () => {
+        simulationController.resetSlider();
+        simulationController.currentFrame = 3;
+        simulationController.frameTotal = 4;
+        controllers.currentDomain.getValue = () => 2;
+        controllers.sorted_timestamps.getValue = () => ["2020", "2020.5", "2021", "2021.5"];
+        simulationController.resetSlider();
+        controllers.currentDomain.getValue = () => 1;
+        controllers.sorted_timestamps.getValue = () => ["2020", "2021"];
+        simulationController.resetSlider();
+        expect(controllers.current_timestamp.getValue()).toEqual("2021");
+    });
 });
