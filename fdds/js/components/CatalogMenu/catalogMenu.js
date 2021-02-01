@@ -161,6 +161,8 @@ export class CatalogMenu extends HTMLElement {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        const catalogSearch = this.querySelector('#search-for');
+        catalogSearch.value = "";
         var sortingFunction = (listElem1, listElem2) => {
             let result = false;
             if (sortBy == "original-order") result = this.addOrder[listElem1.job_id] > this.addOrder[listElem2.job_id];
