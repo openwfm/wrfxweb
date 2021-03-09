@@ -32,7 +32,8 @@ export class LayerController extends HTMLElement {
         this.currentSimulation = '';
         this.overlayDict = {};
         this.rasterDict = {};
-
+        this.imgCanvas = document.createElement('canvas');
+        this.clrBarCanvas = document.createElement('canvas');
         this.displayedColorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
         this.displayedColorbars = [];
     }
@@ -77,7 +78,9 @@ export class LayerController extends HTMLElement {
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
                                             attribution: organization.getValue(),
-                                            opacity: 0.5
+                                            opacity: 0.5,
+                                            interactive: true
+                                            // crossOrigin: "anonymous" 
                                         });
             if(r in prevDisplay) current_display.getValue()[r] = layer;
             if(overlay_list.indexOf(r) >= 0) {
@@ -194,7 +197,27 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             this.displayedColorbar = name;
             this.displayedColorbars.push({name: name, url: cb_url});
+            rasterColorbar.onload = () => {
+                var canvas = document.createElement('canvas');
+                canvas.width = rasterColorbar.width;
+                canvas.height = rasterColorbar.height;
+                canvas.getContext('2d').drawImage(rasterColorbar, 0, 0, rasterColorbar.width, rasterColorbar.height);
+                // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
+                var pixelData = canvas.getContext('2d').getImageData(rasterColorbar.width/2, rasterColorbar.height/2, 1, 1).data;
+                console.log(pixelData);
+            }
         }
+        var img = layer._image;
+        // img.onclick = () => {console.log('clicked')}
+        // img.onload = () => {
+        //     var canvas = document.createElement('canvas');
+        //     canvas.width = img.width;
+        //     canvas.height = img.height;
+        //     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        //     // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
+        //     var pixelData = canvas.getContext('2d').getImageData(img.width/2, img.height/2, 1, 1).data;
+        //     console.log(pixelData);
+        // }
     }
 
     /** Called when a layer is de-selected. */
