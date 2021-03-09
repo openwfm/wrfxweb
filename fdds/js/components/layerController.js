@@ -209,15 +209,15 @@ export class LayerController extends HTMLElement {
         }
         var img = layer._image;
         // img.onclick = () => {console.log('clicked')}
-        // img.onload = () => {
-        //     var canvas = document.createElement('canvas');
-        //     canvas.width = img.width;
-        //     canvas.height = img.height;
-        //     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-        //     // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
-        //     var pixelData = canvas.getContext('2d').getImageData(img.width/2, img.height/2, 1, 1).data;
-        //     console.log(pixelData);
-        // }
+        img.onload = () => {
+            var canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+            // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
+            var pixelData = canvas.getContext('2d').getImageData(img.width/2, img.height/2, 1, 1).data;
+            console.log(pixelData);
+        }
     }
 
     /** Called when a layer is de-selected. */
