@@ -25,10 +25,13 @@ export async function getCatalogEntries() {
 
 /** Service request for fetching a selected simulation from the menu. */
 export function getSimulation(path) {
-    fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
+    fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selectedSimulation) { 
+    // fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
         // store in global state
         rasters.setValue(selectedSimulation);
-        raster_base.setValue(path.substring(0, path.lastIndexOf('/') + 1));
+        // raster_base.setValue(path.substring(0, path.lastIndexOf('/') + 1));
+        // raster_base.setValue("https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1));
+        raster_base.setValue(path.replaceAll(":", "_").substring(0, path.lastIndexOf('/') + 1));
         // retrieve all domains
         domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {

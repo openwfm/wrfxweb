@@ -36,6 +36,7 @@ export class LayerController extends HTMLElement {
         this.clrBarCanvas = document.createElement('canvas');
         this.displayedColorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
         this.displayedColorbars = [];
+        this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -80,7 +81,6 @@ export class LayerController extends HTMLElement {
                                             attribution: organization.getValue(),
                                             opacity: 0.5,
                                             interactive: true
-                                            // crossOrigin: "anonymous" 
                                         });
             if(r in prevDisplay) current_display.getValue()[r] = layer;
             if(overlay_list.indexOf(r) >= 0) {
@@ -197,27 +197,31 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             this.displayedColorbar = name;
             this.displayedColorbars.push({name: name, url: cb_url});
-            rasterColorbar.onload = () => {
-                var canvas = document.createElement('canvas');
-                canvas.width = rasterColorbar.width;
-                canvas.height = rasterColorbar.height;
-                canvas.getContext('2d').drawImage(rasterColorbar, 0, 0, rasterColorbar.width, rasterColorbar.height);
-                // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
-                var pixelData = canvas.getContext('2d').getImageData(rasterColorbar.width/2, rasterColorbar.height/2, 1, 1).data;
-                console.log(pixelData);
-            }
+            // rasterColorbar.onload = () => {
+            //     var canvas = document.createElement('canvas');
+            //     canvas.width = rasterColorbar.width;
+            //     canvas.height = rasterColorbar.height;
+            //     canvas.getContext('2d').drawImage(rasterColorbar, 0, 0, rasterColorbar.width, rasterColorbar.height);
+            //     // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
+            //     var pixelData = canvas.getContext('2d').getImageData(rasterColorbar.width/2, rasterColorbar.height/2, 1, 1).data;
+            //     console.log(pixelData);
+            // }
         }
         var img = layer._image;
-        // img.onclick = () => {console.log('clicked')}
-        // img.onload = () => {
-        //     var canvas = document.createElement('canvas');
-        //     canvas.width = img.width;
-        //     canvas.height = img.height;
-        //     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-        //     // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
-        //     var pixelData = canvas.getContext('2d').getImageData(img.width/2, img.height/2, 1, 1).data;
-        //     console.log(pixelData);
-        // }
+        img.ondblclick = (e) => {
+            var latLon = map.mouseEventToLatLng(e);
+            var pixelData = this.imgCanvas.getContext('2d').getImageData(e.layerX, e.layerY, 1, 1).data;
+            e.stopPropagation();
+            console.log(pixelData);
+            var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
+            var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).setContent(`<p>${data}</p>`).openOn(map);
+        }
+        img.onload = () => {
+            this.imgCanvas = document.createElement('canvas');
+            this.imgCanvas.width = img.width;
+            this.imgCanvas.height = img.height;
+            this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        }
     }
 
     /** Called when a layer is de-selected. */
