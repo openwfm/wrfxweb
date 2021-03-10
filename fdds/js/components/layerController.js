@@ -89,6 +89,10 @@ export class LayerController extends HTMLElement {
             this.displayedColorbars.push({name: name, url: cb_url});
             var img = layer._image;
             img.ondblclick = (e) => {
+                this.imgCanvas = document.createElement('canvas');
+                this.imgCanvas.width = img.width;
+                this.imgCanvas.height = img.height;
+                this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
                 var latLon = map.mouseEventToLatLng(e);
                 var pixelData = this.imgCanvas.getContext('2d').getImageData(e.layerX, e.layerY, 1, 1).data;
                 e.stopPropagation();
