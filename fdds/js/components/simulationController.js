@@ -122,7 +122,7 @@ export class SimulationController extends HTMLElement {
         } else {
             // if the next frame is not ready, preload further and wait longer
             window.setTimeout(() => this.nextFrame(recursionDepth - 1), 500);
-            this.preloadVariables(nextFrame, 8);
+            this.preloadVariables(nextFrame, 1);
         }
     }
 
@@ -157,13 +157,12 @@ export class SimulationController extends HTMLElement {
     // this function should assume that the correct layers are already displayed
     setupForTime(frame_ndx) {
         var timestamp = sorted_timestamps.getValue()[frame_ndx];
-        current_timestamp.setValue(timestamp);
         var rasters_now = rasters.getValue()[currentDomain.getValue()][timestamp];
 
         // set current time
         document.querySelector('#timestamp').innerText = timestamp;
 
-        this.preloadVariables(frame_ndx, 8);
+        this.preloadVariables(frame_ndx, 1);
 
         // modify the URL each displayed cluster is pointing to
         // so that the current timestamp is reflected
@@ -177,6 +176,7 @@ export class SimulationController extends HTMLElement {
                             { attribution: organization.getValue(), opacity: 0.5 });
             }
         }
+        current_timestamp.setValue(timestamp);
     }
 
     /* Code handling auxiliary tasks */

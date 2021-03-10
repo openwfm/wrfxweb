@@ -37,6 +37,8 @@ export class LayerController extends HTMLElement {
         this.displayedColorbar = null; // name of layer currently displaying its colorbar (maybe display multiple cbs?)
         this.displayedColorbars = [];
         this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
+        this.markers = [];
+        this.overlayOrder = [];
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -48,7 +50,70 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
 
         currentDomain.subscribe(() => this.domainSwitch());
+        current_timestamp.subscribe(() => this.updateMarkers());
         this.buildMapBase();
+    }
+
+    updateMarkers() {
+        this.markers.map(marker => {
+            var data = "No layer bar with colobar to show values of";
+            if (this.imgCanvas) {
+                var imageCoords = marker.imageCoords;
+                var pixelData = this.imgCanvas.getContext('2d').getImageData(imageCoords.layerX, imageCoords.layerY, 1, 1).data;
+                var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
+            }
+            marker.setContent(`<p>${data}</p>`);
+        });
+    }
+
+    /** Called when a layer is selected. */
+    handleOverlayadd(name, layer) {
+        // register in currently displayed layers and bring to front if it's an overlay
+        console.log('name ' + name + ' layer ' + layer);
+        layer.addTo(map);
+        current_display.getValue()[name] = layer;
+        if(overlay_list.indexOf(name) >= 0) {
+            layer.bringToFront();
+        } else {
+            layer.bringToBack();
+        }
+
+        // if the overlay being added now has a colorbar and there is none displayed, show it
+        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        if('colorbar' in rasters_now[name]) {
+            var cb_url = raster_base.getValue() + rasters_now[name].colorbar;
+            const rasterColorbar = document.querySelector('#raster-colorbar');
+            rasterColorbar.src = cb_url;
+            rasterColorbar.style.display = 'block';
+            this.displayedColorbar = name;
+            this.displayedColorbars.push({name: name, url: cb_url});
+            var img = layer._image;
+            img.ondblclick = (e) => {
+                var latLon = map.mouseEventToLatLng(e);
+                var pixelData = this.imgCanvas.getContext('2d').getImageData(e.layerX, e.layerY, 1, 1).data;
+                e.stopPropagation();
+                var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
+                var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).setContent(`<p>${data}</p>`).openOn(map);
+                popUp.imageCoords = {layerX: e.layerX, layerY: e.layerY};
+                this.markers.push(popUp);
+            }
+            img.onload = () => {
+                this.drawCanvas(img);
+            }
+            this.drawCanvas(img);
+        }
+        this.overlayOrder.push(layer);
+    }
+
+    drawCanvas(img) {
+        this.imgCanvas = null;
+        if (img != null) {
+            this.imgCanvas = document.createElement('canvas');
+            this.imgCanvas.width = img.width;
+            this.imgCanvas.height = img.height;
+            this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        }
+        this.updateMarkers();
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -176,60 +241,13 @@ export class LayerController extends HTMLElement {
         return [div, input];
     }
 
-    /** Called when a layer is selected. */
-    handleOverlayadd(name, layer) {
-        // register in currently displayed layers and bring to front if it's an overlay
-        console.log('name ' + name + ' layer ' + layer);
-        layer.addTo(map);
-        current_display.getValue()[name] = layer;
-        if(overlay_list.indexOf(name) >= 0) {
-            layer.bringToFront();
-        } else {
-            layer.bringToBack();
-        }
-
-        // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        if('colorbar' in rasters_now[name]) {
-            var cb_url = raster_base.getValue() + rasters_now[name].colorbar;
-            const rasterColorbar = document.querySelector('#raster-colorbar');
-            rasterColorbar.src = cb_url;
-            rasterColorbar.style.display = 'block';
-            this.displayedColorbar = name;
-            this.displayedColorbars.push({name: name, url: cb_url});
-            // rasterColorbar.onload = () => {
-            //     var canvas = document.createElement('canvas');
-            //     canvas.width = rasterColorbar.width;
-            //     canvas.height = rasterColorbar.height;
-            //     canvas.getContext('2d').drawImage(rasterColorbar, 0, 0, rasterColorbar.width, rasterColorbar.height);
-            //     // // var pixelData = this.imgCanvas.getContext('2d').getImageData(event.offsetX, event.offsetY, 1, 1).data;
-            //     var pixelData = canvas.getContext('2d').getImageData(rasterColorbar.width/2, rasterColorbar.height/2, 1, 1).data;
-            //     console.log(pixelData);
-            // }
-        }
-        var img = layer._image;
-        img.ondblclick = (e) => {
-            var latLon = map.mouseEventToLatLng(e);
-            var pixelData = this.imgCanvas.getContext('2d').getImageData(e.layerX, e.layerY, 1, 1).data;
-            e.stopPropagation();
-            console.log(pixelData);
-            var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
-            var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).setContent(`<p>${data}</p>`).openOn(map);
-        }
-        img.onload = () => {
-            this.imgCanvas = document.createElement('canvas');
-            this.imgCanvas.width = img.width;
-            this.imgCanvas.height = img.height;
-            this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-        }
-    }
-
     /** Called when a layer is de-selected. */
     handleOverlayRemove(name, layer) {
         layer.remove(map);
-
+        this.overlayOrder.splice(this.overlayOrder.indexOf(layer), 1)
         this.displayedColorbars = this.displayedColorbars.filter(colorbars => colorbars.name != name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
+        var img = null;
         if (this.displayedColorbars.length == 0) {
             rasterColorbar.src = '';
             rasterColorbar.style.display = 'none';
@@ -238,7 +256,13 @@ export class LayerController extends HTMLElement {
             let mostRecentColorBar = this.displayedColorbars[this.displayedColorbars.length - 1];
             rasterColorbar.src = mostRecentColorBar.url;
             this.displayedColorbar = mostRecentColorBar.name;
+            if (mostRecentColorBar.name in overlay_list) {
+                img = this.overlayDict[mostRecentColorBar.name]._image;
+            } else {
+                img = this.rasterDict[mostRecentColorBar.name]._image;
+            }
         }
+        this.drawCanvas(img)
     }
 }
 
