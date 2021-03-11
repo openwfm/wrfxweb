@@ -80,7 +80,7 @@ export class LayerController extends HTMLElement {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation();
-                var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+                var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
                 popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
                 this.updateMarker(popUp);
                 this.markers.push(popUp);
