@@ -54,17 +54,6 @@ export class LayerController extends HTMLElement {
         this.buildMapBase();
     }
 
-    updateMarkers() {
-        this.markers.map(marker => {
-            var data = "No layer bar with colobar to show values of";
-            if (this.imgCanvas) {
-                var imageCoords = marker.imageCoords;
-                var pixelData = this.imgCanvas.getContext('2d').getImageData(imageCoords.layerX, imageCoords.layerY, 1, 1).data;
-                var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
-            }
-            marker.setContent(`<p>${data}</p>`);
-        });
-    }
 
     /** Called when a layer is selected. */
     handleOverlayadd(name, layer) {
@@ -89,22 +78,20 @@ export class LayerController extends HTMLElement {
             this.displayedColorbars.push({name: name, url: cb_url});
             var img = layer._image;
             img.ondblclick = (e) => {
-                this.imgCanvas = document.createElement('canvas');
-                this.imgCanvas.width = img.width;
-                this.imgCanvas.height = img.height;
-                this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
                 var latLon = map.mouseEventToLatLng(e);
-                var pixelData = this.imgCanvas.getContext('2d').getImageData(e.layerX, e.layerY, 1, 1).data;
                 e.stopPropagation();
-                var data = 'R ' + pixelData[0] + ' G ' + pixelData[1] + ' B ' + pixelData[2];
-                var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).setContent(`<p>${data}</p>`).openOn(map);
-                popUp.imageCoords = {layerX: e.layerX, layerY: e.layerY};
+                var popUp = L.popup({closeOnClick: false, autoClose: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+                popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
+                this.updateMarker(popUp);
                 this.markers.push(popUp);
             }
             img.onload = () => {
                 this.drawCanvas(img);
+                this.updateMarkers();
             }
+            map.on('zoomend', () => this.drawCanvas(img));
             this.drawCanvas(img);
+            this.updateMarkers();
         }
         this.overlayOrder.push(layer);
     }
@@ -117,7 +104,24 @@ export class LayerController extends HTMLElement {
             this.imgCanvas.height = img.height;
             this.imgCanvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
         }
-        this.updateMarkers();
+    }
+
+    updateMarkers() {
+        this.markers.map(marker => {
+            this.updateMarker(marker);
+        });
+    }
+
+    updateMarker(marker) {
+        var popupContent = "No layer bar with colobar to show values of";
+        if (this.imgCanvas) {
+            var imageCoords = marker.imageCoords;
+            var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
+            var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
+            var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+            popupContent = `<p style="color: rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})">R:${pixelData[0]} G:${pixelData[1]} B:${pixelData[2]}</p>`;
+        }
+        marker.setContent(popupContent);
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
