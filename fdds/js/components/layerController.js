@@ -270,7 +270,8 @@ export class LayerController extends HTMLElement {
                 img = this.rasterDict[mostRecentColorBar.name]._image;
             }
         }
-        this.drawCanvas(img)
+        this.drawCanvas(img);
+        this.updateMarkers();
     }
 }
 
