@@ -35,6 +35,13 @@ export const sorted_timestamps = new Controller();
 export const current_timestamp = new Controller(); // currently displayed timestamp
 // Display context
 export const current_display = new Controller({}); // dictionary of layer name -> layer of currently displayed data
+export const displayedColorbar = new Controller();
 export const domainInstance = new Controller();
 export const currentDomain = new Controller();
 export const organization = new Controller();
+
+export const syncImageLoad = new Controller(0);
+syncImageLoad.increment = () => {
+    if (syncImageLoad.getValue() == 0) syncImageLoad.value = 1;
+    else syncImageLoad.setValue(0);
+}

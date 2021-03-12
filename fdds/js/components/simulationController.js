@@ -66,6 +66,7 @@ export class SimulationController extends HTMLElement {
             percentage = 0;
             this.currentFrame = 0;
         }
+        this.preloadVariables(this.currentFrame, 8);
         this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
         var timestamp = sorted_timestamps.getValue()[this.currentFrame];
@@ -161,21 +162,8 @@ export class SimulationController extends HTMLElement {
 
         // set current time
         document.querySelector('#timestamp').innerText = timestamp;
-
-        this.preloadVariables(frame_ndx, 1);
-
         // modify the URL each displayed cluster is pointing to
         // so that the current timestamp is reflected
-        for (var layer_name in current_display.getValue()) {
-            var layer = current_display.getValue()[layer_name];
-            if(layer != null) {
-                var raster_info = rasters_now[layer_name];
-                var cs = raster_info.coords;
-                layer.setUrl(raster_base.getValue() + raster_info.raster,
-                            [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                            { attribution: organization.getValue(), opacity: 0.5 });
-            }
-        }
         current_timestamp.setValue(timestamp);
     }
 
