@@ -164,20 +164,6 @@ export class SimulationController extends HTMLElement {
         document.querySelector('#timestamp').innerText = timestamp;
         // modify the URL each displayed cluster is pointing to
         // so that the current timestamp is reflected
-        for (var layer_name in current_display.getValue()) {
-            var layer = current_display.getValue()[layer_name];
-            if(layer != null) {
-                var raster_info = rasters_now[layer_name];
-                var cs = raster_info.coords;
-                layer.setUrl(raster_base.getValue() + raster_info.raster,
-                            [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                            { attribution: organization.getValue(), opacity: 0.5 });
-                // if ('colorbar' in var_info) {
-                //     const rasterColorbar = document.querySelector('#raster-colorbar');
-                //     rasterColorbar.src = raster_base.getValue() + var_info.colorbar;
-                // }
-            }
-        }
         current_timestamp.setValue(timestamp);
     }
 

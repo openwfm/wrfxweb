@@ -49,6 +49,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
 
         currentDomain.subscribe(() => this.domainSwitch());
+        current_timestamp.subscribe(() => this.updateTime());
         this.buildMapBase();
         // syncImageLoad.subscribe(() => {
         //     if (displayedColorbar.getValue()) {
@@ -64,6 +65,65 @@ export class LayerController extends HTMLElement {
         //         this.updateMarkers();
         //     }
         // });
+    }
+
+    updateTime() {
+        // var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        // for (var layer_name in current_display.getValue()) {
+        //     var layer = current_display.getValue()[layer_name];
+        //     if(layer != null) {
+        //         var raster_info = rasters_now[layer_name];
+        //         var cs = raster_info.coords;
+        //         layer.setUrl(raster_base.getValue() + raster_info.raster,
+        //                     [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
+        //                     { attribution: organization.getValue(), opacity: 0.5 });
+        //         if (layer_name == displayedColorbar.getValue()) {
+        //             const rasterColorbar = document.querySelector('#raster-colorbar');
+        //             rasterColorbar.src = raster_base.getValue() + var_info.colorbar;
+        //         }
+        //     }
+        // }
+    }
+
+    /** Called when a new domain is selected or a new simulation is selected. */
+    domainSwitch() {
+        for(var layerName in current_display.getValue()) {
+            this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
+        }
+        var prevDisplay = current_display.getValue();
+        if (this.currentSimulation != currentSimulation.getValue()) {
+            prevDisplay = {};
+            this.currentSimulation = currentSimulation.getValue();
+            this.querySelector('#layer-controller-container').style.display = 'block';
+        }
+        current_display.setValue({});
+        var first_rasters = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var vars = Object.keys(first_rasters);
+        var cs = first_rasters[vars[0]].coords;
+        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+ 
+        // build the layer groups
+        this.rasterDict = {};
+        this.overlayDict = {};    
+        Object.entries(first_rasters).map(entry => {
+            var r = entry[0];
+            var raster_info = first_rasters[r];
+            var cs = raster_info.coords;
+            var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
+                                        [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
+                                        {
+                                            attribution: organization.getValue(),
+                                            opacity: 0.5,
+                                            interactive: true
+                                        });
+            if(r in prevDisplay) current_display.getValue()[r] = layer;
+            if(overlay_list.indexOf(r) >= 0) {
+                this.overlayDict[r] = layer;
+            } else {
+                this.rasterDict[r] = layer;
+            }
+        });
+        this.buildLayerBoxes();
     }
 
     /** Called when a layer is selected. */
