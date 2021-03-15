@@ -57,6 +57,7 @@ export class LayerController extends HTMLElement {
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.clrbarCanvas = this.drawCanvas(rasterColorbar);
                 this.imgCanvas = this.drawCanvas(layerImage);
+                this.buildColorMap();
                 this.updateMarkers();
             }
         });
@@ -159,6 +160,7 @@ export class LayerController extends HTMLElement {
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.imgCanvas = this.drawCanvas(img);
             this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+            this.buildColorMap();
             this.updateMarkers();
         }
     }
@@ -187,6 +189,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = colorbarDisplay;
         this.imgCanvas = this.drawCanvas(img);
         this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+        this.buildColorMap();
         this.updateMarkers();
     }
 
@@ -223,16 +226,36 @@ export class LayerController extends HTMLElement {
         }
         marker.setContent(popupContent);
     }
-
-    matchToColorBar(pixelData) {
-        // Find the x coordinate of the colorbar
-        // console.log(pixelData);
-        return `<p style="color: rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})">R:${pixelData[0]} G:${pixelData[1]} B:${pixelData[2]}</p>`;
+    
+    findClosestKey(map, key) {
+        var top = key;
+        var bottom = key;
+        while (top < 255 || bottom > 0) {
+            if (top in map) return top;
+            if (bottom in map) return bottom;
+            top = top + 1;
+            bottom = bottom - 1;
+        }
+        return 0;
     }
 
-    buildColorMap(layerName) {
+    matchToColorBar(pixelData) {
+        var rValue = this.findClosestKey(this.clrbarMap, pixelData[0]);
+        var gMap = this.clrbarMap[rValue];
+        var gValue = this.findClosestKey(gMap, pixelData[1]);
+        var bMap = gMap[gValue];
+        var bValue = this.findClosestKey(bMap, pixelData[2]);
+        var index = bMap[bValue];
+        // console.log(rValue + ' ' + gValue + ' ' + bValue);
+        var location = (index - this.clrbarMap.start) / (this.clrbarMap.end - this.clrbarMap.start);
+        var rgbValue = `<p style="color: rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})">R:${pixelData[0]} G:${pixelData[1]} B:${pixelData[2]}</p>`;
+        var locationTag = `<p>${location}</p>`;
+        return `<div>${rgbValue}${locationTag}</div>`;
+    }
 
+    buildColorMap() {
         if (this.clrbarCanvas) {
+            this.clrbarMap = {};
             var y = Math.round(this.clrbarCanvas.height / 2);
             for (var x = 0; x < this.clrbarCanvas.width; x++) {
                 var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
@@ -252,17 +275,23 @@ export class LayerController extends HTMLElement {
                 } else {
                     if (colorbarData[0] == 0 && colorbarData[1] == 0 && colorbarData[2] != 0) {
                         end = j - 1;
+                        break;
                     }
                 }
+                var r = this.clrbarMap[colorbarData[0]];
+                if (!r) {
+                    r = {};
+                    this.clrbarMap[colorbarData[0]] = r;
+                }
+                var g = r[colorbarData[1]];
+                if (!g) {
+                    g = {};
+                    r[colorbarData[1]] = g;
+                }
+                g[colorbarData[2]] = j;
             }
-            var edge = this.clrbarCanvas.getContext('2d').getImageData(x, start, 1, 1).data;
-            console.log(edge);
-            var edge = this.clrbarCanvas.getContext('2d').getImageData(x, end, 1, 1).data;
-            console.log(edge);
-            // for (var j = 0; j < this.clrBarCanvas.height; j++) {
-            //     var colorbarData = this.clrBarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
-            //     if (colorbarData[0] == pixelData[0] && colorbarData[1] == pixelData[1] && colorbarData[2] == pixelData[2]) console.log('here');
-            // }
+            this.clrbarMap.start = start;
+            this.clrbarMap.end = end;
         }
     }
 
