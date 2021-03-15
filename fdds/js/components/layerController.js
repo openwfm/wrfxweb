@@ -33,8 +33,8 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.imgCanvas = null;
-        this.clrBarCanvas = null;
-        this.clrBarMaps = {};
+        this.clrbarCanvas = null;
+        this.clrbarMap = {};
         this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
         this.markers = [];
         this.overlayOrder = [];
@@ -55,7 +55,7 @@ export class LayerController extends HTMLElement {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
-                this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+                this.clrbarCanvas = this.drawCanvas(rasterColorbar);
                 this.imgCanvas = this.drawCanvas(layerImage);
                 this.updateMarkers();
             }
@@ -158,7 +158,7 @@ export class LayerController extends HTMLElement {
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.imgCanvas = this.drawCanvas(img);
-            this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+            this.clrbarCanvas = this.drawCanvas(rasterColorbar);
             this.updateMarkers();
         }
     }
@@ -186,7 +186,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
         this.imgCanvas = this.drawCanvas(img);
-        this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+        this.clrbarCanvas = this.drawCanvas(rasterColorbar);
         this.updateMarkers();
     }
 
@@ -225,21 +225,45 @@ export class LayerController extends HTMLElement {
     }
 
     matchToColorBar(pixelData) {
-        // if (this.clrBarCanvas) {
-        //     for (var i = 0; i < this.clrBarCanvas.width; i++) {
-        //         for (var j = 0; j < this.clrBarCanvas.height; j++) {
-        //             var colorBarData = this.clrBarCanvas.getContext('2d').getImageData(i, j, 1, 1).data;
-        //             if (colorBarData[0] == pixelData[0] && colorBarData[1] == pixelData[1] && colorBarData[2] == pixelData[2]) {
-        //                 console.log(i, j);
-        //             }
-        //         }
-        //     }
-        // }
+        // Find the x coordinate of the colorbar
+        // console.log(pixelData);
         return `<p style="color: rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})">R:${pixelData[0]} G:${pixelData[1]} B:${pixelData[2]}</p>`;
     }
 
     buildColorMap(layerName) {
 
+        if (this.clrbarCanvas) {
+            var y = Math.round(this.clrbarCanvas.height / 2);
+            for (var x = 0; x < this.clrbarCanvas.width; x++) {
+                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+                if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
+                    x += 1;
+                    break;
+                }
+            }
+            var start = 0;
+            var end = 0;
+            for (var j = 0; j < this.clrbarCanvas.height; j++) {
+                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+                if (start == 0) {
+                    if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
+                        start = j + 1;
+                    }
+                } else {
+                    if (colorbarData[0] == 0 && colorbarData[1] == 0 && colorbarData[2] != 0) {
+                        end = j - 1;
+                    }
+                }
+            }
+            var edge = this.clrbarCanvas.getContext('2d').getImageData(x, start, 1, 1).data;
+            console.log(edge);
+            var edge = this.clrbarCanvas.getContext('2d').getImageData(x, end, 1, 1).data;
+            console.log(edge);
+            // for (var j = 0; j < this.clrBarCanvas.height; j++) {
+            //     var colorbarData = this.clrBarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+            //     if (colorbarData[0] == pixelData[0] && colorbarData[1] == pixelData[1] && colorbarData[2] == pixelData[2]) console.log('here');
+            // }
+        }
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
