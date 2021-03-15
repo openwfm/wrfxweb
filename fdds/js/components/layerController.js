@@ -51,20 +51,15 @@ export class LayerController extends HTMLElement {
         currentDomain.subscribe(() => this.domainSwitch());
         current_timestamp.subscribe(() => this.updateTime());
         this.buildMapBase();
-        // syncImageLoad.subscribe(() => {
-        //     if (displayedColorbar.getValue()) {
-        //         const rasterColorbar = document.querySelector('#raster-colorbar');
-        //         var layerImage = null;
-        //         if (displayedColorbar.getValue() in overlay_list) {
-        //             layerImage = this.overlayDict[displayedColorbar.getValue()]._image;
-        //         } else {
-        //             layerImage = this.rasterDict[displayedColorbar.getValue()]._image;
-        //         }
-        //         this.clrBarCanvas = this.drawCanvas(rasterColorbar);
-        //         this.imgCanvas = this.drawCanvas(layerImage);
-        //         this.updateMarkers();
-        //     }
-        // });
+        syncImageLoad.subscribe(() => {
+            if (displayedColorbar.getValue()) {
+                const rasterColorbar = document.querySelector('#raster-colorbar');
+                var layerImage = this.getLayer(displayedColorbar.getValue())._image;
+                this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+                this.imgCanvas = this.drawCanvas(layerImage);
+                this.updateMarkers();
+            }
+        });
     }
 
     updateTime() {
@@ -130,6 +125,7 @@ export class LayerController extends HTMLElement {
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
         current_display.getValue()[name] = layer;
+        this.overlayOrder.push(name);
         if(overlay_list.indexOf(name) >= 0) {
             layer.bringToFront();
         } else {
@@ -149,23 +145,22 @@ export class LayerController extends HTMLElement {
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
-            // var img = layer._image;
-            // img.ondblclick = (e) => {
-            //     var latLon = map.mouseEventToLatLng(e);
-            //     e.stopPropagation();
-            //     var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
-            //     popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
-            //     this.updateMarker(popUp);
-            //     this.markers.push(popUp);
-            // }
-            // img.onload = () => syncImageLoad.increment();
-            // rasterColorbar.onload = () => syncImageLoad.increment();
-            // map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            // this.imgCanvas = this.drawCanvas(img);
-            // this.clrBarCanvas = this.drawCanvas(rasterColorbar);
-            // this.updateMarkers();
+            var img = layer._image;
+            img.ondblclick = (e) => {
+                var latLon = map.mouseEventToLatLng(e);
+                e.stopPropagation();
+                var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+                popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
+                this.updateMarker(popUp);
+                this.markers.push(popUp);
+            }
+            img.onload = () => syncImageLoad.increment();
+            rasterColorbar.onload = () => syncImageLoad.increment();
+            map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
+            this.imgCanvas = this.drawCanvas(img);
+            this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+            this.updateMarkers();
         }
-        this.overlayOrder.push(name);
     }
 
     /** Called when a layer is de-selected. */
