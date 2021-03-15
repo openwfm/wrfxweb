@@ -158,20 +158,8 @@ export class SimulationController extends HTMLElement {
     // this function should assume that the correct layers are already displayed
     setupForTime(frame_ndx) {
         var timestamp = sorted_timestamps.getValue()[frame_ndx];
-
         // set current time
         document.querySelector('#timestamp').innerText = timestamp;
-        // modify the URL each displayed cluster is pointing to
-        // so that the current timestamp is reflected
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        for (var layer_name in current_display.getValue()) {
-            var layer = current_display.getValue()[layer_name];
-            var raster_info = rasters_now[layer_name];
-            var cs = raster_info.coords;
-            layer.setUrl(raster_base.getValue() + raster_info.raster,
-                        [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                        { attribution: organization.getValue(), opacity: 0.5 });
-        }
         current_timestamp.setValue(timestamp);
     }
 
@@ -232,7 +220,7 @@ export class SimulationController extends HTMLElement {
 
             let newFrame = originalFrame + diff;
             this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
-
+            this.preloadVariables(this.currentFrame, 1);
             this.updateSlider();
           }
     }

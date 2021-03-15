@@ -49,7 +49,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableScrollPropagation(layerController);
 
         currentDomain.subscribe(() => this.domainSwitch());
-        // current_timestamp.subscribe(() => this.updateTime());
+        current_timestamp.subscribe(() => this.updateTime());
         this.buildMapBase();
         // syncImageLoad.subscribe(() => {
         //     if (displayedColorbar.getValue()) {
@@ -76,10 +76,10 @@ export class LayerController extends HTMLElement {
             layer.setUrl(raster_base.getValue() + raster_info.raster,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
-            // if (layer_name == displayedColorbar.getValue()) {
-            //     const rasterColorbar = document.querySelector('#raster-colorbar');
-            //     rasterColorbar.src = raster_base.getValue() + raster_info.colorbar;
-            // }
+            if (layer_name == displayedColorbar.getValue()) {
+                const rasterColorbar = document.querySelector('#raster-colorbar');
+                rasterColorbar.src = raster_base.getValue() + raster_info.colorbar;
+            }
         }
     }
 
@@ -149,21 +149,21 @@ export class LayerController extends HTMLElement {
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
-            var img = layer._image;
-            img.ondblclick = (e) => {
-                var latLon = map.mouseEventToLatLng(e);
-                e.stopPropagation();
-                var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
-                popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
-                this.updateMarker(popUp);
-                this.markers.push(popUp);
-            }
-            img.onload = () => syncImageLoad.increment();
-            rasterColorbar.onload = () => syncImageLoad.increment();
-            map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.imgCanvas = this.drawCanvas(img);
-            this.clrBarCanvas = this.drawCanvas(rasterColorbar);
-            this.updateMarkers();
+            // var img = layer._image;
+            // img.ondblclick = (e) => {
+            //     var latLon = map.mouseEventToLatLng(e);
+            //     e.stopPropagation();
+            //     var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+            //     popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
+            //     this.updateMarker(popUp);
+            //     this.markers.push(popUp);
+            // }
+            // img.onload = () => syncImageLoad.increment();
+            // rasterColorbar.onload = () => syncImageLoad.increment();
+            // map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
+            // this.imgCanvas = this.drawCanvas(img);
+            // this.clrBarCanvas = this.drawCanvas(rasterColorbar);
+            // this.updateMarkers();
         }
         this.overlayOrder.push(name);
     }
