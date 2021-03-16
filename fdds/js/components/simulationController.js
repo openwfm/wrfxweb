@@ -173,15 +173,15 @@ export class SimulationController extends HTMLElement {
             var timestamp = sorted_timestamps.getValue()[i];
             for (var var_name of overlayOrder) {
                 // it could happen that a timestamp is missing the variable
-                if(var_name in rasters_dom[timestamp]) {
+                if (var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.
-                    if(!(var_name in this.preloaded)) {
-                        this.preloaded[var_name] = {};
-                    }
-                    if(!(i in this.preloaded[var_name])) {
+                    var currDomain = currentDomain.getValue();
+                    if (!(var_name in this.preloaded)) this.preloaded[var_name] = {};
+                    if (!(currDomain in this.preloaded[var_name])) this.preloaded[var_name][currDomain] = {};
+                    if (!(i in this.preloaded[var_name][currDomain])) {
                         var var_info = rasters_dom[timestamp][var_name];
                         var img = new Image();
-                        img.onload = this.preloaded[var_name][i] = img;
+                        img.onload = this.preloaded[var_name][currDomain][i] = img;
                         img.src = raster_base.getValue() + var_info.raster;
                         if ('colorbar' in var_info) {
                             var cb_key = var_name + '_cb';
