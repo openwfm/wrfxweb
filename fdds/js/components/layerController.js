@@ -64,7 +64,7 @@ export class LayerController extends HTMLElement {
 
     updateTime() {
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        for (var layer_name in overlayOrder) {
+        for (var layer_name of overlayOrder) {
             var layer = this.getLayer(layer_name);
             var raster_info = rasters_now[layer_name];
             var cs = raster_info.coords;
@@ -80,9 +80,10 @@ export class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        console.log("domain");
-        console.log(overlayOrder);
-        for(var layerName in overlayOrder) this.getLayer(layerName).remove(map)
+        for (var layerName of overlayOrder) this.getLayer(layerName).remove(map);
+        const rasterColorbar = document.querySelector('#raster-colorbar');
+        rasterColorbar.src = "";
+        rasterColorbar.style.display = "none";
         if (this.currentSimulation != currentSimulation.getValue()) {
             overlayOrder.length = 0;
             this.currentSimulation = currentSimulation.getValue();
@@ -119,7 +120,7 @@ export class LayerController extends HTMLElement {
         var layer = this.getLayer(name);
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
-        if (!(name in overlayOrder)) overlayOrder.push(name);
+        if (!(overlayOrder.includes(name))) overlayOrder.push(name);
         if (overlay_list.indexOf(name) >= 0) layer.bringToFront();
         else layer.bringToBack();
         // if the overlay being added now has a colorbar and there is none displayed, show it
@@ -135,24 +136,23 @@ export class LayerController extends HTMLElement {
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
-            var img = layer._image;
-            img.ondblclick = (e) => {
-                var latLon = map.mouseEventToLatLng(e);
-                e.stopPropagation();
-                var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
-                popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
-                this.updateMarker(popUp);
-                this.markers.push(popUp);
-            }
-            img.onload = () => syncImageLoad.increment();
-            rasterColorbar.onload = () => syncImageLoad.increment();
-            map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.imgCanvas = this.drawCanvas(img);
-            this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            this.buildColorMap();
-            this.updateMarkers();
+            // var img = layer._image;
+            // img.ondblclick = (e) => {
+            //     var latLon = map.mouseEventToLatLng(e);
+            //     e.stopPropagation();
+            //     var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+            //     popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
+            //     this.updateMarker(popUp);
+            //     this.markers.push(popUp);
+            // }
+            // img.onload = () => syncImageLoad.increment();
+            // rasterColorbar.onload = () => syncImageLoad.increment();
+            // map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
+            // this.imgCanvas = this.drawCanvas(img);
+            // this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+            // this.buildColorMap();
+            // this.updateMarkers();
         }
-        console.log(overlayOrder);
     }
 
     /** Called when a layer is de-selected. */
@@ -184,7 +184,7 @@ export class LayerController extends HTMLElement {
     }
 
     getLayer(name) {
-        if (name in overlay_list) return this.overlayDict[name];
+        if (overlay_list.includes(name)) return this.overlayDict[name];
         return this.rasterDict[name];
     }
 
@@ -313,7 +313,7 @@ export class LayerController extends HTMLElement {
         [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]].map(([layerDiv, layerDict]) => {
             for (var layerName in layerDict) layerDiv.appendChild(this.buildLayerBox(layerName));
         });
-        for (var layerName in overlayOrder) this.handleOverlayadd(layerName)
+        for (var layerName of overlayOrder) this.handleOverlayadd(layerName)
     }
 
     /** Builds a radio box for each map base that can be chosen */
@@ -340,7 +340,7 @@ export class LayerController extends HTMLElement {
         let [div, input] = this.buildCheckBox(name);
         input.type = 'checkbox';
         input.name = 'layers';
-        input.checked = name in overlayOrder;
+        input.checked = overlayOrder.includes(name);
         input.onclick = () => {
             if (input.checked) this.handleOverlayadd(name);
             else this.handleOverlayRemove(name);

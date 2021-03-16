@@ -144,7 +144,7 @@ export class SimulationController extends HTMLElement {
     /** Returns boolean indicating if frame_ndx has been loaded */
     frameReady(frame_ndx) {
     // for all layers currently displayed
-        for(var key in overlayOrder) {
+        for(var key of overlayOrder) {
             // if the current frame is not preloaded yet
             if(this.preloaded[key] == null) return false;
             if(!(frame_ndx in this.preloaded[key])) return false;
@@ -168,10 +168,10 @@ export class SimulationController extends HTMLElement {
         var rasters_dom = rasters.getValue()[currentDomain.getValue()];
         var n_rasters = Object.keys(rasters_dom).length;
         preload_count = Math.min(preload_count, n_rasters);
-        for(var counter=0; counter < preload_count; counter++) {
+        for (var counter=0; counter < preload_count; counter++) {
             var i = (frame + counter) % n_rasters;
             var timestamp = sorted_timestamps.getValue()[i];
-            for(var var_name in overlayOrder) {
+            for (var var_name of overlayOrder) {
                 // it could happen that a timestamp is missing the variable
                 if(var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.
