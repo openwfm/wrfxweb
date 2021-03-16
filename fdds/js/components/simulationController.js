@@ -66,8 +66,7 @@ export class SimulationController extends HTMLElement {
             percentage = 0;
             this.currentFrame = 0;
         }
-        // this.preloadVariables(this.currentFrame, 8);
-        this.preloadVariables(this.currentFrame, 1);
+        this.preloadVariables(this.currentFrame, 8);
         this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
         var timestamp = sorted_timestamps.getValue()[this.currentFrame];
@@ -124,8 +123,7 @@ export class SimulationController extends HTMLElement {
         } else {
             // if the next frame is not ready, preload further and wait longer
             window.setTimeout(() => this.nextFrame(recursionDepth - 1), 500);
-            // this.preloadVariables(nextFrame, 8);
-            this.preloadVariables(nextFrame, 1);
+            this.preloadVariables(nextFrame, 8);
         }
     }
 
