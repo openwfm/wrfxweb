@@ -81,6 +81,7 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         for (var layerName of overlayOrder) this.getLayer(layerName).remove(map);
+        displayedColorbar.setValue(null);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         rasterColorbar.src = "";
         rasterColorbar.style.display = "none";

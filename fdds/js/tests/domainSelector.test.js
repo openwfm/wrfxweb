@@ -14,10 +14,6 @@ jest.mock('../components/Controller.js', () => ({
         getValue: jest.fn(),
         setValue: jest.fn()
     }),
-    current_timestamp: ({
-        getValue: jest.fn(),
-        setValue: jest.fn()
-    }),
     rasters: ({
         getValue: () => ({
             1: {
@@ -34,13 +30,11 @@ jest.mock('../components/Controller.js', () => ({
 describe('Domain Selector Tests', () => {
     var domainSelector;
     var sorted_timestamps;
-    var current_timestamp;
     var currentDomain;
 
     beforeEach(async () => {
         controllers.sorted_timestamps.setValue = (newSortedTimestamps) => sorted_timestamps = newSortedTimestamps;
         controllers.sorted_timestamps.getValue = () => sorted_timestamps;
-        controllers.current_timestamp.setValue = (newTimestamp) => current_timestamp = newTimestamp;
         controllers.currentDomain.setValue = (newDomain) => currentDomain = newDomain;
         domainSelector = await document.body.appendChild(new DomainSelector());
     });
@@ -48,7 +42,6 @@ describe('Domain Selector Tests', () => {
     test('Tests setUpForDomain', () => {
         domainSelector.setUpForDomain(1);
         expect(sorted_timestamps).toEqual(["2020"]);
-        expect(current_timestamp).toEqual("2020");
         expect(currentDomain).toEqual(1);
     });
 
@@ -56,7 +49,6 @@ describe('Domain Selector Tests', () => {
         domainSelector.setUpForDomain(1);
         domainSelector.setUpForDomain(2);
         expect(sorted_timestamps).toEqual(["2020", "2021"]);
-        expect(current_timestamp).toEqual("2020");
         expect(currentDomain).toEqual(2);
     });
 });

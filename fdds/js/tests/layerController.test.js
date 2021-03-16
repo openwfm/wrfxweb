@@ -2,7 +2,8 @@ const {LayerController} = require("../components/layerController");
 
 var globalMap = {};
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
-            imageOverlay: (raster, coordinates, settings) => ({addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}})};
+            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords}, addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}}), 
+            icon: (options) => {}};
 
 const controllers = require("../components/Controller.js");
 jest.mock('../components/Controller.js', () => ({
@@ -10,10 +11,7 @@ jest.mock('../components/Controller.js', () => ({
         getValue: () => 1,
         subscribe: () => {}
     }),
-    current_display: ({
-        getValue: () => ({}),
-        setValue: jest.fn()
-    }),
+    overlayOrder: [],
     currentSimulation: ({
         getValue: () => "test",
     }),
@@ -28,7 +26,16 @@ jest.mock('../components/Controller.js', () => ({
         getValue: () => "test_base/"
     }),
     current_timestamp: ({
-        getValue: () => ["2020"]
+        getValue: () => ["2020"], 
+        subscribe: (fun) => {}
+    }),
+    syncImageLoad: ({
+        subscribe: (fun) => {},
+        increment: () => {}
+    }),
+    displayedColorbar: ({
+        getValue: () => null,
+        setValue: () => {}
     }),
     rasters: ({
         getValue: () => ({
@@ -64,12 +71,11 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     var layerController;
 
     beforeEach(async () => {
-        var testDisplay = {};
         globalMap = {};
         controllers.currentDomain.getValue = () => 1;
         controllers.current_timestamp.getValue = () => "2020";
-        controllers.current_display.getValue = () => testDisplay;
-        controllers.current_display.setValue = (newDisplay) => {testDisplay = newDisplay};
+        controllers.overlayOrder = [];
+
         const div = document.createElement("div");
         div.id = "raster-colorbar";
         await document.body.appendChild(div);
@@ -87,43 +93,38 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 
     test('Layers should be correctly added to the map when selected', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
         expect("test_base/raster test" in globalMap).toEqual(true);
-        expect("raster" in controllers.current_display.getValue()).toEqual(true);
+        expect(controllers.overlayOrder.includes("raster")).toEqual(true);
     });
 
     test('Layers should be correctly removed from the map when selected', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
-        layerController.handleOverlayRemove("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
+        layerController.handleOverlayRemove("raster");
         expect("test_base/raster test" in globalMap).toEqual(false);
     });
 
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
         controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
-        expect("raster" in controllers.current_display.getValue()).toEqual(true);
+        expect(controllers.overlayOrder.includes("raster")).toEqual(true);
         expect("test_base/raster test 2" in globalMap).toEqual(true);
         expect("test_base/raster test" in globalMap).toEqual(false);
     });
 
     test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
         controllers.currentSimulation.getValue = () => "new simulation";
         layerController.domainSwitch();
-        expect(controllers.current_display.getValue()).toEqual({});
+        expect(controllers.overlayOrder.length).toEqual(0);
         expect(globalMap).toEqual({});
     });
 
     test('Layer Controller should show the current_timestamp', () => {
         controllers.current_timestamp.getValue = () => "2021";
-        layerController.domainSwitch();
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
+        console.log(globalMap);
         expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
     });
 });
@@ -134,6 +135,10 @@ describe('Tests for adding layers with colorbars', () => {
     beforeEach(async () => {
         controllers.currentDomain.getValue = () => 1;
         controllers.current_timestamp.getValue = () => "2020";
+        controllers.overlayOrder = [];
+        var colorbar = "";
+        controllers.displayedColorbar.getValue = () => colorbar;
+        controllers.displayedColorbar.setValue = (newColorbar) => {colorbar = newColorbar};
         const div = document.createElement("div");
         div.id = "raster-colorbar";
         await document.body.appendChild(div);
@@ -142,40 +147,33 @@ describe('Tests for adding layers with colorbars', () => {
     });
 
     test('Layer Controller should add any colorbars', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
-        expect(layerController.displayedColorbar).toEqual("raster");
+        layerController.handleOverlayadd("raster");
+        expect(controllers.displayedColorbar.getValue()).toEqual("raster");
     });
 
     test('Layer Controller should remove colorbars when layer deselected', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
-        layerController.handleOverlayRemove("raster", rasterDict["raster"]);
-        expect(layerController.displayedColorbar).toEqual(null);
+        layerController.handleOverlayadd("raster");
+        layerController.handleOverlayRemove("raster");
+        expect(controllers.displayedColorbar.getValue()).toEqual(null);
     });
 
     test('Layer Controller should put most recent selected colorbar on top', () => {
-        const rasterDict = layerController.rasterDict;
-        const overlayDict = layerController.overlayDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
-        layerController.handleOverlayadd("overlay", overlayDict["overlay"]);
-        expect(layerController.displayedColorbar).toEqual("overlay");
+        layerController.handleOverlayadd("raster");
+        layerController.handleOverlayadd("overlay");
+        expect(controllers.displayedColorbar.getValue()).toEqual("overlay");
     });
 
     test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
-        const rasterDict = layerController.rasterDict;
-        const overlayDict = layerController.overlayDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
-        layerController.handleOverlayadd("overlay", overlayDict["overlay"]);
-        layerController.handleOverlayRemove("overlay", overlayDict["overlay"]);
-        expect(layerController.displayedColorbar).toEqual("raster");
+        layerController.handleOverlayadd("raster");
+        layerController.handleOverlayadd("overlay");
+        layerController.handleOverlayRemove("overlay");
+        expect(controllers.displayedColorbar.getValue()).toEqual("raster");
     });
 
     test('Layer Controller should remove colorbar when switching to a domain without one', () => {
-        const rasterDict = layerController.rasterDict;
-        layerController.handleOverlayadd("raster", rasterDict["raster"]);
+        layerController.handleOverlayadd("raster");
         controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
-        expect(layerController.displayedColorbar).toEqual(null);
+        expect(controllers.displayedColorbar.getValue()).toEqual(null);
     });
 });
