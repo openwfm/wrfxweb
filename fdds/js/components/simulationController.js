@@ -1,4 +1,4 @@
-import {currentDomain, sorted_timestamps, current_timestamp, current_display, currentSimulation, rasters, raster_base, organization} from './Controller.js';
+import {currentDomain, sorted_timestamps, current_timestamp, overlayOrder, currentSimulation, rasters, raster_base, organization} from './Controller.js';
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
@@ -144,7 +144,7 @@ export class SimulationController extends HTMLElement {
     /** Returns boolean indicating if frame_ndx has been loaded */
     frameReady(frame_ndx) {
     // for all layers currently displayed
-        for(var key in current_display.getValue()) {
+        for(var key in overlayOrder) {
             // if the current frame is not preloaded yet
             if(this.preloaded[key] == null) return false;
             if(!(frame_ndx in this.preloaded[key])) return false;
@@ -171,7 +171,7 @@ export class SimulationController extends HTMLElement {
         for(var counter=0; counter < preload_count; counter++) {
             var i = (frame + counter) % n_rasters;
             var timestamp = sorted_timestamps.getValue()[i];
-            for(var var_name in current_display.getValue()) {
+            for(var var_name in overlayOrder) {
                 // it could happen that a timestamp is missing the variable
                 if(var_name in rasters_dom[timestamp]) {
                     // have we already preloaded this variable? If not indicate nothing is preloaded.

@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
-import {displayedColorbar, syncImageLoad, currentDomain, current_display, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -37,7 +37,6 @@ export class LayerController extends HTMLElement {
         this.clrbarMap = {};
         this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
         this.markers = [];
-        this.overlayOrder = [];
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -65,8 +64,8 @@ export class LayerController extends HTMLElement {
 
     updateTime() {
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        for (var layer_name in current_display.getValue()) {
-            var layer = current_display.getValue()[layer_name];
+        for (var layer_name in overlayOrder) {
+            var layer = this.getLayer(layer_name);
             var raster_info = rasters_now[layer_name];
             var cs = raster_info.coords;
             layer.setUrl(raster_base.getValue() + raster_info.raster,
@@ -81,16 +80,14 @@ export class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        for(var layerName in current_display.getValue()) {
-            this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
-        }
-        var prevDisplay = current_display.getValue();
+        console.log("domain");
+        console.log(overlayOrder);
+        for(var layerName in overlayOrder) this.getLayer(layerName).remove(map)
         if (this.currentSimulation != currentSimulation.getValue()) {
-            prevDisplay = {};
+            overlayOrder.length = 0;
             this.currentSimulation = currentSimulation.getValue();
             this.querySelector('#layer-controller-container').style.display = 'block';
         }
-        current_display.setValue({});
         var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
@@ -110,29 +107,21 @@ export class LayerController extends HTMLElement {
                                             opacity: 0.5,
                                             interactive: true
                                         });
-            if(r in prevDisplay) current_display.getValue()[r] = layer;
-            if(overlay_list.indexOf(r) >= 0) {
-                this.overlayDict[r] = layer;
-            } else {
-                this.rasterDict[r] = layer;
-            }
+            if(overlay_list.indexOf(r) >= 0) this.overlayDict[r] = layer;
+            else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
     }
 
     /** Called when a layer is selected. */
-    handleOverlayadd(name, layer) {
+    handleOverlayadd(name) {
         // register in currently displayed layers and bring to front if it's an overlay
+        var layer = this.getLayer(name);
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
-        current_display.getValue()[name] = layer;
-        this.overlayOrder.push(name);
-        if(overlay_list.indexOf(name) >= 0) {
-            layer.bringToFront();
-        } else {
-            layer.bringToBack();
-        }
-
+        if (!(name in overlayOrder)) overlayOrder.push(name);
+        if (overlay_list.indexOf(name) >= 0) layer.bringToFront();
+        else layer.bringToBack();
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
@@ -163,24 +152,25 @@ export class LayerController extends HTMLElement {
             this.buildColorMap();
             this.updateMarkers();
         }
+        console.log(overlayOrder);
     }
 
     /** Called when a layer is de-selected. */
-    handleOverlayRemove(name, layer) {
-        layer.remove(map);
-        this.overlayOrder.splice(this.overlayOrder.indexOf(name), 1);
+    handleOverlayRemove(name) {
+        this.getLayer(name).remove(map);
+        overlayOrder.splice(overlayOrder.indexOf(name), 1);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var img = null;
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
-        for (var i = this.overlayOrder.length - 1; i >= 0; i--) {
-            if ('colorbar' in rasters_now[this.overlayOrder[i]]) {
-                mostRecentColorbar = this.overlayOrder[i];
-                colorbarSrc = raster_base.getValue() + rasters_now[this.overlayOrder[i]].colorbar;
+        for (var i = overlayOrder.length - 1; i >= 0; i--) {
+            if ('colorbar' in rasters_now[overlayOrder[i]]) {
+                mostRecentColorbar = overlayOrder[i];
+                colorbarSrc = raster_base.getValue() + rasters_now[overlayOrder[i]].colorbar;
                 colorbarDisplay = 'block';
-                img = this.getLayer(this.overlayOrder[i])._image;
+                img = this.getLayer(overlayOrder[i])._image;
                 break;
             }
         }
@@ -200,12 +190,12 @@ export class LayerController extends HTMLElement {
 
     drawCanvas(img) {
         var canvas = null;
-        if (img != null) {
-            canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-        }
+        // if (img != null) {
+        //     canvas = document.createElement('canvas');
+        //     canvas.width = img.width;
+        //     canvas.height = img.height;
+        //     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        // }
         return canvas;
     }
 
@@ -295,47 +285,6 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    /** Called when a new domain is selected or a new simulation is selected. */
-    domainSwitch() {
-        for(var layerName in current_display.getValue()) {
-            this.handleOverlayRemove(layerName, current_display.getValue()[layerName]);
-        }
-        var prevDisplay = current_display.getValue();
-        if (this.currentSimulation != currentSimulation.getValue()) {
-            prevDisplay = {};
-            this.currentSimulation = currentSimulation.getValue();
-            this.querySelector('#layer-controller-container').style.display = 'block';
-        }
-        current_display.setValue({});
-        var first_rasters = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        var vars = Object.keys(first_rasters);
-        var cs = first_rasters[vars[0]].coords;
-        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
- 
-        // build the layer groups
-        this.rasterDict = {};
-        this.overlayDict = {};    
-        Object.entries(first_rasters).map(entry => {
-            var r = entry[0];
-            var raster_info = first_rasters[r];
-            var cs = raster_info.coords;
-            var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
-                                        [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
-                                        {
-                                            attribution: organization.getValue(),
-                                            opacity: 0.5,
-                                            interactive: true
-                                        });
-            if(r in prevDisplay) current_display.getValue()[r] = layer;
-            if(overlay_list.indexOf(r) >= 0) {
-                this.overlayDict[r] = layer;
-            } else {
-                this.rasterDict[r] = layer;
-            }
-        });
-        this.buildLayerBoxes();
-    }
-
     /** Adds checkboxes for the different available map types. Should only be called once after
      * the map has been initialized. */
     buildMapBase() {
@@ -362,11 +311,9 @@ export class LayerController extends HTMLElement {
         overlayDiv.innerHTML = '';
 
         [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]].map(([layerDiv, layerDict]) => {
-            for (const [name, layer] of Object.entries(layerDict)) {
-                let layerBox = this.buildLayerBox(name, layer);
-                layerDiv.appendChild(layerBox);
-            }
+            for (var layerName in layerDict) layerDiv.appendChild(this.buildLayerBox(layerName));
         });
+        for (var layerName in overlayOrder) this.handleOverlayadd(layerName)
     }
 
     /** Builds a radio box for each map base that can be chosen */
@@ -389,20 +336,14 @@ export class LayerController extends HTMLElement {
 
     /** Creates the checkbox for a layer. Displays name and when clicked adds layer to the map. base is
      * a boolean that indicates whether creating a checkbox for a map type or a layer.*/
-    buildLayerBox(name, layer) {
-        let [div, input] = this.buildCheckBox(name, layer);
+    buildLayerBox(name) {
+        let [div, input] = this.buildCheckBox(name);
         input.type = 'checkbox';
         input.name = 'layers';
-        input.checked = name in current_display.getValue();
-        if (name in current_display.getValue()) {
-            this.handleOverlayadd(name, layer);
-        }
+        input.checked = name in overlayOrder;
         input.onclick = () => {
-            if (input.checked) this.handleOverlayadd(name, layer);
-            else {
-                this.handleOverlayRemove(name, layer);
-                delete current_display.getValue()[name];
-            }
+            if (input.checked) this.handleOverlayadd(name);
+            else this.handleOverlayRemove(name);
         }
         return div;
     }

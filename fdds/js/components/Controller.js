@@ -34,7 +34,7 @@ export const raster_base = new Controller();
 export const sorted_timestamps = new Controller();
 export const current_timestamp = new Controller(); // currently displayed timestamp
 // Display context
-export const current_display = new Controller({}); // dictionary of layer name -> layer of currently displayed data
+export const overlayOrder = []; // array of added layer names in order they were added name
 export const displayedColorbar = new Controller();
 export const domainInstance = new Controller();
 export const currentDomain = new Controller();
