@@ -115,7 +115,10 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the right. */
     nextFrame(recursionDepth) {
-        if (recursionDepth == 0) return;
+        if (recursionDepth == 0) {
+            console.log('recursion depth reached');
+            return;
+        }
         let nextFrame = (this.currentFrame + 1) % sorted_timestamps.getValue().length;
         if(this.frameReady(nextFrame)) {
             this.currentFrame = nextFrame;
@@ -146,8 +149,10 @@ export class SimulationController extends HTMLElement {
     // for all layers currently displayed
         for(var key of overlayOrder) {
             // if the current frame is not preloaded yet
+            var currDomain = currentDomain.getValue();
             if(this.preloaded[key] == null) return false;
-            if(!(frame_ndx in this.preloaded[key])) return false;
+            if(this.preloaded[key][currDomain] == null) return false;
+            if(!(frame_ndx in this.preloaded[key][currDomain])) return false;
             // check if the raster has a colorbar
             var cb_key = key + '_cb';
             if(cb_key in this.preloaded && !(frame_ndx in this.preloaded[cb_key])) return false;
