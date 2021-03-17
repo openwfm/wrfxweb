@@ -140,7 +140,7 @@ export class SimulationController extends HTMLElement {
             this.updateSlider();
         } else {
             window.setTimeout(() => this.prevFrame(recursionDepth - 1), 500);
-            this.preloadVariables(prevFrame, 1);
+            this.preloadVariables(Math.max(prevFrame - 7, 0), 8);
         }
     }
 
@@ -225,7 +225,7 @@ export class SimulationController extends HTMLElement {
 
             let newFrame = originalFrame + diff;
             this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
-            this.preloadVariables(this.currentFrame, 8);
+            this.preloadVariables(Math.max(this.currentFrame - 4, 0), 8);
             this.updateSlider();
           }
     }

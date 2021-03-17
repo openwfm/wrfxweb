@@ -62,7 +62,6 @@ export class DomainSelector extends HTMLElement {
     setUpForDomain(dom_id) {
         // set the current domain, must be updated in this order: sorted_timestamps, current_timestamp, currentDomain
         sorted_timestamps.setValue(Object.keys(rasters.getValue()[dom_id]).sort());
-        // current_timestamp.setValue(sorted_timestamps.getValue()[0]);
         currentDomain.setValue(dom_id);
     }
 }
