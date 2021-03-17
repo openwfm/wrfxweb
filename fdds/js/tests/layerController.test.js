@@ -1,8 +1,9 @@
 const {LayerController} = require("../components/layerController");
 
 var globalMap = {};
+var imageUrl = "";
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
-            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords}, addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}}), 
+            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords; imageUrl = url;}, addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}}), 
             icon: (options) => {}};
 
 const controllers = require("../components/Controller.js");
@@ -124,8 +125,13 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('Layer Controller should show the current_timestamp', () => {
         controllers.current_timestamp.getValue = () => "2021";
         layerController.handleOverlayadd("raster");
-        console.log(globalMap);
         expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
+    });
+
+    test('updateSlider should set img according to currentTimestamp', () => {
+        controllers.current_timestamp.getValue = () => "2021";
+        layerController.handleOverlayadd("raster");
+        expect(imageUrl).toEqual("test_base/raster test current timestamp");
     });
 });
 

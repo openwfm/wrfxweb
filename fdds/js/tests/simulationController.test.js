@@ -72,24 +72,10 @@ describe('Simulation Controller Tests', () => {
         expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
     });
     
-    // move these two tests to the layercontroller
-
-    // test('SetUp For Time should change the current timestamp and preload images', () => {
-    //     simulationController.setupForTime(0);
-    //     expect("layer" in simulationController.preloaded).toEqual(true);
-    //     expect("layer_cb" in simulationController.preloaded).toEqual(true);
-    //     expect(Object.keys(simulationController.preloaded["layer"][1]).length).toEqual(2);
-    //     expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2020");
-    //     expect(imgUrl).toEqual("test_base/raster test 1: 2020");
-    // });
-
-    // test('updateSlider should set img and timestamp according to currentFrame', () => {
-    //     simulationController.currentFrame = 1;
-    //     simulationController.updateSlider();
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2021");
-    //     expect(imgUrl).toEqual("test_base/raster test 1: 2021");
-    // });
+    test('SetUp For Time should change the current timestamp', () => {
+        simulationController.setupForTime(0);
+        expect(controllers.current_timestamp.getValue()).toEqual("2020");
+    });
 
     test('Selecting nextFrame should advance frame', () => {
         simulationController.preloadVariables(0, 2);
