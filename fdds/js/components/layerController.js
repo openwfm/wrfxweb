@@ -264,7 +264,7 @@ export class LayerController extends HTMLElement {
                         start = j + 1;
                     }
                 } else {
-                    if (colorbarData[0] == 0 && colorbarData[1] == 0 && colorbarData[2] != 0) {
+                    if (colorbarData[0] == 0 && colorbarData[1] == 0 && colorbarData[2] == 0) {
                         end = j - 1;
                         break;
                     }
