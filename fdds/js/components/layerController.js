@@ -137,22 +137,22 @@ export class LayerController extends HTMLElement {
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
-            // var img = layer._image;
-            // img.ondblclick = (e) => {
-            //     var latLon = map.mouseEventToLatLng(e);
-            //     e.stopPropagation();
-            //     var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
-            //     popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
-            //     this.updateMarker(popUp);
-            //     this.markers.push(popUp);
-            // }
-            // img.onload = () => syncImageLoad.increment();
-            // rasterColorbar.onload = () => syncImageLoad.increment();
-            // map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            // this.imgCanvas = this.drawCanvas(img);
-            // this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            // this.buildColorMap();
-            // this.updateMarkers();
+            var img = layer._image;
+            img.ondblclick = (e) => {
+                var latLon = map.mouseEventToLatLng(e);
+                e.stopPropagation();
+                var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
+                popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
+                this.updateMarker(popUp);
+                this.markers.push(popUp);
+            }
+            img.onload = () => syncImageLoad.increment();
+            rasterColorbar.onload = () => syncImageLoad.increment();
+            map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
+            this.imgCanvas = this.drawCanvas(img);
+            this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+            this.buildColorMap();
+            this.updateMarkers();
         }
     }
 
@@ -191,12 +191,12 @@ export class LayerController extends HTMLElement {
 
     drawCanvas(img) {
         var canvas = null;
-        // if (img != null) {
-        //     canvas = document.createElement('canvas');
-        //     canvas.width = img.width;
-        //     canvas.height = img.height;
-        //     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-        // }
+        if (img != null) {
+            canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        }
         return canvas;
     }
 

@@ -3,7 +3,12 @@ const {LayerController} = require("../components/layerController");
 var globalMap = {};
 var imageUrl = "";
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
-            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords; imageUrl = url;}, addTo: (map) => {globalMap[raster] = coordinates}, remove: (map) => {delete globalMap[raster]}, bringToFront: () => {}, bringToBack: () => {}}), 
+            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords; imageUrl = url;}, 
+                                                               addTo: (map) => {globalMap[raster] = coordinates},
+                                                               remove: (map) => {delete globalMap[raster]},
+                                                               bringToFront: () => {},
+                                                               bringToBack: () => {},
+                                                               _image: {}}), 
             icon: (options) => {}};
 
 const controllers = require("../components/Controller.js");
@@ -62,11 +67,16 @@ jest.mock('../util.js', () => ({
     baseLayerDict: {},
     map: {
         addTo: jest.fn(),
-        fitBounds: jest.fn()
+        fitBounds: jest.fn(),
+        on: jest.fn()
     },
     dragElement: jest.fn(),
     overlay_list: ['overlay']
 }));
+
+HTMLCanvasElement.prototype.getContext = () => { 
+    return {drawImage: jest.fn()}
+};
 
 describe('Tests for adding layers to menu and selecting layers', () => {
     var layerController;
