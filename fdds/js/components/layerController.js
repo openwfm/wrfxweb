@@ -227,7 +227,7 @@ export class LayerController extends HTMLElement {
         var minDiff = 255*3 + 1;
         for (var key in this.clrbarMap) {
             var [rk, gk, bk] = mapKey(key);
-            var newDiff = Math.abs(r + g + b - (rk + gk + bk));
+            var newDiff = Math.abs(r - rk) + Math.abs(g - gk) + Math.abs(b - bk);
             if (newDiff < minDiff) {
                 minDiff = newDiff;
                 closestKey = createKey(rk, gk, bk);
