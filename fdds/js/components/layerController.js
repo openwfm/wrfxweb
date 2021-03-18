@@ -220,28 +220,20 @@ export class LayerController extends HTMLElement {
     }
     
     findClosestKey(r, g, b) {
-        var q = [];
-        const createKey = (r, g, b) => 'r' + r + 'g' + g + 'b' + b;
-        var key = createKey(r,g,b);
-        var keys = new Set([key]);
-        const pushQueue = (r, g, b) => {
-            var newKey = createKey(r, g, b);
-            if(!keys.has(newKey)) q.push([r, g, b]);
-            keys.add(newKey);
-        }
-        var i = 5000;
-        while (!(key in this.clrbarMap) && i > 0) {
-            if(r < 255) pushQueue(r+1, g, b);
-            if(r > 0) pushQueue(r-1, g, b);
-            if(g < 255) pushQueue(r, g+1, b);
-            if(g > 0) pushQueue(r, g-1, b);
-            if(b < 255) pushQueue(r, g, b+1);
-            if(b > 0) pushQueue(r, g, b-1);
-            [r, g, b] = q.splice(0, 1)[0];
-            key = createKey(r, g, b);
-            i = i-1;
-        }
-        return this.clrbarMap[key];
+        const createKey = (r, g, b) => r + ',' + g + ',' + b;
+        const mapKey = (key) => key.split(',').map(str => parseInt(str));
+        var closestKey = createKey(r, g, b);
+        if (closestKey in this.clrbarMap) return this.clrbarMap[closestKey]; 
+        var minDiff = 255*3 + 1;
+        for (var key in this.clrbarMap) {
+            var [rk, gk, bk] = mapKey(key);
+            var newDiff = Math.abs(r + g + b - (rk + gk + bk));
+            if (newDiff < minDiff) {
+                minDiff = newDiff;
+                closestKey = createKey(rk, gk, bk);
+            }
+        };
+        return this.clrbarMap[closestKey];
     }
 
     matchToColorBar(pixelData) {
@@ -281,7 +273,7 @@ export class LayerController extends HTMLElement {
                         break;
                     }
                 }
-                this.clrbarMap['r' + r + 'g' + g + 'b' + b] = j;
+                this.clrbarMap[r + ',' + g + ',' + b] = j;
             }
             this.clrbarMap.start = start;
             this.clrbarMap.end = end;
