@@ -113,6 +113,7 @@ export class LayerController extends HTMLElement {
             else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
+        this.handleOverlayadd('T2');
     }
 
     /** Called when a layer is selected. */
@@ -228,7 +229,7 @@ export class LayerController extends HTMLElement {
             if(!keys.has(newKey)) q.push([r, g, b]);
             keys.add(newKey);
         }
-        var i = 1000;
+        var i = 5000;
         while (!(key in this.clrbarMap) && i > 0) {
             if(r < 255) pushQueue(r+1, g, b);
             if(r > 0) pushQueue(r-1, g, b);
@@ -284,6 +285,7 @@ export class LayerController extends HTMLElement {
             }
             this.clrbarMap.start = start;
             this.clrbarMap.end = end;
+            console.log('closest key ' + this.findClosestKey(245, 241, 4));
         }
     }
 
