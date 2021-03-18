@@ -218,28 +218,31 @@ export class LayerController extends HTMLElement {
         marker.setContent(popupContent);
     }
     
-    findClosestKey(map, key) {
-        var top = key;
-        var bottom = key;
-        while (top < 255 || bottom > 0) {
-            if (top in map) return top;
-            if (bottom in map) return bottom;
-            top = top + 1;
-            bottom = bottom - 1;
+    findClosestKey(r, g, b) {
+        var q = [];
+        var key = ('r' + r + 'g' + g + 'b' + b);
+        var i = 500;
+        while (!(key in this.clrbarMap) && i > 0) {
+            if(r < 255) q.push([r+1, g, b]);
+            if(r > 0) q.push([r-1, g, b]);
+            if(g < 255) q.push([r, g+1, b]);
+            if(g > 0) q.push([r, g-1, b]);
+            if(b < 255) q.push([r, g, b+1]);
+            if(b > 0) q.push([r, g, b-1]);
+            [r, g, b] = q.splice(0, 1)[0];
+            key = ('r' + r + 'g' + g + 'b' + b);
+            i = i-1;
         }
-        return 0;
+        return this.clrbarMap[key];
     }
 
     matchToColorBar(pixelData) {
-        var rValue = this.findClosestKey(this.clrbarMap, pixelData[0]);
-        var gMap = this.clrbarMap[rValue];
-        var gValue = this.findClosestKey(gMap, pixelData[1]);
-        var bMap = gMap[gValue];
-        var bValue = this.findClosestKey(bMap, pixelData[2]);
-        var index = bMap[bValue];
-        // console.log(rValue + ' ' + gValue + ' ' + bValue);
+        var r = pixelData[0];
+        var g = pixelData[1];
+        var b = pixelData[2];
+        var index = this.findClosestKey(r, g, b);
         var location = (index - this.clrbarMap.start) / (this.clrbarMap.end - this.clrbarMap.start);
-        var rgbValue = `<p style="color: rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})">R:${pixelData[0]} G:${pixelData[1]} B:${pixelData[2]}</p>`;
+        var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b})">R:${r} G:${g} B:${b}</p>`;
         var locationTag = `<p>${location}</p>`;
         return `<div>${rgbValue}${locationTag}</div>`;
     }
@@ -259,27 +262,18 @@ export class LayerController extends HTMLElement {
             var end = 0;
             for (var j = 0; j < this.clrbarCanvas.height; j++) {
                 var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+                var r = colorbarData[0];
+                var g = colorbarData[1];
+                var b = colorbarData[2];
                 if (start == 0) {
-                    if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
-                        start = j + 1;
-                    }
+                    if (r + g + b != 0) start = j + 1;
                 } else {
-                    if (colorbarData[0] == 0 && colorbarData[1] == 0 && colorbarData[2] == 0) {
+                    if (r + g + b == 0) {
                         end = j - 1;
                         break;
                     }
                 }
-                var r = this.clrbarMap[colorbarData[0]];
-                if (!r) {
-                    r = {};
-                    this.clrbarMap[colorbarData[0]] = r;
-                }
-                var g = r[colorbarData[1]];
-                if (!g) {
-                    g = {};
-                    r[colorbarData[1]] = g;
-                }
-                g[colorbarData[2]] = j;
+                this.clrbarMap['r' + r + 'g' + g + 'b' + b] = j;
             }
             this.clrbarMap.start = start;
             this.clrbarMap.end = end;
