@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
-import {displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {SyncController, displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -56,7 +56,7 @@ export class LayerController extends HTMLElement {
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.clrbarCanvas = this.drawCanvas(rasterColorbar);
                 this.imgCanvas = this.drawCanvas(layerImage);
-                this.buildColorMap();
+                this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
                 this.updateMarkers();
             }
         });
@@ -151,7 +151,7 @@ export class LayerController extends HTMLElement {
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.imgCanvas = this.drawCanvas(img);
             this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            this.buildColorMap();
+            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
             this.updateMarkers();
         }
     }
@@ -180,7 +180,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = colorbarDisplay;
         this.imgCanvas = this.drawCanvas(img);
         this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-        this.buildColorMap();
+        this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
         this.updateMarkers();
     }
 
@@ -212,19 +212,20 @@ export class LayerController extends HTMLElement {
             var imageCoords = marker.imageCoords;
             var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
             var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
-            var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
-            popupContent = this.matchToColorBar(pixelData);
+            // var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+            popupContent = this.matchToColorBar(xCoord, yCoord);
         }
         marker.setContent(popupContent);
     }
     
-    findClosestKey(r, g, b) {
+    findClosestKey(r, g, b, clrbarMap) {
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
+        const computeLocation = (key) => (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         var closestKey = createKey(r, g, b);
-        if (closestKey in this.clrbarMap) return this.clrbarMap[closestKey]; 
+        if (closestKey in clrbarMap) return computeLocation(closestKey); 
         var minDiff = 255*3 + 1;
-        for (var key in this.clrbarMap) {
+        for (var key in clrbarMap) {
             var [rk, gk, bk] = mapKey(key);
             var newDiff = Math.abs(r - rk) + Math.abs(g - gk) + Math.abs(b - bk);
             if (newDiff < minDiff) {
@@ -232,26 +233,75 @@ export class LayerController extends HTMLElement {
                 closestKey = createKey(rk, gk, bk);
             }
         };
-        return this.clrbarMap[closestKey];
+        return computeLocation(closestKey);
     }
 
-    matchToColorBar(pixelData) {
+    async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
+        var img = new Image();
+        var clrbarImg = new Image();
+        return new Promise(resolve => {
+            var rasterAtTime = rasterDomains[timeStamp];
+            var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
+            var clrbarMap = {};
+            var pixelData = null;
+            var syncController = new SyncController(0);
+            syncController.subscribe(() => {
+                timeSeriesData[timeStamp] = this.findClosestKey(pixelData[0], pixelData[1], pixelData[2], clrbarMap)
+                resolve('resolved');
+            });
+            img.onload = () => {
+                var imgCanvas = this.drawCanvas(img);
+                pixelData = imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data; 
+                syncController.increment();
+            }
+            clrbarImg.onload = () => {
+                var clrbarCanvas = this.drawCanvas(clrbarImg);
+                clrbarMap = this.buildColorMap(clrbarCanvas);
+                syncController.increment();
+            }
+            img.src = raster_base.getValue() + rasterInfo.raster;
+            clrbarImg.src = raster_base.getValue() + rasterInfo.colorbar;
+        });
+    }
+
+    async generateTimeSeriesData(xCoord, yCoord) {
+        var timeSeriesData = {};
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
+        }
+        return timeSeriesData;
+    }
+
+    matchToColorBar(xCoord, yCoord) {
+        var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+        const timeSeriesChart = document.querySelector('timeseries-chart');
         var r = pixelData[0];
         var g = pixelData[1];
         var b = pixelData[2];
-        var index = this.findClosestKey(r, g, b);
-        var location = (index - this.clrbarMap.start) / (this.clrbarMap.end - this.clrbarMap.start);
+        var location = this.findClosestKey(r, g, b, this.clrbarMap);
         var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b})">R:${r} G:${g} B:${b}</p>`;
         var locationTag = `<p>${location}</p>`;
-        return `<div>${rgbValue}${locationTag}</div>`;
+        var content = document.createElement('div');
+        content.innerHTML += rgbValue;
+        content.innerHTML += locationTag;
+        var timeSeriesButton = document.createElement('div');
+        timeSeriesButton.className = "timeSeriesButton";
+        timeSeriesButton.onclick = async () => {
+            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord);
+            timeSeriesChart.populateChart(timeSeriesData);
+        }
+        timeSeriesButton.innerText = "generate timeseries";
+        content.appendChild(timeSeriesButton);
+        return content;
     }
 
-    buildColorMap() {
-        if (this.clrbarCanvas) {
-            this.clrbarMap = {};
-            var y = Math.round(this.clrbarCanvas.height / 2);
-            for (var x = 0; x < this.clrbarCanvas.width; x++) {
-                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+    buildColorMap(clrbarCanvas) {
+        var clrbarMap = {};
+        if (clrbarCanvas) {
+            var y = Math.round(clrbarCanvas.height / 2);
+            for (var x = 0; x < clrbarCanvas.width; x++) {
+                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
                 if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
                     x += 1;
                     break;
@@ -259,8 +309,8 @@ export class LayerController extends HTMLElement {
             }
             var start = 0;
             var end = 0;
-            for (var j = 0; j < this.clrbarCanvas.height; j++) {
-                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+            for (var j = 0; j < clrbarCanvas.height; j++) {
+                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
                 var r = colorbarData[0];
                 var g = colorbarData[1];
                 var b = colorbarData[2];
@@ -272,11 +322,12 @@ export class LayerController extends HTMLElement {
                         break;
                     }
                 }
-                this.clrbarMap[r + ',' + g + ',' + b] = j;
+                clrbarMap[r + ',' + g + ',' + b] = j;
             }
-            this.clrbarMap.start = start;
-            this.clrbarMap.end = end;
+            clrbarMap.start = start;
+            clrbarMap.end = end;
         }
+        return clrbarMap;
     }
 
     /** Adds checkboxes for the different available map types. Should only be called once after

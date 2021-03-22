@@ -1,7 +1,7 @@
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
  * then be called whenever the value in the controller is updated.
  */
-class Controller {
+export class Controller {
     constructor(value=null) {
         this.listeners = [];
         this.value = value;
@@ -25,6 +25,13 @@ class Controller {
     }
 }
 
+export class SyncController extends Controller {
+    increment() {
+        if (this.value == 0) this.value = 1;
+        else this.setValue(0);
+    }
+}
+
 // global variables
 export const currentSimulation = new Controller();
 export const rasters = new Controller();
@@ -40,8 +47,4 @@ export const domainInstance = new Controller();
 export const currentDomain = new Controller();
 export const organization = new Controller();
 
-export const syncImageLoad = new Controller(0);
-syncImageLoad.increment = () => {
-    if (syncImageLoad.getValue() == 0) syncImageLoad.value = 1;
-    else syncImageLoad.setValue(0);
-}
+export const syncImageLoad = new SyncController(0);
