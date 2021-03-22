@@ -56,7 +56,7 @@ export class LayerController extends HTMLElement {
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.clrbarCanvas = this.drawCanvas(rasterColorbar);
                 this.imgCanvas = this.drawCanvas(layerImage);
-                this.buildColorMap();
+                this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
                 this.updateMarkers();
             }
         });
@@ -153,7 +153,7 @@ export class LayerController extends HTMLElement {
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.imgCanvas = this.drawCanvas(img);
             this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            this.buildColorMap();
+            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
             this.updateMarkers();
         }
     }
@@ -182,7 +182,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = colorbarDisplay;
         this.imgCanvas = this.drawCanvas(img);
         this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-        this.buildColorMap();
+        this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
         this.updateMarkers();
     }
 
@@ -237,6 +237,23 @@ export class LayerController extends HTMLElement {
         return this.clrbarMap[closestKey];
     }
 
+    generateTimeSeriesData() {
+        var timeSeriesData = {};
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        var img = new Image();
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            var rasterAtTime = rasterDomains[timeStamp];
+            var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
+            img.onload = () => {
+                var canvas = this.drawCanvas(img);
+                var pixelData = canvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data; 
+
+            }
+            img.src = raster_base.getValue() + rasterInfo.raster;
+        }
+        return timeSeriesData;
+    }
+
     matchToColorBar(xCoord, yCoord) {
         var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
         const timeSeriesChart = document.querySelector('timeseries-chart');
@@ -252,19 +269,23 @@ export class LayerController extends HTMLElement {
         content.innerHTML += locationTag;
         var timeSeriesButton = document.createElement('div');
         timeSeriesButton.className = "timeSeriesButton";
-        timeSeriesButton.onclick = () => timeSeriesChart.populateChart(xCoord, yCoord);
+        timeSeriesButton.onclick = () => {
+            var timeSeriesData = this.generateTimeSeriesData(xCoord, yCoord);
+            timeSeriesChart.populateChart(timeSeriesData);
+        }
+
         timeSeriesButton.innerText = "generate timeseries";
         content.appendChild(timeSeriesButton);
         // return `<div>${rgbValue}${locationTag}${timeSeriesButton}</div>`;
         return content;
     }
 
-    buildColorMap() {
-        if (this.clrbarCanvas) {
-            this.clrbarMap = {};
-            var y = Math.round(this.clrbarCanvas.height / 2);
-            for (var x = 0; x < this.clrbarCanvas.width; x++) {
-                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+    buildColorMap(clrbarCanvas) {
+        var clrbarMap = {};
+        if (clrbarCanvas) {
+            var y = Math.round(clrbarCanvas.height / 2);
+            for (var x = 0; x < clrbarCanvas.width; x++) {
+                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
                 if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
                     x += 1;
                     break;
@@ -272,8 +293,8 @@ export class LayerController extends HTMLElement {
             }
             var start = 0;
             var end = 0;
-            for (var j = 0; j < this.clrbarCanvas.height; j++) {
-                var colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+            for (var j = 0; j < clrbarCanvas.height; j++) {
+                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
                 var r = colorbarData[0];
                 var g = colorbarData[1];
                 var b = colorbarData[2];
@@ -285,11 +306,12 @@ export class LayerController extends HTMLElement {
                         break;
                     }
                 }
-                this.clrbarMap[r + ',' + g + ',' + b] = j;
+                clrbarMap[r + ',' + g + ',' + b] = j;
             }
-            this.clrbarMap.start = start;
-            this.clrbarMap.end = end;
+            clrbarMap.start = start;
+            clrbarMap.end = end;
         }
+        return clrbarMap;
     }
 
     /** Adds checkboxes for the different available map types. Should only be called once after
