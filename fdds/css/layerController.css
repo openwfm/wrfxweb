@@ -18,14 +18,16 @@
 
 .timeSeriesButton {
     border-radius: .2rem;
-    border-width: 1px;
-    border-style: solid;
-    background: #e8e8e8;
+    padding: 5px;
+    background: #d6d6d6;
     text-align: center;
+    color: #6a6a6a;
+    font-weight: bold;
 }
 
 .timeSeriesButton:hover {
     cursor: pointer;
+    background: #e5e5e5;
 }
 
 .layer-group {
