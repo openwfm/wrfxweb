@@ -21,10 +21,7 @@
        Department of Mathematical and Statistical Sciences -->
 
 	<div id="simulation-flags" style="position: fixed; top:15px; display:none; z-index:1000;"><span id="current-sim-label" class="displayTest"></span></div>
-  <div id="timeSeriesChartContainer">
-    <canvas id="timeSeriesChart" width="400px" height ="400px"></canvas>
-  </div>
-
+  <timeseries-chart></timeseries-chart>
 	<catalog-menu></catalog-menu>
 	<catalog-button></catalog-button>
   <simulation-controller></simulation-controller>
@@ -37,6 +34,7 @@
 
 	<script src="js/components/CatalogMenu/catalogMenu.js" type="module"></script>
 	<script src="js/components/CatalogMenu/catalogButton.js" type="text/javascript"></script>
+  <script src="js/components/timeSeriesChart.js" type="module"></script>
 	<script src="js/components/simulationController.js" type="module"></script>
 	<script src="js/components/domainSelector.js" type="module"></script>
 	<script src="js/components/domainButton.js" type="text/javascript"></script>
