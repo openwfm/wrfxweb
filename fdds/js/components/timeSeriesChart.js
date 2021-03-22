@@ -54,6 +54,9 @@ export class TimeSeriesChart extends HTMLElement {
         });
     }
 
+    populateChart(xCoord, yCoord) {
+        this.querySelector('#timeSeriesChartContainer').style.display = "block";
+    }
 }
 
 window.customElements.define('timeseries-chart', TimeSeriesChart);

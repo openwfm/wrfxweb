@@ -214,8 +214,8 @@ export class LayerController extends HTMLElement {
             var imageCoords = marker.imageCoords;
             var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
             var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
-            var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
-            popupContent = this.matchToColorBar(pixelData);
+            // var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+            popupContent = this.matchToColorBar(xCoord, yCoord);
         }
         marker.setContent(popupContent);
     }
@@ -237,7 +237,9 @@ export class LayerController extends HTMLElement {
         return this.clrbarMap[closestKey];
     }
 
-    matchToColorBar(pixelData) {
+    matchToColorBar(xCoord, yCoord) {
+        var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+        const timeSeriesChart = document.querySelector('timeseries-chart');
         var r = pixelData[0];
         var g = pixelData[1];
         var b = pixelData[2];
@@ -245,7 +247,16 @@ export class LayerController extends HTMLElement {
         var location = (index - this.clrbarMap.start) / (this.clrbarMap.end - this.clrbarMap.start);
         var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b})">R:${r} G:${g} B:${b}</p>`;
         var locationTag = `<p>${location}</p>`;
-        return `<div>${rgbValue}${locationTag}</div>`;
+        var content = document.createElement('div');
+        content.innerHTML += rgbValue;
+        content.innerHTML += locationTag;
+        var timeSeriesButton = document.createElement('div');
+        timeSeriesButton.className = "timeSeriesButton";
+        timeSeriesButton.onclick = () => timeSeriesChart.populateChart(xCoord, yCoord);
+        timeSeriesButton.innerText = "generate timeseries";
+        content.appendChild(timeSeriesButton);
+        // return `<div>${rgbValue}${locationTag}${timeSeriesButton}</div>`;
+        return content;
     }
 
     buildColorMap() {

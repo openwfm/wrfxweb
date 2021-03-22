@@ -16,6 +16,18 @@
     overflow-y: auto;
 }
 
+.timeSeriesButton {
+    border-radius: .2rem;
+    border-width: 1px;
+    border-style: solid;
+    background: #e8e8e8;
+    text-align: center;
+}
+
+.timeSeriesButton:hover {
+    cursor: pointer;
+}
+
 .layer-group {
     display: block;
     width: 100%;
