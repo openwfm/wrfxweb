@@ -56,17 +56,7 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data) {
-        // var rasterDomains = rasters.getValue()[currentDomain.getValue()];
-        // var canvas = null;
-        // var img = new Image();
-        // for (var timeStamp of sorted_timestamps.getValue()) {
-        //     var rasterAtTime = rasterDomains[timeStamp];
-        //     var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
-        //     img.src = raster_base.getValue() + rasterInfo.raster;
-
-            // console.log(timeStamp);
-        // }
-        // this.querySelector('#timeSeriesChartContainer').style.display = "block";
+        console.log(data);
     }
 }
 

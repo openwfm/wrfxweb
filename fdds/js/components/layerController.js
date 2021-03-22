@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
-import {displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {SyncController, displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -220,13 +220,14 @@ export class LayerController extends HTMLElement {
         marker.setContent(popupContent);
     }
     
-    findClosestKey(r, g, b) {
+    findClosestKey(r, g, b, clrbarMap) {
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
+        const computeLocation = (key) => (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         var closestKey = createKey(r, g, b);
-        if (closestKey in this.clrbarMap) return this.clrbarMap[closestKey]; 
+        if (closestKey in clrbarMap) return computeLocation(closestKey); 
         var minDiff = 255*3 + 1;
-        for (var key in this.clrbarMap) {
+        for (var key in clrbarMap) {
             var [rk, gk, bk] = mapKey(key);
             var newDiff = Math.abs(r - rk) + Math.abs(g - gk) + Math.abs(b - bk);
             if (newDiff < minDiff) {
@@ -234,22 +235,42 @@ export class LayerController extends HTMLElement {
                 closestKey = createKey(rk, gk, bk);
             }
         };
-        return this.clrbarMap[closestKey];
+        return computeLocation(closestKey);
     }
 
-    generateTimeSeriesData() {
-        var timeSeriesData = {};
-        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+    async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
         var img = new Image();
-        for (var timeStamp of sorted_timestamps.getValue()) {
+        var clrbarImg = new Image();
+        return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
+            var clrbarMap = {};
+            var pixelData = null;
+            var syncController = new SyncController(0);
+            syncController.subscribe(() => {
+                timeSeriesData[timeStamp] = this.findClosestKey(pixelData[0], pixelData[1], pixelData[2], clrbarMap)
+                resolve('resolved');
+            });
             img.onload = () => {
-                var canvas = this.drawCanvas(img);
-                var pixelData = canvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data; 
-
+                var imgCanvas = this.drawCanvas(img);
+                pixelData = imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data; 
+                syncController.increment();
+            }
+            clrbarImg.onload = () => {
+                var clrbarCanvas = this.drawCanvas(clrbarImg);
+                clrbarMap = this.buildColorMap(clrbarCanvas);
+                syncController.increment();
             }
             img.src = raster_base.getValue() + rasterInfo.raster;
+            clrbarImg.src = raster_base.getValue() + rasterInfo.colorbar;
+        });
+    }
+
+    async generateTimeSeriesData(xCoord, yCoord) {
+        var timeSeriesData = {};
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
         }
         return timeSeriesData;
     }
@@ -260,8 +281,7 @@ export class LayerController extends HTMLElement {
         var r = pixelData[0];
         var g = pixelData[1];
         var b = pixelData[2];
-        var index = this.findClosestKey(r, g, b);
-        var location = (index - this.clrbarMap.start) / (this.clrbarMap.end - this.clrbarMap.start);
+        var location = this.findClosestKey(r, g, b, this.clrbarMap);
         var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b})">R:${r} G:${g} B:${b}</p>`;
         var locationTag = `<p>${location}</p>`;
         var content = document.createElement('div');
@@ -269,14 +289,12 @@ export class LayerController extends HTMLElement {
         content.innerHTML += locationTag;
         var timeSeriesButton = document.createElement('div');
         timeSeriesButton.className = "timeSeriesButton";
-        timeSeriesButton.onclick = () => {
-            var timeSeriesData = this.generateTimeSeriesData(xCoord, yCoord);
+        timeSeriesButton.onclick = async () => {
+            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord);
             timeSeriesChart.populateChart(timeSeriesData);
         }
-
         timeSeriesButton.innerText = "generate timeseries";
         content.appendChild(timeSeriesButton);
-        // return `<div>${rgbValue}${locationTag}${timeSeriesButton}</div>`;
         return content;
     }
 

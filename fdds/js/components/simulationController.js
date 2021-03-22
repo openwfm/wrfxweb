@@ -1,4 +1,4 @@
-import {currentDomain, sorted_timestamps, current_timestamp, overlayOrder, currentSimulation, rasters, raster_base, organization} from './Controller.js';
+import {currentDomain, sorted_timestamps, current_timestamp, overlayOrder, currentSimulation, rasters, raster_base} from './Controller.js';
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
