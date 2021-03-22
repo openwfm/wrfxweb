@@ -18,6 +18,30 @@ html {
   bottom: 0;
 }
 
+#timeSeriesChart {
+  margin: auto;
+  display: block;
+  position: absolute;
+  z-index: 8005;
+  height: 400px;
+  width: 400px;
+}
+
+#timeSeriesChartContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 8000;
+  display: block;
+  margin-top: 50px;
+  margin: auto;
+  height: 400px;
+  width: 400px;
+  background: white;
+}
+
 #map-domains {
   height: 400px;
   width: 500px;

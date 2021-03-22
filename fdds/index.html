@@ -15,11 +15,15 @@
   <script src="js/leaflet/leaflet.js"></script>
   <script src="https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=3rdoGP1zhCE27Q69RXFiR0A3foqbvoZd"></script>
   <script src="js/partial1.js" type="module"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 
   <!-- WRF Fire Display Server; Copyright 2016, University of Colorado Denver,
        Department of Mathematical and Statistical Sciences -->
 
 	<div id="simulation-flags" style="position: fixed; top:15px; display:none; z-index:1000;"><span id="current-sim-label" class="displayTest"></span></div>
+  <div id="timeSeriesChartContainer">
+    <canvas id="timeSeriesChart" width="400px" height ="400px"></canvas>
+  </div>
 
 	<catalog-menu></catalog-menu>
 	<catalog-button></catalog-button>

@@ -1,5 +1,6 @@
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
 import {displayedColorbar, syncImageLoad, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {timeSeriesChart} from './timeSeriesChart.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -114,6 +115,8 @@ export class LayerController extends HTMLElement {
         });
         this.buildLayerBoxes();
         this.handleOverlayadd('T2');
+        timeSeriesChart();
+        // document.querySelector('#timeSeriesChartContainer').appendChild(new TimeSeriesChart());
     }
 
     /** Called when a layer is selected. */
@@ -277,7 +280,6 @@ export class LayerController extends HTMLElement {
             }
             this.clrbarMap.start = start;
             this.clrbarMap.end = end;
-            console.log('closest key ' + this.findClosestKey(245, 241, 4));
         }
     }
 
