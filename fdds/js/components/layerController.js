@@ -113,10 +113,6 @@ export class LayerController extends HTMLElement {
             else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
-<<<<<<< HEAD
-=======
-        this.handleOverlayadd('T2');
->>>>>>> timeSeries
     }
 
     /** Called when a layer is selected. */
