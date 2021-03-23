@@ -18,13 +18,13 @@ export class TimeSeriesChart extends HTMLElement {
         this.querySelector('#closeTimeSeriesChart').onclick = () => timeSeriesChart.style.display = 'none';
     }
 
-    populateChart(data, label) {
+    populateChart(data, label, latLon) {
         new Chart(this.ctx, {
             type: 'line',
             data: {
                 labels: Object.keys(data),
                 datasets: [{
-                    label: label + " values",
+                    label: label + " values at lat: " + latLon.lat + " lon: " + latLon.lng,
                     fill: false,
                     data: Object.entries(data).map(entry => entry[1]),
                     borderColor: "red",
