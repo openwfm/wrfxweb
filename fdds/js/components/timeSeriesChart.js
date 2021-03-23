@@ -26,7 +26,7 @@ export class TimeSeriesChart extends HTMLElement {
                 datasets: [{
                     label: label + " values",
                     fill: false,
-                    data: Object.entries(this.data).map(entry => entry[1]),
+                    data: Object.entries(data).map(entry => entry[1]),
                     borderColor: "red",
                     backgroundColor: "red",
                     lineTension: 0,
