@@ -293,7 +293,9 @@ export class LayerController extends HTMLElement {
         var timeSeriesButton = document.createElement('div');
         timeSeriesButton.className = "timeSeriesButton";
         timeSeriesButton.onclick = async () => {
+            document.body.classList.add("waiting");
             var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord);
+            document.body.classList.remove("waiting");
             timeSeriesChart.populateChart(timeSeriesData, displayedColorbar.getValue(), latLon);
         }
         timeSeriesButton.innerText = "generate timeseries";
