@@ -114,7 +114,6 @@ export class LayerController extends HTMLElement {
         });
         this.buildLayerBoxes();
         this.handleOverlayadd('T2');
-        // document.querySelector('#timeSeriesChartContainer').appendChild(new TimeSeriesChart());
     }
 
     /** Called when a layer is selected. */
@@ -239,7 +238,10 @@ export class LayerController extends HTMLElement {
     }
 
     async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
+        var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var img = new Image();
+        img.width = layerImg.width;
+        img.height = layerImg.height;
         var clrbarImg = new Image();
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
