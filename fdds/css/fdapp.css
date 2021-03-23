@@ -18,6 +18,8 @@ html {
   bottom: 0;
 }
 
+body.waiting * {cursor: wait !important;}
+
 #map-domains {
   height: 400px;
   width: 500px;
