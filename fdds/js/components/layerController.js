@@ -276,17 +276,20 @@ export class LayerController extends HTMLElement {
     }
 
     matchToColorBar(xCoord, yCoord, latLon) {
+        const roundLatLon = (num) => Math.round(num*100)/100;
         var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
         const timeSeriesChart = document.querySelector('timeseries-chart');
         var r = pixelData[0];
         var g = pixelData[1];
         var b = pixelData[2];
-        var location = this.findClosestKey(r, g, b, this.clrbarMap);
-        var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b})">R:${r} G:${g} B:${b}</p>`;
-        var locationTag = `<p>${location}</p>`;
+        var clrbarLocation = this.findClosestKey(r, g, b, this.clrbarMap);
+        var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b}); margin:0">R:${r} G:${g} B:${b}</p>`;
+        var latLonTag = `<p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>`;
+        var clrbarLocationTag = `<p style="margin: 0">${clrbarLocation}</p>`;
         var content = document.createElement('div');
         content.innerHTML += rgbValue;
-        content.innerHTML += locationTag;
+        content.innerHTML += latLonTag;
+        content.innerHTML += clrbarLocationTag;
         var timeSeriesButton = document.createElement('div');
         timeSeriesButton.className = "timeSeriesButton";
         timeSeriesButton.onclick = async () => {

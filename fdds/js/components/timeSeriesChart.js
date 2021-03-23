@@ -9,6 +9,7 @@ export class TimeSeriesChart extends HTMLElement {
             </div>
         `;
         this.ctx = null;
+        this.chart = null;
     }
 
     connectedCallback() {
@@ -20,8 +21,9 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data, label, latLon) {
+        if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
-        new Chart(this.ctx, {
+        this.chart = new Chart(this.ctx, {
             type: 'line',
             data: {
                 labels: Object.keys(data),
