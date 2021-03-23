@@ -212,8 +212,7 @@ export class LayerController extends HTMLElement {
             var imageCoords = marker.imageCoords;
             var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
             var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
-            // var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
-            popupContent = this.matchToColorBar(xCoord, yCoord);
+            popupContent = this.matchToColorBar(xCoord, yCoord, marker._latLon);
         }
         marker.setContent(popupContent);
     }
@@ -276,7 +275,7 @@ export class LayerController extends HTMLElement {
         return timeSeriesData;
     }
 
-    matchToColorBar(xCoord, yCoord) {
+    matchToColorBar(xCoord, yCoord, latLon) {
         var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
         const timeSeriesChart = document.querySelector('timeseries-chart');
         var r = pixelData[0];
@@ -292,7 +291,7 @@ export class LayerController extends HTMLElement {
         timeSeriesButton.className = "timeSeriesButton";
         timeSeriesButton.onclick = async () => {
             var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord);
-            timeSeriesChart.populateChart(timeSeriesData, displayedColorbar.getValue());
+            timeSeriesChart.populateChart(timeSeriesData, displayedColorbar.getValue(), latLon);
         }
         timeSeriesButton.innerText = "generate timeseries";
         content.appendChild(timeSeriesButton);
