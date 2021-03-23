@@ -113,6 +113,10 @@ export class LayerController extends HTMLElement {
             else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
+<<<<<<< HEAD
+=======
+        this.handleOverlayadd('T2');
+>>>>>>> timeSeries
     }
 
     /** Called when a layer is selected. */
@@ -237,7 +241,10 @@ export class LayerController extends HTMLElement {
     }
 
     async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
+        var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var img = new Image();
+        img.width = layerImg.width;
+        img.height = layerImg.height;
         var clrbarImg = new Image();
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
