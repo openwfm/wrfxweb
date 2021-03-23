@@ -113,6 +113,7 @@ export class LayerController extends HTMLElement {
             else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
+        this.handleOverlayadd('T2');
     }
 
     /** Called when a layer is selected. */
