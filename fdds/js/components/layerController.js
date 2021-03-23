@@ -212,7 +212,7 @@ export class LayerController extends HTMLElement {
             var imageCoords = marker.imageCoords;
             var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
             var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
-            popupContent = this.matchToColorBar(xCoord, yCoord, marker._latLon);
+            popupContent = this.matchToColorBar(xCoord, yCoord, marker._latlng);
         }
         marker.setContent(popupContent);
     }
@@ -268,10 +268,10 @@ export class LayerController extends HTMLElement {
 
     async generateTimeSeriesData(xCoord, yCoord) {
         var timeSeriesData = {};
-        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
-        for (var timeStamp of sorted_timestamps.getValue()) {
-            await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
-        }
+        // var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        // for (var timeStamp of sorted_timestamps.getValue()) {
+        //     await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
+        // }
         return timeSeriesData;
     }
 
