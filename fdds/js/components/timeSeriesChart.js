@@ -9,6 +9,7 @@ export class TimeSeriesChart extends HTMLElement {
             </div>
         `;
         this.ctx = null;
+        this.chart = null;
         this.data = {
             "2020-10-16_00:00:00": 0.14556962025316456,
             "2020-10-16_01:00:00": 0.12341772151898735,
@@ -70,8 +71,9 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data, label, latLon) {
+        if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
-        new Chart(this.ctx, {
+        this.chart = new Chart(this.ctx, {
             type: 'line',
             data: {
                 labels: Object.keys(this.data),
