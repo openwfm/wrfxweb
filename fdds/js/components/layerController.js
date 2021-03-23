@@ -268,10 +268,10 @@ export class LayerController extends HTMLElement {
 
     async generateTimeSeriesData(xCoord, yCoord) {
         var timeSeriesData = {};
-        // var rasterDomains = rasters.getValue()[currentDomain.getValue()];
-        // for (var timeStamp of sorted_timestamps.getValue()) {
-        //     await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
-        // }
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
+        }
         return timeSeriesData;
     }
 
