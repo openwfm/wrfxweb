@@ -70,12 +70,13 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data, label, latLon) {
+        const roundLatLon = (num) => Math.round(num*100) / 100;
         new Chart(this.ctx, {
             type: 'line',
             data: {
                 labels: Object.keys(this.data),
                 datasets: [{
-                    label: label + " values at lat: " + latLon.lat + " lon: " + latLon.lng,
+                    label: label + " values at lat: " + roundLatLon(latLon.lat) + " lon: " + roundLatLon(latLon.lng),
                     fill: false,
                     data: Object.entries(this.data).map(entry => entry[1]),
                     borderColor: "red",
