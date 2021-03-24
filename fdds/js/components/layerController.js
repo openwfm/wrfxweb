@@ -113,6 +113,8 @@ export class LayerController extends HTMLElement {
             else this.rasterDict[r] = layer;
         });
         this.buildLayerBoxes();
+        this.handleOverlayadd('T2');
+
     }
 
     /** Called when a layer is selected. */
@@ -286,10 +288,43 @@ export class LayerController extends HTMLElement {
         var rgbValue = `<p style="color: rgb(${r}, ${g}, ${b}); margin:0">R:${r} G:${g} B:${b}</p>`;
         var latLonTag = `<p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>`;
         var clrbarLocationTag = `<p style="margin: 0">${clrbarLocation}</p>`;
+        var startDate = document.createElement('select');
+        var endDate = document.createElement('select');
+        const createOption = (timestamp) => {
+            var option = document.createElement('option');
+            option.value = timestamp;
+            option.innerText = timestamp;
+            return option;
+        }
+        for (var timestamp of sorted_timestamps.getValue()) {
+            var startOption = createOption(timestamp);
+            var endOption = createOption(timestamp);
+            startDate.appendChild(startOption);
+            endDate.appendChild(endOption);
+        }
+        endDate.value = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        startDate.onchange = () => {
+            var selectedDate = startDate.value;
+            endDate.childNodes.forEach(endOption => {
+                if (endOption.value < selectedDate) endOption.disabled = true;
+                else endOption.disabled = false;
+            });
+        };
+        endDate.onchange = () => {
+            var selectedDate = endDate.value;
+            startDate.childNodes.forEach(startOption => {
+                if (startOption.value > selectedDate) startOption.disabled = true;
+                else startOption.disabled = false;
+            });
+        };
+        var rangeSelect = document.createElement('div');
+        rangeSelect.appendChild(startDate);
+        rangeSelect.appendChild(endDate);
         var content = document.createElement('div');
         content.innerHTML += rgbValue;
         content.innerHTML += latLonTag;
         content.innerHTML += clrbarLocationTag;
+        content.appendChild(rangeSelect);
         var timeSeriesButton = document.createElement('div');
         timeSeriesButton.className = "timeSeriesButton";
         timeSeriesButton.onclick = async () => {
