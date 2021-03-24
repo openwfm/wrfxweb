@@ -268,12 +268,14 @@ export class LayerController extends HTMLElement {
         });
     }
 
-    async generateTimeSeriesData(xCoord, yCoord) {
+    async generateTimeSeriesData(xCoord, yCoord, startDate, endDate) {
         var timeSeriesData = {};
-        // var rasterDomains = rasters.getValue()[currentDomain.getValue()];
-        // for (var timeStamp of sorted_timestamps.getValue()) {
-        //     await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
-        // }
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            if (timeStamp >= startDate && timeStamp <= endDate) {
+                await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
+            }
+        }
         return timeSeriesData;
     }
 
@@ -329,7 +331,7 @@ export class LayerController extends HTMLElement {
         timeSeriesButton.className = "timeSeriesButton";
         timeSeriesButton.onclick = async () => {
             document.body.classList.add("waiting");
-            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord);
+            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate.value, endDate.value);
             document.body.classList.remove("waiting");
             timeSeriesChart.populateChart(timeSeriesData, displayedColorbar.getValue(), latLon);
         }
