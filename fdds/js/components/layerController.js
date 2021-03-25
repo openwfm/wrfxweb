@@ -195,9 +195,7 @@ export class LayerController extends HTMLElement {
                 layer.addTo(map);
                 this.mapType = name; 
                 layer.bringToFront();
-            } else {
-                layer.remove(map);
-            }
+            } else layer.remove(map);
         }
         return div;
     }
@@ -228,7 +226,6 @@ export class LayerController extends HTMLElement {
         div.appendChild(label);
         return [div, input];
     }
-
 }
 
 window.customElements.define('layer-controller', LayerController);
