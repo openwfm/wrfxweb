@@ -19,10 +19,11 @@ export class TimeSeriesController extends LayerController {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
-                this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-                this.imgCanvas = this.drawCanvas(layerImage);
-                this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-                this.updateMarkers();
+                this.updateCanvases(layerImage, rasterColorbar);
+                // this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+                // this.imgCanvas = this.drawCanvas(layerImage);
+                // this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
+                // this.updateMarkers();
             }
         });
     }
@@ -65,6 +66,13 @@ export class TimeSeriesController extends LayerController {
         }
         this.imgCanvas = this.drawCanvas(img);
         this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+        this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
+        this.updateMarkers();
+    }
+
+    updateCanvases(layerImg, colorbarImg) {
+        this.imgCanvas = this.drawCanvas(layerImg);
+        this.clrbarCanvas = this.drawCanvas(colorbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
         this.updateMarkers();
     }
