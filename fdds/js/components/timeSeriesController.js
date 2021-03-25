@@ -100,7 +100,7 @@ export class TimeSeriesController extends LayerController {
     findClosestKey(r, g, b, clrbarMap) {
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
-        const computeLocation = (key) => (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
+        const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         var closestKey = createKey(r, g, b);
         if (closestKey in clrbarMap) return computeLocation(closestKey); 
         var minDiff = 255*3 + 1;
