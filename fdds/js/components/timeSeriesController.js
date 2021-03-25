@@ -20,12 +20,13 @@ export class TimeSeriesController extends LayerController {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.updateCanvases(layerImage, rasterColorbar);
-                // this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-                // this.imgCanvas = this.drawCanvas(layerImage);
-                // this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-                // this.updateMarkers();
             }
         });
+    }
+
+    domainSwitch() {
+        super.domainSwitch();
+        console.log(this.markers);
     }
 
     handleOverlayadd(name) {
@@ -47,15 +48,13 @@ export class TimeSeriesController extends LayerController {
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.imgCanvas = this.drawCanvas(img);
-            this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-            this.updateMarkers();
+            this.updateCanvases(img, rasterColorbar);
         }
     }
 
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
+        const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var img = null;
         for (var i = overlayOrder.length - 1; i >= 0; i--) {
@@ -64,10 +63,7 @@ export class TimeSeriesController extends LayerController {
                 break;
             }
         }
-        this.imgCanvas = this.drawCanvas(img);
-        this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-        this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-        this.updateMarkers();
+        this.updateCanvases(img, rasterColorbar);
     }
 
     updateCanvases(layerImg, colorbarImg) {
@@ -217,4 +213,5 @@ export class TimeSeriesController extends LayerController {
         return clrbarMap;
     }
 }
+
 window.customElements.define('timeseries-controller', TimeSeriesController);
