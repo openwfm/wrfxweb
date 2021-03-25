@@ -3,6 +3,10 @@ import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlay
 import {map} from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 
+/** This class extends LayerController and adds to it functionality for generating a timeseries
+ * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
+ * range in the simulation. Uses the layer that is on top. 
+ */
 export class TimeSeriesController extends LayerController {
     constructor() {
         super();
@@ -36,8 +40,8 @@ export class TimeSeriesController extends LayerController {
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
+        var img = layer._image;
         if ('colorbar' in raster_info) {
-            var img = layer._image;
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation();
@@ -50,7 +54,7 @@ export class TimeSeriesController extends LayerController {
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.updateCanvases(img, rasterColorbar);
-        }
+        } else img.style.pointerEvents = 'none';
     }
 
     handleOverlayRemove(name) {
