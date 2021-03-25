@@ -48,7 +48,6 @@ export class TimeSeriesChart extends HTMLElement {
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
-
     }
 }
 

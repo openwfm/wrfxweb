@@ -19,12 +19,15 @@ export class TimeSeriesController extends LayerController {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
-                this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-                this.imgCanvas = this.drawCanvas(layerImage);
-                this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-                this.updateMarkers();
+                this.updateCanvases(layerImage, rasterColorbar);
             }
         });
+    }
+
+    domainSwitch() {
+        super.domainSwitch();
+        this.markers.map(marker => marker.removeFrom(map));
+        this.markers = [];
     }
 
     handleOverlayadd(name) {
@@ -46,15 +49,13 @@ export class TimeSeriesController extends LayerController {
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.imgCanvas = this.drawCanvas(img);
-            this.clrbarCanvas = this.drawCanvas(rasterColorbar);
-            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-            this.updateMarkers();
+            this.updateCanvases(img, rasterColorbar);
         }
     }
 
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
+        const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var img = null;
         for (var i = overlayOrder.length - 1; i >= 0; i--) {
@@ -63,8 +64,12 @@ export class TimeSeriesController extends LayerController {
                 break;
             }
         }
-        this.imgCanvas = this.drawCanvas(img);
-        this.clrbarCanvas = this.drawCanvas(rasterColorbar);
+        this.updateCanvases(img, rasterColorbar);
+    }
+
+    updateCanvases(layerImg, colorbarImg) {
+        this.imgCanvas = this.drawCanvas(layerImg);
+        this.clrbarCanvas = this.drawCanvas(colorbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
         this.updateMarkers();
     }
@@ -209,4 +214,5 @@ export class TimeSeriesController extends LayerController {
         return clrbarMap;
     }
 }
+
 window.customElements.define('timeseries-controller', TimeSeriesController);
