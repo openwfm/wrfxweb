@@ -26,7 +26,8 @@ export class TimeSeriesController extends LayerController {
 
     domainSwitch() {
         super.domainSwitch();
-        console.log(this.markers);
+        this.markers.map(marker => marker.removeFrom(map));
+        this.markers = [];
     }
 
     handleOverlayadd(name) {
