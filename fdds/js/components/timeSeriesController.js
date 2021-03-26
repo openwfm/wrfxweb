@@ -81,6 +81,9 @@ export class TimeSeriesController extends LayerController {
         this.updateCanvases(img, rasterColorbar);
     }
 
+    /** Redraws the clrbarCanvas and imgCanvas used to map values for the timeSeries with 
+     * given img elements. Updates the map of rgb values to colorbar locations. Updates every 
+     * marker to reflec values in the new img and colorbar */
     updateCanvases(layerImg, colorbarImg) {
         this.imgCanvas = this.drawCanvas(layerImg);
         this.clrbarCanvas = this.drawCanvas(colorbarImg);
@@ -88,6 +91,7 @@ export class TimeSeriesController extends LayerController {
         for (var marker of this.markers) this.updateMarker(marker);
     }
 
+    /** returns a canvas drawn with given image. */
     drawCanvas(img) {
         var canvas = null;
         if (img != null) {
@@ -99,6 +103,8 @@ export class TimeSeriesController extends LayerController {
         return canvas;
     }
 
+    /** Maps location of marker to position on colorbar for current layer image and colorbar.
+     * Updates the content of the marker. */
     updateMarker(marker) {
         var popupContent = "No layer bar with colobar to show values of";
         if (this.imgCanvas) {
@@ -110,6 +116,8 @@ export class TimeSeriesController extends LayerController {
         marker.setContent(popupContent);
     }
     
+    /** Iterates over all keys in clrbarMap and finds closest one to given rgb values. Returns relative 
+     * location in clrbarMap. */
     findClosestKey(r, g, b, clrbarMap) {
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
@@ -128,12 +136,18 @@ export class TimeSeriesController extends LayerController {
         return computeLocation(closestKey);
     }
 
+    /** Function called for populating a timeSeries chart. Needs to load image and colorbar pair
+     * for given timestamp of given rasterDomains. Once image loaded, should map given xCoord and yCoord
+     * to an rgb value and find its corresponding place in the colormap. Puts the colorbar location into the 
+     * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
+     * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var img = new Image();
         img.width = layerImg.width;
         img.height = layerImg.height;
         var clrbarImg = new Image();
+        // Returns a promise so that loadImageAndColorbar can be called with await. 
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
@@ -142,7 +156,7 @@ export class TimeSeriesController extends LayerController {
             var syncController = new SyncController(0);
             syncController.subscribe(() => {
                 timeSeriesData[timeStamp] = this.findClosestKey(pixelData[0], pixelData[1], pixelData[2], clrbarMap)
-                resolve('resolved');
+                resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
             img.onload = () => {
                 var imgCanvas = this.drawCanvas(img);
@@ -159,6 +173,9 @@ export class TimeSeriesController extends LayerController {
         });
     }
 
+    /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
+     * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
+     * the corresponding timestamp. */
     async generateTimeSeriesData(xCoord, yCoord, startDate, endDate) {
         var timeSeriesData = {};
         var rasterDomains = rasters.getValue()[currentDomain.getValue()];
@@ -188,6 +205,12 @@ export class TimeSeriesController extends LayerController {
         return timeSeriesMarker;
     }
 
+    /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
+     * end pixels of the colorbar so that relative positions in the colobar can be calculated. Starts from a 
+     * y value half the height of the image and iterates over x until a non black pixel is located. Advances one
+     * more pixel away to avoid distortion and sets this as the xCoordinate band that the colorbard spans. Then
+     * iterates over the height of the colorbar keeping the xCoord constant mapping the value of the rgb value 
+     * to the yCoord. */
     buildColorMap(clrbarCanvas) {
         var clrbarMap = {};
         if (clrbarCanvas) {
