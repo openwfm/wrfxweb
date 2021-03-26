@@ -153,6 +153,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = colorbarDisplay;
     }
 
+    /** Returns the layer associated with a given name */
     getLayer(name) {
         if (overlay_list.includes(name)) return this.overlayDict[name];
         return this.rasterDict[name];
@@ -219,6 +220,7 @@ export class LayerController extends HTMLElement {
         return div;
     }
 
+    /** Creates the htmlElement for each checkbox in the LayerController. */
     buildCheckBox(name) {
         var div = document.createElement('div');
         div.className = 'layer-checkbox';
