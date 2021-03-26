@@ -14,7 +14,7 @@ export class CatalogMenu extends HTMLElement {
         this.firesList = [];
         this.fuelMoistureList = [];
         this.satelliteList = [];
-        this.addOrder = {};
+        this.addOrder = [];
         this.innerHTML = `
             <div class="catalog-menu">
                 <div id="menu-title" class="menu-title">
@@ -73,13 +73,12 @@ export class CatalogMenu extends HTMLElement {
         const reverseOrder = this.querySelector('#reverse-order');
         const reverseLabel = this.querySelector('#reverse-label');
         const menuSearch = this.querySelector('#search-for');
+        const menuSelect = this.querySelector('#mobile-selector');
+        // change labels, sizes and positions based on screen size
         reverseLabel.innerText = (clientWidth < 769) ? "Reverse" : "Reverse Order";
-        sortBy.onchange = () => this.sortBy(sortBy.value, reverseOrder.checked);
-        reverseOrder.onclick = () => this.sortBy(sortBy.value, reverseOrder.checked);
         catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + "px";
         var searchDescription = (clientWidth < 769) ? "Search..." : "Search for Simulation...";
         // Makes sure that map events like zooming and panning are disabled from within menu div
-        L.DomEvent.disableScrollPropagation(catalogMenu);
         L.DomEvent.disableClickPropagation(catalogMenu);
         // Closes the menu when the x is clicked
         this.querySelector('#menu-close').onclick = () => catalogMenu.style.display = 'none';
@@ -89,10 +88,9 @@ export class CatalogMenu extends HTMLElement {
         menuSearch.onpointerdown = (e) => e.stopPropagation();
         // Sets up search functionality
         menuSearch.oninput = () => this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value);
-
-        const menuSelect = this.querySelector('#mobile-selector');
+        sortBy.onchange = () => this.sortBy(sortBy.value, reverseOrder.checked);
+        reverseOrder.onclick = () => this.sortBy(sortBy.value, reverseOrder.checked);
         menuSelect.onchange = () => this.selectCategory(menuSelect.value);
-
         this.buildMenu();
     }
 
@@ -104,12 +102,10 @@ export class CatalogMenu extends HTMLElement {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
-        let c = 0;
         // build html for list item for each catalog entry and add it to the proper list depending on its description
         const catalogEntries = await getCatalogEntries();
         for (const [catName, catEntry] of Object.entries(catalogEntries)) {
-            this.addOrder[catEntry.job_id] = c;
-            c += 1;
+            this.addOrder.push(catEntry.job_id);
             let desc = catEntry.description;
             var newLI = new CatalogItem(catEntry, navJobId);
             if(desc.indexOf('GACC') >= 0) {
@@ -143,7 +139,7 @@ export class CatalogMenu extends HTMLElement {
         catalogSearch.value = "";
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
-            if (sortBy == "original-order") result = this.addOrder[listElem1.job_id] > this.addOrder[listElem2.job_id];
+            if (sortBy == "original-order") result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
             if (sortBy == "description") result = listElem1.description > listElem2.description; 
             if (sortBy == "start-date") result = listElem1.from_utc > listElem2.from_utc;
             if (sortBy == "end-date") result = listElem1.to_utc > listElem2.to_utc;

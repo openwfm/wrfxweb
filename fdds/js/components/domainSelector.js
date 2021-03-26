@@ -1,4 +1,4 @@
-import {domainInstance, currentDomain, sorted_timestamps, current_timestamp, rasters} from './Controller.js';
+import {domainInstance, currentDomain, sorted_timestamps, rasters} from './Controller.js';
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
     constructor() {

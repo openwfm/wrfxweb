@@ -17,12 +17,12 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas = null;
         this.clrbarCanvas = null;
         this.clrbarMap = {};
-        this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
         this.markers = [];
     }
 
     connectedCallback() {
         super.connectedCallback();
+        // When both a layer and its colorbar have loaded, update the timeSeries canvases
         syncImageLoad.subscribe(() => {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -32,23 +32,27 @@ export class TimeSeriesController extends LayerController {
         });
     }
 
+    /** When domain is switched, remove all timeSeries markers. */
     domainSwitch() {
         super.domainSwitch();
-        this.markers.map(marker => marker.removeFrom(map));
+        for (var marker of this.markers) marker.removeFrom(map);
         this.markers = [];
     }
 
+    /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
+     * Update the current canvases and markers to point to the new layer and create a callback to 
+     * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
-        const rasterColorbar = document.querySelector('#raster-colorbar');
         var img = layer._image;
+        const rasterColorbar = document.querySelector('#raster-colorbar');
         if ('colorbar' in raster_info) {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
-                e.stopPropagation();
+                e.stopPropagation(); // needed because otherwise immediately closes the popup
                 var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
                 popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
                 this.updateMarker(popUp);
@@ -57,10 +61,12 @@ export class TimeSeriesController extends LayerController {
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.updateCanvases(img, rasterColorbar);
+            this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
         } else img.style.pointerEvents = 'none';
     }
 
+    /** When removing a layer, need to find the most recent colorbar and update the timeSeries canvases
+     * to that layer. */
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -75,13 +81,17 @@ export class TimeSeriesController extends LayerController {
         this.updateCanvases(img, rasterColorbar);
     }
 
+    /** Redraws the clrbarCanvas and imgCanvas used to map values for the timeSeries with 
+     * given img elements. Updates the map of rgb values to colorbar locations. Updates every 
+     * marker to reflec values in the new img and colorbar */
     updateCanvases(layerImg, colorbarImg) {
         this.imgCanvas = this.drawCanvas(layerImg);
         this.clrbarCanvas = this.drawCanvas(colorbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-        this.updateMarkers();
+        for (var marker of this.markers) this.updateMarker(marker);
     }
 
+    /** returns a canvas drawn with given image. */
     drawCanvas(img) {
         var canvas = null;
         if (img != null) {
@@ -93,12 +103,8 @@ export class TimeSeriesController extends LayerController {
         return canvas;
     }
 
-    updateMarkers() {
-        this.markers.map(marker => {
-            this.updateMarker(marker);
-        });
-    }
-
+    /** Maps location of marker to position on colorbar for current layer image and colorbar.
+     * Updates the content of the marker. */
     updateMarker(marker) {
         var popupContent = "No layer bar with colobar to show values of";
         if (this.imgCanvas) {
@@ -110,6 +116,8 @@ export class TimeSeriesController extends LayerController {
         marker.setContent(popupContent);
     }
     
+    /** Iterates over all keys in clrbarMap and finds closest one to given rgb values. Returns relative 
+     * location in clrbarMap. */
     findClosestKey(r, g, b, clrbarMap) {
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
@@ -128,12 +136,18 @@ export class TimeSeriesController extends LayerController {
         return computeLocation(closestKey);
     }
 
+    /** Function called for populating a timeSeries chart. Needs to load image and colorbar pair
+     * for given timestamp of given rasterDomains. Once image loaded, should map given xCoord and yCoord
+     * to an rgb value and find its corresponding place in the colormap. Puts the colorbar location into the 
+     * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
+     * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var img = new Image();
         img.width = layerImg.width;
         img.height = layerImg.height;
         var clrbarImg = new Image();
+        // Returns a promise so that loadImageAndColorbar can be called with await. 
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
@@ -142,7 +156,7 @@ export class TimeSeriesController extends LayerController {
             var syncController = new SyncController(0);
             syncController.subscribe(() => {
                 timeSeriesData[timeStamp] = this.findClosestKey(pixelData[0], pixelData[1], pixelData[2], clrbarMap)
-                resolve('resolved');
+                resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
             img.onload = () => {
                 var imgCanvas = this.drawCanvas(img);
@@ -159,6 +173,9 @@ export class TimeSeriesController extends LayerController {
         });
     }
 
+    /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
+     * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
+     * the corresponding timestamp. */
     async generateTimeSeriesData(xCoord, yCoord, startDate, endDate) {
         var timeSeriesData = {};
         var rasterDomains = rasters.getValue()[currentDomain.getValue()];
@@ -188,6 +205,12 @@ export class TimeSeriesController extends LayerController {
         return timeSeriesMarker;
     }
 
+    /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
+     * end pixels of the colorbar so that relative positions in the colobar can be calculated. Starts from a 
+     * y value half the height of the image and iterates over x until a non black pixel is located. Advances one
+     * more pixel away to avoid distortion and sets this as the xCoordinate band that the colorbard spans. Then
+     * iterates over the height of the colorbar keeping the xCoord constant mapping the value of the rgb value 
+     * to the yCoord. */
     buildColorMap(clrbarCanvas) {
         var clrbarMap = {};
         if (clrbarCanvas) {
