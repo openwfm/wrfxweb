@@ -1,6 +1,5 @@
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
- * then be called whenever the value in the controller is updated.
- */
+ * then be called whenever the value in the controller is updated. */
 export class Controller {
     constructor(value=null) {
         this.listeners = [];
@@ -25,6 +24,8 @@ export class Controller {
     }
 }
 
+/** Class to synchronise a function call at the end of two asynchronous events.
+ * Useful for executing a function after both a layer and its colorbar have loaded. */
 export class SyncController extends Controller {
     increment() {
         if (this.value == 0) this.value = 1;

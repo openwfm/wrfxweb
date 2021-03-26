@@ -17,12 +17,12 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas = null;
         this.clrbarCanvas = null;
         this.clrbarMap = {};
-        this.markerIcon = L.icon({iconUrl: 'icons/square_icon_filled.png', iconSize: [5,5]});
         this.markers = [];
     }
 
     connectedCallback() {
         super.connectedCallback();
+        // When both a layer and its colorbar have loaded, update the timeSeries canvases
         syncImageLoad.subscribe(() => {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -32,23 +32,27 @@ export class TimeSeriesController extends LayerController {
         });
     }
 
+    /** When domain is switched, remove all timeSeries markers. */
     domainSwitch() {
         super.domainSwitch();
-        this.markers.map(marker => marker.removeFrom(map));
+        for (var marker of this.markers) marker.removeFrom(map);
         this.markers = [];
     }
 
+    /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
+     * Update the current canvases and markers to point to the new layer and create a callback to 
+     * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
-        const rasterColorbar = document.querySelector('#raster-colorbar');
         var img = layer._image;
+        const rasterColorbar = document.querySelector('#raster-colorbar');
         if ('colorbar' in raster_info) {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
-                e.stopPropagation();
+                e.stopPropagation(); // needed because otherwise immediately closes the popup
                 var popUp = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
                 popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
                 this.updateMarker(popUp);
@@ -57,10 +61,12 @@ export class TimeSeriesController extends LayerController {
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
-            this.updateCanvases(img, rasterColorbar);
+            this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
         } else img.style.pointerEvents = 'none';
     }
 
+    /** When removing a layer, need to find the most recent colorbar and update the timeSeries canvases
+     * to that layer. */
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -79,7 +85,7 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas = this.drawCanvas(layerImg);
         this.clrbarCanvas = this.drawCanvas(colorbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-        this.updateMarkers();
+        for (var marker of this.markers) this.updateMarker(marker);
     }
 
     drawCanvas(img) {
@@ -91,12 +97,6 @@ export class TimeSeriesController extends LayerController {
             canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
         }
         return canvas;
-    }
-
-    updateMarkers() {
-        this.markers.map(marker => {
-            this.updateMarker(marker);
-        });
     }
 
     updateMarker(marker) {
