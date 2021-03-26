@@ -5,7 +5,11 @@ import {TimeSeriesMarker} from './timeSeriesMarker.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
- * range in the simulation. Uses the layer that is on top. 
+ * range in the simulation. Uses the layer that is on top. To use, double click on image to bring up
+ * a popup showing the value of the pixel at that particular time stamp as well as a button to 
+ * generate a timeseries of the pixel over a specified range. The first time a timeseries is generated,
+ * since it will need to fetch every single image in the specified range it will take longer to load. 
+ * Every subsequent timeseries generated for a layer will be significantly sped up.
  */
 export class TimeSeriesController extends LayerController {
     constructor() {

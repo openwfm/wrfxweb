@@ -35,7 +35,8 @@ export class LayerController extends HTMLElement {
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
-     * and panning. */
+     * and panning. Set up callbacks to trigger when currentdomain updates and current_timestamp
+     * updates. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
         dragElement(layerController, '');
@@ -47,6 +48,10 @@ export class LayerController extends HTMLElement {
         this.buildMapBase();
     }
 
+    /** Triggered whenever current_timestamp is changed. For every layer currently selected 
+     * need to set its image url to the point to the image associated with the current time.
+     * Need to update the colorbar on top to the current time as well.
+     */
     updateTime() {
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         for (var layer_name of overlayOrder) {
@@ -65,26 +70,26 @@ export class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
+        // remove all layers of previous domain and reset the colorbar
         for (var layerName of overlayOrder) this.getLayer(layerName).remove(map);
         displayedColorbar.setValue(null);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         rasterColorbar.src = "";
         rasterColorbar.style.display = "none";
+        // if on a new simulation entirely, reset selected layers
         if (this.currentSimulation != currentSimulation.getValue()) {
             overlayOrder.length = 0;
             this.currentSimulation = currentSimulation.getValue();
             this.querySelector('#layer-controller-container').style.display = 'block';
         }
+        // build the layer groups of the current domain
         var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
- 
-        // build the layer groups
         this.rasterDict = {};
         this.overlayDict = {};    
-        Object.entries(first_rasters).map(entry => {
-            var r = entry[0];
+        for (var r in first_rasters) {
             var raster_info = first_rasters[r];
             var cs = raster_info.coords;
             var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
@@ -96,7 +101,7 @@ export class LayerController extends HTMLElement {
                                         });
             if(overlay_list.indexOf(r) >= 0) this.overlayDict[r] = layer;
             else this.rasterDict[r] = layer;
-        });
+        };
         this.buildLayerBoxes();
     }
 
@@ -177,9 +182,9 @@ export class LayerController extends HTMLElement {
         const overlayDiv = this.querySelector('#overlay-checkboxes');
         overlayDiv.innerHTML = '';
 
-        [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]].map(([layerDiv, layerDict]) => {
+        for (const [layerDiv, layerDict] of [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]]) {
             for (var layerName in layerDict) layerDiv.appendChild(this.buildLayerBox(layerName));
-        });
+        }
         for (var layerName of overlayOrder) this.handleOverlayadd(layerName)
     }
 
