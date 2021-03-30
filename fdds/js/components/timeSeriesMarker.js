@@ -10,11 +10,16 @@ export class TimeSeriesMarker extends TimeSeriesButton {
                 <p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>
                 <p style="margin: 0">colorbar location: ${clrbarLocation}</p>
         `;
+        this.rgb = [r, g, b];
     }
 
     connectedCallback() {
         super.connectedCallback;
         this.updateTimestamps();
+    }
+
+    getRGB() {
+        return this.rgb;
     }
 }
 

@@ -25,7 +25,6 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        startDate.onclick = () => console.log('clicked');
         startDate.onchange = () => {
             var selectedDate = startDate.value;
             endDate.childNodes.forEach(endOption => {
