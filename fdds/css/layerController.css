@@ -16,19 +16,6 @@
     overflow-y: auto;
 }
 
-.timeSeriesButton {
-    border-radius: .2rem;
-    padding: 5px;
-    background: #d6d6d6;
-    text-align: center;
-    color: #6a6a6a;
-    font-weight: bold;
-}
-
-.timeSeriesButton:hover {
-    cursor: pointer;
-    background: #e5e5e5;
-}
 
 .layer-group {
     display: block;

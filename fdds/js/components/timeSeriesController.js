@@ -2,6 +2,7 @@ import { LayerController } from './layerController.js';
 import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, rasters, raster_base, sorted_timestamps} from './Controller.js';
 import {map} from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
+import { TimeSeriesButton } from './timeSeriesButton.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
@@ -14,6 +15,17 @@ import {TimeSeriesMarker} from './timeSeriesMarker.js';
 export class TimeSeriesController extends LayerController {
     constructor() {
         super();
+        this.timeSeriesButton = new TimeSeriesButton();
+        this.timeSeriesButton.getButton().disabled = true;
+        const container = this.querySelector('#layer-controller-container');
+        const timeSeriesDiv = document.createElement('div');
+        timeSeriesDiv.className = 'layer-group';
+        timeSeriesDiv.id = 'timeseries-layer-group';
+        const span = document.createElement('span');
+        span.innerText = "Timeseries over all Markers";
+        timeSeriesDiv.appendChild(span);
+        timeSeriesDiv.appendChild(this.timeSeriesButton);
+        container.appendChild(timeSeriesDiv);
         this.imgCanvas = null;
         this.clrbarCanvas = null;
         this.clrbarMap = {};
@@ -30,13 +42,28 @@ export class TimeSeriesController extends LayerController {
                 this.updateCanvases(layerImage, rasterColorbar);
             }
         });
+        this.timeSeriesButton.getButton().onclick = async () => {
+            var timeSeriesData = [];
+            for (var marker of this.markers) {
+                var imageCoords = marker.imageCoords;
+                var rgb = marker.getContent().getRGB();
+                var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
+                var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
+                var startDate = this.timeSeriesButton.getStartDate();
+                var endDate = this.timeSeriesButton.getEndDate();
+                var markerData = await this.generateTimeSeriesData(xCoord, yCoord, startDate, endDate, marker._latlng, displayedColorbar.getValue(), rgb);
+                timeSeriesData.push(markerData);
+            }
+            const timeSeriesChart = document.querySelector('timeseries-chart');
+            timeSeriesChart.populateChart(timeSeriesData);
+        }
     }
 
     /** When domain is switched, remove all timeSeries markers. */
     domainSwitch() {
+        this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
-        for (var marker of this.markers) marker.removeFrom(map);
-        this.markers = [];
+        while (this.markers.length > 0) this.markers[0].removeFrom(map);
     }
 
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
@@ -57,11 +84,17 @@ export class TimeSeriesController extends LayerController {
                 popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
                 this.updateMarker(popUp);
                 this.markers.push(popUp);
+                this.timeSeriesButton.getButton().disabled = false;
+                popUp.on('remove', () => {
+                    this.markers.splice(this.markers.indexOf(popUp), 1);
+                    if (this.markers.length == 0) this.timeSeriesButton.getButton().disabled = true;
+                });
             }
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
+            if (this.markers.length > 0) this.timeSeriesButton.getButton().disabled = false;
         } else img.style.pointerEvents = 'none';
     }
 
@@ -78,6 +111,7 @@ export class TimeSeriesController extends LayerController {
                 break;
             }
         }
+        if (!displayedColorbar.getValue()) this.timeSeriesButton.getButton().disabled = true;
         this.updateCanvases(img, rasterColorbar);
     }
 
@@ -176,14 +210,16 @@ export class TimeSeriesController extends LayerController {
     /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
      * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
      * the corresponding timestamp. */
-    async generateTimeSeriesData(xCoord, yCoord, startDate, endDate) {
-        var timeSeriesData = {};
+    async generateTimeSeriesData(xCoord, yCoord, startDate, endDate, latLon, label, rgb) {
+        var timeSeriesData = {label: label, latLon: latLon, rgb: rgb};
+        var dataset = {};
         var rasterDomains = rasters.getValue()[currentDomain.getValue()];
         for (var timeStamp of sorted_timestamps.getValue()) {
             if (timeStamp >= startDate && timeStamp <= endDate) {
-                await this.loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord);
+                await this.loadImageAndColorbar(dataset, timeStamp, rasterDomains, xCoord, yCoord);
             }
         }
+        timeSeriesData.dataset = dataset;
         return timeSeriesData;
     }
 
@@ -198,9 +234,11 @@ export class TimeSeriesController extends LayerController {
         const timeSeriesButton = timeSeriesMarker.getButton();
         timeSeriesButton.onclick = async () => {
             document.body.classList.add("waiting");
-            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate.value, endDate.value);
+            var startDate = timeSeriesMarker.getStartDate();
+            var endDate = timeSeriesMarker.getEndDate();
+            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate, endDate, latLon, displayedColorbar.getValue(), [r, g, b]);
             document.body.classList.remove("waiting");
-            timeSeriesChart.populateChart(timeSeriesData, displayedColorbar.getValue(), latLon);
+            timeSeriesChart.populateChart([timeSeriesData]);
         }
         return timeSeriesMarker;
     }
