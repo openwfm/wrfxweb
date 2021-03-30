@@ -4,14 +4,15 @@ export class TimeSeriesButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
+            <link rel="stylesheet" href="css/timeSeriesButton.css"/>
             <div id='timeseries-button'>
                 <div>
-                    <span>select start time</span>
-                    <select id="startDate"></select>
+                    <label class="timeseries-select-label" for="startDate">select start time:</label>
+                    <select class="timeseries-select" id="startDate"></select>
                 </div>
                 <div>
-                    <span>select end time</span>
-                    <select id="endDate"></select>
+                    <label class="timeseries-select-label" for="endDate">select end time: </label>
+                    <select class="timeseries-select" id="endDate"></select>
                 </div>
                 <div class="timeSeriesButton" id="timeSeriesButton">
                     <span>generate timeseries</span>

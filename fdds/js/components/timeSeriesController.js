@@ -69,6 +69,7 @@ export class TimeSeriesController extends LayerController {
                 popUp.imageCoords = {layerX: e.layerX /img.width, layerY: e.layerY / img.height};
                 this.updateMarker(popUp);
                 this.markers.push(popUp);
+                popUp.on('remove', () => this.markers.splice(this.markers.indexOf(popUp), 1));
             }
             img.onload = () => syncImageLoad.increment();
             rasterColorbar.onload = () => syncImageLoad.increment();
