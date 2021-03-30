@@ -236,8 +236,6 @@ export class TimeSeriesController extends LayerController {
             document.body.classList.add("waiting");
             var startDate = timeSeriesMarker.getStartDate();
             var endDate = timeSeriesMarker.getEndDate();
-            console.log(startDate);
-            console.log(endDate);
             var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate, endDate, latLon, displayedColorbar.getValue(), [r, g, b]);
             document.body.classList.remove("waiting");
             timeSeriesChart.populateChart([timeSeriesData]);
