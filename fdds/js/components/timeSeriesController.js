@@ -42,6 +42,17 @@ export class TimeSeriesController extends LayerController {
                 this.updateCanvases(layerImage, rasterColorbar);
             }
         });
+        this.timeSeriesButton.getButton().onclick = () => {
+            timeSeriesData = [];
+            for (var marker of this.markers) {
+                var imageCoords = marker.imageCoords;
+                var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
+                var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
+                timeSeriesData.push(this.generateTimeSeriesData(xCoord, yCoord, this.timeSeriesButton.getStartDate(), this.timeSeriesButton.getEndDate()));
+            }
+            const timeSeriesChart = document.querySelector('timeseries-chart');
+            console.log(timeSeriesData);
+        }
     }
 
     /** When domain is switched, remove all timeSeries markers. */
