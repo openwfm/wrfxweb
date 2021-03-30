@@ -2,6 +2,7 @@ import { LayerController } from './layerController.js';
 import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, rasters, raster_base, sorted_timestamps} from './Controller.js';
 import {map} from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
+import { TimeSeriesButton } from './timeSeriesButton.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
@@ -14,6 +15,16 @@ import {TimeSeriesMarker} from './timeSeriesMarker.js';
 export class TimeSeriesController extends LayerController {
     constructor() {
         super();
+        this.timeSeriesButton = new TimeSeriesButton();
+        const container = this.querySelector('#layer-controller-container');
+        const timeSeriesDiv = document.createElement('div');
+        timeSeriesDiv.className = 'layer-group';
+        timeSeriesDiv.id = 'timeseries-layer-group';
+        const span = document.createElement('span');
+        span.innerText = "Timeseries";
+        timeSeriesDiv.appendChild(span);
+        timeSeriesDiv.appendChild(this.timeSeriesButton);
+        container.appendChild(timeSeriesDiv);
         this.imgCanvas = null;
         this.clrbarCanvas = null;
         this.clrbarMap = {};
@@ -34,6 +45,7 @@ export class TimeSeriesController extends LayerController {
 
     /** When domain is switched, remove all timeSeries markers. */
     domainSwitch() {
+        this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
         for (var marker of this.markers) marker.removeFrom(map);
         this.markers = [];
