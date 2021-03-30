@@ -71,7 +71,7 @@ export class TimeSeriesController extends LayerController {
                 this.markers.push(popUp);
                 this.timeSeriesButton.getButton().disabled = false;
                 popUp.on('remove', () => {
-                    this.markers.splice(this.markers.indexOf(popUp), 1)
+                    this.markers.splice(this.markers.indexOf(popUp), 1);
                     if (this.markers.length == 0) this.timeSeriesButton.getButton().disabled = true;
                 });
             }
@@ -79,6 +79,7 @@ export class TimeSeriesController extends LayerController {
             rasterColorbar.onload = () => syncImageLoad.increment();
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
+            if (this.markers.length > 0) this.timeSeriesButton.getButton().disabled = false;
         } else img.style.pointerEvents = 'none';
     }
 
@@ -95,6 +96,7 @@ export class TimeSeriesController extends LayerController {
                 break;
             }
         }
+        if (!displayedColorbar.getValue()) this.timeSeriesButton.getButton().disabled = true;
         this.updateCanvases(img, rasterColorbar);
     }
 
