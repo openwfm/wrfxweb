@@ -14,9 +14,9 @@ export class TimeSeriesButton extends HTMLElement {
                     <label class="timeseries-select-label" for="endDate">select end time: </label>
                     <select class="timeseries-select" id="endDate"></select>
                 </div>
-                <div class="timeSeriesButton" id="timeSeriesButton">
+                <button class="timeSeriesButton" id="timeSeriesButton">
                     <span>generate timeseries</span>
-                </div>
+                </button>
             </div>
         `;
     }

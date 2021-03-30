@@ -6,9 +6,11 @@
     text-align: center;
     color: #6a6a6a;
     font-weight: bold;
+    width: 100%;
+    border: none;
 }
 
-.timeSeriesButton:hover {
+.timeSeriesButton:hover:not([disabled]) {
     cursor: pointer;
     background: #e5e5e5;
 }
