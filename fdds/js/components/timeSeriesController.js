@@ -43,7 +43,7 @@ export class TimeSeriesController extends LayerController {
             }
         });
         this.timeSeriesButton.getButton().onclick = () => {
-            timeSeriesData = [];
+            var timeSeriesData = [];
             for (var marker of this.markers) {
                 var imageCoords = marker.imageCoords;
                 var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
