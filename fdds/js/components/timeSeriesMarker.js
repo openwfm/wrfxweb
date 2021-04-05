@@ -1,16 +1,16 @@
 import {TimeSeriesButton} from './timeSeriesButton.js';
 
 export class TimeSeriesMarker extends TimeSeriesButton {
-    constructor(r, g, b, latLon, clrbarLocation) {
+    constructor(rgb, latLon, clrbarLocation) {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
         const timeSeriesButton = this.querySelector('#timeseries-button');
         timeSeriesButton.innerHTML += `
-                <p style="color: rgb(${r}, ${g}, ${b}); margin:0">R:${r} G:${g} B:${b}</p>
+                <p style="color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); margin:0">R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</p>
                 <p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>
                 <p style="margin: 0">colorbar location: ${clrbarLocation}</p>
         `;
-        this.rgb = [r, g, b];
+        this.rgb = rgb;
     }
 
     connectedCallback() {

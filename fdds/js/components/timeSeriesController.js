@@ -142,19 +142,34 @@ export class TimeSeriesController extends LayerController {
     /** Maps location of marker to position on colorbar for current layer image and colorbar.
      * Updates the content of the marker. */
     updateMarker(marker) {
-        var popupContent = "No layer bar with colobar to show values of";
+        var timeSeriesMarker = "No layer bar with colobar to show values of";
         if (this.imgCanvas) {
             var imageCoords = marker.imageCoords;
+            var latLon = marker._latlng;
             var xCoord = Math.floor(imageCoords.layerX * this.imgCanvas.width);
             var yCoord = Math.floor(imageCoords.layerY * this.imgCanvas.height);
-            popupContent = this.matchToColorBar(xCoord, yCoord, marker._latlng);
+            var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
+            const timeSeriesChart = document.querySelector('timeseries-chart');
+            var rgb = [pixelData[0], pixelData[1], pixelData[2]];
+            var clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
+            timeSeriesMarker = new TimeSeriesMarker(rgb, latLon, clrbarLocation);
+            const timeSeriesButton = timeSeriesMarker.getButton();
+            timeSeriesButton.onclick = async () => {
+                document.body.classList.add("waiting");
+                var startDate = timeSeriesMarker.getStartDate();
+                var endDate = timeSeriesMarker.getEndDate();
+                var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate, endDate, latLon, displayedColorbar.getValue(), rgb);
+                document.body.classList.remove("waiting");
+                timeSeriesChart.populateChart([timeSeriesData]);
+            }
         }
-        marker.setContent(popupContent);
+        marker.setContent(timeSeriesMarker);
     }
     
     /** Iterates over all keys in clrbarMap and finds closest one to given rgb values. Returns relative 
      * location in clrbarMap. */
-    findClosestKey(r, g, b, clrbarMap) {
+    findClosestKey(rgb, clrbarMap) {
+        var [r, g, b] = rgb;
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
         const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
@@ -191,7 +206,7 @@ export class TimeSeriesController extends LayerController {
             var pixelData = null;
             var syncController = new SyncController(0);
             syncController.subscribe(() => {
-                timeSeriesData[timeStamp] = this.findClosestKey(pixelData[0], pixelData[1], pixelData[2], clrbarMap)
+                timeSeriesData[timeStamp] = this.findClosestKey([pixelData[0], pixelData[1], pixelData[2]], clrbarMap)
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
             img.onload = () => {
@@ -223,26 +238,6 @@ export class TimeSeriesController extends LayerController {
         }
         timeSeriesData.dataset = dataset;
         return timeSeriesData;
-    }
-
-    matchToColorBar(xCoord, yCoord, latLon) {
-        var pixelData = this.imgCanvas.getContext('2d').getImageData(xCoord, yCoord, 1, 1).data;
-        const timeSeriesChart = document.querySelector('timeseries-chart');
-        var r = pixelData[0];
-        var g = pixelData[1];
-        var b = pixelData[2];
-        var clrbarLocation = this.findClosestKey(r, g, b, this.clrbarMap);
-        var timeSeriesMarker = new TimeSeriesMarker(r, g,  b, latLon, clrbarLocation);
-        const timeSeriesButton = timeSeriesMarker.getButton();
-        timeSeriesButton.onclick = async () => {
-            document.body.classList.add("waiting");
-            var startDate = timeSeriesMarker.getStartDate();
-            var endDate = timeSeriesMarker.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(xCoord, yCoord, startDate, endDate, latLon, displayedColorbar.getValue(), [r, g, b]);
-            document.body.classList.remove("waiting");
-            timeSeriesChart.populateChart([timeSeriesData]);
-        }
-        return timeSeriesMarker;
     }
 
     /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
