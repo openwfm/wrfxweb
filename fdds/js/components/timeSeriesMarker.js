@@ -1,16 +1,17 @@
 import {TimeSeriesButton} from './timeSeriesButton.js';
 
 export class TimeSeriesMarker extends TimeSeriesButton {
-    constructor(rgb, latLon, clrbarLocation) {
+    constructor(latLon) {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
         const timeSeriesButton = this.querySelector('#timeseries-button');
         timeSeriesButton.innerHTML += `
-                <p style="color: rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}); margin:0">R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</p>
+                <p id="rgb-value" style="margin:0">No layer with colorbar to show values</p>
                 <p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>
-                <p style="margin: 0">colorbar location: ${clrbarLocation}</p>
+                <p id="colorbar-location" style="margin: 0"></p>
         `;
-        this.rgb = rgb;
+        this.rgb = null;
+        this.clrbarLocation = null;
     }
 
     connectedCallback() {
@@ -20,6 +21,25 @@ export class TimeSeriesMarker extends TimeSeriesButton {
 
     getRGB() {
         return this.rgb;
+    }
+
+    setRGBValues(rgb, clrbarLocation) {
+        this.rgb = rgb;
+        this.clrbarLocation = clrbarLocation;
+        const clrbarP = this.querySelector('#colorbar-location');
+        const rgbP = this.querySelector('#rgb-value');
+        const button = this.getButton();
+        clrbarP.style.display = "none";
+        rgbP.innerHTML = "No layer with colorbar to show values of";
+        rgbP.style.color = "black";
+        button.disabled = true;
+        if (clrbarLocation) {
+            clrbarP.style.display = "block";
+            clrbarP.innerHTML = "colorbar location: " + clrbarLocation;
+            rgbP.style.color = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+            rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
+            button.disabled = false;
+        }
     }
 }
 
