@@ -56,7 +56,8 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(startOption);
             endDate.appendChild(endOption);
         }
-        endDate.value = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        // endDate.value = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        if (sorted_timestamps.getValue().length > 1) endDate.value = sorted_timestamps.getValue()[1];
     }
 
     getButton() {
