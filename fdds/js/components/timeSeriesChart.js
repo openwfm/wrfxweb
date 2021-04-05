@@ -44,15 +44,6 @@ export class TimeSeriesChart extends HTMLElement {
             data: {
                 labels: labels,
                 datasets: dataset
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                },
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
