@@ -176,6 +176,7 @@ export class TimeSeriesController extends LayerController {
      * location in clrbarMap. */
     findClosestKey(rgb, clrbarMap) {
         var [r, g, b] = rgb;
+        if (r + g + b == 0) return 0;
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
         const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
