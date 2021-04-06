@@ -5,11 +5,12 @@ export class TimeSeriesMarker extends TimeSeriesButton {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
         const timeSeriesButton = this.querySelector('#timeseries-button');
-        timeSeriesButton.innerHTML += `
+        var labelDetails = `
                 <p id="rgb-value" style="margin:0">No layer with colorbar to show values</p>
                 <p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>
                 <p id="colorbar-location" style="margin: 0"></p>
-        `;
+        `; 
+        timeSeriesButton.innerHTML = labelDetails + timeSeriesButton.innerHTML;
         this.rgb = null;
         this.clrbarLocation = null;
     }

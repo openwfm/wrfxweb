@@ -261,7 +261,7 @@ export class TimeSeriesController extends LayerController {
             var y = Math.round(clrbarCanvas.height / 2);
             for (var x = clrbarCanvas.width - 1; x > 0; x--) {
                 var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                if (colorbarData[0] != 0 || colorbarData[1] != 0 || colorbarData[2] != 0) {
+                if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) {
                     x = x - 5;
                     break;
                 }
