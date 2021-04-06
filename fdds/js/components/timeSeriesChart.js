@@ -1,3 +1,5 @@
+import {displayedColorbar} from './Controller.js';
+
 export class TimeSeriesChart extends HTMLElement {
     constructor() {
         super();
@@ -45,6 +47,23 @@ export class TimeSeriesChart extends HTMLElement {
             data: {
                 labels: labels,
                 datasets: dataset
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: displayedColorbar.getValue() 
+                        }
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Timestamp"
+                        }
+
+                    }]
+                }
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
