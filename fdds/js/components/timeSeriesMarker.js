@@ -6,8 +6,14 @@ export class TimeSeriesMarker extends TimeSeriesButton {
         const roundLatLon = (num) => Math.round(num*100)/100; 
         const timeSeriesButton = this.querySelector('#timeseries-button');
         var labelDetails = `
-                <p id="rgb-value" style="margin:0">No layer with colorbar to show values</p>
-                <p style="margin: 1px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</p>
+                <div>
+                    <label style="display: inline-block; width: 100px" for="timeseries-custom-name">Add name: </label>
+                    <input id="timeseries-custom-name"></input>
+                </div>
+                <div>
+                    <span style="margin: 1px; margin-right: 10px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
+                    <span id="rgb-value" style="margin:0">No layer with colorbar to show values</span>
+                </div>
                 <p id="colorbar-location" style="margin: 0"></p>
         `; 
         timeSeriesButton.innerHTML = labelDetails + timeSeriesButton.innerHTML;
@@ -22,6 +28,10 @@ export class TimeSeriesMarker extends TimeSeriesButton {
 
     getRGB() {
         return this.rgb;
+    }
+
+    getName() {
+        return this.querySelector('#timeseries-custom-name').value;
     }
 
     setRGBValues(rgb, clrbarLocation) {
