@@ -35,7 +35,7 @@ export class TimeSeriesMarker extends TimeSeriesButton {
     }
 
     setRGBValues(rgb, clrbarLocation) {
-        this.rgb = rgb;
+        this.rgb = rgb[0] + rgb[1] + rgb[2] > 745? [0, 0, 0]: rgb;
         this.clrbarLocation = clrbarLocation;
         const clrbarP = this.querySelector('#colorbar-location');
         const rgbP = this.querySelector('#rgb-value');
