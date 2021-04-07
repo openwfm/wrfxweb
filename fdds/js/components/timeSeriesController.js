@@ -156,7 +156,7 @@ export class TimeSeriesController extends LayerController {
     /** Maps location of marker to position on colorbar for current layer image and colorbar.
      * Updates the content of the marker. */
     updateMarker(marker) {
-        var rgb = null;
+        var rgb = [0, 0, 0];
         var clrbarLocation = null;
         if (this.imgCanvas) {
             var [xCoord, yCoord] = marker.imageCoords;
