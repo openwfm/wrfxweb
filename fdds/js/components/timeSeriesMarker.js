@@ -47,7 +47,7 @@ export class TimeSeriesMarker extends TimeSeriesButton {
         if (clrbarLocation != null) {
             clrbarP.style.display = "block";
             clrbarP.innerHTML = "colorbar location: " + clrbarLocation;
-            rgbP.style.color = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+            rgbP.style.color = `rgb(${this.rgb[0]},${this.rgb[1]},${this.rgb[2]})`;
             rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
             button.disabled = false;
         }
