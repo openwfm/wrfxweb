@@ -27,9 +27,13 @@ export class Controller {
 /** Class to synchronise a function call at the end of two asynchronous events.
  * Useful for executing a function after both a layer and its colorbar have loaded. */
 export class SyncController extends Controller {
-    increment() {
-        if (this.value == 0) this.value = 1;
-        else this.setValue(0);
+    constructor() {
+        super([false, false]);
+    }
+
+    increment(i) {
+        this.value[i] = true;
+        if (this.value[0] && this.value[1]) this.setValue([false, false]);
     }
 }
 
@@ -48,4 +52,4 @@ export const domainInstance = new Controller();
 export const currentDomain = new Controller();
 export const organization = new Controller();
 
-export const syncImageLoad = new SyncController(0);
+export const syncImageLoad = new SyncController();

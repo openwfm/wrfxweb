@@ -83,8 +83,8 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
-            img.onload = () => syncImageLoad.increment();
-            rasterColorbar.onload = () => syncImageLoad.increment();
+            img.onload = () => syncImageLoad.increment(0);
+            rasterColorbar.onload = () => syncImageLoad.increment(1);
             map.on('zoomend', () => this.imgCanvas = this.drawCanvas(img));
             this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
             if (this.markers.length > 0) this.timeSeriesButton.getButton().disabled = false;
@@ -210,7 +210,7 @@ export class TimeSeriesController extends LayerController {
             var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
             var clrbarMap = {};
             var pixelData = null;
-            var syncController = new SyncController(0);
+            var syncController = new SyncController();
             syncController.subscribe(() => {
                 timeSeriesData[timeStamp] = this.findClosestKey([pixelData[0], pixelData[1], pixelData[2]], clrbarMap)
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
@@ -218,12 +218,12 @@ export class TimeSeriesController extends LayerController {
             img.onload = () => {
                 var imgCanvas = this.drawCanvas(img);
                 pixelData = imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data; 
-                syncController.increment();
+                syncController.increment(0);
             }
             clrbarImg.onload = () => {
                 var clrbarCanvas = this.drawCanvas(clrbarImg);
                 clrbarMap = this.buildColorMap(clrbarCanvas);
-                syncController.increment();
+                syncController.increment(1);
             }
             img.src = raster_base.getValue() + rasterInfo.raster;
             clrbarImg.src = raster_base.getValue() + rasterInfo.colorbar;
