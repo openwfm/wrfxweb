@@ -53,6 +53,7 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
+        if (this.currentSimulation != currentSimulation.getValue()) return;
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         for (var layer_name of overlayOrder) {
             var layer = this.getLayer(layer_name);
