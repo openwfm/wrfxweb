@@ -248,6 +248,14 @@ export class TimeSeriesController extends LayerController {
         return timeSeriesData;
     }
 
+    mapLevels(clrbarCanvas) {
+        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var raster_info = rasters_now[displayedColorbar.getValue()];
+        var levels = raster_info.levels;
+        console.log(levels);
+
+    }
+
     /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
      * end pixels of the colorbar so that relative positions in the colobar can be calculated. Starts from a 
      * y value half the height of the image and iterates over x until a non black pixel is located. Advances one
@@ -257,13 +265,21 @@ export class TimeSeriesController extends LayerController {
     buildColorMap(clrbarCanvas) {
         var clrbarMap = {};
         if (clrbarCanvas) {
+            var right = 0;
+            var left = 0;
             var y = Math.round(clrbarCanvas.height / 2);
             for (var x = clrbarCanvas.width - 1; x > 0; x--) {
                 var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) {
-                    x = x - 5;
-                    break;
+                if (!borderColor) {
+                    if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) right = x;
+                } else {
+                    if (colorbarData[0] + colorbarData[1] + colorbarData[2] == 0) {
+                        left = x;
+                        x = Math.floor((right + left)/2);
+                        break;
+                    }
                 }
+                
             }
             var start = 0;
             var end = 0;
@@ -284,6 +300,8 @@ export class TimeSeriesController extends LayerController {
             }
             clrbarMap.start = start;
             clrbarMap.end = end;
+            clrbarMap.right = right;
+            clrbarMap.left = left;
         }
         return clrbarMap;
     }
