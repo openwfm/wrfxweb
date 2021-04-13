@@ -78,8 +78,8 @@ export class TimeSeriesController extends LayerController {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
-                var xCoord = e.layerX / img.width;
-                var yCoord = e.layerY / img.height;
+                var xCoord = e.offsetX / img.width;
+                var yCoord = e.offsetY / img.height;
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
