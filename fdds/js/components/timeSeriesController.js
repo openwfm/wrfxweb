@@ -176,9 +176,7 @@ export class TimeSeriesController extends LayerController {
         if (r + g + b == 0) return 0;
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
-        // const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         var closestKey = createKey(r, g, b);
-        // if (closestKey in clrbarMap) return computeLocation(closestKey); 
         if (closestKey in clrbarMap) return clrbarMap[closestKey]; 
         var minDiff = 255*3 + 1;
         for (var key in clrbarMap) {
@@ -251,6 +249,8 @@ export class TimeSeriesController extends LayerController {
     }
 
     mapLevels(clrbarCanvas, clrbarMap) {
+        var levelMap = {};
+        if (displayedColorbar.getValue() == null) return;
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[displayedColorbar.getValue()];
         var levels = raster_info.levels;
@@ -259,7 +259,6 @@ export class TimeSeriesController extends LayerController {
         var stratified = false;
         if (Object.keys(clrbarMap).length - 10 < levels.length) stratified = true;
         var levelIndex = levels.length - 1;
-        var levelMap = {};
         if (stratified) levelMap[0] = 0;
         var coord1 = [];
         var coord2 = [];
@@ -281,7 +280,7 @@ export class TimeSeriesController extends LayerController {
             if (!stratified) return slope*(location - coord1[0]) + coord1[1];
             // find closest key in levelMap
             var closestKey = location;
-            var minDistance = location;
+            var minDistance = 1;
             for (var key in levelMap) {
                 var distance = Math.abs(key - location);
                 if (distance < minDistance) {
@@ -292,7 +291,6 @@ export class TimeSeriesController extends LayerController {
             return levelMap[closestKey];
         }
         for (var color in clrbarMap) clrbarMap[color] = interpolate(clrbarMap[color]);
-        // return levelMap;
     }
 
     /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
