@@ -50,19 +50,18 @@ export class TimeSeriesChart extends HTMLElement {
             },
             options: {
                 scales: {
-                    yAxes: [{
-                        scaleLabel: {
+                    yAxes: {
+                        title: {
                             display: true,
-                            labelString: displayedColorbar.getValue() 
+                            text: displayedColorbar.getValue()
                         }
-                    }],
-                    xAxes: [{
-                        scaleLabel: {
+                    },
+                    xAxes: {
+                        title: {
                             display: true,
-                            labelString: "Timestamp"
+                            text: "Timestamp"
                         }
-
-                    }]
+                    }
                 }
             }
         });
