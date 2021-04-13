@@ -176,9 +176,10 @@ export class TimeSeriesController extends LayerController {
         if (r + g + b == 0) return 0;
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
-        const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
+        // const computeLocation = (key) => 1 - (clrbarMap[key] - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         var closestKey = createKey(r, g, b);
-        if (closestKey in clrbarMap) return computeLocation(closestKey); 
+        // if (closestKey in clrbarMap) return computeLocation(closestKey); 
+        if (closestKey in clrbarMap) return clrbarMap[closestKey]; 
         var minDiff = 255*3 + 1;
         for (var key in clrbarMap) {
             var [rk, gk, bk] = mapKey(key);
@@ -188,7 +189,8 @@ export class TimeSeriesController extends LayerController {
                 closestKey = createKey(rk, gk, bk);
             }
         };
-        return computeLocation(closestKey);
+        return clrbarMap[closestKey];
+        // return computeLocation(closestKey);
     }
 
     /** Function called for populating a timeSeries chart. Needs to load image and colorbar pair
@@ -248,12 +250,49 @@ export class TimeSeriesController extends LayerController {
         return timeSeriesData;
     }
 
-    mapLevels(clrbarCanvas) {
+    mapLevels(clrbarCanvas, clrbarMap) {
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[displayedColorbar.getValue()];
         var levels = raster_info.levels;
-        console.log(levels);
-
+        var x = clrbarMap.left - 5;
+        if (!levels) return;
+        var stratified = false;
+        if (Object.keys(clrbarMap).length - 10 < levels.length) stratified = true;
+        var levelIndex = levels.length - 1;
+        var levelMap = {};
+        if (stratified) levelMap[0] = 0;
+        var coord1 = [];
+        var coord2 = [];
+        const computeLocation = (y) => 1 - (y - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
+        for (var y = 0; y < clrbarCanvas.height; y++) {
+            if (levelIndex < 0) break;
+            var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+            if (colorbarData[3] != 0) {
+                var location = computeLocation(y);
+                levelMap[location] = levels[levelIndex];
+                if (coord2.length == 0) coord2 = [location, levels[levelIndex]];
+                else coord1 = [location, levels[levelIndex]];
+                levelIndex = levelIndex - 1;
+                y += 5;
+            }
+        }
+        var slope = (coord2[1] - coord1[1]) / (coord2[0] - coord1[0]);
+        const interpolate = (location) => {
+            if (!stratified) return slope*(location - coord1[0]) + coord1[1];
+            // find closest key in levelMap
+            var closestKey = location;
+            var minDistance = location;
+            for (var key in levelMap) {
+                var distance = Math.abs(key - location);
+                if (distance < minDistance) {
+                    closestKey = key;
+                    minDistance = distance;
+                }
+            }
+            return levelMap[closestKey];
+        }
+        for (var color in clrbarMap) clrbarMap[color] = interpolate(clrbarMap[color]);
+        // return levelMap;
     }
 
     /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
@@ -264,45 +303,46 @@ export class TimeSeriesController extends LayerController {
      * to the yCoord. */
     buildColorMap(clrbarCanvas) {
         var clrbarMap = {};
-        if (clrbarCanvas) {
-            var right = 0;
-            var left = 0;
-            var y = Math.round(clrbarCanvas.height / 2);
-            for (var x = clrbarCanvas.width - 1; x > 0; x--) {
-                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
-                if (!borderColor) {
-                    if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) right = x;
-                } else {
-                    if (colorbarData[0] + colorbarData[1] + colorbarData[2] == 0) {
-                        left = x;
-                        x = Math.floor((right + left)/2);
-                        break;
-                    }
+        if (!clrbarCanvas) return clrbarMap;
+        var right = 0;
+        var left = 0;
+        var y = Math.round(clrbarCanvas.height / 2);
+        for (var x = clrbarCanvas.width - 1; x > 0; x--) {
+            var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+            if (right == 0) {
+                if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) right = x;
+            } else {
+                if (colorbarData[0] + colorbarData[1] + colorbarData[2] == 0) {
+                    left = x;
+                    x = Math.floor((right + left)/2);
+                    break;
                 }
-                
             }
-            var start = 0;
-            var end = 0;
-            for (var j = 0; j < clrbarCanvas.height; j++) {
-                var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
-                var r = colorbarData[0];
-                var g = colorbarData[1];
-                var b = colorbarData[2];
-                if (start == 0) {
-                    if (r + g + b != 0) start = j + 1;
-                } else {
-                    if (r + g + b == 0) {
-                        end = j - 1;
-                        break;
-                    }
-                }
-                clrbarMap[r + ',' + g + ',' + b] = j;
-            }
-            clrbarMap.start = start;
-            clrbarMap.end = end;
-            clrbarMap.right = right;
-            clrbarMap.left = left;
         }
+        var start = 0;
+        var end = 0;
+        for (var j = 0; j < clrbarCanvas.height; j++) {
+            var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
+            var r = colorbarData[0];
+            var g = colorbarData[1];
+            var b = colorbarData[2];
+            if (start == 0) {
+                if (r + g + b != 0) start = j + 1;
+            } else {
+                if (r + g + b == 0) {
+                    end = j - 1;
+                    break;
+                }
+            }
+            clrbarMap[r + ',' + g + ',' + b] = j;
+        }
+        const computeLocation = (key) => 1 - (clrbarMap[key] - start) / (end - start);
+        for (var rgbKey in clrbarMap) clrbarMap[rgbKey] = computeLocation(rgbKey);
+        clrbarMap.start = start;
+        clrbarMap.end = end;
+        clrbarMap.right = right;
+        clrbarMap.left = left;
+        this.mapLevels(clrbarCanvas, clrbarMap);
         return clrbarMap;
     }
 }
