@@ -188,7 +188,6 @@ export class TimeSeriesController extends LayerController {
             }
         };
         return clrbarMap[closestKey];
-        // return computeLocation(closestKey);
     }
 
     /** Function called for populating a timeSeries chart. Needs to load image and colorbar pair
@@ -235,14 +234,17 @@ export class TimeSeriesController extends LayerController {
      * the corresponding timestamp. */
     async generateTimeSeriesData(marker, startDate, endDate) {
         var timeSeriesMarker = marker.getContent();
+        timeSeriesMarker.setProgress(0);
         var timeSeriesData = {label: timeSeriesMarker.getName(), latLon: marker._latlng, rgb: timeSeriesMarker.getRGB()};
         var dataset = {};
         var [xCoord, yCoord] = marker.imageCoords;
         var rasterDomains = rasters.getValue()[currentDomain.getValue()];
-        for (var timeStamp of sorted_timestamps.getValue()) {
-            if (timeStamp >= startDate && timeStamp <= endDate) {
-                await this.loadImageAndColorbar(dataset, timeStamp, rasterDomains, xCoord, yCoord);
-            }
+        var filteredTimeStamps = sorted_timestamps.getValue().filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        var progress = 0;
+        for (var timeStamp of filteredTimeStamps) {
+            await this.loadImageAndColorbar(dataset, timeStamp, rasterDomains, xCoord, yCoord);
+            progress += 1;
+            timeSeriesMarker.setProgress(progress/filteredTimeStamps.length);
         }
         timeSeriesData.dataset = dataset;
         return timeSeriesData;

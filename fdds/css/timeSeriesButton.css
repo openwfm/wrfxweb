@@ -10,6 +10,16 @@
     border: none;
 }
 
+#progressBar {
+    display: none;
+    border-radius: .2rem;
+    margin-top: 5px;
+    background: black;
+    height: 10px;
+    width: 100%;
+    border: none;
+}
+
 .timeSeriesButton:hover:not([disabled]) {
     cursor: pointer;
     background: #e5e5e5;
