@@ -153,7 +153,7 @@ export class TimeSeriesController extends LayerController {
             canvas = document.createElement('canvas');
             canvas.width = img.width * factor;
             canvas.height = img.height * factor;
-            canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+            canvas.getContext('2d').drawImage(img, 0, 0, img.width*factor, img.height*factor);
         }
         return canvas;
     }
