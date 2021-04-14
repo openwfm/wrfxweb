@@ -30,6 +30,7 @@ export class TimeSeriesController extends LayerController {
         this.clrbarCanvas = null;
         this.clrbarMap = {};
         this.markers = [];
+        this.canvasMaxHeight = 10000;
     }
 
     connectedCallback() {
@@ -80,14 +81,13 @@ export class TimeSeriesController extends LayerController {
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
                 var xCoord = e.offsetX / img.width;
                 var yCoord = e.offsetY / img.height;
-                console.log(xCoord + ' ' + yCoord);
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
             img.onload = () => syncImageLoad.increment(0);
             rasterColorbar.onload = () => syncImageLoad.increment(1);
             map.on('zoomend', () => {
-                if (img.height < 16000) this.imgCanvas = this.drawCanvas(img)
+                if (img.height < this.canvasMaxHeight) this.imgCanvas = this.drawCanvas(img)
             });
             this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
             if (this.markers.length > 0) this.timeSeriesButton.getButton().disabled = false;
@@ -165,7 +165,6 @@ export class TimeSeriesController extends LayerController {
             var [xCoord, yCoord] = marker.imageCoords;
             var x = Math.floor(xCoord * this.imgCanvas.width);
             var y = Math.floor(yCoord * this.imgCanvas.height);
-            console.log(x + ' ' + y);
             var pixelData = this.imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
             rgb = [pixelData[0], pixelData[1], pixelData[2]];
             clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
@@ -201,11 +200,13 @@ export class TimeSeriesController extends LayerController {
      * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
+        var factor = 1;
+        if (layerImg.height >= this.canvasMaxHeight) factor = this.canvasMaxHeight / layerImg.height;
         var img = new Image();
-        img.width = layerImg.width;
-        img.height = layerImg.height;
-        var x = Math.floor(xCoord * layerImg.width);
-        var y = Math.floor(yCoord * layerImg.height);
+        img.width = layerImg.width*factor;
+        img.height = layerImg.height*factor;
+        var x = Math.floor(xCoord * layerImg.width*factor);
+        var y = Math.floor(yCoord * layerImg.height*factor);
         var clrbarImg = new Image();
         // Returns a promise so that loadImageAndColorbar can be called with await. 
         return new Promise(resolve => {
