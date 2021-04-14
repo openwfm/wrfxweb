@@ -16,6 +16,7 @@ export class TimeSeriesButton extends HTMLElement {
                 </div>
                 <button class="timeSeriesButton" id="timeSeriesButton">
                     <span>generate timeseries</span>
+                    <div id="progressBar"></div>
                 </button>
             </div>
         `;
@@ -40,6 +41,19 @@ export class TimeSeriesButton extends HTMLElement {
             });
         };
     }
+
+    setProgress(progress) {
+        const progressBar = this.querySelector('#progressBar');
+        if (progress < 1) {
+            progressBar.style.display = 'block';
+            progressBar.style.width = Math.floor(progress*100) + "%";
+            this.getButton().disabled = true;
+        } else {
+            this.getButton().disabled = false;
+            progressBar.style.display = 'none';
+        }
+    }
+
     
     updateTimestamps() {
         const createOption = (timestamp) => {
