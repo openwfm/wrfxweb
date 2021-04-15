@@ -25,7 +25,9 @@ export class SimulationController extends HTMLElement {
                             <img src='icons/arrow_right-24px.svg'></img>
                         </button>
                     </div>
-                    <span id='timestamp'></span>
+                    <div id='slider-timestamp'>
+                        <span id='timestamp'></span>
+                    </div>
                 </div>
                 <div id='slider'>
                     <div id='slider-bar'></div>
