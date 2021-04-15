@@ -64,6 +64,8 @@ export class TimeSeriesButton extends HTMLElement {
         }
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
+        startDate.innerHTML = "";
+        endDate.innerHTML = "";
         for (var timestamp of sorted_timestamps.getValue()) {
             var startOption = createOption(timestamp);
             var endOption = createOption(timestamp);
