@@ -1,4 +1,6 @@
 import {currentDomain, sorted_timestamps, current_timestamp, overlayOrder, currentSimulation, rasters, raster_base} from './Controller.js';
+import {utcToLocal} from '../util.js';
+
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
  * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
@@ -69,8 +71,6 @@ export class SimulationController extends HTMLElement {
         this.preloadVariables(this.currentFrame, 8);
         this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
-        var timestamp = sorted_timestamps.getValue()[this.currentFrame];
-        this.querySelector('#timestamp').innerText = timestamp;
         this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + "%";
     }
 
@@ -164,7 +164,7 @@ export class SimulationController extends HTMLElement {
     setupForTime(frame_ndx) {
         var timestamp = sorted_timestamps.getValue()[frame_ndx];
         // set current time
-        document.querySelector('#timestamp').innerText = timestamp;
+        document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
         current_timestamp.setValue(timestamp);
     }
 

@@ -23,6 +23,12 @@ export const map = L.map('map-fd', {
     minZoom: 3
 });
 
+/** Function to convert UTC timestamp to PT timestamp. */
+export function utcToLocal(utcTime) {
+  var date = new Date(utcTime.replace('_', 'T') + 'Z');
+  return date.toLocaleString();
+}
+
 /** Makes given element draggable from sub element with id "subID" */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
