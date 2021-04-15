@@ -1,4 +1,5 @@
 import {sorted_timestamps} from './Controller.js';
+import {utcToLocal} from '../util.js';
 
 export class TimeSeriesButton extends HTMLElement {
     constructor() {
@@ -59,11 +60,13 @@ export class TimeSeriesButton extends HTMLElement {
         const createOption = (timestamp) => {
             var option = document.createElement('option');
             option.value = timestamp;
-            option.innerText = timestamp;
+            option.innerText = utcToLocal(timestamp);
             return option;
         }
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
+        startDate.innerHTML = "";
+        endDate.innerHTML = "";
         for (var timestamp of sorted_timestamps.getValue()) {
             var startOption = createOption(timestamp);
             var endOption = createOption(timestamp);

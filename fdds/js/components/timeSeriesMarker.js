@@ -22,7 +22,7 @@ export class TimeSeriesMarker extends TimeSeriesButton {
     }
 
     connectedCallback() {
-        super.connectedCallback;
+        super.connectedCallback();
         this.updateTimestamps();
     }
 

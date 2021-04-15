@@ -1,3 +1,4 @@
+import { utcToLocal } from '../util.js';
 import {displayedColorbar} from './Controller.js';
 
 export class TimeSeriesChart extends HTMLElement {
@@ -24,7 +25,7 @@ export class TimeSeriesChart extends HTMLElement {
 
     populateChart(data) {
         if (data.length == 0) return;
-        var labels = Object.keys(data[0].dataset);
+        var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];

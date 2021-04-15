@@ -1,4 +1,5 @@
 import {getSimulation} from '../../services.js';
+import { utcToLocal } from '../../util.js';
 import {currentSimulation} from '../Controller.js';
 
 const template = document.createElement('template');
@@ -68,8 +69,8 @@ export class CatalogItem extends HTMLElement {
 
         this.shadowRoot.querySelector('h3').innerText = description;
         this.shadowRoot.querySelector('#jobID').innerText += ' ' + jobId;
-        this.shadowRoot.querySelector('#from').innerText += ' ' + from;
-        this.shadowRoot.querySelector('#to').innerText += ' ' + to;
+        this.shadowRoot.querySelector('#from').innerText += ' ' + utcToLocal(from);
+        this.shadowRoot.querySelector('#to').innerText += ' ' + utcToLocal(to);
         if(kmlURL) {
             let mb = Math.round(10*kmlSize/1048576.0)/10;
             const kmlLink = this.shadowRoot.querySelector('#kml');
