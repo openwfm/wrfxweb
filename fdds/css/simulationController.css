@@ -19,12 +19,16 @@
 
 #slider-play-bar {
     display: inline-block;
+    width: 95px;
+}
+
+#slider-timestamp {
+    display: inline-block;
+    width: 215px;
+    height: 30px;
 }
 
 #timestamp {
-    display: inline-block;
-    margin-left: 15px;
-    margin-bottom: 15px;
     font-weight: bold;
     color: #5d5d5d;
 }
