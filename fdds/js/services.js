@@ -30,7 +30,7 @@ export function getSimulation(path) {
         // store in global state
         rasters.setValue(selectedSimulation);
         // raster_base.setValue(path.substring(0, path.lastIndexOf('/') + 1));
-        raster_base.setValue("https://demo.openwfm.org/ch/" + path.substring(0, path.lastIndexOf('/') + 1));
+        raster_base.setValue(path.replaceAll(":", "_").substring(0, path.lastIndexOf('/') + 1));
         // retrieve all domains
         domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
