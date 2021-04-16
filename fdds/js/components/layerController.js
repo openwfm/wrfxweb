@@ -32,6 +32,7 @@ export class LayerController extends HTMLElement {
         this.currentSimulation = '';
         this.overlayDict = {};
         this.rasterDict = {};
+        this.worker = new Worker('js/workers/imageLoadingWorker.js');
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -42,7 +43,9 @@ export class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
-
+        worker.addEventListener('message', (message) => {
+            console.log(message.data);
+        });
         currentDomain.subscribe(() => this.domainSwitch());
         current_timestamp.subscribe(() => this.updateTime());
         this.buildMapBase();
@@ -128,6 +131,13 @@ export class LayerController extends HTMLElement {
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
+        }
+
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
+            var rasterInfo = raster[name];
+            const imageURL = raster_base.getValue() + rasterInfo.raster;
+            worker.postMessage(imageURL);
         }
     }
 
