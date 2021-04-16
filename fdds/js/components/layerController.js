@@ -32,6 +32,7 @@ export class LayerController extends HTMLElement {
         this.currentSimulation = '';
         this.overlayDict = {};
         this.rasterDict = {};
+        this.preloaded = {};
         this.worker = new Worker('js/workers/imageLoadingWorker.js');
     }
 
@@ -43,8 +44,16 @@ export class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
-        worker.addEventListener('message', (message) => {
-            console.log(message.data);
+        this.worker.addEventListener('message', event => {
+            const imageData = event.data;
+            const imageURL = imageData.imageURL;
+            const objectURL = URL.createObjectURL(imageData.blob);
+            const img = new Img();
+            img.onload = () => {
+                URL.revokeObjectURL(objectURL);
+                this.preloaded[imageURL] = img;
+            }
+            img.setAttribute('src', objectURL);
         });
         currentDomain.subscribe(() => this.domainSwitch());
         current_timestamp.subscribe(() => this.updateTime());
@@ -137,7 +146,10 @@ export class LayerController extends HTMLElement {
             var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
             var rasterInfo = raster[name];
             const imageURL = raster_base.getValue() + rasterInfo.raster;
-            worker.postMessage(imageURL);
+            if (!(imageURL in this.preloaded)) {
+                this.worker.postMessage(imageURL);
+                if ('colorbar' in rasterInfo) this.worker.postMessage(raster_base.getValue() + rasterInfo.colorbar);
+            }
         }
     }
 

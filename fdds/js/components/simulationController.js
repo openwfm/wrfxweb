@@ -149,6 +149,7 @@ export class SimulationController extends HTMLElement {
     /** Returns boolean indicating if frame_ndx has been loaded */
     frameReady(frame_ndx) {
     // for all layers currently displayed
+        return true;
         for(var key of overlayOrder) {
             // if the current frame is not preloaded yet
             var currDomain = currentDomain.getValue();
