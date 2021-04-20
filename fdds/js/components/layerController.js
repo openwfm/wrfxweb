@@ -155,8 +155,8 @@ export class LayerController extends HTMLElement {
             displayedColorbar.setValue(name);
         }
 
-        var worker = this.workers[layerName];
-        if (!worker) worker = this.createWorker(layerName);
+        var worker = this.workers[name];
+        if (!worker) worker = this.createWorker(name);
         this.loadWithPriority(woker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
     }
 
