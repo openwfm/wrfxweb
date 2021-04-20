@@ -1,4 +1,3 @@
-import { sort } from 'shelljs';
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
 import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
