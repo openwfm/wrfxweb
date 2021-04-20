@@ -91,7 +91,7 @@ export class LayerController extends HTMLElement {
                 if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
             }
         }
-        for (var imageURL of loadLater) worker.postMessage(imageURL);
+        // for (var imageURL of loadLater) worker.postMessage(imageURL);
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -128,6 +128,7 @@ export class LayerController extends HTMLElement {
             if(overlay_list.indexOf(r) >= 0) this.overlayDict[r] = layer;
             else this.rasterDict[r] = layer;
         };
+        this.handleOverlayadd('T2');
         this.buildLayerBoxes();
     }
 
@@ -158,7 +159,8 @@ export class LayerController extends HTMLElement {
         var worker = this.workers[name];
         if (!worker) worker = this.createWorker(name);
         var startDate = current_timestamp.getValue();
-        var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        // var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        var endDate = sorted_timestamps.getValue()[1];
         this.loadWithPriority(worker, startDate, endDate, name);
     }
 
