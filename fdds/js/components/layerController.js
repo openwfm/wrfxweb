@@ -64,7 +64,7 @@ export class LayerController extends HTMLElement {
             if (!(imageURL in this.preloaded)) {
                 this.workers[layerName].terminate();
                 var worker = this.createWorker(layerName);
-                this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
+                this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], layerName);
             }
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
@@ -76,7 +76,7 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    loadWithPriority(worker, startTime, endTime) {
+    loadWithPriority(worker, startTime, endTime, layerName) {
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
             if (timeStamp < startTime || timeStamp > endTime) loadLater.push(imageURL);
@@ -85,13 +85,13 @@ export class LayerController extends HTMLElement {
         for (var timeStamp of sorted_timestamps.getValue()) {
             var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
             var rasterInfo = raster[layerName];
-            const imageURL = raster_base.getValue() + rasterInfo.raster;
+            var imageURL = raster_base.getValue() + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
                 nowOrLater(timeStamp, imageURL);
                 if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
             }
         }
-        for (imgURL of loadLater) worker.postMessage(imageURL);
+        for (var imageURL of loadLater) worker.postMessage(imageURL);
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -157,7 +157,7 @@ export class LayerController extends HTMLElement {
 
         var worker = this.workers[name];
         if (!worker) worker = this.createWorker(name);
-        this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
+        this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], name);
     }
 
     createWorker(layerName) {
