@@ -157,7 +157,7 @@ export class LayerController extends HTMLElement {
 
         var worker = this.workers[name];
         if (!worker) worker = this.createWorker(name);
-        this.loadWithPriority(woker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
+        this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
     }
 
     createWorker(layerName) {
