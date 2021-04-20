@@ -163,7 +163,7 @@ export class LayerController extends HTMLElement {
     }
 
     createWorker(layerName) {
-        var worker = new Worker('js/workers/imageLoadingWorker.js');
+        var worker = new Worker('imageLoadingWorker.js');
         this.workers[layerName] = worker;
         worker.addEventListener('message', event => {
             const imageData = event.data;
