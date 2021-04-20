@@ -1,3 +1,4 @@
+import { sort } from 'shelljs';
 import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
 import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
@@ -55,19 +56,43 @@ export class LayerController extends HTMLElement {
      */
     updateTime() {
         if (this.currentSimulation != currentSimulation.getValue()) return;
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
-        for (var layer_name of overlayOrder) {
-            var layer = this.getLayer(layer_name);
-            var raster_info = rasters_now[layer_name];
-            var cs = raster_info.coords;
-            layer.setUrl(raster_base.getValue() + raster_info.raster,
+        var rastersNow = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        for (var layerName of overlayOrder) {
+            var layer = this.getLayer(layerName);
+            var rasterInfo = rastersNow[layerName];
+            var cs = rasterInfo.coords;
+            var imageURL = raster_base.getValue() + rasterInfo.raster;
+            if (!(imageURL in this.preloaded)) {
+                this.workers[layerName].terminate();
+                var worker = this.createWorker(layerName);
+                this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
+            }
+            layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
-            if (layer_name == displayedColorbar.getValue()) {
+            if (layerName == displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
-                rasterColorbar.src = raster_base.getValue() + raster_info.colorbar;
+                rasterColorbar.src = raster_base.getValue() + rasterInfo.colorbar;
             }
         }
+    }
+
+    loadWithPriority(worker, startTime, endTime) {
+        var loadLater = [];
+        const nowOrLater = (timeStamp, imageURL) => {
+            if (timeStamp < startTime || timeStamp > endTime) loadLater.push(imageURL);
+            else worker.postMessage(imageURL);
+        }
+        for (var timeStamp of sorted_timestamps.getValue()) {
+            var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
+            var rasterInfo = raster[layerName];
+            const imageURL = raster_base.getValue() + rasterInfo.raster;
+            if (!(imageURL in this.preloaded)) {
+                nowOrLater(timeStamp, imageURL);
+                if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
+            }
+        }
+        for (imgURL of loadLater) worker.postMessage(imageURL);
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -131,20 +156,12 @@ export class LayerController extends HTMLElement {
             displayedColorbar.setValue(name);
         }
 
-        var worker = this.getOrMakeWorker(name);
-        for (var timeStamp of sorted_timestamps.getValue()) {
-            var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
-            var rasterInfo = raster[name];
-            const imageURL = raster_base.getValue() + rasterInfo.raster;
-            if (!(imageURL in this.preloaded)) {
-                worker.postMessage(imageURL);
-                if ('colorbar' in rasterInfo) worker.postMessage(raster_base.getValue() + rasterInfo.colorbar);
-            }
-        }
+        var worker = this.workers[layerName];
+        if (!worker) worker = this.createWorker(layerName);
+        this.loadWithPriority(woker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1]);
     }
 
-    getOrMakeWorker(layerName) {
-        if (this.workers[layerName]) return this.workers[layerName];
+    createWorker(layerName) {
         var worker = new Worker('js/workers/imageLoadingWorker.js');
         this.workers[layerName] = worker;
         worker.addEventListener('message', event => {
