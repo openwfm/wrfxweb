@@ -33,7 +33,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.preloaded = {};
-        this.worker = new Worker('js/workers/imageLoadingWorker.js');
+        this.workers = {};
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -44,17 +44,6 @@ export class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
-        this.worker.addEventListener('message', event => {
-            const imageData = event.data;
-            const imageURL = imageData.imageURL;
-            const objectURL = URL.createObjectURL(imageData.blob);
-            const img = new Img();
-            img.onload = () => {
-                URL.revokeObjectURL(objectURL);
-                this.preloaded[imageURL] = img;
-            }
-            img.setAttribute('src', objectURL);
-        });
         currentDomain.subscribe(() => this.domainSwitch());
         current_timestamp.subscribe(() => this.updateTime());
         this.buildMapBase();
@@ -142,15 +131,34 @@ export class LayerController extends HTMLElement {
             displayedColorbar.setValue(name);
         }
 
+        var worker = this.getOrMakeWorker(name);
         for (var timeStamp of sorted_timestamps.getValue()) {
             var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
             var rasterInfo = raster[name];
             const imageURL = raster_base.getValue() + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
-                this.worker.postMessage(imageURL);
-                if ('colorbar' in rasterInfo) this.worker.postMessage(raster_base.getValue() + rasterInfo.colorbar);
+                worker.postMessage(imageURL);
+                if ('colorbar' in rasterInfo) worker.postMessage(raster_base.getValue() + rasterInfo.colorbar);
             }
         }
+    }
+
+    getOrMakeWorker(layerName) {
+        if (this.workers[layerName]) return this.workers[layerName];
+        var worker = new Worker('js/workers/imageLoadingWorker.js');
+        this.workers[layerName] = worker;
+        worker.addEventListener('message', event => {
+            const imageData = event.data;
+            const imageURL = imageData.imageURL;
+            const objectURL = URL.createObjectURL(imageData.blob);
+            const img = new Image();
+            img.onload = () => {
+                URL.revokeObjectURL(objectURL);
+                this.preloaded[imageURL] = img;
+            }
+            img.setAttribute('src', objectURL);
+        });
+        return worker;
     }
 
     /** Called when a layer is de-selected. */
