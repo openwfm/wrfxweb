@@ -168,14 +168,12 @@ export class LayerController extends HTMLElement {
         worker.addEventListener('message', event => {
             const imageData = event.data;
             const imageURL = imageData.imageURL;
-            this.preloaded[imageURL] = true;
             const objectURL = URL.createObjectURL(imageData.blob);
             const img = new Image();
             img.onload = () => {
                 // URL.revokeObjectURL(objectURL);
                 this.preloaded[imageURL] = objectURL;
             }
-            // img.src = imageURL;
             img.src = objectURL;
         });
         return worker;
