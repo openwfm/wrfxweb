@@ -228,7 +228,7 @@ export class SimulationController extends HTMLElement {
 
             let newFrame = originalFrame + diff;
             this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
-            this.preloadVariables(Math.max(this.currentFrame - 4, 0), 8);
+            // this.preloadVariables(Math.max(this.currentFrame - 4, 0), 8);
             this.updateSlider();
           }
     }
