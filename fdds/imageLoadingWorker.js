@@ -1,3 +1,5 @@
+"use strict";
+
 self.addEventListener('message', async event => {
     const imageURL = event.data;
     const response = await fetch(imageURL);
