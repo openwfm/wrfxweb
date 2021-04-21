@@ -70,7 +70,7 @@ export class SimulationController extends HTMLElement {
             percentage = 0;
             this.currentFrame = 0;
         }
-        this.preloadVariables(this.currentFrame, 8);
+        // this.preloadVariables(this.currentFrame, 8);
         this.setupForTime(this.currentFrame);
         this.frameTotal = sorted_timestamps.getValue().length;
         this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + "%";
