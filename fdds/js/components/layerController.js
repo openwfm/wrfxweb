@@ -65,13 +65,15 @@ export class LayerController extends HTMLElement {
                 this.workers[layerName].terminate();
                 var worker = this.createWorker(layerName);
                 this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], layerName);
-            }
+            } else imageURL = this.preloaded[imageURL];
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
             if (layerName == displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
-                rasterColorbar.src = raster_base.getValue() + rasterInfo.colorbar;
+                var colorbarURL = raster_base.getValue() + rasterInfo.colorbar;
+                if (colorbarURL in this.preloaded) colorbarURL = this.preloaded[colorbarURL];
+                rasterColorbar.src = colorbarURL;
             }
         }
     }
@@ -128,7 +130,6 @@ export class LayerController extends HTMLElement {
             if(overlay_list.indexOf(r) >= 0) this.overlayDict[r] = layer;
             else this.rasterDict[r] = layer;
         };
-        this.handleOverlayadd('T2');
         this.buildLayerBoxes();
     }
 
@@ -170,13 +171,15 @@ export class LayerController extends HTMLElement {
         worker.addEventListener('message', event => {
             const imageData = event.data;
             const imageURL = imageData.imageURL;
+            this.preloaded[imageURL] = true;
             const objectURL = URL.createObjectURL(imageData.blob);
             const img = new Image();
             img.onload = () => {
-                URL.revokeObjectURL(objectURL);
-                this.preloaded[imageURL] = img;
+                // URL.revokeObjectURL(objectURL);
+                this.preloaded[imageURL] = objectURL;
             }
-            img.setAttribute('src', objectURL);
+            // img.src = imageURL;
+            img.src = objectURL;
         });
         return worker;
     }

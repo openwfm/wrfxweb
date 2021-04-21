@@ -5,5 +5,5 @@ self.addEventListener('message', async event => {
     self.postMessage({
         imageURL: imageURL, 
         blob: blob
-    })
+    });
 });
