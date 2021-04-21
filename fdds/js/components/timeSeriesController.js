@@ -231,8 +231,14 @@ export class TimeSeriesController extends LayerController {
                 clrbarMap = this.buildColorMap(clrbarCanvas);
                 syncController.increment(1);
             }
-            img.src = raster_base.getValue() + rasterInfo.raster;
-            clrbarImg.src = raster_base.getValue() + rasterInfo.colorbar;
+            var imgURL = raster_base.getValue() + rasterInfo.raster;
+            var clrbarURL = raster_base.getValue() + rasterInfo.colorbar;
+            if (imgURL in this.preloaded) {
+                imgURL = this.preloaded[imgURL];
+                clrbarURL = this.preloaded[clrbarURL];
+            } else this.loadWithPriority(timeStamp, sorted_timestamps.getValue()[sorted_timestamps.length - 1], displayedColorbar.getValue());
+            img.src = imgURL;
+            clrbarImg.src = clrbarURL;
         });
     }
 

@@ -61,11 +61,8 @@ export class LayerController extends HTMLElement {
             var rasterInfo = rastersNow[layerName];
             var cs = rasterInfo.coords;
             var imageURL = raster_base.getValue() + rasterInfo.raster;
-            if (!(imageURL in this.preloaded)) {
-                this.workers[layerName].terminate();
-                var worker = this.createWorker(layerName);
-                this.loadWithPriority(worker, current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], layerName);
-            } else imageURL = this.preloaded[imageURL];
+            if (!(imageURL in this.preloaded)) this.loadWithPriority(current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], layerName);
+            else imageURL = this.preloaded[imageURL];
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
@@ -78,7 +75,10 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    loadWithPriority(worker, startTime, endTime, layerName) {
+    loadWithPriority(startTime, endTime, layerName) {
+        var worker = this.workers[layerName];
+        if (worker) worker.terminate();
+        worker = this.createWorker(layerName);
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
             if (timeStamp < startTime || timeStamp > endTime) loadLater.push(imageURL);
@@ -156,13 +156,10 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
         }
-
-        var worker = this.workers[name];
-        if (!worker) worker = this.createWorker(name);
         var startDate = current_timestamp.getValue();
         // var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
         var endDate = sorted_timestamps.getValue()[1];
-        this.loadWithPriority(worker, startDate, endDate, name);
+        this.loadWithPriority(startDate, endDate, name);
     }
 
     createWorker(layerName) {
