@@ -236,7 +236,7 @@ export class TimeSeriesController extends LayerController {
             if (imgURL in this.preloaded) {
                 imgURL = this.preloaded[imgURL];
                 clrbarURL = this.preloaded[clrbarURL];
-            } else this.loadWithPriority(timeStamp, sorted_timestamps.getValue()[sorted_timestamps.length - 1], displayedColorbar.getValue());
+            }
             img.src = imgURL;
             clrbarImg.src = clrbarURL;
         });
