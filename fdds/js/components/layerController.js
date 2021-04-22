@@ -33,7 +33,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.preloaded = {};
-        this.workers = {};
+        this.worker; 
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -76,9 +76,7 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerName) {
-        var worker = this.workers[layerName];
-        if (worker) worker.terminate();
-        worker = this.createWorker(layerName);
+        var worker = this.createWorker();
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
             if (timeStamp < startTime || timeStamp > endTime) loadLater.push(imageURL);
@@ -109,6 +107,10 @@ export class LayerController extends HTMLElement {
             overlayOrder.length = 0;
             this.currentSimulation = currentSimulation.getValue();
             this.querySelector('#layer-controller-container').style.display = 'block';
+            for (var imgURL in this.preloaded) {
+                URL.revokeObjectURL(this.preloaded[imgURL]);
+            }
+            this.preloaded = {};
         }
         // build the layer groups of the current domain
         var first_rasters = rasters.getValue()[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
@@ -161,16 +163,16 @@ export class LayerController extends HTMLElement {
         this.loadWithPriority(startDate, endDate, name);
     }
 
-    createWorker(layerName) {
+    createWorker() {
+        if (this.worker) this.worker.terminate();
         var worker = new Worker('imageLoadingWorker.js');
-        this.workers[layerName] = worker;
+        this.worker = worker;
         worker.addEventListener('message', event => {
             const imageData = event.data;
             const imageURL = imageData.imageURL;
             const objectURL = URL.createObjectURL(imageData.blob);
             const img = new Image();
             img.onload = () => {
-                // URL.revokeObjectURL(objectURL);
                 this.preloaded[imageURL] = objectURL;
             }
             img.src = objectURL;
