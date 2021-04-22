@@ -56,12 +56,16 @@ export class LayerController extends HTMLElement {
     updateTime() {
         if (this.currentSimulation != currentSimulation.getValue()) return;
         var rastersNow = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var reloading = false;
         for (var layerName of overlayOrder) {
             var layer = this.getLayer(layerName);
             var rasterInfo = rastersNow[layerName];
             var cs = rasterInfo.coords;
             var imageURL = raster_base.getValue() + rasterInfo.raster;
-            if (!(imageURL in this.preloaded)) this.loadWithPriority(current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], layerName);
+            if (!(imageURL in this.preloaded)) {
+                if (!reloading) this.loadWithPriority(current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], overlayOrder);
+                reloading = true;
+            }
             else imageURL = this.preloaded[imageURL];
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
@@ -75,7 +79,7 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    loadWithPriority(startTime, endTime, layerName) {
+    loadWithPriority(startTime, endTime, layerNames) {
         var worker = this.createWorker();
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
@@ -84,11 +88,13 @@ export class LayerController extends HTMLElement {
         }
         for (var timeStamp of sorted_timestamps.getValue()) {
             var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
-            var rasterInfo = raster[layerName];
-            var imageURL = raster_base.getValue() + rasterInfo.raster;
-            if (!(imageURL in this.preloaded)) {
-                nowOrLater(timeStamp, imageURL);
-                if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
+            for (var layerName of layerNames) {
+                var rasterInfo = raster[layerName];
+                var imageURL = raster_base.getValue() + rasterInfo.raster;
+                if (!(imageURL in this.preloaded)) {
+                    nowOrLater(timeStamp, imageURL);
+                    if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
+                }
             }
         }
         // for (var imageURL of loadLater) worker.postMessage(imageURL);
@@ -97,6 +103,7 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
+        if (this.worker) this.worker.terminate();
         for (var layerName of overlayOrder) this.getLayer(layerName).remove(map);
         displayedColorbar.setValue(null);
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -161,7 +168,7 @@ export class LayerController extends HTMLElement {
         var startDate = current_timestamp.getValue();
         // var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
         var endDate = sorted_timestamps.getValue()[1];
-        this.loadWithPriority(startDate, endDate, name);
+        this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 
     createWorker() {
