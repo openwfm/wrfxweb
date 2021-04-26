@@ -59,6 +59,7 @@ export class SimulationController extends HTMLElement {
     }
 
     resetSlider() {
+        if (this.playing) this.playPause();
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (sorted_timestamps.getValue().length < 2) ? 'none' : 'block';
         let percentage = this.currentFrame / this.frameTotal;
