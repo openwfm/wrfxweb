@@ -32,3 +32,11 @@
   display: block;
   margin-left:10px;
 }
+
+@media (max-width: 769px) {
+    #timeSeriesChartContainer {
+        width: 300px;
+        height: 300px;
+    }
+}
+
