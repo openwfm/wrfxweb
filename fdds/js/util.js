@@ -1,3 +1,9 @@
+// var utc = require('dayjs/plugin/utc'); // dependent on utc plugin
+// var timezone = require('dayjs/plugin/timezone');
+// var dayJs = require('dayjs');
+// dayJs.extend(utc);
+// dayJs.extend(timezone);
+
 export const overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 export const baseLayerDict = {
   /*
@@ -25,8 +31,9 @@ export const map = L.map('map-fd', {
 
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
-  var date = new Date(utcTime.replace('_', 'T') + 'Z');
-  return date.toLocaleString();
+  var timezone = "America/Los_Angeles";
+  var a = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
+  return a.format("YYYY-MM-DD HH:mm:ss");
 }
 
 /** Makes given element draggable from sub element with id "subID" */
