@@ -29,6 +29,14 @@ export const map = L.map('map-fd', {
     minZoom: 3
 });
 
+export function debounce(callback, delay) {
+  let timeout;
+  return function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(callback, delay);
+  }
+}
+
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
   var timezone = "America/Los_Angeles";

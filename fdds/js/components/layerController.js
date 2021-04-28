@@ -1,4 +1,4 @@
-import {map, baseLayerDict, dragElement, overlay_list} from '../util.js';
+import {map, baseLayerDict, dragElement, overlay_list, debounce} from '../util.js';
 import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
@@ -45,7 +45,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
         currentDomain.subscribe(() => this.domainSwitch());
-        current_timestamp.subscribe(() => this.updateTime());
+        current_timestamp.subscribe(debounce(() => this.updateTime(), 10));
         this.buildMapBase();
     }
 
