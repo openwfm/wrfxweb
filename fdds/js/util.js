@@ -30,10 +30,14 @@ export const map = L.map('map-fd', {
 });
 
 export function debounce(callback, delay) {
-  let timeout;
+  let timeout; 
   return function() {
-    clearTimeout(timeout);
-    timeout = setTimeout(callback, delay);
+    if (timeout) return;
+    var callbackInIntervals = () => {
+      timeout = null;
+      callback();
+    };
+    timeout = setTimeout(callbackInIntervals, delay);
   }
 }
 

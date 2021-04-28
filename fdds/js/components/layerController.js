@@ -45,7 +45,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
         currentDomain.subscribe(() => this.domainSwitch());
-        current_timestamp.subscribe(debounce(() => this.updateTime(), 10));
+        current_timestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
     }
 
