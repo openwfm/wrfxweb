@@ -208,6 +208,9 @@ export class LayerController extends HTMLElement {
         displayedColorbar.setValue(mostRecentColorbar);
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
+        var startDate = current_timestamp.getValue();
+        var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 
     /** Returns the layer associated with a given name */
