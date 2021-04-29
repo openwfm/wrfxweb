@@ -237,9 +237,9 @@ export class TimeSeriesController extends LayerController {
                 imgURL = this.preloaded[imgURL];
                 clrbarURL = this.preloaded[clrbarURL];
             } else {
+                this.worker.terminate();
                 this.preloaded[imgURL] = imgURL;
                 this.preloaded[clrbarURL] = clrbarURL;
-                this.worker.terminate();
             }
             img.src = imgURL;
             clrbarImg.src = clrbarURL;
