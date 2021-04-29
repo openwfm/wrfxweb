@@ -233,7 +233,7 @@ export class TimeSeriesController extends LayerController {
             }
             var imgURL = raster_base.getValue() + rasterInfo.raster;
             var clrbarURL = raster_base.getValue() + rasterInfo.colorbar;
-            if (imgURL in this.preloaded) {
+            if (imgURL in this.preloaded && clrbarURL in this.preloaded) {
                 imgURL = this.preloaded[imgURL];
                 clrbarURL = this.preloaded[clrbarURL];
             } else {
