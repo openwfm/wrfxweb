@@ -15,6 +15,9 @@ export class SimulationController extends HTMLElement {
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
+                        <button id='slider-slow-down'>
+                            <img src='icons/fast_rewind_black_24dp.svg'></img>
+                        </button>
                         <button id='slider-prev'>
                             <img src='icons/arrow_left-24px.svg'></img>
                         </button>
@@ -23,6 +26,9 @@ export class SimulationController extends HTMLElement {
                         </button>
                         <button id='slider-next'>
                             <img src='icons/arrow_right-24px.svg'></img>
+                        </button>
+                        <button id='slider-fast-forward'>
+                            <img src='icons/fast_forward_black_24dp.svg'></img>
                         </button>
                     </div>
                     <div id='slider-timestamp'>
@@ -40,6 +46,10 @@ export class SimulationController extends HTMLElement {
         this.currentFrame = 0;
         this.frameTotal = 1;
         this.playing = false;
+        this.fastRate = 150;
+        this.slowRate = 500;
+        this.normalRate = 330;
+        this.frameRate = this.normalRate;
     }
 
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
@@ -54,6 +64,8 @@ export class SimulationController extends HTMLElement {
         this.querySelector('#slider-play-pause').onclick = () => this.playPause();
         this.querySelector('#slider-prev').onclick = () => this.prevFrame(5);
         this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
+        this.querySelector('#slider-fast-forward').onclick = () => this.toggleSpeedUp();
+        this.querySelector('#slider-slow-down').onclick = () => this.toggleSlowDown();
 
         currentDomain.subscribe(() => this.resetSlider());
     }
@@ -106,11 +118,32 @@ export class SimulationController extends HTMLElement {
         if (this.playing) {
             this.nextFrame(5);
             if (this.currentFrame == sorted_timestamps.getValue().length-1){
-                window.setTimeout(() => this.play(), 1000);
+                window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
-                window.setTimeout(() => this.play(), 330);
+                window.setTimeout(() => this.play(), this.frameRate);
             }
         }
+    }
+
+    toggleSpeedUp() {
+        const speedUp = this.querySelector('#slider-fast-forward');
+        speedUp.classList.remove('pressed');
+        this.querySelector('#slider-slow-down').classList.remove('pressed');
+        if (this.frameRate > this.fastRate) {
+            this.frameRate = this.fastRate;
+            speedUp.classList.add('pressed');
+        } else this.frameRate = this.normalRate;
+    }
+
+    toggleSlowDown() {
+        const slowDown = this.querySelector('#slider-slow-down');
+        slowDown.classList.remove('pressed');
+        this.querySelector('#slider-fast-forward').classList.remove('pressed');
+        if (this.frameRate < this.slowRate) {
+            this.frameRate = this.slowRate;
+            slowDown.classList.add('pressed');
+        }
+        else this.frameRate = this.slowRate;
     }
 
     /** Moves one frame to the right. */
