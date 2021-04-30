@@ -97,7 +97,7 @@ export class LayerController extends HTMLElement {
                 }
             }
         }
-        // for (var imageURL of loadLater) worker.postMessage(imageURL);
+        for (var imageURL of loadLater) worker.postMessage(imageURL);
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -166,8 +166,8 @@ export class LayerController extends HTMLElement {
             displayedColorbar.setValue(name);
         }
         var startDate = current_timestamp.getValue();
-        // var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
-        var endDate = sorted_timestamps.getValue()[1];
+        var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        // var endDate = sorted_timestamps.getValue()[1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 
