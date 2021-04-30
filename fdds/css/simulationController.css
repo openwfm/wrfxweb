@@ -2,7 +2,7 @@
     position: fixed;
     left: 20px;
     bottom: 20px;
-    width: 320px;
+    width: 360px;
     z-index: 4000;
     border-radius: 4px;
     background:#e8e8e8;
@@ -24,7 +24,7 @@
 
 #slider-timestamp {
     display: inline-block;
-    width: 215px;
+    /* width: 215px; */
     height: 30px;
 }
 
@@ -74,7 +74,7 @@ button[disabled] {
     margin: auto 0;
     top: 0; bottom: 0; left: 0; right: 0;
     height: 11px;
-    width: 300px;
+    width: 340px;
     background: #f8f8f8;
     border-style: solid;
     border-radius: 4px;
