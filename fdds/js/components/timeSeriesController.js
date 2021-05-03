@@ -45,15 +45,8 @@ export class TimeSeriesController extends LayerController {
         });
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add("waiting");
-            // var timeSeriesData = [];
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
-            // for (var marker of this.markers) {
-
-            //     // var markerData = await this.generateTimeSeriesData(marker, startDate, endDate);
-            //     // timeSeriesData.push(markerData);
-            //     coords.push
-            // }
             var timeSeriesData = await this.generateTimeSeriesData(this.timeSeriesButton, startDate, endDate, this.markers);
             document.body.classList.remove("waiting");
             const timeSeriesChart = document.querySelector('timeseries-chart');
