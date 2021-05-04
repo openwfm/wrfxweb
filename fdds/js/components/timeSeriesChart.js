@@ -8,7 +8,12 @@ export class TimeSeriesChart extends HTMLElement {
             <link rel="stylesheet" href="css/timeSeriesChart.css"/>
             <div id="timeSeriesChartContainer">
                 <span id="closeTimeSeriesChart">x</span>
-                <canvas id="timeSeriesChart" width="400px" height ="400px"></canvas>
+                <canvas id="timeSeriesChart" width="400px" height="400px"></canvas>
+                <div id="break" style="width: 100%; height: 1px; background: #5d5d5d"></div>
+                <div id="add-threshold" style="margin-top: 10px">
+                    <label style="display: inline-block; width: 100px" for="timeseries-custom-name">y-axis threshold: </label>
+                    <input id="threshold-setter"></input>
+                </div>
             </div>
         `;
         this.ctx = null;
@@ -21,6 +26,14 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
         this.querySelector('#closeTimeSeriesChart').onclick = () => timeSeriesChart.style.display = 'none';
+        const thresholdSetter = this.querySelector('#threshold-setter');
+        thresholdSetter.oninput = () => this.setThreshold(thresholdSetter.value);
+    }
+
+    setThreshold(threshold) {
+        if (threshold == "" || isNaN(threshold)) {
+            return;
+        }
     }
 
     populateChart(data) {
@@ -67,6 +80,7 @@ export class TimeSeriesChart extends HTMLElement {
                 plugins: {
                     annotation: {
                         annotations: [{
+                            display: false,
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'yAxes',
@@ -84,7 +98,6 @@ export class TimeSeriesChart extends HTMLElement {
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
-        console.log(this.chart);
     }
 }
 
