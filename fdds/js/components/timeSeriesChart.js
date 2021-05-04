@@ -63,10 +63,28 @@ export class TimeSeriesChart extends HTMLElement {
                             text: "Timestamp"
                         }
                     }
-                }
+                },
+                plugins: {
+                    annotation: {
+                        annotations: [{
+                            type: 'line',
+                            mode: 'horizontal',
+                            scaleID: 'yAxes',
+                            value: 15,
+                            endValue: 15,
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderWidth: 2,
+                            label: {
+                                enabled: false,
+                                content: "Test Label"
+                            }
+                        }]
+                      }
+                },
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
+        console.log(this.chart);
     }
 }
 
