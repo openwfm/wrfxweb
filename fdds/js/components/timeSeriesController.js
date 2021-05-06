@@ -45,13 +45,9 @@ export class TimeSeriesController extends LayerController {
         });
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add("waiting");
-            var timeSeriesData = [];
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
-            for (var marker of this.markers) {
-                var markerData = await this.generateTimeSeriesData(marker, startDate, endDate);
-                timeSeriesData.push(markerData);
-            }
+            var timeSeriesData = await this.generateTimeSeriesData(this.timeSeriesButton, startDate, endDate, this.markers);
             document.body.classList.remove("waiting");
             const timeSeriesChart = document.querySelector('timeseries-chart');
             timeSeriesChart.populateChart(timeSeriesData);
@@ -63,6 +59,13 @@ export class TimeSeriesController extends LayerController {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
         while (this.markers.length > 0) this.markers[0].removeFrom(map);
+        // this.handleOverlayadd('T2');
+        const timeSeriesChart = document.querySelector('timeseries-chart');
+        displayedColorbar.setValue('test');
+        var dataset = [];
+        dataset.push({label: 'test', latLon: {lat: 1, lng: 0}, rgb: [0, 0, 0], dataset: {'2020-10-15 17:00:00': 12, '2020-10-15 18:00:00': 19}});
+        dataset.push({label: 'test2', latLon: {lat: 1, lng: 0}, rgb: [0, 180, 0], dataset: {'2020-10-15 17:00:00': 18, '2020-10-15 18:00:00': 12}});
+        timeSeriesChart.populateChart(dataset);
     }
 
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
@@ -107,12 +110,10 @@ export class TimeSeriesController extends LayerController {
         const timeSeriesButton = timeSeriesMarker.getButton();
         marker.setContent(timeSeriesMarker);
         timeSeriesButton.onclick = async () => {
-            document.body.classList.add("waiting");
             var startDate = timeSeriesMarker.getStartDate();
             var endDate = timeSeriesMarker.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(marker, startDate, endDate);
-            document.body.classList.remove("waiting");
-            timeSeriesChart.populateChart([timeSeriesData]);
+            var timeSeriesData = await this.generateTimeSeriesData(timeSeriesMarker, startDate, endDate, [marker]);
+            timeSeriesChart.populateChart(timeSeriesData);
         }
         this.updateMarker(marker);
     }
@@ -200,30 +201,36 @@ export class TimeSeriesController extends LayerController {
      * to an rgb value and find its corresponding place in the colormap. Puts the colorbar location into the 
      * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
      * colorbar have been loaded and the timeSeriesData has been populated. */
-    async loadImageAndColorbar(timeSeriesData, timeStamp, rasterDomains, xCoord, yCoord) {
+    async loadImageAndColorbar(timeSeriesData, timeStamp, markers) {
+        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var factor = 1;
         if (layerImg.height >= this.canvasMaxHeight) factor = this.canvasMaxHeight / layerImg.height;
         var img = new Image();
         img.width = layerImg.width*factor;
         img.height = layerImg.height*factor;
-        var x = Math.floor(xCoord * layerImg.width*factor);
-        var y = Math.floor(yCoord * layerImg.height*factor);
+        var convertX = (xCoord) => Math.floor(xCoord * layerImg.width*factor);
+        var convertY = (yCoord) => Math.floor(yCoord * layerImg.height*factor);
         var clrbarImg = new Image();
         // Returns a promise so that loadImageAndColorbar can be called with await. 
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[displayedColorbar.getValue()];
             var clrbarMap = {};
-            var pixelData = null;
+            var imgCanvas;
             var syncController = new SyncController();
             syncController.subscribe(() => {
-                timeSeriesData[timeStamp] = this.findClosestKey([pixelData[0], pixelData[1], pixelData[2]], clrbarMap)
+                for (var i = 0; i < markers.length; i++) {
+                    var [xCoord, yCoord] = markers[i].imageCoords;
+                    var x = convertX(xCoord);
+                    var y = convertY(yCoord);
+                    var pixelData = imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data; 
+                    timeSeriesData[i].dataset[timeStamp] = this.findClosestKey([pixelData[0], pixelData[1], pixelData[2]], clrbarMap)
+                }
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
             img.onload = () => {
-                var imgCanvas = this.drawCanvas(img);
-                pixelData = imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data; 
+                imgCanvas = this.drawCanvas(img);
                 syncController.increment(0);
             }
             clrbarImg.onload = () => {
@@ -249,21 +256,22 @@ export class TimeSeriesController extends LayerController {
     /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
      * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
      * the corresponding timestamp. */
-    async generateTimeSeriesData(marker, startDate, endDate) {
-        var timeSeriesMarker = marker.getContent();
-        timeSeriesMarker.setProgress(0);
-        var timeSeriesData = {label: timeSeriesMarker.getName(), latLon: marker._latlng, rgb: timeSeriesMarker.getRGB()};
-        var dataset = {};
-        var [xCoord, yCoord] = marker.imageCoords;
-        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+    async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
+        document.body.classList.add("waiting");
+        progressMarker.setProgress(0);
         var filteredTimeStamps = sorted_timestamps.getValue().filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var progress = 0;
-        for (var timeStamp of filteredTimeStamps) {
-            await this.loadImageAndColorbar(dataset, timeStamp, rasterDomains, xCoord, yCoord);
-            progress += 1;
-            timeSeriesMarker.setProgress(progress/filteredTimeStamps.length);
+        var timeSeriesData = [];
+        for (var i = 0; i < markers.length; i++) {
+            var timeSeriesMarker = markers[i].getContent();
+            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, rgb: timeSeriesMarker.getRGB(), dataset: {}});
         }
-        timeSeriesData.dataset = dataset;
+        for (var timeStamp of filteredTimeStamps) {
+            await this.loadImageAndColorbar(timeSeriesData, timeStamp, markers);
+            progress += 1;
+            progressMarker.setProgress(progress/filteredTimeStamps.length);
+        }
+        document.body.classList.remove("waiting");
         return timeSeriesData;
     }
 
