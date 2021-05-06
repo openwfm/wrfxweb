@@ -11,13 +11,16 @@ export class TimeSeriesChart extends HTMLElement {
                 <canvas id="timeSeriesChart" width="400px" height="400px"></canvas>
                 <div id="break" style="width: 100%; height: 1px; background: #5d5d5d"></div>
                 <div id="add-threshold" style="margin-top: 10px">
-                    <label style="display: inline-block; width: 100px" for="timeseries-custom-name">y-axis threshold: </label>
+                    <label style="display: inline-block; width: 100px" for="threshold-setter">y-axis threshold: </label>
                     <input id="threshold-setter"></input>
+                    <label style="display: inline-block; width: 100px" for="threshold-label">threshold label: </label>
+                    <input id="threshold-label"></input>
                 </div>
             </div>
         `;
         this.ctx = null;
         this.chart = null;
+        this.data = null;
     }
 
     connectedCallback() {
@@ -25,19 +28,37 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
-        this.querySelector('#closeTimeSeriesChart').onclick = () => timeSeriesChart.style.display = 'none';
         const thresholdSetter = this.querySelector('#threshold-setter');
         thresholdSetter.oninput = () => this.setThreshold(thresholdSetter.value);
+        const labelSetter = this.querySelector('#threshold-label');
+        labelSetter.oninput = () => this.setLabel(labelSetter.value);
+        this.querySelector('#closeTimeSeriesChart').onclick = () => {
+            thresholdSetter.value = "";
+            labelSetter.value = "";
+            timeSeriesChart.style.display = 'none';
+        }
+
+    }
+
+    setLabel(label) {
+        // var display = label != "";
+        // this.chart.options.plugins.annotation.annotations[0].label.enabled = display;
+        // this.chart.options.plugins.annotation.annotations[0].label.content = label;
+        // console.log(this.chart.options.plugins.annotation.annotations[0].display);
+        // console.log(this.chart.options.plugins.annotation.annotations[0].value);
+        // this.chart.update();
+        this.populateChart(this.data, this.val, label);
     }
 
     setThreshold(threshold) {
-        if (threshold == "" || isNaN(threshold)) {
-            return;
-        }
+        this.populateChart(this.data, threshold, this.label);
     }
 
-    populateChart(data) {
+    populateChart(data, val=0, label="") {
         if (data.length == 0) return;
+        this.data = data;
+        this.val = val;
+        this.label = label;
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
@@ -45,7 +66,7 @@ export class TimeSeriesChart extends HTMLElement {
         for (var timeSeriesDataset of data) {
             var rgb = timeSeriesDataset.rgb;
             var color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-            var data = {
+            var timeSeriesData = {
                     label: timeSeriesDataset.label + " values at lat: " + roundLatLon(timeSeriesDataset.latLon.lat) + " lon: " + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
@@ -54,7 +75,7 @@ export class TimeSeriesChart extends HTMLElement {
                     lineTension: 0,
                     borderWidth: 1
             }
-            dataset.push(data);
+            dataset.push(timeSeriesData);
         }
         this.chart = new Chart(this.ctx, {
             type: 'line',
@@ -63,6 +84,9 @@ export class TimeSeriesChart extends HTMLElement {
                 datasets: dataset
             },
             options: {
+                animation: {
+                    duration: 0
+                },
                 scales: {
                     yAxes: {
                         title: {
@@ -80,17 +104,17 @@ export class TimeSeriesChart extends HTMLElement {
                 plugins: {
                     annotation: {
                         annotations: [{
-                            display: false,
+                            display: val != "" && !isNaN(val),
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'yAxes',
-                            value: 15,
-                            endValue: 15,
+                            value: val,
                             borderColor: 'rgb(255, 99, 132)',
                             borderWidth: 2,
                             label: {
-                                enabled: false,
-                                content: "Test Label"
+                                enabled: label != "",
+                                content: label,
+                                xAdjust: 220 - 2*label.length
                             }
                         }]
                       }
