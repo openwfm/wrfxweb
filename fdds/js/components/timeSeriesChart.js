@@ -29,32 +29,17 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
         const thresholdSetter = this.querySelector('#threshold-setter');
-        thresholdSetter.oninput = () => this.setThreshold(thresholdSetter.value);
+        thresholdSetter.oninput = () => this.populateChart(this.data, thresholdSetter.value, this.label);
         const labelSetter = this.querySelector('#threshold-label');
-        labelSetter.oninput = () => this.setLabel(labelSetter.value);
+        labelSetter.oninput = () => this.populateChart(this.data, this.val, labelSetter.value);
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             thresholdSetter.value = "";
             labelSetter.value = "";
             timeSeriesChart.style.display = 'none';
         }
-
     }
 
-    setLabel(label) {
-        // var display = label != "";
-        // this.chart.options.plugins.annotation.annotations[0].label.enabled = display;
-        // this.chart.options.plugins.annotation.annotations[0].label.content = label;
-        // console.log(this.chart.options.plugins.annotation.annotations[0].display);
-        // console.log(this.chart.options.plugins.annotation.annotations[0].value);
-        // this.chart.update();
-        this.populateChart(this.data, this.val, label);
-    }
-
-    setThreshold(threshold) {
-        this.populateChart(this.data, threshold, this.label);
-    }
-
-    populateChart(data, val=0, label="") {
+    populateChart(data, val="", label="") {
         if (data.length == 0) return;
         this.data = data;
         this.val = val;
@@ -63,6 +48,24 @@ export class TimeSeriesChart extends HTMLElement {
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
+        const complementColor = (rgb) => {
+            var complement = [];
+            for (var colorValue of rgb) {
+                var upper = (colorValue + 255) / 2;
+                var lower = colorValue / 2;
+                if ((upper - colorValue) > (colorValue - lower)) complement.push(upper);
+                else complement.push(lower);
+            }
+            return `rgb(${complement[0]}, ${complement[1]}, ${complement[2]})`;
+        };
+        const createBackgroundFunction = (rgb) => {
+            var color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            return function(context) {
+                var index = context.dataIndex;
+                var value = context.dataset.data[index];
+                return (val ==="" || isNaN(val) || value > val) ? color: complementColor(rgb);
+            }
+        }
         for (var timeSeriesDataset of data) {
             var rgb = timeSeriesDataset.rgb;
             var color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
@@ -72,6 +75,7 @@ export class TimeSeriesChart extends HTMLElement {
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
                     backgroundColor: color,
+                    pointBackgroundColor: createBackgroundFunction(rgb),
                     lineTension: 0,
                     borderWidth: 1
             }
@@ -104,7 +108,7 @@ export class TimeSeriesChart extends HTMLElement {
                 plugins: {
                     annotation: {
                         annotations: [{
-                            display: val != "" && !isNaN(val),
+                            display: val !== "" && !isNaN(val),
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'yAxes',
