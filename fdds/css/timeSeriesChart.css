@@ -30,7 +30,29 @@
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
+  overflow-y: auto;
 }
+
+#timeSeriesChartContainer button {
+  height: 10px;
+  width: 10px;
+  background-color: transparent;
+  border: none;
+}
+
+#undo-zoom {
+  opacity: 50%;
+}
+
+#undo-zoom:hover {
+  opacity: 100%;
+  cursor: pointer;
+}
+
+/* #timeSeriesChartContainer button.undo-zoom:hover:not([disabled]) {
+  cursor: pointer;
+  opacity: 100%;
+} */
 
 #timeSeriesChart {
   display: block;

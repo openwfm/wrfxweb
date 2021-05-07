@@ -1,4 +1,4 @@
-import { utcToLocal } from '../util.js';
+import { utcToLocal, createOption } from '../util.js';
 import {displayedColorbar} from './Controller.js';
 
 export class TimeSeriesChart extends HTMLElement {
@@ -8,13 +8,22 @@ export class TimeSeriesChart extends HTMLElement {
             <link rel="stylesheet" href="css/timeSeriesChart.css"/>
             <div id="timeSeriesChartContainer">
                 <span id="closeTimeSeriesChart">x</span>
+                <button>
+                    <img id="undo-zoom" style="display:none" height=10 width=10 src='icons/undo_black_24dp.svg'></img>
+                </button>
                 <canvas id="timeSeriesChart" width="400px" height="400px"></canvas>
                 <div id="break" style="width: 100%; height: 1px; background: #5d5d5d"></div>
                 <div id="add-threshold" style="margin-top: 10px">
                     <label style="display: inline-block; width: 100px" for="threshold-setter">y-axis threshold: </label>
-                    <input id="threshold-setter"></input>
+                    <input id="threshold-setter" style="margin-right:10px"></input>
                     <label style="display: inline-block; width: 100px" for="threshold-label">threshold label: </label>
                     <input id="threshold-label"></input>
+                </div>
+                <div id="zoomIn" style="display: inline-block; margin-top: 10px">
+                    <label style="display: inline-block; width: 100px" for="zoom-start">zoom in start: </label>
+                    <select id="zoom-start" style="width: 160px; margin-right:10px"></select>
+                    <label style="display: inline-block; width: 100px" for="zoom-end">zoom in end: </label>
+                    <select id="zoom-end" style="width: 160px"></select>
                 </div>
             </div>
         `;
@@ -39,12 +48,25 @@ export class TimeSeriesChart extends HTMLElement {
         }
     }
 
+    populateZoomSelectors(timeStamps) {
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        zoomStart.innerHTML = '';
+        zoomEnd.innerHTML = '';
+        for (var timeStamp of timeStamps) {
+            zoomStart.appendChild(createOption(timeStamp, false));
+            zoomEnd.appendChild(createOption(timeStamp, false));
+        }
+        zoomEnd.value = timeStamps[timeStamps.length - 1];
+    }
+
     populateChart(data, val="", label="") {
         if (data.length == 0) return;
         this.data = data;
         this.val = val;
         this.label = label;
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
+        this.populateZoomSelectors(labels);
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
@@ -58,24 +80,20 @@ export class TimeSeriesChart extends HTMLElement {
             }
             return `rgb(${complement[0]}, ${complement[1]}, ${complement[2]})`;
         };
-        const createBackgroundFunction = (rgb) => {
-            var color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-            return function(context) {
-                var index = context.dataIndex;
-                var value = context.dataset.data[index];
-                return (val ==="" || isNaN(val) || value > val) ? color: complementColor(rgb);
-            }
-        }
         for (var timeSeriesDataset of data) {
-            var rgb = timeSeriesDataset.rgb;
-            var color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            let rgb = timeSeriesDataset.rgb; // use let here to create block scope
+            let color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;  
             var timeSeriesData = {
                     label: timeSeriesDataset.label + " values at lat: " + roundLatLon(timeSeriesDataset.latLon.lat) + " lon: " + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
                     backgroundColor: color,
-                    pointBackgroundColor: createBackgroundFunction(rgb),
+                    pointBackgroundColor: function(context) {
+                        var index = context.dataIndex;
+                        var value = context.dataset.data[index];
+                        return (val ==="" || isNaN(val) || value > val) ? color: complementColor(rgb);
+                    },
                     lineTension: 0,
                     borderWidth: 1
             }
