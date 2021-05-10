@@ -1,4 +1,4 @@
-import { utcToLocal, createOption } from '../util.js';
+import { utcToLocal, createOption, linkSelects } from '../util.js';
 import {displayedColorbar} from './Controller.js';
 
 export class TimeSeriesChart extends HTMLElement {
@@ -30,6 +30,10 @@ export class TimeSeriesChart extends HTMLElement {
         this.ctx = null;
         this.chart = null;
         this.data = null;
+        this.val = "";
+        this.label = "";
+        this.startDate = "";
+        this.endDate = "";
     }
 
     connectedCallback() {
@@ -38,17 +42,40 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
         const thresholdSetter = this.querySelector('#threshold-setter');
-        thresholdSetter.oninput = () => this.populateChart(this.data, thresholdSetter.value, this.label);
+        // thresholdSetter.oninput = () => this.populateChart(this.data, thresholdSetter.value, this.label);
+        thresholdSetter.oninput = () => {
+            this.val = thresholdSetter.value;
+            this.populateChart(this.data, this.startDate, this.endDate);
+        }
+
         const labelSetter = this.querySelector('#threshold-label');
-        labelSetter.oninput = () => this.populateChart(this.data, this.val, labelSetter.value);
+        labelSetter.oninput = () => {
+            // this.populateChart(this.data, this.val, labelSetter.value);
+            this.label = labelSetter.value;
+            this.populateChart(this.data, this.startDate, this.endDate);
+        }
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             thresholdSetter.value = "";
             labelSetter.value = "";
             timeSeriesChart.style.display = 'none';
         }
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        zoomStart.onchange = () => {
+            this.populateChart(this.data, zoomStart.value, zoomEnd.value)
+            linkSelects(zoomStart, zoomEnd);
+        }
+        zoomEnd.onchange = () => {
+            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
+            linkSelects(zoomStart, zoomEnd);
+        }
     }
 
-    populateZoomSelectors(timeStamps) {
+    populateZoomSelectors(timeStamps, startDate, endDate) {
+        if (startDate == "") startDate = timeStamps[0]
+        if (endDate == "") endDate = timeStamps[timeStamps.length - 1];
+        this.startDate = startDate;
+        this.endDate = endDate;
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         zoomStart.innerHTML = '';
@@ -57,16 +84,16 @@ export class TimeSeriesChart extends HTMLElement {
             zoomStart.appendChild(createOption(timeStamp, false));
             zoomEnd.appendChild(createOption(timeStamp, false));
         }
-        zoomEnd.value = timeStamps[timeStamps.length - 1];
+        zoomStart.value = startDate;
+        zoomEnd.value = endDate;
     }
 
-    populateChart(data, val="", label="") {
+    populateChart(data, startDate="", endDate="") {
         if (data.length == 0) return;
         this.data = data;
-        this.val = val;
-        this.label = label;
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
-        this.populateZoomSelectors(labels);
+        this.populateZoomSelectors(labels, startDate, endDate);
+        labels = labels.filter(label => label >= this.startDate && label <= this.endDate);
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
@@ -86,13 +113,15 @@ export class TimeSeriesChart extends HTMLElement {
             var timeSeriesData = {
                     label: timeSeriesDataset.label + " values at lat: " + roundLatLon(timeSeriesDataset.latLon.lat) + " lon: " + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
-                    data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
+                    data: Object.entries(timeSeriesDataset.dataset).filter(entry => {
+                        return utcToLocal(entry[0]) >= this.startDate && utcToLocal(entry[0]) <= this.endDate
+                    }).map(entry => entry[1]),
                     borderColor: color, 
                     backgroundColor: color,
-                    pointBackgroundColor: function(context) {
+                    pointBackgroundColor: (context) => {
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];
-                        return (val ==="" || isNaN(val) || value > val) ? color: complementColor(rgb);
+                        return (this.val ==="" || isNaN(this.val) || value > this.val) ? color: complementColor(rgb);
                     },
                     lineTension: 0,
                     borderWidth: 1
@@ -126,17 +155,17 @@ export class TimeSeriesChart extends HTMLElement {
                 plugins: {
                     annotation: {
                         annotations: [{
-                            display: val !== "" && !isNaN(val),
+                            display: this.val !== "" && !isNaN(this.val),
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'yAxes',
-                            value: val,
+                            value: this.val,
                             borderColor: 'rgb(255, 99, 132)',
                             borderWidth: 2,
                             label: {
-                                enabled: label != "",
-                                content: label,
-                                xAdjust: 220 - 2*label.length
+                                enabled: this.label != "",
+                                content: this.label,
+                                xAdjust: 220 - 2*this.label.length
                             }
                         }]
                       }

@@ -56,6 +56,17 @@ export function createOption(timeStamp, utcValue) {
   return option;
 }
 
+export function linkSelects(selectStart, selectEnd) {
+  selectStart.childNodes.forEach(startOption => {
+      if (startOption.value > selectEnd.value) startOption.disabled = true;
+      else startOption.disabled = false;
+  });
+  selectEnd.childNodes.forEach(endOption => {
+    if (endOption.value < selectStart.value) endOption.disabled = true;
+    else endOption.disabled = false;
+  })
+}
+
 /** Makes given element draggable from sub element with id "subID" */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
