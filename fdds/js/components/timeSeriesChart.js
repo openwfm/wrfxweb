@@ -42,7 +42,6 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
         const thresholdSetter = this.querySelector('#threshold-setter');
-        // thresholdSetter.oninput = () => this.populateChart(this.data, thresholdSetter.value, this.label);
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
             this.populateChart(this.data, this.startDate, this.endDate);
@@ -50,13 +49,14 @@ export class TimeSeriesChart extends HTMLElement {
 
         const labelSetter = this.querySelector('#threshold-label');
         labelSetter.oninput = () => {
-            // this.populateChart(this.data, this.val, labelSetter.value);
             this.label = labelSetter.value;
             this.populateChart(this.data, this.startDate, this.endDate);
         }
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             thresholdSetter.value = "";
             labelSetter.value = "";
+            this.val = "";
+            this.label = "";
             timeSeriesChart.style.display = 'none';
         }
         const zoomStart = this.querySelector('#zoom-start');
