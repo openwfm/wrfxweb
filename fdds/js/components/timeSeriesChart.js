@@ -7,6 +7,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.innerHTML = `
             <link rel="stylesheet" href="css/timeSeriesChart.css"/>
             <div id="timeSeriesChartContainer">
+                <div id="zoomBox"></div>
                 <span id="closeTimeSeriesChart">x</span>
                 <button>
                     <img id="undo-zoom" style="display:none" height=10 width=10 src='icons/undo_black_24dp.svg'></img>
@@ -40,7 +41,9 @@ export class TimeSeriesChart extends HTMLElement {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
-        this.ctx = this.querySelector('#timeSeriesChart').getContext('2d');
+        const timeSeries = this.querySelector('#timeSeriesChart');
+        this.ctx = timeSeries.getContext('2d');
+        timeSeries.onpointerdown = (e) => this.zoomBox(e);
         const thresholdSetter = this.querySelector('#threshold-setter');
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
@@ -124,7 +127,7 @@ export class TimeSeriesChart extends HTMLElement {
                         return (this.val ==="" || isNaN(this.val) || value > this.val) ? color: complementColor(rgb);
                     },
                     lineTension: 0,
-                    borderWidth: 1
+                    borderWidth: 1,
             }
             dataset.push(timeSeriesData);
         }
@@ -137,6 +140,13 @@ export class TimeSeriesChart extends HTMLElement {
             options: {
                 animation: {
                     duration: 0
+                },
+                onClick: (evt) => {
+                    console.log(evt);
+                    const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                    if(points.length > 0) {
+                        console.log(points[0]);
+                    }
                 },
                 scales: {
                     yAxes: {
@@ -173,6 +183,39 @@ export class TimeSeriesChart extends HTMLElement {
             }
         });
         this.querySelector('#timeSeriesChartContainer').style.display = 'block';
+    }
+
+    zoomBox(e) {
+        const zoomBoxArea = this.querySelector('#zoomBox');
+        zoomBoxArea.style.width = '0px';
+        zoomBoxArea.style.height = '0px';
+        zoomBoxArea.style.display = 'block';
+        e = e || window.event;
+        e.stopPropagation();
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        var pos3 = e.clientX;
+        var pos2 = e.clientY;
+        console.log(pos3 + " y: " + pos2);
+        zoomBoxArea.style.left = e.clientX + 'px';
+        zoomBoxArea.style.top = e.clientY + 'px';
+        document.onpointerup = () => {
+            zoomBoxArea.style.display = 'none';
+            document.onpointerup = null;
+            document.onpointermove = null;
+        };
+        // call a function whenever the cursor moves:
+        document.onpointermove = (e2) => {
+            e2 = e2 || window.event;
+            e2.preventDefault();
+            e2.stopPropagation();
+            // calculate the new cursor position:
+            let xDiff = e2.clientX - pos3;
+            let yDiff = e2.clientY - pos2;
+            zoomBoxArea.style.width = xDiff + 'px';
+            zoomBoxArea.style.height = yDiff + 'px';
+            window
+        }
     }
 }
 

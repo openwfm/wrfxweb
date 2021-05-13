@@ -33,6 +33,17 @@
   overflow-y: auto;
 }
 
+#zoomBox {
+  position: fixed; 
+  display:none; 
+  height: 0px; 
+  width: 0px; 
+  background-color: #b6e2f0;
+  opacity: 50%;
+  border-radius: .2rem;
+  border: 1px solid #b6e2f0;
+}
+
 #timeSeriesChartContainer button {
   height: 10px;
   width: 10px;
