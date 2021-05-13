@@ -51,11 +51,11 @@
   border: none;
 }
 
-#undo-zoom {
+#undo-zoom img{
   opacity: 50%;
 }
 
-#undo-zoom:hover {
+#undo-zoom img:hover {
   opacity: 100%;
   cursor: pointer;
 }
