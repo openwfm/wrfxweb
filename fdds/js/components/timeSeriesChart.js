@@ -65,12 +65,16 @@ export class TimeSeriesChart extends HTMLElement {
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         zoomStart.onchange = () => {
-            this.populateChart(this.data, zoomStart.value, zoomEnd.value)
             linkSelects(zoomStart, zoomEnd);
+            this.chart.options.scales.xAxes.min = zoomStart.value;
+            this.chart.options.scales.xAxes.max = zoomEnd.value;
+            this.chart.update(this.data);
         }
         zoomEnd.onchange = () => {
-            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
             linkSelects(zoomStart, zoomEnd);
+            this.chart.options.scales.xAxes.min = zoomStart.value;
+            this.chart.options.scales.xAxes.max = zoomEnd.value;
+            this.chart.update(this.data);
         }
         const undoZoom = this.querySelector('#undo-zoom');
         undoZoom.onclick = () => {
@@ -94,12 +98,14 @@ export class TimeSeriesChart extends HTMLElement {
         }
         zoomStart.value = startDate;
         zoomEnd.value = endDate;
+        linkSelects(zoomStart, zoomEnd);
     }
 
-    populateChart(data, startDate="", endDate="", maxValue="", minValue="") {
+    populateChart(data, startDate="", endDate="") {
         if (data.length == 0) return;
         this.data = data;
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
+        this.labels = labels;
         this.populateZoomSelectors(labels, startDate, endDate);
         labels = labels.filter(label => label >= this.startDate && label <= this.endDate);
         if (this.chart) this.chart.destroy();
@@ -146,14 +152,6 @@ export class TimeSeriesChart extends HTMLElement {
                 animation: {
                     duration: 0
                 },
-                onClick: (evt) => {
-                    // console.log(evt);
-                    const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                    // console.log(points);
-                    if(points.length > 0) {
-                        // console.log(points[0]);
-                    }
-                },
                 scales: {
                     yAxes: {
                         title: {
@@ -192,6 +190,7 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     zoomBox(e) {
+        console.log('here')
         const zoomBoxArea = this.querySelector('#zoomBox');
         const canvas = this.querySelector('#timeSeriesChart');
         var boundingRect = canvas.getBoundingClientRect();
@@ -203,7 +202,6 @@ export class TimeSeriesChart extends HTMLElement {
         e = e || window.event;
         e.stopPropagation();
         e.preventDefault();
-        // console.log(this.chart.options.scales.yAxes);
         // get the mouse cursor position at startup:
         var zoomLeft = e.clientX;
         var zoomTop = e.clientY;
@@ -226,10 +224,24 @@ export class TimeSeriesChart extends HTMLElement {
             const minValue = (values) => Math.min(...values.map(dataValues => Math.min(...dataValues)));
             var yMax = maxValue(yValues);
             var yMin = minValue(yValues);
-            if (yMax > -Infinity) this.chart.options.scales.yAxes.max = yMax;
-            if (yMin < Infinity) this.chart.options.scales.yAxes.min = yMin;
-            this.chart.update(this.data);
-            this.querySelector('#undo-zoom').style.display = "block";
+            var minIndex = minValue(labelIndices);
+            var maxIndex = maxValue(labelIndices);
+            if (yMax > -Infinity) {
+                this.chart.options.scales.yAxes.max = yMax;
+                this.chart.options.scales.yAxes.min = yMin;
+                this.chart.options.scales.xAxes.min = this.labels[minIndex];
+                this.chart.options.scales.xAxes.max = this.labels[maxIndex];
+                const zoomStart = this.querySelector('#zoom-start');
+                const zoomEnd = this.querySelector('#zoom-end');
+                zoomStart.value = this.labels[minIndex];
+                zoomEnd.value = this.labels[maxIndex];
+                linkSelects(zoomStart, zoomEnd);
+                this.querySelector('#undo-zoom').style.display = "block";
+                this.chart.update(this.data);
+            }
+            // if (yMin < Infinity) this.chart.options.scales.yAxes.min = yMin;
+            // if (minIndex < Infinity) this.chart.options.scales.xAxes.min = this.labels[minIndex];
+            // if (maxIndex > -Infinity) this.chart.options.scales.xAxes.max = this.labels[maxIndex];
             // console.log(this.chart.scales.xAxes._labelItems);
         };
         // call a function whenever the cursor moves:
