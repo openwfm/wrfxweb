@@ -142,10 +142,10 @@ export class TimeSeriesChart extends HTMLElement {
                     duration: 0
                 },
                 onClick: (evt) => {
-                    console.log(evt);
+                    // console.log(evt);
                     const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
                     if(points.length > 0) {
-                        console.log(points[0]);
+                        // console.log(points[0]);
                     }
                 },
                 scales: {
@@ -187,6 +187,9 @@ export class TimeSeriesChart extends HTMLElement {
 
     zoomBox(e) {
         const zoomBoxArea = this.querySelector('#zoomBox');
+        const canvas = this.querySelector('#timeSeriesChart');
+        var boundingRect = canvas.getBoundingClientRect();
+        var data = this.chart.getDatasetMeta(0).data;
         zoomBoxArea.style.width = '0px';
         zoomBoxArea.style.height = '0px';
         zoomBoxArea.style.display = 'block';
@@ -194,15 +197,22 @@ export class TimeSeriesChart extends HTMLElement {
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
-        var pos3 = e.clientX;
-        var pos2 = e.clientY;
-        console.log(pos3 + " y: " + pos2);
+        var zoomLeft = e.clientX;
+        var zoomTop = e.clientY;
+        var zoomRight = e.clientX;
+        var zoomBottom = e.clientY;
         zoomBoxArea.style.left = e.clientX + 'px';
         zoomBoxArea.style.top = e.clientY + 'px';
         document.onpointerup = () => {
             zoomBoxArea.style.display = 'none';
             document.onpointerup = null;
             document.onpointermove = null;
+            var zoomData = data.filter(datapoint => {
+                var xCheck = datapoint.x >= zoomLeft - boundingRect.left && datapoint.x <= zoomRight - boundingRect.left;
+                var yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
+                return xCheck && yCheck;
+            }).map(datapoint => datapoint['$context'].dataIndex);
+            console.log(zoomData);
         };
         // call a function whenever the cursor moves:
         document.onpointermove = (e2) => {
@@ -210,11 +220,13 @@ export class TimeSeriesChart extends HTMLElement {
             e2.preventDefault();
             e2.stopPropagation();
             // calculate the new cursor position:
-            let xDiff = e2.clientX - pos3;
-            let yDiff = e2.clientY - pos2;
+            if (e2.clientX > boundingRect.right || e2.clientY > boundingRect.bottom) return;
+            let xDiff = e2.clientX - zoomLeft;
+            let yDiff = e2.clientY - zoomTop;
+            zoomRight = zoomLeft + xDiff;
+            zoomBottom = zoomTop + yDiff;
             zoomBoxArea.style.width = xDiff + 'px';
             zoomBoxArea.style.height = yDiff + 'px';
-            window
         }
     }
 }
