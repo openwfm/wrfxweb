@@ -227,8 +227,10 @@ export class TimeSeriesChart extends HTMLElement {
             var minIndex = minValue(labelIndices);
             var maxIndex = maxValue(labelIndices);
             if (yMax > -Infinity) {
-                this.chart.options.scales.yAxes.max = yMax;
-                this.chart.options.scales.yAxes.min = yMin;
+                this.chart.options.scales.yAxes.max = yMax + .005*yMax;
+                this.chart.options.scales.yAxes.min = yMin - .005*yMin;
+                minIndex = Math.max(0, minIndex - 1);
+                maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
                 this.chart.options.scales.xAxes.min = this.labels[minIndex];
                 this.chart.options.scales.xAxes.max = this.labels[maxIndex];
                 const zoomStart = this.querySelector('#zoom-start');
