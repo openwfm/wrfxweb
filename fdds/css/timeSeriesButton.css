@@ -10,6 +10,12 @@
     border: none;
 }
 
+.timeseries-select-label {
+    width: 50%;
+}
+
+
+
 #progressBar {
     display: none;
     border-radius: .2rem;
@@ -27,7 +33,7 @@
 
 .timeseries-select {
     display: inline-block;
-    width: 150px;
+    width: 50%;
 }
 
 .timeseries-select-label {
