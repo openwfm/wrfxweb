@@ -33,8 +33,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.data = null;
         this.val = "";
         this.label = "";
-        this.startDate = "";
-        this.endDate = "";
+        this.labels = "";
     }
 
     connectedCallback() {
@@ -42,18 +41,20 @@ export class TimeSeriesChart extends HTMLElement {
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         const timeSeries = this.querySelector('#timeSeriesChart');
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        const thresholdSetter = this.querySelector('#threshold-setter');
+        const labelSetter = this.querySelector('#threshold-label');
+        const undoZoom = this.querySelector('#undo-zoom');
         this.ctx = timeSeries.getContext('2d');
         timeSeries.onpointerdown = (e) => this.zoomBox(e);
-        const thresholdSetter = this.querySelector('#threshold-setter');
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
         }
-
-        const labelSetter = this.querySelector('#threshold-label');
         labelSetter.oninput = () => {
             this.label = labelSetter.value;
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
         }
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             thresholdSetter.value = "";
@@ -62,21 +63,19 @@ export class TimeSeriesChart extends HTMLElement {
             this.label = "";
             timeSeriesChart.style.display = 'none';
         }
-        const zoomStart = this.querySelector('#zoom-start');
-        const zoomEnd = this.querySelector('#zoom-end');
-        zoomStart.onchange = () => {
+        const zoomDate = (zoomStart, zoomEnd) => { 
             linkSelects(zoomStart, zoomEnd);
+            if (zoomStart.value != this.labels[0] || zoomEnd.value != this.labels[this.labels.length - 1]) {
+                undoZoom.style.display = 'block';
+            } else {
+                undoZoom.style.display = 'none';
+            }
             this.chart.options.scales.xAxes.min = zoomStart.value;
             this.chart.options.scales.xAxes.max = zoomEnd.value;
             this.chart.update(this.data);
         }
-        zoomEnd.onchange = () => {
-            linkSelects(zoomStart, zoomEnd);
-            this.chart.options.scales.xAxes.min = zoomStart.value;
-            this.chart.options.scales.xAxes.max = zoomEnd.value;
-            this.chart.update(this.data);
-        }
-        const undoZoom = this.querySelector('#undo-zoom');
+        zoomStart.onchange = () => zoomDate(zoomStart, zoomEnd);
+        zoomEnd.onchange = () => zoomDate(zoomStart, zoomEnd);
         undoZoom.onclick = () => {
             undoZoom.style.display = 'none';
             this.populateChart(this.data);
@@ -86,8 +85,6 @@ export class TimeSeriesChart extends HTMLElement {
     populateZoomSelectors(timeStamps, startDate, endDate) {
         if (startDate == "") startDate = timeStamps[0]
         if (endDate == "") endDate = timeStamps[timeStamps.length - 1];
-        this.startDate = startDate;
-        this.endDate = endDate;
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         zoomStart.innerHTML = '';
@@ -107,7 +104,6 @@ export class TimeSeriesChart extends HTMLElement {
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
         this.labels = labels;
         this.populateZoomSelectors(labels, startDate, endDate);
-        labels = labels.filter(label => label >= this.startDate && label <= this.endDate);
         if (this.chart) this.chart.destroy();
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
@@ -127,9 +123,7 @@ export class TimeSeriesChart extends HTMLElement {
             var timeSeriesData = {
                     label: timeSeriesDataset.label + " values at lat: " + roundLatLon(timeSeriesDataset.latLon.lat) + " lon: " + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
-                    data: Object.entries(timeSeriesDataset.dataset).filter(entry => {
-                        return utcToLocal(entry[0]) >= this.startDate && utcToLocal(entry[0]) <= this.endDate
-                    }).map(entry => entry[1]),
+                    data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
@@ -142,6 +136,12 @@ export class TimeSeriesChart extends HTMLElement {
             }
             dataset.push(timeSeriesData);
         }
+        var xAxisOptions = {
+            display: true,
+            text: "Timestamp"
+        };
+        if (startDate) xAxisOptions.min = startDate;
+        if (endDate) xAxisOptions.max = endDate;
         this.chart = new Chart(this.ctx, {
             type: 'line',
             data: {
@@ -159,12 +159,7 @@ export class TimeSeriesChart extends HTMLElement {
                             text: displayedColorbar.getValue()
                         }
                     },
-                    xAxes: {
-                        title: {
-                            display: true,
-                            text: "Timestamp"
-                        }
-                    }
+                    xAxes: xAxisOptions
                 },
                 plugins: {
                     annotation: {
