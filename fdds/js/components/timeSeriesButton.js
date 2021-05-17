@@ -1,5 +1,5 @@
 import {sorted_timestamps} from './Controller.js';
-import {utcToLocal} from '../util.js';
+import {createOption, linkSelects} from '../util.js';
 
 export class TimeSeriesButton extends HTMLElement {
     constructor() {
@@ -27,20 +27,8 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        startDate.onchange = () => {
-            var selectedDate = startDate.value;
-            endDate.childNodes.forEach(endOption => {
-                if (endOption.value < selectedDate) endOption.disabled = true;
-                else endOption.disabled = false;
-            });
-        };
-        endDate.onchange = () => {
-            var selectedDate = endDate.value;
-            startDate.childNodes.forEach(startOption => {
-                if (startOption.value > selectedDate) startOption.disabled = true;
-                else startOption.disabled = false;
-            });
-        };
+        startDate.onchange = () => linkSelects(startDate, endDate);
+        endDate.onchange = () => linkSelects(startDate, endDate);
     }
 
     setProgress(progress) {
@@ -57,21 +45,13 @@ export class TimeSeriesButton extends HTMLElement {
 
     
     updateTimestamps() {
-        const createOption = (timestamp) => {
-            var option = document.createElement('option');
-            option.value = timestamp;
-            option.innerText = utcToLocal(timestamp);
-            return option;
-        }
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
         startDate.innerHTML = "";
         endDate.innerHTML = "";
         for (var timestamp of sorted_timestamps.getValue()) {
-            var startOption = createOption(timestamp);
-            var endOption = createOption(timestamp);
-            startDate.appendChild(startOption);
-            endDate.appendChild(endOption);
+            startDate.appendChild(createOption(timestamp, true));
+            endDate.appendChild(createOption(timestamp, true));
         }
         endDate.value = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
     }
