@@ -103,3 +103,30 @@ button[disabled] {
 #slider-head:hover {
     border-color: black;
 }
+
+@media (max-width: 769px) {
+    .slider-container {
+        width: 320px;
+    }
+
+    #slider-bar {
+        left:10px;
+        width: 300px;
+    }
+
+    #slider-timestamp {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    #slider-play-bar {
+        display: flex;
+        padding-left: 10px;
+        padding-right: 10px;
+        justify-content: space-between;
+    }
+
+    #slider-header {
+        height:60px;
+    }
+}

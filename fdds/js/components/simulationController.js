@@ -1,5 +1,5 @@
-import {currentDomain, sorted_timestamps, current_timestamp, overlayOrder, currentSimulation, rasters, raster_base} from './Controller.js';
-import {utcToLocal} from '../util.js';
+import { currentDomain, sorted_timestamps, current_timestamp, currentSimulation } from './Controller.js';
+import { utcToLocal } from '../util.js';
 
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
@@ -55,6 +55,11 @@ export class SimulationController extends HTMLElement {
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
+        if (document.body.clientWidth < 769) {
+            const timeStamp = this.querySelector('#slider-timestamp');
+            const playButtons = this.querySelector('#slider-play-bar');
+            timeStamp.parentNode.insertBefore(timeStamp, playButtons);
+        }
         L.DomEvent.disableScrollPropagation(container);
         L.DomEvent.disableClickPropagation(container);
         const sliderHead = this.querySelector('#slider-head');
