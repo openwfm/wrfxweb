@@ -63,23 +63,49 @@ export class TimeSeriesChart extends HTMLElement {
             this.label = "";
             timeSeriesChart.style.display = 'none';
         }
-        const zoomDate = (zoomStart, zoomEnd) => { 
-            linkSelects(zoomStart, zoomEnd);
-            if (zoomStart.value != this.labels[0] || zoomEnd.value != this.labels[this.labels.length - 1]) {
-                undoZoom.style.display = 'block';
-            } else {
-                undoZoom.style.display = 'none';
-            }
-            this.chart.options.scales.xAxes.min = zoomStart.value;
-            this.chart.options.scales.xAxes.max = zoomEnd.value;
-            this.chart.update(this.data);
-        }
-        zoomStart.onchange = () => zoomDate(zoomStart, zoomEnd);
-        zoomEnd.onchange = () => zoomDate(zoomStart, zoomEnd);
+        // const zoomDate = (zoomStart, zoomEnd) => { 
+        //     linkSelects(zoomStart, zoomEnd);
+        //     if (zoomStart.value != this.labels[0] || zoomEnd.value != this.labels[this.labels.length - 1]) {
+        //         undoZoom.style.display = 'block';
+        //     } else {
+        //         undoZoom.style.display = 'none';
+        //     }
+        //     this.chart.options.scales.xAxes.min = zoomStart.value;
+        //     this.chart.options.scales.xAxes.max = zoomEnd.value;
+        //     this.chart.update(this.data);
+        // }
+        zoomStart.onchange = () => this.zoomDate();
+        zoomEnd.onchange = () => this.zoomDate();
         undoZoom.onclick = () => {
             undoZoom.style.display = 'none';
             this.populateChart(this.data);
         }
+    }
+
+    zoomDate(startDate = "", endDate = "", yMin = NaN, yMax = NaN) {
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        const undoZoom = this.querySelector('#undo-zoom');
+        if (startDate) zoomStart.value = startDate;
+        if (endDate) zoomEnd.value = endDate;
+        linkSelects(zoomStart, zoomEnd);
+        var startCheck = zoomStart.value == this.labels[0];
+        var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
+        var yAxisCheck = isNaN(yMin);
+        if (startCheck && endCheck && yAxisCheck) 
+            undoZoom.style.display = 'none';
+        else 
+            undoZoom.style.display = 'block';
+        this.chart.options.scales.xAxes.min = zoomStart.value;
+        this.chart.options.scales.xAxes.max = zoomEnd.value;
+        if (!isNaN(yMin)) {
+            this.chart.options.scales.yAxes.min = yMin;
+            this.chart.options.scales.yAxes.max = yMax;
+        } else {
+            delete this.chart.options.scales.yAxes.min;
+            delete this.chart.options.scales.yAxes.max;
+        }
+        this.chart.update(this.data);
     }
 
     populateZoomSelectors(timeStamps, startDate, endDate) {
@@ -221,18 +247,20 @@ export class TimeSeriesChart extends HTMLElement {
             var minIndex = minValue(labelIndices);
             var maxIndex = maxValue(labelIndices);
             if (yMax > -Infinity) {
-                this.chart.options.scales.yAxes.max = yMax + .005*yMax;
-                this.chart.options.scales.yAxes.min = yMin - .005*yMin;
+                // this.chart.options.scales.yAxes.max = yMax + .005*yMax;
+                // this.chart.options.scales.yAxes.min = yMin - .005*yMin;
                 minIndex = Math.max(0, minIndex - 1);
                 maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
-                this.chart.options.scales.xAxes.min = this.labels[minIndex];
-                this.chart.options.scales.xAxes.max = this.labels[maxIndex];
-                const zoomStart = this.querySelector('#zoom-start');
-                const zoomEnd = this.querySelector('#zoom-end');
-                zoomStart.value = this.labels[minIndex];
-                zoomEnd.value = this.labels[maxIndex];
-                linkSelects(zoomStart, zoomEnd);
-                this.querySelector('#undo-zoom').style.display = "block";
+                // this.chart.options.scales.xAxes.min = this.labels[minIndex];
+                // this.chart.options.scales.xAxes.max = this.labels[maxIndex];
+                // const zoomStart = this.querySelector('#zoom-start');
+                // const zoomEnd = this.querySelector('#zoom-end');
+                // zoomStart.value = this.labels[minIndex];
+                // zoomEnd.value = this.labels[maxIndex];
+
+                // linkSelects(zoomStart, zoomEnd);
+                // this.querySelector('#undo-zoom').style.display = "block";
+                this.zoomDate(this.labels[minIndex], this.labels[maxIndex], yMin - .01*yMin, yMax + .01*yMax);
                 this.chart.update(this.data);
             }
         };

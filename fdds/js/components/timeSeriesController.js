@@ -59,7 +59,7 @@ export class TimeSeriesController extends LayerController {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
         while (this.markers.length > 0) this.markers[0].removeFrom(map);
-        // this.handleOverlayadd('T2');
+        this.handleOverlayadd('T2');
         // const timeSeriesChart = document.querySelector('timeseries-chart');
         // displayedColorbar.setValue('test');
         // var dataset = [];
