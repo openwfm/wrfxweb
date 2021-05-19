@@ -63,17 +63,6 @@ export class TimeSeriesChart extends HTMLElement {
             this.label = "";
             timeSeriesChart.style.display = 'none';
         }
-        // const zoomDate = (zoomStart, zoomEnd) => { 
-        //     linkSelects(zoomStart, zoomEnd);
-        //     if (zoomStart.value != this.labels[0] || zoomEnd.value != this.labels[this.labels.length - 1]) {
-        //         undoZoom.style.display = 'block';
-        //     } else {
-        //         undoZoom.style.display = 'none';
-        //     }
-        //     this.chart.options.scales.xAxes.min = zoomStart.value;
-        //     this.chart.options.scales.xAxes.max = zoomEnd.value;
-        //     this.chart.update(this.data);
-        // }
         zoomStart.onchange = () => this.zoomDate();
         zoomEnd.onchange = () => this.zoomDate();
         undoZoom.onclick = () => {
@@ -247,19 +236,8 @@ export class TimeSeriesChart extends HTMLElement {
             var minIndex = minValue(labelIndices);
             var maxIndex = maxValue(labelIndices);
             if (yMax > -Infinity) {
-                // this.chart.options.scales.yAxes.max = yMax + .005*yMax;
-                // this.chart.options.scales.yAxes.min = yMin - .005*yMin;
                 minIndex = Math.max(0, minIndex - 1);
                 maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
-                // this.chart.options.scales.xAxes.min = this.labels[minIndex];
-                // this.chart.options.scales.xAxes.max = this.labels[maxIndex];
-                // const zoomStart = this.querySelector('#zoom-start');
-                // const zoomEnd = this.querySelector('#zoom-end');
-                // zoomStart.value = this.labels[minIndex];
-                // zoomEnd.value = this.labels[maxIndex];
-
-                // linkSelects(zoomStart, zoomEnd);
-                // this.querySelector('#undo-zoom').style.display = "block";
                 this.zoomDate(this.labels[minIndex], this.labels[maxIndex], yMin - .01*yMin, yMax + .01*yMax);
                 this.chart.update(this.data);
             }
