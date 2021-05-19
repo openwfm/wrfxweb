@@ -44,7 +44,10 @@ export class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
-        currentDomain.subscribe(() => this.domainSwitch());
+        const domainSubscription = () => {
+            this.domainSwitch();
+        }
+        currentDomain.subscribe(domainSubscription);
         current_timestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
     }
@@ -54,7 +57,9 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        if (this.currentSimulation != currentSimulation.getValue()) return;
+        if (this.currentSimulation != currentSimulation.getValue()) {
+            return;
+        }
         var rastersNow = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var reloading = false;
         for (var layerName of overlayOrder) {
@@ -63,17 +68,24 @@ export class LayerController extends HTMLElement {
             var cs = rasterInfo.coords;
             var imageURL = raster_base.getValue() + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
-                if (!reloading) this.loadWithPriority(current_timestamp.getValue(), sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1], overlayOrder);
+                if (!reloading) {
+                    var startTime = current_timestamp.getValue();
+                    var endTime = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+                    this.loadWithPriority(startTime, endTime, overlayOrder);
+                }
                 reloading = true;
+            } else {
+                imageURL = this.preloaded[imageURL];
             }
-            else imageURL = this.preloaded[imageURL];
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
             if (layerName == displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var colorbarURL = raster_base.getValue() + rasterInfo.colorbar;
-                if (colorbarURL in this.preloaded) colorbarURL = this.preloaded[colorbarURL];
+                if (colorbarURL in this.preloaded) {
+                    colorbarURL = this.preloaded[colorbarURL];
+                }
                 rasterColorbar.src = colorbarURL;
             }
         }
@@ -82,9 +94,13 @@ export class LayerController extends HTMLElement {
     loadWithPriority(startTime, endTime, layerNames) {
         var worker = this.createWorker();
         var loadLater = [];
-        const nowOrLater = (timeStamp, imageURL) => {
-            if (timeStamp < startTime || timeStamp > endTime) loadLater.push(imageURL);
-            else worker.postMessage(imageURL);
+        function nowOrLater(timeStamp, imageURL) {
+            if (timeStamp < startTime || timeStamp > endTime) {
+                loadLater.push(imageURL);
+            }    
+            else {
+                worker.postMessage(imageURL);
+            }
         }
         for (var timeStamp of sorted_timestamps.getValue()) {
             var raster = rasters.getValue()[currentDomain.getValue()][timeStamp];
@@ -93,18 +109,27 @@ export class LayerController extends HTMLElement {
                 var imageURL = raster_base.getValue() + rasterInfo.raster;
                 if (!(imageURL in this.preloaded)) {
                     nowOrLater(timeStamp, imageURL);
-                    if ('colorbar' in rasterInfo) nowOrLater(timeStamp, raster_base.getValue() + rasterInfo.colorbar);
+                    if ('colorbar' in rasterInfo) {
+                        var colorbarURL = raster_base.getValue() + rasterInfo.colorbar;
+                        nowOrLater(timeStamp, colorbarURL);
+                    }
                 }
             }
         }
-        for (var imageURL of loadLater) worker.postMessage(imageURL);
+        for (var imageURL of loadLater) {
+            worker.postMessage(imageURL);
+        }
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
-        if (this.worker) this.worker.terminate();
-        for (var layerName of overlayOrder) this.getLayer(layerName).remove(map);
+        if (this.worker) {
+            this.worker.terminate();
+        }
+        for (var layerName of overlayOrder) {
+            this.getLayer(layerName).remove(map);
+        }
         displayedColorbar.setValue(null);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         rasterColorbar.src = "";
@@ -136,8 +161,11 @@ export class LayerController extends HTMLElement {
                                             opacity: 0.5,
                                             interactive: true
                                         });
-            if(overlay_list.indexOf(r) >= 0) this.overlayDict[r] = layer;
-            else this.rasterDict[r] = layer;
+            if(overlay_list.indexOf(r) >= 0) {
+                this.overlayDict[r] = layer;
+            } else {
+                this.rasterDict[r] = layer;
+            }
         };
         this.buildLayerBoxes();
     }
@@ -148,9 +176,14 @@ export class LayerController extends HTMLElement {
         var layer = this.getLayer(name);
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
-        if (!(overlayOrder.includes(name))) overlayOrder.push(name);
-        if (overlay_list.indexOf(name) >= 0) layer.bringToFront();
-        else layer.bringToBack();
+        if (!(overlayOrder.includes(name))) {
+            overlayOrder.push(name);
+        }
+        if (overlay_list.indexOf(name) >= 0) {
+            layer.bringToFront();
+        } else {
+            layer.bringToBack();
+        }
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
@@ -167,12 +200,13 @@ export class LayerController extends HTMLElement {
         }
         var startDate = current_timestamp.getValue();
         var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
-        // var endDate = sorted_timestamps.getValue()[1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 
     createWorker() {
-        if (this.worker) this.worker.terminate();
+        if (this.worker) {
+            this.worker.terminate();
+        }
         var worker = new Worker('imageLoadingWorker.js');
         this.worker = worker;
         worker.addEventListener('message', event => {
@@ -215,7 +249,9 @@ export class LayerController extends HTMLElement {
 
     /** Returns the layer associated with a given name */
     getLayer(name) {
-        if (overlay_list.includes(name)) return this.overlayDict[name];
+        if (overlay_list.includes(name)) {
+            return this.overlayDict[name];
+        }
         return this.rasterDict[name];
     }
 
@@ -233,11 +269,14 @@ export class LayerController extends HTMLElement {
     buildLayerBoxes() {
         const rasterRegion = this.querySelector('#raster-layers');
         rasterRegion.style.display = 'block';
-        if (Object.keys(this.rasterDict).length == 0) rasterRegion.style.display = 'none';
-
+        if (Object.keys(this.rasterDict).length == 0) {
+            rasterRegion.style.display = 'none';
+        }
         const overlayRegion = this.querySelector('#overlay-layers');
         overlayRegion.style.display = 'block';
-        if (Object.keys(this.overlayDict).length == 0) overlayRegion.style.display = 'none';
+        if (Object.keys(this.overlayDict).length == 0) {
+            overlayRegion.style.display = 'none';
+        }
 
         const rasterDiv = this.querySelector('#raster-checkboxes');
         rasterDiv.innerHTML = '';
@@ -245,9 +284,13 @@ export class LayerController extends HTMLElement {
         overlayDiv.innerHTML = '';
 
         for (const [layerDiv, layerDict] of [[rasterDiv, this.rasterDict], [overlayDiv, this.overlayDict]]) {
-            for (var layerName in layerDict) layerDiv.appendChild(this.buildLayerBox(layerName));
+            for (var layerName in layerDict) {
+                layerDiv.appendChild(this.buildLayerBox(layerName));
+            }
         }
-        for (var layerName of overlayOrder) this.handleOverlayadd(layerName)
+        for (var layerName of overlayOrder) {
+            this.handleOverlayadd(layerName);
+        }
     }
 
     /** Builds a radio box for each map base that can be chosen */
@@ -261,7 +304,9 @@ export class LayerController extends HTMLElement {
                 layer.addTo(map);
                 this.mapType = name; 
                 layer.bringToFront();
-            } else layer.remove(map);
+            } else {
+                layer.remove(map);
+            }
         }
         return div;
     }
@@ -274,8 +319,11 @@ export class LayerController extends HTMLElement {
         input.name = 'layers';
         input.checked = overlayOrder.includes(name);
         input.onclick = () => {
-            if (input.checked) this.handleOverlayadd(name);
-            else this.handleOverlayRemove(name);
+            if (input.checked) {
+                this.handleOverlayadd(name);
+            } else {
+                this.handleOverlayRemove(name);
+            }
         }
         return div;
     }
