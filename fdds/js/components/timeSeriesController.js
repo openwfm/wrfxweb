@@ -36,13 +36,14 @@ export class TimeSeriesController extends LayerController {
     connectedCallback() {
         super.connectedCallback();
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
-        syncImageLoad.subscribe(() => {
+        const syncImageSubscription = () => {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.updateCanvases(layerImage, rasterColorbar);
             }
-        });
+        }
+        syncImageLoad.subscribe(syncImageSubscription);
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add("waiting");
             var startDate = this.timeSeriesButton.getStartDate();
@@ -89,8 +90,12 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
-            img.onload = () => syncImageLoad.increment(0);
-            rasterColorbar.onload = () => syncImageLoad.increment(1);
+            img.onload = () => {
+                syncImageLoad.increment(0);
+            }
+            rasterColorbar.onload = () => {
+                syncImageLoad.increment(1);
+            }
             map.on('zoomend', () => {
                 if (img.height < this.canvasMaxHeight) {
                     this.imgCanvas = this.drawCanvas(img);
