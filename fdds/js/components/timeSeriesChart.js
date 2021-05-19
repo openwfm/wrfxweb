@@ -47,7 +47,9 @@ export class TimeSeriesChart extends HTMLElement {
         const labelSetter = this.querySelector('#threshold-label');
         const undoZoom = this.querySelector('#undo-zoom');
         this.ctx = timeSeries.getContext('2d');
-        timeSeries.onpointerdown = (e) => this.zoomBox(e);
+        timeSeries.onpointerdown = (e) => {
+            this.zoomBox(e);
+        }
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
             this.populateChart(this.data, zoomStart.value, zoomEnd.value);
@@ -63,8 +65,11 @@ export class TimeSeriesChart extends HTMLElement {
             this.label = "";
             timeSeriesChart.style.display = 'none';
         }
-        zoomStart.onchange = () => this.zoomDate();
-        zoomEnd.onchange = () => this.zoomDate();
+        const zoomChange = () => {
+            this.zoomDate();
+        }
+        zoomStart.onchange = zoomChange;
+        zoomEnd.onchange = zoomChange;
         undoZoom.onclick = () => {
             undoZoom.style.display = 'none';
             this.populateChart(this.data);
@@ -127,7 +132,9 @@ export class TimeSeriesChart extends HTMLElement {
             return;
         }
         this.data = data;
-        var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
+        var labels = Object.keys(data[0].dataset).map(timeStamp => {
+            return utcToLocal(timeStamp);
+        });
         this.labels = labels;
         this.populateZoomSelectors(labels, startDate, endDate);
         if (this.chart) {
@@ -160,7 +167,10 @@ export class TimeSeriesChart extends HTMLElement {
                     pointBackgroundColor: (context) => {
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];
-                        return (this.val ==="" || isNaN(this.val) || value > this.val) ? color: complementColor(rgb);
+                        if (this.val === "" || isNaN(this.val) || value > this.val) {
+                            return color;
+                        }
+                        return complementColor(rgb);
                     },
                     lineTension: 0,
                     borderWidth: 1,
@@ -245,7 +255,9 @@ export class TimeSeriesChart extends HTMLElement {
                 var xCheck = datapoint.x >= zoomLeft - boundingRect.left && datapoint.x <= zoomRight - boundingRect.left;
                 var yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
                 return xCheck && yCheck;
-            }).map(datapoint => [datapoint.parsed.x, datapoint.parsed.y]));
+            }).map(datapoint => {
+                return [datapoint.parsed.x, datapoint.parsed.y];
+            }));
             var labelIndices = zoomData.map(dataset => dataset.map(data => data[0]));
             var yValues = zoomData.map(dataset => dataset.map(data => data[1]));
             const minValue = (values) => Math.min(...values.map(dataValues => Math.min(...dataValues)));
@@ -254,7 +266,9 @@ export class TimeSeriesChart extends HTMLElement {
             if (yMax > -Infinity) {
                 minIndex = Math.max(0, minIndex - 1);
                 maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
-                this.zoomDate(this.labels[minIndex], this.labels[maxIndex], yMin - .01*yMin, yMax + .01*yMax);
+                yMin = yMin - .01*yMin;
+                yMax = yMax + .01*yMax;
+                this.zoomDate(this.labels[minIndex], this.labels[maxIndex], yMin, yMax);
                 this.chart.update(this.data);
             }
         };
