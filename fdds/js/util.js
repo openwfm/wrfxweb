@@ -1,9 +1,3 @@
-// var utc = require('dayjs/plugin/utc'); // dependent on utc plugin
-// var timezone = require('dayjs/plugin/timezone');
-// var dayJs = require('dayjs');
-// dayJs.extend(utc);
-// dayJs.extend(timezone);
-
 export const overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 export const baseLayerDict = {
   /*
@@ -32,8 +26,10 @@ export const map = L.map('map-fd', {
 export function debounce(callback, delay) {
   let timeout; 
   return function() {
-    if (timeout) return;
-    var callbackInIntervals = () => {
+    if (timeout) {
+      return;
+    }
+    function callbackInIntervals() {
       timeout = null;
       callback();
     };
@@ -58,13 +54,17 @@ export function createOption(timeStamp, utcValue) {
 
 export function linkSelects(selectStart, selectEnd) {
   selectStart.childNodes.forEach(startOption => {
-      if (startOption.value > selectEnd.value) startOption.disabled = true;
-      else startOption.disabled = false;
+    startOption.disabled = false;
+    if (startOption.value > selectEnd.value) {
+      startOption.disabled = true;
+    }
   });
   selectEnd.childNodes.forEach(endOption => {
-    if (endOption.value < selectStart.value) endOption.disabled = true;
-    else endOption.disabled = false;
-  })
+    endOption.disabled = false;
+    if (endOption.value < selectStart.value) {
+      endOption.disabled = true;
+    }
+  });
 }
 
 /** Makes given element draggable from sub element with id "subID" */
@@ -72,7 +72,9 @@ export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   var elmntLeft = 0, elmntTop = 0;
   var clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
-  if (clientWidth < 769) return;
+  if (clientWidth < 769) {
+    return;
+  }
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
   window.addEventListener("resize", () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
