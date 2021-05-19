@@ -185,7 +185,6 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     zoomBox(e) {
-        console.log('here')
         const zoomBoxArea = this.querySelector('#zoomBox');
         const canvas = this.querySelector('#timeSeriesChart');
         var boundingRect = canvas.getBoundingClientRect();
@@ -236,10 +235,6 @@ export class TimeSeriesChart extends HTMLElement {
                 this.querySelector('#undo-zoom').style.display = "block";
                 this.chart.update(this.data);
             }
-            // if (yMin < Infinity) this.chart.options.scales.yAxes.min = yMin;
-            // if (minIndex < Infinity) this.chart.options.scales.xAxes.min = this.labels[minIndex];
-            // if (maxIndex > -Infinity) this.chart.options.scales.xAxes.max = this.labels[maxIndex];
-            // console.log(this.chart.scales.xAxes._labelItems);
         };
         // call a function whenever the cursor moves:
         document.onpointermove = (e2) => {
