@@ -64,15 +64,31 @@ export class SimulationController extends HTMLElement {
         L.DomEvent.disableClickPropagation(container);
         const sliderHead = this.querySelector('#slider-head');
         const sliderBar = this.querySelector('#slider-bar');
-        sliderHead.onpointerdown = (e) => this.dragSliderHead(e);
-        sliderBar.onclick = (e) => this.clickBar(e);
-        this.querySelector('#slider-play-pause').onclick = () => this.playPause();
-        this.querySelector('#slider-prev').onclick = () => this.prevFrame(5);
-        this.querySelector('#slider-next').onclick = () => this.nextFrame(5);
-        this.querySelector('#slider-fast-forward').onclick = () => this.toggleSpeedUp();
-        this.querySelector('#slider-slow-down').onclick = () => this.toggleSlowDown();
-
-        currentDomain.subscribe(() => this.resetSlider());
+        sliderHead.onpointerdown = (e) => {
+            this.dragSliderHead(e);
+        }
+        sliderBar.onclick = (e) => {
+            this.clickBar(e);
+        }
+        this.querySelector('#slider-play-pause').onclick = () => {
+            this.playPause();
+        }
+        this.querySelector('#slider-prev').onclick = () => {
+            this.prevFrame(5);
+        }
+        this.querySelector('#slider-next').onclick = () => {
+            this.nextFrame(5);
+        }
+        this.querySelector('#slider-fast-forward').onclick = () => {
+            this.toggleSpeedUp();
+        }
+        this.querySelector('#slider-slow-down').onclick = () => {
+            this.toggleSlowDown();
+        }
+        const domainSubscription = () => {
+            this.resetSlider();
+        }
+        currentDomain.subscribe(domainSubscription);
     }
 
     resetSlider() {
