@@ -15,7 +15,10 @@ export class DomainSelector extends HTMLElement {
     }
 
     connectedCallback() {
-        domainInstance.subscribe(() => this.buildDomains());
+        const domainSubscription = () => {
+            this.buildDomains();
+        }
+        domainInstance.subscribe(domainSubscription);
     }
 
     /** Builds the list of domain elements that can be chosen. */
@@ -46,8 +49,12 @@ export class DomainSelector extends HTMLElement {
         input.type = 'radio';
         input.name = 'domains';
         input.id = dom_id;
-        if (dom_id == '1') input.checked = 'yes';
-        input.onclick = () => this.setUpForDomain(dom_id);
+        if (dom_id == '1') {
+            input.checked = 'yes';
+        }
+        input.onclick = () => {
+            this.setUpForDomain(dom_id);
+        }
 
         var label = document.createElement('label');
         label.for = dom_id;
