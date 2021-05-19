@@ -135,7 +135,7 @@ export class CatalogMenu extends HTMLElement {
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
     searchCatalog(searchText, sortBy) {
-        const filterFunction = (catalogEntry) => {
+        function filterFunction(catalogEntry) {
             if (sortBy == 'original-order' || sortBy == 'description') {
                 return catalogEntry.description.toLowerCase().includes(searchText);
             }
@@ -146,7 +146,9 @@ export class CatalogMenu extends HTMLElement {
                 return catalogEntry.to_utc.toLowerCase().includes(searchText);
             }
         }
-        const createList = (list) => list.filter(filterFunction);
+        function createList(list) {
+            return list.filter(filterFunction);
+        }
         this.filterColumns(createList);
     }
 
@@ -157,29 +159,41 @@ export class CatalogMenu extends HTMLElement {
         catalogSearch.value = "";
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
-            if (sortBy == "original-order") result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
-            if (sortBy == "description") result = listElem1.description > listElem2.description; 
-            if (sortBy == "start-date") result = listElem1.from_utc > listElem2.from_utc;
-            if (sortBy == "end-date") result = listElem1.to_utc > listElem2.to_utc;
-            if (reverseOrder) result = !result;
+            if (sortBy == "original-order") {
+                result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+            }
+            if (sortBy == "description") {
+                result = listElem1.description > listElem2.description; 
+            }
+            if (sortBy == "start-date") {
+                result = listElem1.from_utc > listElem2.from_utc;
+            }
+            if (sortBy == "end-date") {
+                result = listElem1.to_utc > listElem2.to_utc;
+            }
+            if (reverseOrder) {
+                result = !result;
+            }
             return result ? 1 : -1;
         }
-        const createList = (list) => list.sort(sortingFunction);
+        function createList(list) { 
+            return list.sort(sortingFunction);
+        }
         this.filterColumns(createList);
     }
 
     /** Clears each catalog column on the DOM, filters the stored array of catalog entries by 
      * provided function. Builds <li> html for filtered catalog entries and adds them to the columns */
-    filterColumns(createList) {
+    filterColumns(listCreator) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
         let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
-        for (const [listDOM, list] of catalogColumns) {
+        for (var [listDOM, list] of catalogColumns) {
             listDOM.innerHTML = '';
-            let newList = createList(list);
+            var newList = listCreator(list);
             for (var catalogEntry of newList) {
-                let newLI = new CatalogItem(catalogEntry, null);
+                var newLI = new CatalogItem(catalogEntry, null);
                 listDOM.append(newLI);
             }
         }
