@@ -84,8 +84,12 @@ export class CatalogItem extends HTMLElement {
             zipLink.innerText = 'Download ZIP ' + mb.toString() + ' MB';
         }
 
-        this.shadowRoot.querySelector('#entry').onclick = () => this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
-        if (this.navJobId == jobId) this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+        this.shadowRoot.querySelector('#entry').onclick = () => {
+            this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+        }
+        if (this.navJobId == jobId) {
+            this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+        }
     }
 
     /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated

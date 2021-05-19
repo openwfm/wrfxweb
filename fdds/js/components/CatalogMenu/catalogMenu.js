@@ -81,16 +81,28 @@ export class CatalogMenu extends HTMLElement {
         // Makes sure that map events like zooming and panning are disabled from within menu div
         L.DomEvent.disableClickPropagation(catalogMenu);
         // Closes the menu when the x is clicked
-        this.querySelector('#menu-close').onclick = () => catalogMenu.style.display = 'none';
+        this.querySelector('#menu-close').onclick = () => {
+            catalogMenu.style.display = 'none';
+        }
         // Implements repositioning menu
         dragElement(catalogMenu, "menu-title");
         menuSearch.placeholder = searchDescription;
-        menuSearch.onpointerdown = (e) => e.stopPropagation();
+        menuSearch.onpointerdown = (e) => {
+            e.stopPropagation();
+        }
         // Sets up search functionality
-        menuSearch.oninput = () => this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value);
-        sortBy.onchange = () => this.sortBy(sortBy.value, reverseOrder.checked);
-        reverseOrder.onclick = () => this.sortBy(sortBy.value, reverseOrder.checked);
-        menuSelect.onchange = () => this.selectCategory(menuSelect.value);
+        menuSearch.oninput = () => {
+            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value);
+        }
+        sortBy.onchange = () => {
+            this.sortBy(sortBy.value, reverseOrder.checked);
+        }
+        reverseOrder.onclick = () => {
+            this.sortBy(sortBy.value, reverseOrder.checked);
+        }
+        menuSelect.onchange = () => {
+            this.selectCategory(menuSelect.value);
+        }
         this.buildMenu();
     }
 
