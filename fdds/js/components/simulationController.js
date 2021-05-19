@@ -76,7 +76,9 @@ export class SimulationController extends HTMLElement {
     }
 
     resetSlider() {
-        if (this.playing) this.playPause();
+        if (this.playing) {
+            this.playPause();
+        }
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (sorted_timestamps.getValue().length < 2) ? 'none' : 'block';
         let percentage = this.currentFrame / this.frameTotal;
@@ -122,7 +124,7 @@ export class SimulationController extends HTMLElement {
     play() {
         if (this.playing) {
             this.nextFrame(5);
-            if (this.currentFrame == sorted_timestamps.getValue().length-1){
+            if (this.currentFrame == sorted_timestamps.getValue().length-1) {
                 window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
                 window.setTimeout(() => this.play(), this.frameRate);
@@ -137,7 +139,9 @@ export class SimulationController extends HTMLElement {
         if (this.frameRate > this.fastRate) {
             this.frameRate = this.fastRate;
             speedUp.classList.add('pressed');
-        } else this.frameRate = this.normalRate;
+        } else {
+            this.frameRate = this.normalRate;
+        }
     }
 
     toggleSlowDown() {
@@ -147,8 +151,9 @@ export class SimulationController extends HTMLElement {
         if (this.frameRate < this.slowRate) {
             this.frameRate = this.slowRate;
             slowDown.classList.add('pressed');
+        } else {
+            this.frameRate = this.slowRate;
         }
-        else this.frameRate = this.slowRate;
     }
 
     /** Moves one frame to the right. */
@@ -164,9 +169,13 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the left. */
     prevFrame(recursionDepth) {
-        if (recursionDepth == 0) return;
+        if (recursionDepth == 0) {
+            return;
+        }
         let prevFrame = (this.currentFrame - 1) % sorted_timestamps.getValue().length;
-        if (prevFrame < 0) prevFrame += sorted_timestamps.getValue().length;
+        if (prevFrame < 0) {
+            prevFrame += sorted_timestamps.getValue().length;
+        }
         this.currentFrame = prevFrame;
         this.updateSlider();
     }

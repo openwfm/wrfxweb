@@ -75,16 +75,21 @@ export class TimeSeriesChart extends HTMLElement {
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         const undoZoom = this.querySelector('#undo-zoom');
-        if (startDate) zoomStart.value = startDate;
-        if (endDate) zoomEnd.value = endDate;
+        if (startDate) {
+            zoomStart.value = startDate;
+        }
+        if (endDate) {
+            zoomEnd.value = endDate;
+        }
         linkSelects(zoomStart, zoomEnd);
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
         var yAxisCheck = isNaN(yMin);
-        if (startCheck && endCheck && yAxisCheck) 
+        if (startCheck && endCheck && yAxisCheck) {
             undoZoom.style.display = 'none';
-        else 
+        } else {
             undoZoom.style.display = 'block';
+        }
         this.chart.options.scales.xAxes.min = zoomStart.value;
         this.chart.options.scales.xAxes.max = zoomEnd.value;
         if (!isNaN(yMin)) {
@@ -98,8 +103,12 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateZoomSelectors(timeStamps, startDate, endDate) {
-        if (startDate == "") startDate = timeStamps[0]
-        if (endDate == "") endDate = timeStamps[timeStamps.length - 1];
+        if (startDate == "") {
+            startDate = timeStamps[0]
+        }
+        if (endDate == "") {
+            endDate = timeStamps[timeStamps.length - 1];
+        }
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         zoomStart.innerHTML = '';
@@ -114,12 +123,16 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data, startDate="", endDate="") {
-        if (data.length == 0) return;
+        if (data.length == 0) {
+            return;
+        }
         this.data = data;
         var labels = Object.keys(data[0].dataset).map(timeStamp => utcToLocal(timeStamp));
         this.labels = labels;
         this.populateZoomSelectors(labels, startDate, endDate);
-        if (this.chart) this.chart.destroy();
+        if (this.chart) {
+            this.chart.destroy();
+        }
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
         const complementColor = (rgb) => {
@@ -127,8 +140,11 @@ export class TimeSeriesChart extends HTMLElement {
             for (var colorValue of rgb) {
                 var upper = (colorValue + 255) / 2;
                 var lower = colorValue / 2;
-                if ((upper - colorValue) > (colorValue - lower)) complement.push(upper);
-                else complement.push(lower);
+                if ((upper - colorValue) > (colorValue - lower)) {
+                    complement.push(upper);
+                } else {
+                    complement.push(lower);
+                }
             }
             return `rgb(${complement[0]}, ${complement[1]}, ${complement[2]})`;
         };
@@ -155,8 +171,12 @@ export class TimeSeriesChart extends HTMLElement {
             display: true,
             text: "Timestamp"
         };
-        if (startDate) xAxisOptions.min = startDate;
-        if (endDate) xAxisOptions.max = endDate;
+        if (startDate) {
+            xAxisOptions.min = startDate;
+        }
+        if (endDate) {
+            xAxisOptions.max = endDate;
+        }
         this.chart = new Chart(this.ctx, {
             type: 'line',
             data: {
@@ -204,7 +224,9 @@ export class TimeSeriesChart extends HTMLElement {
         const canvas = this.querySelector('#timeSeriesChart');
         var boundingRect = canvas.getBoundingClientRect();
         var dataset = [];
-        for (var i = 0; i < this.data.length; i++) dataset.push(this.chart.getDatasetMeta(i).data);
+        for (var i = 0; i < this.data.length; i++) {
+            dataset.push(this.chart.getDatasetMeta(i).data);
+        }
         zoomBoxArea.style.width = '0px';
         zoomBoxArea.style.height = '0px';
         zoomBoxArea.style.display = 'block';
@@ -212,10 +234,7 @@ export class TimeSeriesChart extends HTMLElement {
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
-        var zoomLeft = e.clientX;
-        var zoomTop = e.clientY;
-        var zoomRight = e.clientX;
-        var zoomBottom = e.clientY;
+        var [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
         zoomBoxArea.style.left = e.clientX + 'px';
         zoomBoxArea.style.top = e.clientY + 'px';
         document.onpointerup = () => {
@@ -227,14 +246,11 @@ export class TimeSeriesChart extends HTMLElement {
                 var yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
                 return xCheck && yCheck;
             }).map(datapoint => [datapoint.parsed.x, datapoint.parsed.y]));
-            var yValues = zoomData.map(dataset => dataset.map(data => data[1]));
             var labelIndices = zoomData.map(dataset => dataset.map(data => data[0]));
-            const maxValue = (values) => Math.max(...values.map(dataValues => Math.max(...dataValues)));
+            var yValues = zoomData.map(dataset => dataset.map(data => data[1]));
             const minValue = (values) => Math.min(...values.map(dataValues => Math.min(...dataValues)));
-            var yMax = maxValue(yValues);
-            var yMin = minValue(yValues);
-            var minIndex = minValue(labelIndices);
-            var maxIndex = maxValue(labelIndices);
+            const maxValue = (values) => Math.max(...values.map(dataValues => Math.max(...dataValues)));
+            var [minIndex, maxIndex, yMin, yMax] = [minValue(labelIndices), maxValue(labelIndices), minValue(yValues), maxValue(yValues)];
             if (yMax > -Infinity) {
                 minIndex = Math.max(0, minIndex - 1);
                 maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
@@ -248,7 +264,9 @@ export class TimeSeriesChart extends HTMLElement {
             e2.preventDefault();
             e2.stopPropagation();
             // calculate the new cursor position:
-            if (e2.clientX > boundingRect.right || e2.clientY > boundingRect.bottom) return;
+            if (e2.clientX > boundingRect.right || e2.clientY > boundingRect.bottom) {
+                return;
+            }
             let xDiff = e2.clientX - zoomLeft;
             let yDiff = e2.clientY - zoomTop;
             zoomRight = zoomLeft + xDiff;
