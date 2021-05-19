@@ -8,11 +8,11 @@ export class TimeSeriesButton extends HTMLElement {
             <link rel="stylesheet" href="css/timeSeriesButton.css"/>
             <div id='timeseries-button'>
                 <div>
-                    <label class="timeseries-select-label" for="startDate">select start time:</label>
+                    <label class="timeseries-select-label" for="startDate">start time:</label>
                     <select class="timeseries-select" id="startDate"></select>
                 </div>
                 <div>
-                    <label class="timeseries-select-label" for="endDate">select end time: </label>
+                    <label class="timeseries-select-label" for="endDate">end time: </label>
                     <select class="timeseries-select" id="endDate"></select>
                 </div>
                 <button class="timeSeriesButton" id="timeSeriesButton">
