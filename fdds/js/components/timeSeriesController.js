@@ -155,7 +155,9 @@ export class TimeSeriesController extends LayerController {
      * marker to reflec values in the new img and colorbar */
     updateCanvases(layerImg, colorbarImg) {
         this.imgCanvas = this.drawCanvas(layerImg);
-        this.clrbarCanvas = this.drawCanvas(colorbarImg);
+        var clrbarImg = new Image();
+        clrbarImg.src = colorbarImg.src;
+        this.clrbarCanvas = this.drawCanvas(clrbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
         for (var marker of this.markers) {
             this.updateMarker(marker);
