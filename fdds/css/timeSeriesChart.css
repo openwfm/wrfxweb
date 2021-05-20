@@ -30,7 +30,6 @@
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
-  overflow-y: auto;
 }
 
 #zoomBox {
@@ -74,7 +73,7 @@
     #timeSeriesChartContainer {
         padding: 20px;
         width: 300px;
-        height: 300px;
+        height: 390px;
         overflow-y: auto;
     }
 }

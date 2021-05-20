@@ -36,13 +36,14 @@ export class TimeSeriesController extends LayerController {
     connectedCallback() {
         super.connectedCallback();
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
-        syncImageLoad.subscribe(() => {
+        const syncImageSubscription = () => {
             if (displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var layerImage = this.getLayer(displayedColorbar.getValue())._image;
                 this.updateCanvases(layerImage, rasterColorbar);
             }
-        });
+        }
+        syncImageLoad.subscribe(syncImageSubscription);
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add("waiting");
             var startDate = this.timeSeriesButton.getStartDate();
@@ -58,7 +59,9 @@ export class TimeSeriesController extends LayerController {
     domainSwitch() {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
-        while (this.markers.length > 0) this.markers[0].removeFrom(map);
+        while (this.markers.length > 0) {
+            this.markers[0].removeFrom(map);
+        }
     }
 
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
@@ -80,13 +83,21 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
-            img.onload = () => syncImageLoad.increment(0);
-            rasterColorbar.onload = () => syncImageLoad.increment(1);
+            img.onload = () => {
+                syncImageLoad.increment(0);
+            }
+            rasterColorbar.onload = () => {
+                syncImageLoad.increment(1);
+            }
             map.on('zoomend', () => {
-                if (img.height < this.canvasMaxHeight) this.imgCanvas = this.drawCanvas(img)
+                if (img.height < this.canvasMaxHeight) {
+                    this.imgCanvas = this.drawCanvas(img);
+                }
             });
             this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
-            if (this.markers.length > 0) this.timeSeriesButton.getButton().disabled = false;
+            if (this.markers.length > 0) {
+                this.timeSeriesButton.getButton().disabled = false;
+            }
         } else img.style.pointerEvents = 'none';
     }
 
@@ -96,7 +107,9 @@ export class TimeSeriesController extends LayerController {
         this.markers.push(marker);
         marker.on('remove', () => {
             this.markers.splice(this.markers.indexOf(marker), 1);
-            if (this.markers.length == 0) this.timeSeriesButton.getButton().disabled = true;
+            if (this.markers.length == 0) {
+                this.timeSeriesButton.getButton().disabled = true;
+            }
         });
         const timeSeriesChart = document.querySelector('timeseries-chart');
         const timeSeriesMarker = new TimeSeriesMarker(latLon);
@@ -124,7 +137,9 @@ export class TimeSeriesController extends LayerController {
                 break;
             }
         }
-        if (!displayedColorbar.getValue()) this.timeSeriesButton.getButton().disabled = true;
+        if (!displayedColorbar.getValue()) {
+            this.timeSeriesButton.getButton().disabled = true;
+        }
         this.updateCanvases(img, rasterColorbar);
     }
 
@@ -135,7 +150,9 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas = this.drawCanvas(layerImg);
         this.clrbarCanvas = this.drawCanvas(colorbarImg);
         this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-        for (var marker of this.markers) this.updateMarker(marker);
+        for (var marker of this.markers) {
+            this.updateMarker(marker);
+        }
     }
 
     /** returns a canvas drawn with given image. */
@@ -143,7 +160,9 @@ export class TimeSeriesController extends LayerController {
         var canvas = null;
         if (img != null) {
             var factor = 1; 
-            if (img.height > this.canvasMaxHeight) factor = this.canvasMaxHeight / img.height;
+            if (img.height > this.canvasMaxHeight) {
+                factor = this.canvasMaxHeight / img.height;
+            }
             canvas = document.createElement('canvas');
             canvas.width = img.width * factor;
             canvas.height = img.height * factor;
@@ -172,11 +191,15 @@ export class TimeSeriesController extends LayerController {
      * location in clrbarMap. */
     findClosestKey(rgb, clrbarMap) {
         var [r, g, b] = rgb;
-        if (r + g + b == 0) return 0;
+        if (r + g + b == 0) {
+            return 0;
+        }
         const createKey = (r, g, b) => r + ',' + g + ',' + b;
         const mapKey = (key) => key.split(',').map(str => parseInt(str));
         var closestKey = createKey(r, g, b);
-        if (closestKey in clrbarMap) return clrbarMap[closestKey]; 
+        if (closestKey in clrbarMap){
+            return clrbarMap[closestKey];
+        }
         var minDiff = 255*3 + 1;
         for (var key in clrbarMap) {
             var [rk, gk, bk] = mapKey(key);
@@ -198,7 +221,9 @@ export class TimeSeriesController extends LayerController {
         var rasterDomains = rasters.getValue()[currentDomain.getValue()];
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var factor = 1;
-        if (layerImg.height >= this.canvasMaxHeight) factor = this.canvasMaxHeight / layerImg.height;
+        if (layerImg.height >= this.canvasMaxHeight) {
+            factor = this.canvasMaxHeight / layerImg.height;
+        }
         var img = new Image();
         img.width = layerImg.width*factor;
         img.height = layerImg.height*factor;
@@ -270,34 +295,50 @@ export class TimeSeriesController extends LayerController {
 
     mapLevels(clrbarCanvas, clrbarMap) {
         var levelMap = {};
-        if (displayedColorbar.getValue() == null) return;
+        if (displayedColorbar.getValue() == null) {
+            return;
+        }
         var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[displayedColorbar.getValue()];
         var levels = raster_info.levels;
         var x = clrbarMap.left - 5;
-        if (!levels) return;
+        if (!levels) {
+            return;
+        }
         var stratified = false;
-        if (Object.keys(clrbarMap).length - 10 < levels.length) stratified = true;
+        if (Object.keys(clrbarMap).length - 10 < levels.length) {
+            stratified = true;
+        }
         var levelIndex = levels.length - 1;
-        if (stratified) levelMap[0] = 0;
+        if (stratified) {
+            levelMap[0] = 0;
+        }
         var coord1 = [];
         var coord2 = [];
         const computeLocation = (y) => 1 - (y - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
         for (var y = 0; y < clrbarCanvas.height; y++) {
-            if (levelIndex < 0) break;
+            if (levelIndex < 0) {
+                break;
+            }
             var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
             if (colorbarData[3] != 0) {
                 var location = computeLocation(y);
                 levelMap[location] = levels[levelIndex];
-                if (coord2.length == 0) coord2 = [location, levels[levelIndex]];
-                else coord1 = [location, levels[levelIndex]];
+                if (coord2.length == 0) {
+                    coord2 = [location, levels[levelIndex]];
+                }
+                else {
+                    coord1 = [location, levels[levelIndex]];
+                }
                 levelIndex = levelIndex - 1;
                 y += 5;
             }
         }
         var slope = (coord2[1] - coord1[1]) / (coord2[0] - coord1[0]);
         const interpolate = (location) => {
-            if (!stratified) return slope*(location - coord1[0]) + coord1[1];
+            if (!stratified) {
+                return slope*(location - coord1[0]) + coord1[1];
+            }
             // find closest key in levelMap
             var closestKey = location;
             var minDistance = 1;
@@ -310,7 +351,9 @@ export class TimeSeriesController extends LayerController {
             }
             return levelMap[closestKey];
         }
-        for (var color in clrbarMap) clrbarMap[color] = interpolate(clrbarMap[color]);
+        for (var color in clrbarMap) {
+            clrbarMap[color] = interpolate(clrbarMap[color]);
+        }
     }
 
     /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
@@ -321,14 +364,18 @@ export class TimeSeriesController extends LayerController {
      * to the yCoord. */
     buildColorMap(clrbarCanvas) {
         var clrbarMap = {};
-        if (!clrbarCanvas) return clrbarMap;
+        if (!clrbarCanvas) {
+            return clrbarMap;
+        }
         var right = 0;
         var left = 0;
         var y = Math.round(clrbarCanvas.height / 2);
         for (var x = clrbarCanvas.width - 1; x > 0; x--) {
             var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
             if (right == 0) {
-                if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) right = x;
+                if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) {
+                    right = x;
+                }
             } else {
                 if (colorbarData[0] + colorbarData[1] + colorbarData[2] == 0) {
                     left = x;
@@ -345,7 +392,9 @@ export class TimeSeriesController extends LayerController {
             var g = colorbarData[1];
             var b = colorbarData[2];
             if (start == 0) {
-                if (r + g + b != 0) start = j + 1;
+                if (r + g + b != 0) {
+                    start = j + 1;
+                }
             } else {
                 if (r + g + b == 0) {
                     end = j - 1;
@@ -355,7 +404,9 @@ export class TimeSeriesController extends LayerController {
             clrbarMap[r + ',' + g + ',' + b] = j;
         }
         const computeLocation = (key) => 1 - (clrbarMap[key] - start) / (end - start);
-        for (var rgbKey in clrbarMap) clrbarMap[rgbKey] = computeLocation(rgbKey);
+        for (var rgbKey in clrbarMap) {
+            clrbarMap[rgbKey] = computeLocation(rgbKey);
+        }
         clrbarMap.start = start;
         clrbarMap.end = end;
         clrbarMap.right = right;

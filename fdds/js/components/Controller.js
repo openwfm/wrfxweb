@@ -33,7 +33,9 @@ export class SyncController extends Controller {
 
     increment(i) {
         this.value[i] = true;
-        if (this.value[0] && this.value[1]) this.setValue([false, false]);
+        if (this.value[0] && this.value[1]) {
+            this.setValue([false, false]);
+        }
     }
 }
 
