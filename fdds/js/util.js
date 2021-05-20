@@ -29,7 +29,7 @@ export function debounce(callback, delay) {
     if (timeout) {
       return;
     }
-    function callbackInIntervals() {
+    const callbackInIntervals = () => {
       timeout = null;
       callback();
     };

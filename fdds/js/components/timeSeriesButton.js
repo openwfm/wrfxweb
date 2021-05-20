@@ -27,7 +27,7 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        function dateChange() {
+        const dateChange =() => {
             linkSelects(startDate, endDate)
         }
         startDate.onchange = dateChange;
