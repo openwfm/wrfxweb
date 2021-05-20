@@ -92,19 +92,18 @@ export class TimeSeriesChart extends HTMLElement {
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
         var yAxisCheck = isNaN(yMin);
+        var undoZoomDisplay = 'block';
         if (startCheck && endCheck && yAxisCheck) {
-            undoZoom.style.display = 'none';
-        } else {
-            undoZoom.style.display = 'block';
+            undoZoomDisplay = 'none';
         }
+        undoZoom.style.display = undoZoomDisplay;
         this.chart.options.scales.xAxes.min = zoomStart.value;
         this.chart.options.scales.xAxes.max = zoomEnd.value;
+        delete this.chart.options.scales.yAxes.min;
+        delete this.chart.options.scales.yAxes.max;
         if (!isNaN(yMin)) {
             this.chart.options.scales.yAxes.min = yMin;
             this.chart.options.scales.yAxes.max = yMax;
-        } else {
-            delete this.chart.options.scales.yAxes.min;
-            delete this.chart.options.scales.yAxes.max;
         }
         this.chart.update(this.data);
     }

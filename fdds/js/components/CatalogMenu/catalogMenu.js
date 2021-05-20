@@ -135,7 +135,7 @@ export class CatalogMenu extends HTMLElement {
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
     searchCatalog(searchText, sortBy) {
-        function filterFunction(catalogEntry) {
+        const filterFunction = (catalogEntry) => {
             if (sortBy == 'original-order' || sortBy == 'description') {
                 return catalogEntry.description.toLowerCase().includes(searchText);
             }
@@ -146,7 +146,7 @@ export class CatalogMenu extends HTMLElement {
                 return catalogEntry.to_utc.toLowerCase().includes(searchText);
             }
         }
-        function createList(list) {
+        const createList = (list) => {
             return list.filter(filterFunction);
         }
         this.filterColumns(createList);
@@ -176,7 +176,7 @@ export class CatalogMenu extends HTMLElement {
             }
             return result ? 1 : -1;
         }
-        function createList(list) { 
+        const createList = (list) => { 
             return list.sort(sortingFunction);
         }
         this.filterColumns(createList);

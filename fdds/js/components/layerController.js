@@ -94,7 +94,7 @@ export class LayerController extends HTMLElement {
     loadWithPriority(startTime, endTime, layerNames) {
         var worker = this.createWorker();
         var loadLater = [];
-        function nowOrLater(timeStamp, imageURL) {
+        const nowOrLater = (timeStamp, imageURL) => {
             if (timeStamp < startTime || timeStamp > endTime) {
                 loadLater.push(imageURL);
             }    
