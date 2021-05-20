@@ -117,6 +117,7 @@ html, body {
   #raster-colorbar {
     height: 160px;
     width: 80px;
-    bottom: 100px;
+    bottom: 120px;
+    left: 40px;
   }
 }
