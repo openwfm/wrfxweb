@@ -72,9 +72,13 @@
 @media (max-width: 769px) {
     #timeSeriesChartContainer {
         padding: 20px;
+        padding-left: 10px;
         width: 300px;
         height: 420px;
         overflow-y: auto;
+    }
+    #timeSeriesChart {
+      margin-left: 0px;
     }
 }
 

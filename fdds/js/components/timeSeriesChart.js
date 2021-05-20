@@ -34,6 +34,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.val = "";
         this.label = "";
         this.labels = "";
+        this.xAdjust = null;
     }
 
     connectedCallback() {
@@ -74,6 +75,7 @@ export class TimeSeriesChart extends HTMLElement {
             undoZoom.style.display = 'none';
             this.populateChart(this.data);
         }
+        this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
     }
 
     zoomDate(startDate = "", endDate = "", yMin = NaN, yMax = NaN) {
@@ -219,7 +221,7 @@ export class TimeSeriesChart extends HTMLElement {
                             label: {
                                 enabled: this.label != "",
                                 content: this.label,
-                                xAdjust: 220 - 2*this.label.length
+                                xAdjust: this.xAdjust - 2*this.label.length
                             }
                         }]
                       }
