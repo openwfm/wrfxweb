@@ -48,7 +48,7 @@ export class LayerController extends HTMLElement {
             this.domainSwitch();
         }
         controllers.currentDomain.subscribe(domainSubscription);
-        simVars.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
+        controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
     }
 
@@ -60,7 +60,7 @@ export class LayerController extends HTMLElement {
         if (this.currentSimulation != simVars.currentSimulation) {
             return;
         }
-        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var reloading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(layerName);
@@ -69,7 +69,7 @@ export class LayerController extends HTMLElement {
             var imageURL = simVars.rasterBase + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
                 if (!reloading) {
-                    var startTime = simVars.currentTimestamp.getValue();
+                    var startTime = controllers.currentTimestamp.getValue();
                     var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
                     this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
                 }
@@ -185,7 +185,7 @@ export class LayerController extends HTMLElement {
             layer.bringToBack();
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
         var cs = raster_info.coords;
         layer.setUrl(simVars.rasterBase + raster_info.raster,
@@ -198,7 +198,7 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             simVars.displayedColorbar = name;
         }
-        var startDate = simVars.currentTimestamp.getValue();
+        var startDate = controllers.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
     }
@@ -227,7 +227,7 @@ export class LayerController extends HTMLElement {
         this.getLayer(name).remove(map);
         simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(name), 1);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
@@ -242,7 +242,7 @@ export class LayerController extends HTMLElement {
         simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
-        var startDate = simVars.currentTimestamp.getValue();
+        var startDate = controllers.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
     }

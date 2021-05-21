@@ -201,7 +201,7 @@ export class SimulationController extends HTMLElement {
         var timestamp = simVars.sortedTimestamps[frame_ndx];
         // set current time
         document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
-        simVars.currentTimestamp.setValue(timestamp);
+        controllers.currentTimestamp.setValue(timestamp);
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates

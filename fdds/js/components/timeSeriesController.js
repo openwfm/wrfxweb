@@ -76,7 +76,7 @@ export class TimeSeriesController extends LayerController {
      * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
         var img = layer._image;
@@ -136,7 +136,7 @@ export class TimeSeriesController extends LayerController {
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var img = null;
         for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
@@ -307,7 +307,7 @@ export class TimeSeriesController extends LayerController {
         if (simVars.displayedColorbar == null) {
             return;
         }
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var raster_info = rasters_now[simVars.displayedColorbar];
         var levels = raster_info.levels;
         var x = clrbarMap.left - 5;

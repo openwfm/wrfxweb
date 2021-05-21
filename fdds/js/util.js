@@ -1,5 +1,3 @@
-import { Controller } from './components/Controller.js';
-
 export const overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 export const baseLayerDict = {
   /*
@@ -31,7 +29,6 @@ export const simVars = {
   rasters: [],
   rasterBase: "",
   sortedTimestamps: [],
-  currentTimestamp: new Controller(),
   overlayOrder: [],
   displayedColorbar: null,
   organization: null,
