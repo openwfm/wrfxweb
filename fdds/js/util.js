@@ -29,6 +29,7 @@ export const map = L.map('map-fd', {
 export const simVars = {
   currentSimulation: null,
   rasters: [],
+  rasterBase: "",
 };
 
 export function debounce(callback, delay) {

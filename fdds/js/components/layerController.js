@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -66,7 +66,7 @@ export class LayerController extends HTMLElement {
             var layer = this.getLayer(layerName);
             var rasterInfo = rastersNow[layerName];
             var cs = rasterInfo.coords;
-            var imageURL = raster_base.getValue() + rasterInfo.raster;
+            var imageURL = simVars.rasterBase + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
                 if (!reloading) {
                     var startTime = current_timestamp.getValue();
@@ -82,7 +82,7 @@ export class LayerController extends HTMLElement {
                         { attribution: organization.getValue(), opacity: 0.5 });
             if (layerName == displayedColorbar.getValue()) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
-                var colorbarURL = raster_base.getValue() + rasterInfo.colorbar;
+                var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
                 if (colorbarURL in this.preloaded) {
                     colorbarURL = this.preloaded[colorbarURL];
                 }
@@ -106,11 +106,11 @@ export class LayerController extends HTMLElement {
             var raster = simVars.rasters[currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
-                var imageURL = raster_base.getValue() + rasterInfo.raster;
+                var imageURL = simVars.rasterBase + rasterInfo.raster;
                 if (!(imageURL in this.preloaded)) {
                     nowOrLater(timeStamp, imageURL);
                     if ('colorbar' in rasterInfo) {
-                        var colorbarURL = raster_base.getValue() + rasterInfo.colorbar;
+                        var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
                         nowOrLater(timeStamp, colorbarURL);
                     }
                 }
@@ -154,7 +154,7 @@ export class LayerController extends HTMLElement {
         for (var r in first_rasters) {
             var raster_info = first_rasters[r];
             var cs = raster_info.coords;
-            var layer = L.imageOverlay(raster_base.getValue() + raster_info.raster,
+            var layer = L.imageOverlay(simVars.rasterBase + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
                                             attribution: organization.getValue(),
@@ -188,11 +188,11 @@ export class LayerController extends HTMLElement {
         var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
         var cs = raster_info.coords;
-        layer.setUrl(raster_base.getValue() + raster_info.raster,
+        layer.setUrl(simVars.rasterBase + raster_info.raster,
                     [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                     { attribution: organization.getValue(), opacity: 0.5 });
         if('colorbar' in raster_info) {
-            var cb_url = raster_base.getValue() + raster_info.colorbar;
+            var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
@@ -234,7 +234,7 @@ export class LayerController extends HTMLElement {
         for (var i = overlayOrder.length - 1; i >= 0; i--) {
             if ('colorbar' in rasters_now[overlayOrder[i]]) {
                 mostRecentColorbar = overlayOrder[i];
-                colorbarSrc = raster_base.getValue() + rasters_now[overlayOrder[i]].colorbar;
+                colorbarSrc = simVars.rasterBase + rasters_now[overlayOrder[i]].colorbar;
                 colorbarDisplay = 'block';
                 break;
             }

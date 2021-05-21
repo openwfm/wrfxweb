@@ -1,4 +1,4 @@
-import {raster_base, domainInstance} from './components/Controller.js';
+import {domainInstance} from './components/Controller.js';
 import { simVars } from './util.js';
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
@@ -30,8 +30,8 @@ export function getSimulation(path) {
     // fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
         // store in global state
         simVars.rasters = selectedSimulation;
-        // raster_base.setValue(path.substring(0, path.lastIndexOf('/') + 1));
-        raster_base.setValue(path.replaceAll(":", "_").substring(0, path.lastIndexOf('/') + 1));
+        // simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
+        simVars.rasterBase = path.replaceAll(":", "_").substring(0, path.lastIndexOf('/') + 1);
         // retrieve all domains
         domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {

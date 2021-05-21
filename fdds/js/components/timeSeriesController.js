@@ -1,5 +1,5 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, raster_base, sorted_timestamps} from './Controller.js';
+import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, sorted_timestamps} from './Controller.js';
 import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -265,8 +265,8 @@ export class TimeSeriesController extends LayerController {
                 clrbarMap = this.buildColorMap(clrbarCanvas);
                 syncController.increment(1);
             }
-            var imgURL = raster_base.getValue() + rasterInfo.raster;
-            var clrbarURL = raster_base.getValue() + rasterInfo.colorbar;
+            var imgURL = simVars.rasterBase + rasterInfo.raster;
+            var clrbarURL = simVars.rasterBase + rasterInfo.colorbar;
             if (imgURL in this.preloaded && clrbarURL in this.preloaded) {
                 imgURL = this.preloaded[imgURL];
                 clrbarURL = this.preloaded[clrbarURL];
