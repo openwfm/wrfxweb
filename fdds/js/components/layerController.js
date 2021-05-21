@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {displayedColorbar, currentDomain, overlayOrder, organization} from './Controller.js';
+import {displayedColorbar, currentDomain, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -62,7 +62,7 @@ export class LayerController extends HTMLElement {
         }
         var rastersNow = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var reloading = false;
-        for (var layerName of overlayOrder) {
+        for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(layerName);
             var rasterInfo = rastersNow[layerName];
             var cs = rasterInfo.coords;
@@ -71,7 +71,7 @@ export class LayerController extends HTMLElement {
                 if (!reloading) {
                     var startTime = simVars.currentTimestamp.getValue();
                     var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-                    this.loadWithPriority(startTime, endTime, overlayOrder);
+                    this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
                 }
                 reloading = true;
             } else {
@@ -127,7 +127,7 @@ export class LayerController extends HTMLElement {
         if (this.worker) {
             this.worker.terminate();
         }
-        for (var layerName of overlayOrder) {
+        for (var layerName of simVars.overlayOrder) {
             this.getLayer(layerName).remove(map);
         }
         displayedColorbar.setValue(null);
@@ -136,7 +136,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = "none";
         // if on a new simulation entirely, reset selected layers
         if (this.currentSimulation != simVars.currentSimulation) {
-            overlayOrder.length = 0;
+            simVars.overlayOrder.length = 0;
             this.currentSimulation = simVars.currentSimulation;
             this.querySelector('#layer-controller-container').style.display = 'block';
             for (var imgURL in this.preloaded) {
@@ -176,8 +176,8 @@ export class LayerController extends HTMLElement {
         var layer = this.getLayer(name);
         console.log('name ' + name + ' layer ' + layer);
         layer.addTo(map);
-        if (!(overlayOrder.includes(name))) {
-            overlayOrder.push(name);
+        if (!(simVars.overlayOrder.includes(name))) {
+            simVars.overlayOrder.push(name);
         }
         if (overlay_list.indexOf(name) >= 0) {
             layer.bringToFront();
@@ -200,7 +200,7 @@ export class LayerController extends HTMLElement {
         }
         var startDate = simVars.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-        this.loadWithPriority(startDate, endDate, overlayOrder);
+        this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
     }
 
     createWorker() {
@@ -225,16 +225,16 @@ export class LayerController extends HTMLElement {
     /** Called when a layer is de-selected. */
     handleOverlayRemove(name) {
         this.getLayer(name).remove(map);
-        overlayOrder.splice(overlayOrder.indexOf(name), 1);
+        simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(name), 1);
         const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
-        for (var i = overlayOrder.length - 1; i >= 0; i--) {
-            if ('colorbar' in rasters_now[overlayOrder[i]]) {
-                mostRecentColorbar = overlayOrder[i];
-                colorbarSrc = simVars.rasterBase + rasters_now[overlayOrder[i]].colorbar;
+        for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
+            if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
+                mostRecentColorbar = simVars.overlayOrder[i];
+                colorbarSrc = simVars.rasterBase + rasters_now[simVars.overlayOrder[i]].colorbar;
                 colorbarDisplay = 'block';
                 break;
             }
@@ -244,7 +244,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = colorbarDisplay;
         var startDate = simVars.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-        this.loadWithPriority(startDate, endDate, overlayOrder);
+        this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
     }
 
     /** Returns the layer associated with a given name */
@@ -288,7 +288,7 @@ export class LayerController extends HTMLElement {
                 layerDiv.appendChild(this.buildLayerBox(layerName));
             }
         }
-        for (var layerName of overlayOrder) {
+        for (var layerName of simVars.overlayOrder) {
             this.handleOverlayadd(layerName);
         }
     }
@@ -317,7 +317,7 @@ export class LayerController extends HTMLElement {
         let [div, input] = this.buildCheckBox(name);
         input.type = 'checkbox';
         input.name = 'layers';
-        input.checked = overlayOrder.includes(name);
+        input.checked = simVars.overlayOrder.includes(name);
         input.onclick = () => {
             if (input.checked) {
                 this.handleOverlayadd(name);

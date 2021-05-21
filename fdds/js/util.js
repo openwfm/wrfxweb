@@ -32,6 +32,7 @@ export const simVars = {
   rasterBase: "",
   sortedTimestamps: [],
   currentTimestamp: new Controller(),
+  overlayOrder: [],
 };
 
 export function debounce(callback, delay) {

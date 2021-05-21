@@ -1,5 +1,5 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, } from './Controller.js';
+import {SyncController, syncImageLoad, displayedColorbar, currentDomain } from './Controller.js';
 import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -138,9 +138,9 @@ export class TimeSeriesController extends LayerController {
         const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var img = null;
-        for (var i = overlayOrder.length - 1; i >= 0; i--) {
-            if ('colorbar' in rasters_now[overlayOrder[i]]) {
-                img = this.getLayer(overlayOrder[i])._image;
+        for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
+            if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
+                img = this.getLayer(simVars.overlayOrder[i])._image;
                 break;
             }
         }
