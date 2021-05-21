@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, sorted_timestamps, organization} from './Controller.js';
+import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -70,7 +70,7 @@ export class LayerController extends HTMLElement {
             if (!(imageURL in this.preloaded)) {
                 if (!reloading) {
                     var startTime = current_timestamp.getValue();
-                    var endTime = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+                    var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
                     this.loadWithPriority(startTime, endTime, overlayOrder);
                 }
                 reloading = true;
@@ -102,7 +102,7 @@ export class LayerController extends HTMLElement {
                 worker.postMessage(imageURL);
             }
         }
-        for (var timeStamp of sorted_timestamps.getValue()) {
+        for (var timeStamp of simVars.sortedTimestamps) {
             var raster = simVars.rasters[currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
@@ -145,7 +145,7 @@ export class LayerController extends HTMLElement {
             this.preloaded = {};
         }
         // build the layer groups of the current domain
-        var first_rasters = simVars.rasters[currentDomain.getValue()][sorted_timestamps.getValue()[0]];
+        var first_rasters = simVars.rasters[currentDomain.getValue()][simVars.sortedTimestamps[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
@@ -199,7 +199,7 @@ export class LayerController extends HTMLElement {
             displayedColorbar.setValue(name);
         }
         var startDate = current_timestamp.getValue();
-        var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 
@@ -243,7 +243,7 @@ export class LayerController extends HTMLElement {
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
         var startDate = current_timestamp.getValue();
-        var endDate = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }
 

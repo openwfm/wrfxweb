@@ -43,9 +43,9 @@ export class SyncController extends Controller {
 // export const currentSimulation = new Controller();
 // export const rasters = new Controller();
 
-export const raster_base = new Controller();
+// export const raster_base = new Controller();
 
-export const sorted_timestamps = new Controller();
+// export const sorted_timestamps = new Controller();
 export const current_timestamp = new Controller(); // currently displayed timestamp
 // Display context
 export const overlayOrder = []; // array of added layer names in order they were added name

@@ -1,4 +1,4 @@
-import { currentDomain, sorted_timestamps, current_timestamp  } from './Controller.js';
+import { currentDomain, current_timestamp  } from './Controller.js';
 import { utcToLocal, simVars } from '../util.js';
 
 /**
@@ -96,16 +96,16 @@ export class SimulationController extends HTMLElement {
             this.playPause();
         }
         const sliderContainer = this.querySelector('.slider-container');
-        sliderContainer.style.display = (sorted_timestamps.getValue().length < 2) ? 'none' : 'block';
+        sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
         let percentage = this.currentFrame / this.frameTotal;
-        this.currentFrame = Math.floor((sorted_timestamps.getValue().length) * percentage);
+        this.currentFrame = Math.floor((simVars.sortedTimestamps.length) * percentage);
         if (this.currentSimulation != simVars.currentSimulation) {
             this.currentSimulation = simVars.currentSimulation;
             percentage = 0;
             this.currentFrame = 0;
         }
         this.setupForTime(this.currentFrame);
-        this.frameTotal = sorted_timestamps.getValue().length;
+        this.frameTotal = simVars.sortedTimestamps.length;
         this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + "%";
     }
 
@@ -113,7 +113,7 @@ export class SimulationController extends HTMLElement {
     updateSlider() {
         this.setupForTime(this.currentFrame);
         const sliderHead = this.querySelector('#slider-head');
-        let percentage = Math.floor((this.currentFrame / sorted_timestamps.getValue().length) * 92);
+        let percentage = Math.floor((this.currentFrame / simVars.sortedTimestamps.length) * 92);
         sliderHead.style.left = percentage + '%';
     }
 
@@ -140,7 +140,7 @@ export class SimulationController extends HTMLElement {
     play() {
         if (this.playing) {
             this.nextFrame(5);
-            if (this.currentFrame == sorted_timestamps.getValue().length-1) {
+            if (this.currentFrame == simVars.sortedTimestamps.length-1) {
                 window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
                 window.setTimeout(() => this.play(), this.frameRate);
@@ -178,7 +178,7 @@ export class SimulationController extends HTMLElement {
             console.log('recursion depth reached');
             return;
         }
-        let nextFrame = (this.currentFrame + 1) % sorted_timestamps.getValue().length;
+        let nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
         this.currentFrame = nextFrame;
         this.updateSlider();
     }
@@ -188,9 +188,9 @@ export class SimulationController extends HTMLElement {
         if (recursionDepth == 0) {
             return;
         }
-        let prevFrame = (this.currentFrame - 1) % sorted_timestamps.getValue().length;
+        let prevFrame = (this.currentFrame - 1) % simVars.sortedTimestamps.length;
         if (prevFrame < 0) {
-            prevFrame += sorted_timestamps.getValue().length;
+            prevFrame += simVars.sortedTimestamps.length;
         }
         this.currentFrame = prevFrame;
         this.updateSlider();
@@ -198,7 +198,7 @@ export class SimulationController extends HTMLElement {
 
     // this function should assume that the correct layers are already displayed
     setupForTime(frame_ndx) {
-        var timestamp = sorted_timestamps.getValue()[frame_ndx];
+        var timestamp = simVars.sortedTimestamps[frame_ndx];
         // set current time
         document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
         current_timestamp.setValue(timestamp);
@@ -224,10 +224,10 @@ export class SimulationController extends HTMLElement {
             e2.preventDefault();
             e2.stopPropagation();
             // calculate the new cursor position:
-            let diff = Math.floor((e2.clientX - pos3) / 300 * sorted_timestamps.getValue().length - 1);
+            let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
 
             let newFrame = originalFrame + diff;
-            this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
+            this.currentFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
             this.updateSlider();
           }
     }
@@ -237,10 +237,10 @@ export class SimulationController extends HTMLElement {
      */
     clickBar(e) {
         const head = this.querySelector('#slider-head').getBoundingClientRect();
-        let diff = Math.floor((e.clientX - head.left) / 300 * sorted_timestamps.getValue().length - 1);
+        let diff = Math.floor((e.clientX - head.left) / 300 * simVars.sortedTimestamps.length - 1);
 
         let newFrame = this.currentFrame + diff;
-        this.currentFrame = Math.max(Math.min(sorted_timestamps.getValue().length-1, newFrame), 0);
+        this.currentFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
         this.updateSlider();
     }
 }

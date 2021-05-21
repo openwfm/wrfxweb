@@ -1,5 +1,5 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, sorted_timestamps} from './Controller.js';
+import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp } from './Controller.js';
 import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -286,7 +286,7 @@ export class TimeSeriesController extends LayerController {
     async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
         document.body.classList.add("waiting");
         progressMarker.setProgress(0);
-        var filteredTimeStamps = sorted_timestamps.getValue().filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
