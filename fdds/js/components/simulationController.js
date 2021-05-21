@@ -1,4 +1,4 @@
-import { currentDomain, current_timestamp  } from './Controller.js';
+import { currentDomain   } from './Controller.js';
 import { utcToLocal, simVars } from '../util.js';
 
 /**
@@ -201,7 +201,7 @@ export class SimulationController extends HTMLElement {
         var timestamp = simVars.sortedTimestamps[frame_ndx];
         // set current time
         document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
-        current_timestamp.setValue(timestamp);
+        simVars.currentTimestamp.setValue(timestamp);
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates

@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, organization} from './Controller.js';
+import {displayedColorbar, currentDomain, overlayOrder, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -37,7 +37,7 @@ export class LayerController extends HTMLElement {
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
-     * and panning. Set up callbacks to trigger when currentdomain updates and current_timestamp
+     * and panning. Set up callbacks to trigger when currentdomain updates and currentTimestamp
      * updates. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
@@ -48,11 +48,11 @@ export class LayerController extends HTMLElement {
             this.domainSwitch();
         }
         currentDomain.subscribe(domainSubscription);
-        current_timestamp.subscribe(debounce(() => this.updateTime(), 100));
+        simVars.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
     }
 
-    /** Triggered whenever current_timestamp is changed. For every layer currently selected 
+    /** Triggered whenever currentTimestamp is changed. For every layer currently selected 
      * need to set its image url to the point to the image associated with the current time.
      * Need to update the colorbar on top to the current time as well.
      */
@@ -60,7 +60,7 @@ export class LayerController extends HTMLElement {
         if (this.currentSimulation != simVars.currentSimulation) {
             return;
         }
-        var rastersNow = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
+        var rastersNow = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var reloading = false;
         for (var layerName of overlayOrder) {
             var layer = this.getLayer(layerName);
@@ -69,7 +69,7 @@ export class LayerController extends HTMLElement {
             var imageURL = simVars.rasterBase + rasterInfo.raster;
             if (!(imageURL in this.preloaded)) {
                 if (!reloading) {
-                    var startTime = current_timestamp.getValue();
+                    var startTime = simVars.currentTimestamp.getValue();
                     var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
                     this.loadWithPriority(startTime, endTime, overlayOrder);
                 }
@@ -185,7 +185,7 @@ export class LayerController extends HTMLElement {
             layer.bringToBack();
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
         var cs = raster_info.coords;
         layer.setUrl(simVars.rasterBase + raster_info.raster,
@@ -198,7 +198,7 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             displayedColorbar.setValue(name);
         }
-        var startDate = current_timestamp.getValue();
+        var startDate = simVars.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }
@@ -227,7 +227,7 @@ export class LayerController extends HTMLElement {
         this.getLayer(name).remove(map);
         overlayOrder.splice(overlayOrder.indexOf(name), 1);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
@@ -242,7 +242,7 @@ export class LayerController extends HTMLElement {
         displayedColorbar.setValue(mostRecentColorbar);
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
-        var startDate = current_timestamp.getValue();
+        var startDate = simVars.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, overlayOrder);
     }

@@ -68,7 +68,7 @@ export class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-        // set the current domain, must be updated in this order: sortedTimestamps, current_timestamp, currentDomain
+        // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
         simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
         currentDomain.setValue(dom_id);
     }
