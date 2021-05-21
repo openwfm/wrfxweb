@@ -1,4 +1,5 @@
-import {domainInstance, currentDomain, sorted_timestamps, rasters} from './Controller.js';
+import {domainInstance, currentDomain, sorted_timestamps} from './Controller.js';
+import { simVars } from '../util.js';
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
     constructor() {
@@ -68,7 +69,7 @@ export class DomainSelector extends HTMLElement {
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
         // set the current domain, must be updated in this order: sorted_timestamps, current_timestamp, currentDomain
-        sorted_timestamps.setValue(Object.keys(rasters.getValue()[dom_id]).sort());
+        sorted_timestamps.setValue(Object.keys(simVars.rasters[dom_id]).sort());
         currentDomain.setValue(dom_id);
     }
 }

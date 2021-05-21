@@ -1,6 +1,6 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, rasters, raster_base, sorted_timestamps} from './Controller.js';
-import {map} from '../util.js';
+import {SyncController, syncImageLoad, displayedColorbar, currentDomain, overlayOrder, current_timestamp, raster_base, sorted_timestamps} from './Controller.js';
+import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
 
@@ -76,7 +76,7 @@ export class TimeSeriesController extends LayerController {
      * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
         var img = layer._image;
@@ -136,7 +136,7 @@ export class TimeSeriesController extends LayerController {
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
         var img = null;
         for (var i = overlayOrder.length - 1; i >= 0; i--) {
             if ('colorbar' in rasters_now[overlayOrder[i]]) {
@@ -227,7 +227,7 @@ export class TimeSeriesController extends LayerController {
      * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
      * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, markers) {
-        var rasterDomains = rasters.getValue()[currentDomain.getValue()];
+        var rasterDomains = simVars.rasters[currentDomain.getValue()];
         var layerImg = this.getLayer(displayedColorbar.getValue())._image;
         var factor = 1;
         if (layerImg.height >= this.canvasMaxHeight) {
@@ -307,7 +307,7 @@ export class TimeSeriesController extends LayerController {
         if (displayedColorbar.getValue() == null) {
             return;
         }
-        var rasters_now = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain.getValue()][current_timestamp.getValue()];
         var raster_info = rasters_now[displayedColorbar.getValue()];
         var levels = raster_info.levels;
         var x = clrbarMap.left - 5;
