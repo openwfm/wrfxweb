@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {currentDomain } from './Controller.js';
+import { controllers } from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -47,7 +47,7 @@ export class LayerController extends HTMLElement {
         const domainSubscription = () => {
             this.domainSwitch();
         }
-        currentDomain.subscribe(domainSubscription);
+        controllers.currentDomain.subscribe(domainSubscription);
         simVars.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
     }
@@ -60,7 +60,7 @@ export class LayerController extends HTMLElement {
         if (this.currentSimulation != simVars.currentSimulation) {
             return;
         }
-        var rastersNow = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var reloading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(layerName);
@@ -103,7 +103,7 @@ export class LayerController extends HTMLElement {
             }
         }
         for (var timeStamp of simVars.sortedTimestamps) {
-            var raster = simVars.rasters[currentDomain.getValue()][timeStamp];
+            var raster = simVars.rasters[controllers.currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
@@ -145,7 +145,7 @@ export class LayerController extends HTMLElement {
             this.preloaded = {};
         }
         // build the layer groups of the current domain
-        var first_rasters = simVars.rasters[currentDomain.getValue()][simVars.sortedTimestamps[0]];
+        var first_rasters = simVars.rasters[controllers.currentDomain.getValue()][simVars.sortedTimestamps[0]];
         var vars = Object.keys(first_rasters);
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
@@ -185,7 +185,7 @@ export class LayerController extends HTMLElement {
             layer.bringToBack();
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
         var cs = raster_info.coords;
         layer.setUrl(simVars.rasterBase + raster_info.raster,
@@ -227,7 +227,7 @@ export class LayerController extends HTMLElement {
         this.getLayer(name).remove(map);
         simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(name), 1);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';

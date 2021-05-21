@@ -1,4 +1,4 @@
-import { currentDomain   } from './Controller.js';
+import { controllers } from './Controller.js';
 import { utcToLocal, simVars } from '../util.js';
 
 /**
@@ -88,7 +88,7 @@ export class SimulationController extends HTMLElement {
         const domainSubscription = () => {
             this.resetSlider();
         }
-        currentDomain.subscribe(domainSubscription);
+        controllers.currentDomain.subscribe(domainSubscription);
     }
 
     resetSlider() {

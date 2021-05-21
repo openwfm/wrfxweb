@@ -51,11 +51,12 @@ export class SyncController extends Controller {
 // export const overlayOrder = []; // array of added layer names in order they were added name
 // export const displayedColorbar = new Controller();
 // export const domainInstance = new Controller();
-export const currentDomain = new Controller();
+// export const currentDomain = new Controller();
 // export const organization = new Controller();
 
 export const syncImageLoad = new SyncController();
 
 export const controllers = {
     domainInstance: new Controller(),
+    currentDomain: new Controller(),
 };

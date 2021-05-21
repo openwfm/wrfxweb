@@ -1,5 +1,5 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, currentDomain } from './Controller.js';
+import {SyncController, syncImageLoad, controllers } from './Controller.js';
 import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -76,7 +76,7 @@ export class TimeSeriesController extends LayerController {
      * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
-        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
         var layer = this.getLayer(name);
         var img = layer._image;
@@ -136,7 +136,7 @@ export class TimeSeriesController extends LayerController {
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var img = null;
         for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
@@ -227,7 +227,7 @@ export class TimeSeriesController extends LayerController {
      * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
      * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, markers) {
-        var rasterDomains = simVars.rasters[currentDomain.getValue()];
+        var rasterDomains = simVars.rasters[controllers.currentDomain.getValue()];
         var layerImg = this.getLayer(simVars.displayedColorbar)._image;
         var factor = 1;
         if (layerImg.height >= this.canvasMaxHeight) {
@@ -307,7 +307,7 @@ export class TimeSeriesController extends LayerController {
         if (simVars.displayedColorbar == null) {
             return;
         }
-        var rasters_now = simVars.rasters[currentDomain.getValue()][simVars.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][simVars.currentTimestamp.getValue()];
         var raster_info = rasters_now[simVars.displayedColorbar];
         var levels = raster_info.levels;
         var x = clrbarMap.left - 5;
