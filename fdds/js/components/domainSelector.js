@@ -1,4 +1,4 @@
-import {domainInstance, currentDomain} from './Controller.js';
+import {controllers, currentDomain} from './Controller.js';
 import { simVars } from '../util.js';
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
@@ -19,12 +19,12 @@ export class DomainSelector extends HTMLElement {
         const domainSubscription = () => {
             this.buildDomains();
         }
-        domainInstance.subscribe(domainSubscription);
+        controllers.domainInstance.subscribe(domainSubscription);
     }
 
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
-        var domains = domainInstance.getValue();
+        var domains = controllers.domainInstance.getValue();
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
         for(var dom in domains) {
