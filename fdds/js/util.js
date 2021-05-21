@@ -1,3 +1,5 @@
+import {Controller, SyncController} from './components/Controller.js';
+
 export const overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
 export const baseLayerDict = {
   /*
@@ -22,6 +24,11 @@ export const map = L.map('map-fd', {
     zoomControl: true,
     minZoom: 3
 });
+
+// Set needed global variables 
+export const simVars = {
+  currentSimulation: null,
+};
 
 export function debounce(callback, delay) {
   let timeout; 

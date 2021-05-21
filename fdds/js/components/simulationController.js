@@ -1,5 +1,5 @@
-import { currentDomain, sorted_timestamps, current_timestamp, currentSimulation } from './Controller.js';
-import { utcToLocal } from '../util.js';
+import { currentDomain, sorted_timestamps, current_timestamp  } from './Controller.js';
+import { utcToLocal, simVars } from '../util.js';
 
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
@@ -99,8 +99,8 @@ export class SimulationController extends HTMLElement {
         sliderContainer.style.display = (sorted_timestamps.getValue().length < 2) ? 'none' : 'block';
         let percentage = this.currentFrame / this.frameTotal;
         this.currentFrame = Math.floor((sorted_timestamps.getValue().length) * percentage);
-        if (this.currentSimulation != currentSimulation.getValue()) {
-            this.currentSimulation = currentSimulation.getValue();
+        if (this.currentSimulation != simVars.currentSimulation) {
+            this.currentSimulation = simVars.currentSimulation;
             percentage = 0;
             this.currentFrame = 0;
         }

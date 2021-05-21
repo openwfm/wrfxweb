@@ -40,7 +40,7 @@ export class SyncController extends Controller {
 }
 
 // global variables
-export const currentSimulation = new Controller();
+// export const currentSimulation = new Controller();
 export const rasters = new Controller();
 
 export const raster_base = new Controller();

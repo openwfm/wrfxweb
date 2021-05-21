@@ -1,5 +1,5 @@
-import {map, baseLayerDict, dragElement, overlay_list, debounce} from '../util.js';
-import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, currentSimulation, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
+import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
+import {displayedColorbar, currentDomain, overlayOrder, current_timestamp, rasters, raster_base, sorted_timestamps, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -57,7 +57,7 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        if (this.currentSimulation != currentSimulation.getValue()) {
+        if (this.currentSimulation != simVars.currentSimulation) {
             return;
         }
         var rastersNow = rasters.getValue()[currentDomain.getValue()][current_timestamp.getValue()];
@@ -135,9 +135,9 @@ export class LayerController extends HTMLElement {
         rasterColorbar.src = "";
         rasterColorbar.style.display = "none";
         // if on a new simulation entirely, reset selected layers
-        if (this.currentSimulation != currentSimulation.getValue()) {
+        if (this.currentSimulation != simVars.currentSimulation) {
             overlayOrder.length = 0;
-            this.currentSimulation = currentSimulation.getValue();
+            this.currentSimulation = simVars.currentSimulation;
             this.querySelector('#layer-controller-container').style.display = 'block';
             for (var imgURL in this.preloaded) {
                 URL.revokeObjectURL(this.preloaded[imgURL]);
