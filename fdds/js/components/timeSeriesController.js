@@ -1,5 +1,5 @@
 import { LayerController } from './layerController.js';
-import {SyncController, syncImageLoad, controllers } from './Controller.js';
+import {SyncController, controllers } from './Controller.js';
 import { map, simVars } from '../util.js';
 import {TimeSeriesMarker} from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -43,7 +43,7 @@ export class TimeSeriesController extends LayerController {
                 this.updateCanvases(layerImage, rasterColorbar);
             }
         }
-        syncImageLoad.subscribe(syncImageSubscription);
+        controllers.syncImageLoad.subscribe(syncImageSubscription);
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add("waiting");
             var startDate = this.timeSeriesButton.getStartDate();
@@ -91,10 +91,10 @@ export class TimeSeriesController extends LayerController {
                 this.timeSeriesButton.getButton().disabled = false;
             }
             img.onload = () => {
-                syncImageLoad.increment(0);
+                controllers.syncImageLoad.increment(0);
             }
             rasterColorbar.onload = () => {
-                syncImageLoad.increment(1);
+                controllers.syncImageLoad.increment(1);
             }
             map.on('zoomend', () => {
                 if (img.height < this.canvasMaxHeight) {

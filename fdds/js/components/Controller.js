@@ -54,9 +54,11 @@ export class SyncController extends Controller {
 // export const currentDomain = new Controller();
 // export const organization = new Controller();
 
-export const syncImageLoad = new SyncController();
+// export const syncImageLoad = new SyncController();
 
 export const controllers = {
+    currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
+    syncImageLoad: new SyncController()
 };
