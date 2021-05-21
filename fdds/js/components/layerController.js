@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {displayedColorbar, currentDomain, organization} from './Controller.js';
+import {currentDomain, organization} from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -80,7 +80,7 @@ export class LayerController extends HTMLElement {
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                         { attribution: organization.getValue(), opacity: 0.5 });
-            if (layerName == displayedColorbar.getValue()) {
+            if (layerName == simVars.displayedColorbar) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
                 if (colorbarURL in this.preloaded) {
@@ -130,7 +130,7 @@ export class LayerController extends HTMLElement {
         for (var layerName of simVars.overlayOrder) {
             this.getLayer(layerName).remove(map);
         }
-        displayedColorbar.setValue(null);
+        simVars.displayedColorbar = null;
         const rasterColorbar = document.querySelector('#raster-colorbar');
         rasterColorbar.src = "";
         rasterColorbar.style.display = "none";
@@ -196,7 +196,7 @@ export class LayerController extends HTMLElement {
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
-            displayedColorbar.setValue(name);
+            simVars.displayedColorbar = name;
         }
         var startDate = simVars.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
@@ -239,7 +239,7 @@ export class LayerController extends HTMLElement {
                 break;
             }
         }
-        displayedColorbar.setValue(mostRecentColorbar);
+        simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
         var startDate = simVars.currentTimestamp.getValue();

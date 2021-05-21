@@ -33,6 +33,7 @@ export const simVars = {
   sortedTimestamps: [],
   currentTimestamp: new Controller(),
   overlayOrder: [],
+  displayedColorbar: null,
 };
 
 export function debounce(callback, delay) {

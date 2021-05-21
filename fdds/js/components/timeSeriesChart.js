@@ -1,5 +1,4 @@
-import { utcToLocal, createOption, linkSelects } from '../util.js';
-import {displayedColorbar} from './Controller.js';
+import { utcToLocal, createOption, linkSelects, simVars } from '../util.js';
 
 export class TimeSeriesChart extends HTMLElement {
     constructor() {
@@ -202,7 +201,7 @@ export class TimeSeriesChart extends HTMLElement {
                     yAxes: {
                         title: {
                             display: true,
-                            text: displayedColorbar.getValue()
+                            text: simVars.displayedColorbar
                         }
                     },
                     xAxes: xAxisOptions
