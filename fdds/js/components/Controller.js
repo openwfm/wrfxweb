@@ -52,6 +52,6 @@ export class SyncController extends Controller {
 // export const displayedColorbar = new Controller();
 export const domainInstance = new Controller();
 export const currentDomain = new Controller();
-export const organization = new Controller();
+// export const organization = new Controller();
 
 export const syncImageLoad = new SyncController();

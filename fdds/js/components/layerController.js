@@ -1,5 +1,5 @@
 import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
-import {currentDomain, organization} from './Controller.js';
+import {currentDomain } from './Controller.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -79,7 +79,7 @@ export class LayerController extends HTMLElement {
             }
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                        { attribution: organization.getValue(), opacity: 0.5 });
+                        { attribution: simVars.organization, opacity: 0.5 });
             if (layerName == simVars.displayedColorbar) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
@@ -157,7 +157,7 @@ export class LayerController extends HTMLElement {
             var layer = L.imageOverlay(simVars.rasterBase + raster_info.raster,
                                         [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                         {
-                                            attribution: organization.getValue(),
+                                            attribution: simVars.organization,
                                             opacity: 0.5,
                                             interactive: true
                                         });
@@ -190,7 +190,7 @@ export class LayerController extends HTMLElement {
         var cs = raster_info.coords;
         layer.setUrl(simVars.rasterBase + raster_info.raster,
                     [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                    { attribution: organization.getValue(), opacity: 0.5 });
+                    { attribution: simVars.organization, opacity: 0.5 });
         if('colorbar' in raster_info) {
             var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');

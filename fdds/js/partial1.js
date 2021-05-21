@@ -1,7 +1,6 @@
 "use strict";
 import { getConfigurations } from "./services.js";
-import { map } from "./util.js";
-import { organization } from "./components/Controller.js";
+import { map, simVars } from "./util.js";
 
 window.onload = () => {
   map.doubleClickZoom.disable();
@@ -17,11 +16,11 @@ window.onload = () => {
 async function loadConfig() {
   var configData = await getConfigurations();
   if (configData.organization) {
-    organization.setValue(configData.organization);
-    if (!organization.getValue().includes("SJSU")) {
+    simVars.organization = configData.organization;
+    if (!simVars.organization.includes("SJSU")) {
         map.panTo([39.7392, -104.9903]);
     }
-    document.title = organization.getValue();
+    document.title = simVars.organization;
   }
 
   if (configData.flags) {

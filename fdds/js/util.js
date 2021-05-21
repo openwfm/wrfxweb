@@ -34,6 +34,7 @@ export const simVars = {
   currentTimestamp: new Controller(),
   overlayOrder: [],
   displayedColorbar: null,
+  organization: null,
 };
 
 export function debounce(callback, delay) {
