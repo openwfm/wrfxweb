@@ -1,4 +1,4 @@
-import {map, baseLayerDict, dragElement, debounce, simVars} from '../util.js';
+import { map, dragElement, debounce, simVars } from '../util.js';
 import { controllers } from './Controller.js';
 
 /**
@@ -259,7 +259,7 @@ export class LayerController extends HTMLElement {
      * the map has been initialized. */
     buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
-        for (const [name, layer] of Object.entries(baseLayerDict)) {
+        for (const [name, layer] of Object.entries(simVars.baseLayerDict)) {
             let mapCheckBox = this.buildMapCheckBox(name, layer);
             baseMapDiv.appendChild(mapCheckBox);
         }
