@@ -1,4 +1,4 @@
-import { dragElement } from '../../util.js';
+import { dragElement, utcToLocal } from '../../util.js';
 import { getCatalogEntries } from '../../services.js';
 import { CatalogItem } from './catalogItem.js';
 
@@ -140,10 +140,10 @@ export class CatalogMenu extends HTMLElement {
                 return catalogEntry.description.toLowerCase().includes(searchText);
             }
             if (sortBy.includes('start-date')) {
-                return catalogEntry.from_utc.toLowerCase().includes(searchText);
+                return utcToLocal(catalogEntry.from_utc).toLowerCase().includes(searchText);
             }
             if (sortBy.includes('end-date')) {
-                return catalogEntry.to_utc.toLowerCase().includes(searchText);
+                return utcToLocal(catalogEntry.to_utc).toLowerCase().includes(searchText);
             }
         }
         const createList = (list) => {
