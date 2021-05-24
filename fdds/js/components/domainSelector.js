@@ -1,4 +1,5 @@
-import {domainInstance, currentDomain, sorted_timestamps, rasters} from './Controller.js';
+import { controllers } from './Controller.js';
+import { simVars } from '../util.js';
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
     constructor() {
@@ -18,12 +19,12 @@ export class DomainSelector extends HTMLElement {
         const domainSubscription = () => {
             this.buildDomains();
         }
-        domainInstance.subscribe(domainSubscription);
+        controllers.domainInstance.subscribe(domainSubscription);
     }
 
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
-        var domains = domainInstance.getValue();
+        var domains = controllers.domainInstance.getValue();
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
         for(var dom in domains) {
@@ -67,9 +68,9 @@ export class DomainSelector extends HTMLElement {
 
     /** Function called when a new domain is selected. */
     setUpForDomain(dom_id) {
-        // set the current domain, must be updated in this order: sorted_timestamps, current_timestamp, currentDomain
-        sorted_timestamps.setValue(Object.keys(rasters.getValue()[dom_id]).sort());
-        currentDomain.setValue(dom_id);
+        // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
+        simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
+        controllers.currentDomain.setValue(dom_id);
     }
 }
 

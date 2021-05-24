@@ -1,5 +1,4 @@
-import { utcToLocal, createOption, linkSelects } from '../util.js';
-import {displayedColorbar} from './Controller.js';
+import { utcToLocal, createOption, linkSelects, simVars } from '../util.js';
 
 export class TimeSeriesChart extends HTMLElement {
     constructor() {
@@ -41,12 +40,12 @@ export class TimeSeriesChart extends HTMLElement {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
-        const timeSeries = this.querySelector('#timeSeriesChart');
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         const thresholdSetter = this.querySelector('#threshold-setter');
         const labelSetter = this.querySelector('#threshold-label');
         const undoZoom = this.querySelector('#undo-zoom');
+        const timeSeries = this.querySelector('#timeSeriesChart');
         this.ctx = timeSeries.getContext('2d');
         timeSeries.onpointerdown = (e) => {
             this.zoomBox(e);
@@ -92,19 +91,18 @@ export class TimeSeriesChart extends HTMLElement {
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
         var yAxisCheck = isNaN(yMin);
+        var undoZoomDisplay = 'block';
         if (startCheck && endCheck && yAxisCheck) {
-            undoZoom.style.display = 'none';
-        } else {
-            undoZoom.style.display = 'block';
+            undoZoomDisplay = 'none';
         }
+        undoZoom.style.display = undoZoomDisplay;
         this.chart.options.scales.xAxes.min = zoomStart.value;
         this.chart.options.scales.xAxes.max = zoomEnd.value;
+        delete this.chart.options.scales.yAxes.min;
+        delete this.chart.options.scales.yAxes.max;
         if (!isNaN(yMin)) {
             this.chart.options.scales.yAxes.min = yMin;
             this.chart.options.scales.yAxes.max = yMax;
-        } else {
-            delete this.chart.options.scales.yAxes.min;
-            delete this.chart.options.scales.yAxes.max;
         }
         this.chart.update(this.data);
     }
@@ -203,7 +201,7 @@ export class TimeSeriesChart extends HTMLElement {
                     yAxes: {
                         title: {
                             display: true,
-                            text: displayedColorbar.getValue()
+                            text: simVars.displayedColorbar
                         }
                     },
                     xAxes: xAxisOptions
@@ -232,27 +230,33 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     zoomBox(e) {
+        // get the mouse cursor position at startup:
+        e = e || window.event;
+        e.stopPropagation();
+        e.preventDefault();
+        var [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
+        // position the drawn box
         const zoomBoxArea = this.querySelector('#zoomBox');
+        zoomBoxArea.style.width = '0px';
+        zoomBoxArea.style.height = '0px';
+        zoomBoxArea.style.display = 'block';
+        zoomBoxArea.style.left = e.clientX + 'px';
+        zoomBoxArea.style.top = e.clientY + 'px';
+        // get the bounds of the chart to ensure we don't overdraw
         const canvas = this.querySelector('#timeSeriesChart');
         var boundingRect = canvas.getBoundingClientRect();
+        // get the data of each point on the chart
         var dataset = [];
         for (var i = 0; i < this.data.length; i++) {
             dataset.push(this.chart.getDatasetMeta(i).data);
         }
-        zoomBoxArea.style.width = '0px';
-        zoomBoxArea.style.height = '0px';
-        zoomBoxArea.style.display = 'block';
-        e = e || window.event;
-        e.stopPropagation();
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        var [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
-        zoomBoxArea.style.left = e.clientX + 'px';
-        zoomBoxArea.style.top = e.clientY + 'px';
+
         document.onpointerup = () => {
-            zoomBoxArea.style.display = 'none';
             document.onpointerup = null;
             document.onpointermove = null;
+
+            zoomBoxArea.style.display = 'none';
+            // get the index and y value of each data point that is inside the drawn box
             var zoomData = dataset.map(data => data.filter(datapoint => {
                 var xCheck = datapoint.x >= zoomLeft - boundingRect.left && datapoint.x <= zoomRight - boundingRect.left;
                 var yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
@@ -262,9 +266,11 @@ export class TimeSeriesChart extends HTMLElement {
             }));
             var labelIndices = zoomData.map(dataset => dataset.map(data => data[0]));
             var yValues = zoomData.map(dataset => dataset.map(data => data[1]));
+            // get the min/max indices and values to set the bound of the chart
             const minValue = (values) => Math.min(...values.map(dataValues => Math.min(...dataValues)));
             const maxValue = (values) => Math.max(...values.map(dataValues => Math.max(...dataValues)));
             var [minIndex, maxIndex, yMin, yMax] = [minValue(labelIndices), maxValue(labelIndices), minValue(yValues), maxValue(yValues)];
+            // if there are selected points zoom the chart to them
             if (yMax > -Infinity) {
                 minIndex = Math.max(0, minIndex - 1);
                 maxIndex = Math.min(maxIndex + 1, this.labels.length - 1);
@@ -274,7 +280,7 @@ export class TimeSeriesChart extends HTMLElement {
                 this.chart.update(this.data);
             }
         };
-        // call a function whenever the cursor moves:
+        // call a function whenever the cursor moves: draws a zoombox
         document.onpointermove = (e2) => {
             e2 = e2 || window.event;
             e2.preventDefault();

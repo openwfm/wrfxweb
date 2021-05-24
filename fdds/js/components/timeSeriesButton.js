@@ -1,5 +1,4 @@
-import {sorted_timestamps} from './Controller.js';
-import {createOption, linkSelects} from '../util.js';
+import { createOption, linkSelects, simVars } from '../util.js';
 
 export class TimeSeriesButton extends HTMLElement {
     constructor() {
@@ -27,7 +26,7 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        function dateChange() {
+        const dateChange =() => {
             linkSelects(startDate, endDate)
         }
         startDate.onchange = dateChange;
@@ -52,11 +51,11 @@ export class TimeSeriesButton extends HTMLElement {
         const endDate = this.querySelector('#endDate');
         startDate.innerHTML = "";
         endDate.innerHTML = "";
-        for (var timestamp of sorted_timestamps.getValue()) {
+        for (var timestamp of simVars.sortedTimestamps) {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        endDate.value = sorted_timestamps.getValue()[sorted_timestamps.getValue().length - 1];
+        endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
     }
 
     getButton() {

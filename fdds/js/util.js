@@ -1,5 +1,14 @@
-export const overlay_list = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'];
-export const baseLayerDict = {
+// Set needed global variables 
+export const simVars = {
+  currentSimulation: "",
+  rasters: [],
+  rasterBase: "",
+  sortedTimestamps: [],
+  overlayOrder: [],
+  displayedColorbar: null,
+  organization: null,
+  overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
+  baseLayerDict: {
   /*
     'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
                             attribution: 'Data and imagery by MapQuest',
@@ -11,14 +20,14 @@ export const baseLayerDict = {
                                 subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
     'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
+  },
 };
-
 
 // construct map with the base layers
 export const map = L.map('map-fd', {
     center: [37.34, -121.89],
     zoom: 7,
-    layers: [baseLayerDict['OSM']],
+    layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,
     minZoom: 3
 });
@@ -29,7 +38,7 @@ export function debounce(callback, delay) {
     if (timeout) {
       return;
     }
-    function callbackInIntervals() {
+    const callbackInIntervals = () => {
       timeout = null;
       callback();
     };
