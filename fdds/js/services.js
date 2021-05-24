@@ -28,8 +28,8 @@ export async function getCatalogEntries() {
 export function getSimulation(path) {
     fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
         // store in global state
-        simVars.rasters.setValue(selectedSimulation);
-        simVars.rasterBase.setValue(path.substring(0, path.lastIndexOf('/') + 1));
+        simVars.rasters = selectedSimulation;
+        simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
         // retrieve all domains
         controllers.domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
