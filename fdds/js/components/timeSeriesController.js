@@ -94,7 +94,6 @@ export class TimeSeriesController extends LayerController {
                     this.imgCanvas = this.drawCanvas(img);
                 }
             });
-            this.updateCanvases(img, rasterColorbar); // needed because sometimes layer is already loaded
             if (this.markers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
             }
@@ -150,10 +149,13 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas = this.drawCanvas(layerImg);
         var clrbarImg = new Image();
         clrbarImg.src = colorbarImg.src;
-        this.clrbarCanvas = this.drawCanvas(clrbarImg);
-        this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-        for (var marker of this.markers) {
-            this.updateMarker(marker);
+        clrbarImg.onload = () => {
+            this.clrbarCanvas = this.drawCanvas(clrbarImg);
+            // this.clrbarCanvas = this.drawCanvas(colorbarImg);
+            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
+            for (var marker of this.markers) {
+                this.updateMarker(marker);
+            }
         }
     }
 
