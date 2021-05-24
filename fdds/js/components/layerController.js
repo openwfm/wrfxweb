@@ -1,4 +1,4 @@
-import {map, baseLayerDict, dragElement, overlay_list, debounce, simVars} from '../util.js';
+import {map, baseLayerDict, dragElement, debounce, simVars} from '../util.js';
 import { controllers } from './Controller.js';
 
 /**
@@ -161,7 +161,7 @@ export class LayerController extends HTMLElement {
                                             opacity: 0.5,
                                             interactive: true
                                         });
-            if(overlay_list.indexOf(r) >= 0) {
+            if(simVars.overlayList.indexOf(r) >= 0) {
                 this.overlayDict[r] = layer;
             } else {
                 this.rasterDict[r] = layer;
@@ -179,7 +179,7 @@ export class LayerController extends HTMLElement {
         if (!(simVars.overlayOrder.includes(name))) {
             simVars.overlayOrder.push(name);
         }
-        if (overlay_list.indexOf(name) >= 0) {
+        if (simVars.overlayList.indexOf(name) >= 0) {
             layer.bringToFront();
         } else {
             layer.bringToBack();
@@ -249,7 +249,7 @@ export class LayerController extends HTMLElement {
 
     /** Returns the layer associated with a given name */
     getLayer(name) {
-        if (overlay_list.includes(name)) {
+        if (simVars.overlayList.includes(name)) {
             return this.overlayDict[name];
         }
         return this.rasterDict[name];

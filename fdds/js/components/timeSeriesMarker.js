@@ -1,4 +1,4 @@
-import {TimeSeriesButton} from './timeSeriesButton.js';
+import { TimeSeriesButton } from './timeSeriesButton.js';
 
 export class TimeSeriesMarker extends TimeSeriesButton {
     constructor(latLon) {

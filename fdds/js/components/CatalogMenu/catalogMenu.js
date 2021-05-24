@@ -1,6 +1,6 @@
-import {dragElement} from '../../util.js';
-import {getCatalogEntries} from '../../services.js';
-import {CatalogItem} from './catalogItem.js';
+import { dragElement } from '../../util.js';
+import { getCatalogEntries } from '../../services.js';
+import { CatalogItem } from './catalogItem.js';
 
 /** A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
  * 

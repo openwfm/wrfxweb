@@ -1,4 +1,4 @@
-import {getSimulation} from '../../services.js';
+import { getSimulation } from '../../services.js';
 import { utcToLocal, simVars } from '../../util.js';
 
 const template = document.createElement('template');

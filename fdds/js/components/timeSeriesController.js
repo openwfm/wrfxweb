@@ -1,7 +1,7 @@
 import { LayerController } from './layerController.js';
-import {SyncController, controllers } from './Controller.js';
+import { SyncController, controllers } from './Controller.js';
 import { map, simVars } from '../util.js';
-import {TimeSeriesMarker} from './timeSeriesMarker.js';
+import { TimeSeriesMarker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
