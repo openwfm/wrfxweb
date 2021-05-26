@@ -168,11 +168,11 @@ describe('Tests for adding layers with colorbars', () => {
         expect(util.simVars.displayedColorbar).toEqual(null);
     });
 
-//     test('Layer Controller should put most recent selected colorbar on top', () => {
-//         layerController.handleOverlayadd("raster");
-//         layerController.handleOverlayadd("overlay");
-//         expect(controllers.displayedColorbar.getValue()).toEqual("overlay");
-//     });
+    test('Layer Controller should put most recent selected colorbar on top', () => {
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayadd('overlay');
+        expect(util.simVars.displayedColorbar).toEqual('overlay');
+    });
 
 //     test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
 //         layerController.handleOverlayadd("raster");
