@@ -121,12 +121,12 @@ describe('Simulation Controller Tests', () => {
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
-    // test('Switching to a new simulation should reset the slider', () => {
-    //     simulationController.resetSlider();
-    //     simulationController.currentFrame = 1;
-    //     simulationController.resetSlider();
-    //     controllers.currentSimulation.getValue = () => "new Simulation";
-    //     simulationController.resetSlider();
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2020");
-    // });
+    test('Switching to a new simulation should reset the slider', () => {
+        simulationController.resetSlider();
+        simulationController.currentFrame = 1;
+        simulationController.resetSlider();
+        util.simVars.currentSimulation = 'new Simulation';
+        simulationController.resetSlider();
+        expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
+    });
 });
