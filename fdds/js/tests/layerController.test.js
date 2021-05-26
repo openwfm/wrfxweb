@@ -181,10 +181,10 @@ describe('Tests for adding layers with colorbars', () => {
         expect(util.simVars.displayedColorbar).toEqual('raster');
     });
 
-//     test('Layer Controller should remove colorbar when switching to a domain without one', () => {
-//         layerController.handleOverlayadd("raster");
-//         controllers.currentDomain.getValue = () => 2;
-//         layerController.domainSwitch();
-//         expect(controllers.displayedColorbar.getValue()).toEqual(null);
-//     });
+    test('Layer Controller should remove colorbar when switching to a domain without one', () => {
+        layerController.handleOverlayadd('raster');
+        controller.controllers.currentDomain.getValue = () => 2;
+        layerController.domainSwitch();
+        expect(util.simVars.displayedColorbar).toEqual(null);
+    });
 });
