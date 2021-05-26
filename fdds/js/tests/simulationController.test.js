@@ -92,13 +92,12 @@ describe('Simulation Controller Tests', () => {
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
-    // test('Selecting prevFrame should regress frame', () => {
-    //     simulationController.preloadVariables(0, 2);
-    //     simulationController.currentFrame = 1;
-    //     simulationController.updateSlider();
-    //     simulationController.prevFrame(3);
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2020");
-    // });
+    test('Selecting prevFrame should regress frame', () => {
+        simulationController.currentFrame = 1;
+        simulationController.updateSlider();
+        simulationController.prevFrame(3);
+        expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
+    });
 
     // test('Switching domain should preserve relative current frame position', () => {
     //     simulationController.resetSlider();
