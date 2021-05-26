@@ -75,14 +75,12 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
         util.simVars.overlayOrder = []
-        // controllers.current_timestamp.getValue = () => "2020";
-        // controllers.overlayOrder = [];
-
         const div = document.createElement('div');
         div.id = 'raster-colorbar';
         await document.body.appendChild(div);
         layerController = await document.body.appendChild(new LayerController());
         layerController.domainSwitch();
+        layerController.loadWithPriority = jest.fn();
     });
 
     test('Layer Controller should populate its raster and overlay layers correctly', () => {
@@ -95,21 +93,18 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 
     test('Layers should be correctly added to the map when selected', () => {
-        layerController.loadWithPriority = jest.fn(),
         layerController.handleOverlayadd('raster');
         expect('testBase/raster test' in globalMap).toEqual(true);
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
 
     test('Layers should be correctly removed from the map when selected', () => {
-        layerController.loadWithPriority = jest.fn(),
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayRemove('raster');
         expect('testBase/raster test' in globalMap).toEqual(false);
     });
 
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
-        layerController.loadWithPriority = jest.fn(),
         layerController.handleOverlayadd('raster');
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
@@ -118,25 +113,25 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         expect('testBase/raster test' in globalMap).toEqual(false);
     });
 
-    // test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
-    //     layerController.handleOverlayadd("raster");
-    //     controllers.currentSimulation.getValue = () => "new simulation";
-    //     layerController.domainSwitch();
-    //     expect(controllers.overlayOrder.length).toEqual(0);
-    //     expect(globalMap).toEqual({});
-    // });
+    test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
+        layerController.handleOverlayadd('raster');
+        util.simVars.currentSimulation = 'new simulation';
+        layerController.domainSwitch();
+        expect(util.simVars.overlayOrder.length).toEqual(0);
+        expect(globalMap).toEqual({});
+    });
 
-    // test('Layer Controller should show the current_timestamp', () => {
-    //     controllers.current_timestamp.getValue = () => "2021";
-    //     layerController.handleOverlayadd("raster");
-    //     expect("test_base/raster test current timestamp" in globalMap).toEqual(true);
-    // });
+    test('Layer Controller should show the current_timestamp', () => {
+        controller.controllers.currentTimestamp.getValue = () => '2021';
+        layerController.handleOverlayadd('raster');
+        expect('testBase/raster test current timestamp' in globalMap).toEqual(true);
+    });
 
-    // test('updateSlider should set img according to currentTimestamp', () => {
-    //     controllers.current_timestamp.getValue = () => "2021";
-    //     layerController.handleOverlayadd("raster");
-    //     expect(imageUrl).toEqual("test_base/raster test current timestamp");
-    // });
+    test('updateSlider should set img according to currentTimestamp', () => {
+        controller.controllers.currentTimestamp.getValue = () => '2021';
+        layerController.handleOverlayadd('raster');
+        expect(imageUrl).toEqual('testBase/raster test current timestamp');
+    });
 });
 
 // describe('Tests for adding layers with colorbars', () => {
