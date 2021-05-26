@@ -94,11 +94,12 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         expect('overlay' in overlayDict).toEqual(true);
     });
 
-    // test('Layers should be correctly added to the map when selected', () => {
-    //     layerController.handleOverlayadd("raster");
-    //     expect("test_base/raster test" in globalMap).toEqual(true);
-    //     expect(controllers.overlayOrder.includes("raster")).toEqual(true);
-    // });
+    test('Layers should be correctly added to the map when selected', () => {
+        layerController.loadWithPriority = jest.fn(),
+        layerController.handleOverlayadd("raster");
+        expect('testBase/raster test' in globalMap).toEqual(true);
+        expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
+    });
 
     // test('Layers should be correctly removed from the map when selected', () => {
     //     layerController.handleOverlayadd("raster");
