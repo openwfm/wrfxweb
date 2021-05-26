@@ -96,25 +96,27 @@ describe('Tests for adding layers to menu and selecting layers', () => {
 
     test('Layers should be correctly added to the map when selected', () => {
         layerController.loadWithPriority = jest.fn(),
-        layerController.handleOverlayadd("raster");
+        layerController.handleOverlayadd('raster');
         expect('testBase/raster test' in globalMap).toEqual(true);
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
 
-    // test('Layers should be correctly removed from the map when selected', () => {
-    //     layerController.handleOverlayadd("raster");
-    //     layerController.handleOverlayRemove("raster");
-    //     expect("test_base/raster test" in globalMap).toEqual(false);
-    // });
+    test('Layers should be correctly removed from the map when selected', () => {
+        layerController.loadWithPriority = jest.fn(),
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayRemove('raster');
+        expect('testBase/raster test' in globalMap).toEqual(false);
+    });
 
-    // test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
-    //     layerController.handleOverlayadd("raster");
-    //     controllers.currentDomain.getValue = () => 2;
-    //     layerController.domainSwitch();
-    //     expect(controllers.overlayOrder.includes("raster")).toEqual(true);
-    //     expect("test_base/raster test 2" in globalMap).toEqual(true);
-    //     expect("test_base/raster test" in globalMap).toEqual(false);
-    // });
+    test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
+        layerController.loadWithPriority = jest.fn(),
+        layerController.handleOverlayadd('raster');
+        controller.controllers.currentDomain.getValue = () => 2;
+        layerController.domainSwitch();
+        expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
+        expect('testBase/raster test 2' in globalMap).toEqual(true);
+        expect('testBase/raster test' in globalMap).toEqual(false);
+    });
 
     // test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
     //     layerController.handleOverlayadd("raster");
