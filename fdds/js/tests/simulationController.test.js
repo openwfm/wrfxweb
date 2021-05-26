@@ -99,14 +99,14 @@ describe('Simulation Controller Tests', () => {
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
     });
 
-    // test('Switching domain should preserve relative current frame position', () => {
-    //     simulationController.resetSlider();
-    //     simulationController.currentFrame = 1;
-    //     controllers.currentDomain.getValue = () => 2;
-    //     controllers.sorted_timestamps.getValue = () => ["2020", "2020.5", "2021", "2021.5"];
-    //     simulationController.resetSlider();
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2021");
-    // });
+    test('Switching domain should preserve relative current frame position', () => {
+        simulationController.resetSlider();
+        simulationController.currentFrame = 1;
+        controller.controllers.currentDomain.getValue = () => 2;
+        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
+        simulationController.resetSlider();
+        expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
+    });
 
     // test('Switching from domain with more timestamps to less should preserve relative current frame position', () => {
     //     simulationController.resetSlider();
