@@ -108,18 +108,18 @@ describe('Simulation Controller Tests', () => {
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
-    // test('Switching from domain with more timestamps to less should preserve relative current frame position', () => {
-    //     simulationController.resetSlider();
-    //     simulationController.currentFrame = 3;
-    //     simulationController.frameTotal = 4;
-    //     controllers.currentDomain.getValue = () => 2;
-    //     controllers.sorted_timestamps.getValue = () => ["2020", "2020.5", "2021", "2021.5"];
-    //     simulationController.resetSlider();
-    //     controllers.currentDomain.getValue = () => 1;
-    //     controllers.sorted_timestamps.getValue = () => ["2020", "2021"];
-    //     simulationController.resetSlider();
-    //     expect(controllers.current_timestamp.getValue()).toEqual("2021");
-    // });
+    test('Switching from domain with more timestamps to less should preserve relative current frame position', () => {
+        simulationController.resetSlider();
+        simulationController.currentFrame = 3;
+        simulationController.frameTotal = 4;
+        controller.controllers.currentDomain.getValue = () => 2;
+        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
+        simulationController.resetSlider();
+        controller.controllers.currentDomain.getValue = () => 1;
+        util.simVars.sortedTimestamps = ['2020', '2021'];
+        simulationController.resetSlider();
+        expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
+    });
 
     // test('Switching to a new simulation should reset the slider', () => {
     //     simulationController.resetSlider();
