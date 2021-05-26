@@ -72,12 +72,16 @@ describe('Tests for adding layers to menu and selecting layers', () => {
 
     beforeEach(async () => {
         globalMap = {};
+
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
+
         util.simVars.overlayOrder = []
+         
         const div = document.createElement('div');
         div.id = 'raster-colorbar';
         await document.body.appendChild(div);
+
         layerController = await document.body.appendChild(new LayerController());
         layerController.domainSwitch();
         layerController.loadWithPriority = jest.fn();
@@ -134,27 +138,29 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 });
 
-// describe('Tests for adding layers with colorbars', () => {
-//     var layerController;
+describe('Tests for adding layers with colorbars', () => {
+    var layerController;
 
-//     beforeEach(async () => {
-//         controllers.currentDomain.getValue = () => 1;
-//         controllers.current_timestamp.getValue = () => "2020";
-//         controllers.overlayOrder = [];
-//         var colorbar = "";
-//         controllers.displayedColorbar.getValue = () => colorbar;
-//         controllers.displayedColorbar.setValue = (newColorbar) => {colorbar = newColorbar};
-//         const div = document.createElement("div");
-//         div.id = "raster-colorbar";
-//         await document.body.appendChild(div);
-//         layerController = await document.body.appendChild(new LayerController());
-//         layerController.domainSwitch();
-//     });
+    beforeEach(async () => {
+        controller.controllers.currentDomain.getValue = () => 1;
+        controller.controllers.currentTimestamp.getValue = () => '2020';
 
-//     test('Layer Controller should add any colorbars', () => {
-//         layerController.handleOverlayadd("raster");
-//         expect(controllers.displayedColorbar.getValue()).toEqual("raster");
-//     });
+        util.simVars.overlayOrder = [];
+        util.simVars.displayedColorbar = '';
+
+        const div = document.createElement('div');
+        div.id = 'raster-colorbar';
+        await document.body.appendChild(div);
+
+        layerController = await document.body.appendChild(new LayerController());
+        layerController.domainSwitch();
+        layerController.loadWithPriority = jest.fn();
+    });
+
+    test('Layer Controller should add any colorbars', () => {
+        layerController.handleOverlayadd('raster');
+        expect(util.simVars.displayedColorbar).toEqual('raster');
+    });
 
 //     test('Layer Controller should remove colorbars when layer deselected', () => {
 //         layerController.handleOverlayadd("raster");
@@ -181,4 +187,4 @@ describe('Tests for adding layers to menu and selecting layers', () => {
 //         layerController.domainSwitch();
 //         expect(controllers.displayedColorbar.getValue()).toEqual(null);
 //     });
-// });
+});
