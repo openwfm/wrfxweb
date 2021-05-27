@@ -84,6 +84,8 @@ export class CatalogItem extends HTMLElement {
         }
 
         this.shadowRoot.querySelector('#entry').onclick = () => {
+            const timeSeriesChart = document.querySelector('#timeSeriesChartContainer');
+            timeSeriesChart.style.display = 'none';
             this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
         }
         if (this.navJobId == jobId) {
@@ -98,8 +100,8 @@ export class CatalogItem extends HTMLElement {
         // close selection dialog
         simVars.currentSimulation = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').style.display = "none";
-        history.pushState({id: entryID}, 'Data', "?job_id=" + entryID);
+        document.querySelector('.catalog-menu').style.display = 'none';
+        history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
         getSimulation(path);

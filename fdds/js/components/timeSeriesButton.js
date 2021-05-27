@@ -4,19 +4,19 @@ export class TimeSeriesButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel="stylesheet" href="css/timeSeriesButton.css"/>
+            <link rel='stylesheet' href='css/timeSeriesButton.css'/>
             <div id='timeseries-button'>
                 <div>
-                    <label class="timeseries-select-label" for="startDate">start time:</label>
-                    <select class="timeseries-select" id="startDate"></select>
+                    <label class='timeseries-select-label' for='startDate'>start time:</label>
+                    <select class='timeseries-select' id='startDate'></select>
                 </div>
                 <div>
-                    <label class="timeseries-select-label" for="endDate">end time: </label>
-                    <select class="timeseries-select" id="endDate"></select>
+                    <label class='timeseries-select-label' for='endDate'>end time: </label>
+                    <select class='timeseries-select' id='endDate'></select>
                 </div>
-                <button class="timeSeriesButton" id="timeSeriesButton">
+                <button class='timeSeriesButton' id='timeSeriesButton'>
                     <span>generate timeseries</span>
-                    <div id="progressBar"></div>
+                    <div id='progressBar'></div>
                 </button>
             </div>
         `;
@@ -37,7 +37,7 @@ export class TimeSeriesButton extends HTMLElement {
         const progressBar = this.querySelector('#progressBar');
         if (progress < 1) {
             progressBar.style.display = 'block';
-            progressBar.style.width = Math.floor(progress*100) + "%";
+            progressBar.style.width = Math.floor(progress*100) + '%';
             this.getButton().disabled = true;
         } else {
             this.getButton().disabled = false;
@@ -49,8 +49,8 @@ export class TimeSeriesButton extends HTMLElement {
     updateTimestamps() {
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        startDate.innerHTML = "";
-        endDate.innerHTML = "";
+        startDate.innerHTML = '';
+        endDate.innerHTML = '';
         for (var timestamp of simVars.sortedTimestamps) {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
@@ -59,7 +59,7 @@ export class TimeSeriesButton extends HTMLElement {
     }
 
     getButton() {
-        return this.querySelector("#timeSeriesButton");
+        return this.querySelector('#timeSeriesButton');
     }
 
     getStartDate() {

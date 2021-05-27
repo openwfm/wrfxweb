@@ -1,5 +1,6 @@
 import { controllers } from './components/Controller.js';
 import { simVars } from './util.js';
+
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
     let json = {};
@@ -7,7 +8,7 @@ export async function getConfigurations() {
         const response = await fetch('conf.json');
         json = response.json();
     } catch(error) {
-        console.error("Error fetching conf.json: " + error);
+        console.error('Error fetching conf.json: ' + error);
     }
     return json;
 }
@@ -16,10 +17,10 @@ export async function getConfigurations() {
 export async function getCatalogEntries() {
     let json = {};
     try {
-        const response = await fetch("simulations/catalog.json");
+        const response = await fetch('simulations/catalog.json');
         json = response.json();
     } catch(error) {
-        console.error("Error fetching catalog entries: " + error);
+        console.error('Error fetching catalog entries: ' + error);
     }
     return json;
 }
@@ -33,6 +34,6 @@ export function getSimulation(path) {
         // retrieve all domains
         controllers.domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
-        console.error("Error fetching simulation at " + path + ": " + error);
+        console.error('Error fetching simulation at ' + path + ': ' + error);
     });
 }

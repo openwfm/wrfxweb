@@ -1,8 +1,8 @@
 // Set needed global variables 
 export const simVars = {
-  currentSimulation: "",
+  currentSimulation: '',
   rasters: [],
-  rasterBase: "",
+  rasterBase: '',
   sortedTimestamps: [],
   overlayOrder: [],
   displayedColorbar: null,
@@ -48,9 +48,9 @@ export function debounce(callback, delay) {
 
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
-  var timezone = "America/Los_Angeles";
+  var timezone = 'America/Los_Angeles';
   var a = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
-  return a.format("YYYY-MM-DD HH:mm:ss");
+  return a.format('YYYY-MM-DD HH:mm:ss');
 }
 
 export function createOption(timeStamp, utcValue) {
@@ -76,7 +76,7 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
-/** Makes given element draggable from sub element with id "subID" */
+/** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   var elmntLeft = 0, elmntTop = 0;
@@ -85,16 +85,16 @@ export function dragElement(elmnt, subID) {
     return;
   }
   document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
-  window.addEventListener("resize", () => {
+  window.addEventListener('resize', () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {
       elmntLeft = elmntLeft - offsetLeft; 
-      elmnt.style.left = elmntLeft + "px";
+      elmnt.style.left = elmntLeft + 'px';
     }
     let offsetTop = clientHeight - document.body.clientHeight;
     if (elmntTop != 0 && elmnt.offsetTop + (elmnt.clientHeight / 2) > (document.body.clientHeight / 2) && (elmntTop - offsetTop) > 0 && (elmntTop - offsetTop + elmnt.clientHeight) < document.body.clientHeight) {
       elmntTop = elmntTop - offsetTop;
-      elmnt.style.top = elmntTop + "px";
+      elmnt.style.top = elmntTop + 'px';
     }
     clientWidth = document.body.clientWidth;
     clientHeight = document.body.clientHeight;
@@ -128,11 +128,11 @@ export function dragElement(elmnt, subID) {
     // set the element's new position:
     if (Math.abs(pos1) >= 1 && elmntLeft - pos1 > 0 && elmntLeft + elmnt.clientWidth - pos1 < clientWidth) {
       elmntLeft = elmntLeft - pos1;
-      elmnt.style.left = elmntLeft + "px";
+      elmnt.style.left = elmntLeft + 'px';
     }
     if (Math.abs(pos2) >= 1 && elmntTop - pos2 > 0 && elmntTop + elmnt.clientHeight - pos2  < clientHeight) {
       elmntTop = elmntTop - pos2;
-      elmnt.style.top = elmntTop + "px";
+      elmnt.style.top = elmntTop + 'px';
     }
   }
 

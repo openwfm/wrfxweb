@@ -11,7 +11,7 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel="stylesheet" href="css/simulationController.css"/>
+            <link rel='stylesheet' href='css/simulationController.css'/>
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
@@ -42,7 +42,7 @@ export class SimulationController extends HTMLElement {
             </div>
         `;
 
-        this.currentSimulation = "";
+        this.currentSimulation = '';
         this.currentFrame = 0;
         this.frameTotal = 1;
         this.playing = false;
@@ -106,7 +106,7 @@ export class SimulationController extends HTMLElement {
         }
         this.setupForTime(this.currentFrame);
         this.frameTotal = simVars.sortedTimestamps.length;
-        this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + "%";
+        this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + '%';
     }
 
     /** Called to update the UI when the currentFrame has been updated. */

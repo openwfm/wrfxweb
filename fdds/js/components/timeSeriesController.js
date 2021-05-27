@@ -22,7 +22,7 @@ export class TimeSeriesController extends LayerController {
         timeSeriesDiv.className = 'layer-group';
         timeSeriesDiv.id = 'timeseries-layer-group';
         const span = document.createElement('span');
-        span.innerText = "Timeseries over all Markers";
+        span.innerText = 'Timeseries over all Markers';
         timeSeriesDiv.appendChild(span);
         timeSeriesDiv.appendChild(this.timeSeriesButton);
         container.appendChild(timeSeriesDiv);
@@ -45,11 +45,11 @@ export class TimeSeriesController extends LayerController {
         }
         controllers.syncImageLoad.subscribe(syncImageSubscription);
         this.timeSeriesButton.getButton().onclick = async () => {
-            document.body.classList.add("waiting");
+            document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
             var timeSeriesData = await this.generateTimeSeriesData(this.timeSeriesButton, startDate, endDate, this.markers);
-            document.body.classList.remove("waiting");
+            document.body.classList.remove('waiting');
             const timeSeriesChart = document.querySelector('timeseries-chart');
             timeSeriesChart.populateChart(timeSeriesData);
         }
@@ -279,7 +279,7 @@ export class TimeSeriesController extends LayerController {
      * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
      * the corresponding timestamp. */
     async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
-        document.body.classList.add("waiting");
+        document.body.classList.add('waiting');
         progressMarker.setProgress(0);
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var progress = 0;
@@ -293,7 +293,7 @@ export class TimeSeriesController extends LayerController {
             progress += 1;
             progressMarker.setProgress(progress/filteredTimeStamps.length);
         }
-        document.body.classList.remove("waiting");
+        document.body.classList.remove('waiting');
         return timeSeriesData;
     }
 

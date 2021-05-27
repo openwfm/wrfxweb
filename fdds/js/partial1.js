@@ -1,6 +1,6 @@
-"use strict";
-import { getConfigurations } from "./services.js";
-import { map, simVars } from "./util.js";
+'use strict';
+import { getConfigurations } from './services.js';
+import { map, simVars } from './util.js';
 
 window.onload = () => {
   map.doubleClickZoom.disable();
@@ -17,7 +17,7 @@ async function loadConfig() {
   var configData = await getConfigurations();
   if (configData.organization) {
     simVars.organization = configData.organization;
-    if (!simVars.organization.includes("SJSU")) {
+    if (!simVars.organization.includes('SJSU')) {
         map.panTo([39.7392, -104.9903]);
     }
     document.title = simVars.organization;
@@ -25,10 +25,10 @@ async function loadConfig() {
 
   if (configData.flags) {
     let flags = configData.flags;
-    const simulationFlags = document.querySelector("#simulation-flags");
+    const simulationFlags = document.querySelector('#simulation-flags');
     flags.map(flag => {
-        var spanElement = document.createElement("span");
-        spanElement.className = "displayTest";
+        var spanElement = document.createElement('span');
+        spanElement.className = 'displayTest';
         spanElement.innerText = flag;
         simulationFlags.appendChild(spanElement);
     });

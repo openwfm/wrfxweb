@@ -5,7 +5,7 @@ class LayersButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel="stylesheet" href="css/layersButton.css"/>
+            <link rel='stylesheet' href='css/layersButton.css'/>
             <div id='layers-button-wrapper'>
                 <div id='layers-button'>
                     <span id='layers-button-label'>layers</span>
