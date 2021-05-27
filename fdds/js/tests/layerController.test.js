@@ -92,6 +92,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('Layer Controller should populate its raster and overlay layers correctly', () => {
         const rasterDict = layerController.rasterDict;
         const overlayDict = layerController.overlayDict;
+
         expect(Object.entries(rasterDict).length).toEqual(1);
         expect('raster' in rasterDict).toEqual(true);
         expect(Object.entries(overlayDict).length).toEqual(1);
@@ -100,6 +101,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
 
     test('Layers should be correctly added to the map when selected', () => {
         layerController.handleOverlayadd('raster');
+
         expect('testBase/rasterTest' in globalMap).toEqual(true);
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
@@ -107,6 +109,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('Layers should be correctly removed from the map when selected', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayRemove('raster');
+
         expect('testBase/rasterTest' in globalMap).toEqual(false);
     });
 
@@ -114,6 +117,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         layerController.handleOverlayadd('raster');
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
+
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
         expect('testBase/rasterTest2' in globalMap).toEqual(true);
         expect('testBase/rasterTest' in globalMap).toEqual(false);
@@ -123,6 +127,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         layerController.handleOverlayadd('raster');
         util.simVars.currentSimulation = 'new simulation';
         layerController.domainSwitch();
+
         expect(util.simVars.overlayOrder.length).toEqual(0);
         expect(globalMap).toEqual({});
     });
@@ -136,6 +141,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('updateSlider should set img according to currentTimestamp', () => {
         controller.controllers.currentTimestamp.getValue = () => '2021';
         layerController.handleOverlayadd('raster');
+
         expect(imageUrl).toEqual('testBase/rasterTest/currentTimestamp');
     });
 });
@@ -161,18 +167,21 @@ describe('Tests for adding layers with colorbars', () => {
 
     test('Layer Controller should add any colorbars', () => {
         layerController.handleOverlayadd('raster');
+
         expect(util.simVars.displayedColorbar).toEqual('raster');
     });
 
     test('Layer Controller should remove colorbars when layer deselected', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayRemove('raster');
+
         expect(util.simVars.displayedColorbar).toEqual(null);
     });
 
     test('Layer Controller should put most recent selected colorbar on top', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayadd('overlay');
+
         expect(util.simVars.displayedColorbar).toEqual('overlay');
     });
 
@@ -180,6 +189,7 @@ describe('Tests for adding layers with colorbars', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayadd('overlay');
         layerController.handleOverlayRemove('overlay');
+
         expect(util.simVars.displayedColorbar).toEqual('raster');
     });
 
@@ -187,6 +197,7 @@ describe('Tests for adding layers with colorbars', () => {
         layerController.handleOverlayadd('raster');
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
+
         expect(util.simVars.displayedColorbar).toEqual(null);
     });
 });
@@ -227,16 +238,19 @@ describe('Tests for preloading', () => {
 
     test('UpdateTime should not load if no layers currently added', () => {
         layerController.updateTime();
+
         expect(imageUrl).toEqual('');
     })
 
     test('UpdateTime should load a preloaded URL', () => {
         util.simVars.overlayOrder = ['layer'];
+
         var preloadedUrl = 'preloadedRasterTest1/2020';
         var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
         var currentUrl = util.simVars.rasterBase + currentRasters[controller.controllers.currentTimestamp.getValue()]['layer'].raster;
         layerController.preloaded[currentUrl] = preloadedUrl;
         layerController.updateTime();
+
         expect(imageUrl).toEqual(preloadedUrl);
     });
 
@@ -248,6 +262,7 @@ describe('Tests for preloading', () => {
 
     test('UpdateTime should preload future times when current time not loaded', () => {
         util.simVars.overlayOrder = ['layer'];
+
         var futureTimeStamp = '2021';
         var preloadedFutureUrl = 'preloadedFutureUrl';
         layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
@@ -255,9 +270,11 @@ describe('Tests for preloading', () => {
             var futureUrl = util.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
             layerController.preloaded[futureUrl] = preloadedFutureUrl;
         }
+
         layerController.updateTime();
         controller.controllers.currentTimestamp.getValue = () => futureTimeStamp;
         layerController.updateTime();
+
         expect(imageUrl).toEqual(preloadedFutureUrl);
     });
 
