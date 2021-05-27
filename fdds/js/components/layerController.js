@@ -67,15 +67,15 @@ export class LayerController extends HTMLElement {
             var rasterInfo = rastersNow[layerName];
             var cs = rasterInfo.coords;
             var imageURL = simVars.rasterBase + rasterInfo.raster;
-            if (!(imageURL in this.preloaded)) {
+            if (imageURL in this.preloaded) {
+                imageURL = this.preloaded[imageURL];
+            } else {
                 if (!reloading) {
                     var startTime = controllers.currentTimestamp.getValue();
                     var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
                     this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
                 }
                 reloading = true;
-            } else {
-                imageURL = this.preloaded[imageURL];
             }
             layer.setUrl(imageURL,
                         [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
