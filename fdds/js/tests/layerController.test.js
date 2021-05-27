@@ -262,6 +262,22 @@ describe('Tests for preloading', () => {
     });
 
     test('Switching domains with a layer added should preload times', () => {
-        expect(true).toEqual(true);
+        util.simVars.overlayOrder = ['layer'];
+        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
+        controller.controllers.currentDomain.getValue = () => '2';
+
+        var futureTimeStamp = '2021.5';
+        var preloadedFutureUrl = 'preloadedFutureUrl';
+        layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
+            var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
+            var futureUrl = util.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
+            layerController.preloaded[futureUrl] = preloadedFutureUrl;
+        }
+
+        layerController.domainSwitch();
+        controller.controllers.currentTimestamp.getValue = () => futureTimeStamp;
+        layerController.updateTime();
+
+        expect(imageUrl).toEqual(preloadedFutureUrl);
     });
 });
