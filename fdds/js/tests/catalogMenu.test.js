@@ -1,7 +1,7 @@
-const {CatalogMenu} = require('../components/CatalogMenu/catalogMenu');
+const { CatalogMenu } = require('../components/CatalogMenu/catalogMenu');
 const services = require('../services.js');
 
-const {L} = require('../leaflet/leaflet.js');
+const { L } = require('../leaflet/leaflet.js');
 jest.mock('../leaflet/leaflet.js');
 
 const {CatalogItem} = require('../components/CatalogMenu/catalogItem');

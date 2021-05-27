@@ -135,6 +135,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('Layer Controller should show the current_timestamp', () => {
         controller.controllers.currentTimestamp.getValue = () => '2021';
         layerController.handleOverlayadd('raster');
+
         expect('testBase/rasterTest/currentTimestamp' in globalMap).toEqual(true);
     });
 
@@ -257,6 +258,7 @@ describe('Tests for preloading', () => {
     test('UpdateTime should load URLs not preloaded', () => {
         util.simVars.overlayOrder = ['layer'];
         layerController.updateTime();
+
         expect(imageUrl).toEqual('testBase/rasterTest1/2020');
     });
 
