@@ -7,14 +7,14 @@ export class TimeSeriesMarker extends TimeSeriesButton {
         const timeSeriesButton = this.querySelector('#timeseries-button');
         var labelDetails = `
                 <div>
-                    <label style="display: inline-block; width: 100px" for="timeseries-custom-name">Add name: </label>
-                    <input id="timeseries-custom-name"></input>
+                    <label style='display: inline-block; width: 100px' for='timeseries-custom-name'>Add name: </label>
+                    <input id='timeseries-custom-name'></input>
                 </div>
                 <div>
-                    <span style="margin: 1px; margin-right: 10px">lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
-                    <span id="rgb-value" style="margin:0">No layer with colorbar to show values</span>
+                    <span style='margin: 1px; margin-right: 10px'>lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
+                    <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
                 </div>
-                <p id="colorbar-location" style="margin: 0"></p>
+                <p id='colorbar-location' style='margin: 0'></p>
         `; 
         timeSeriesButton.innerHTML = labelDetails + timeSeriesButton.innerHTML;
         this.rgb = null;
@@ -40,13 +40,13 @@ export class TimeSeriesMarker extends TimeSeriesButton {
         const clrbarP = this.querySelector('#colorbar-location');
         const rgbP = this.querySelector('#rgb-value');
         const button = this.getButton();
-        clrbarP.style.display = "none";
-        rgbP.innerHTML = "No layer with colorbar to show values of";
-        rgbP.style.color = "black";
+        clrbarP.style.display = 'none';
+        rgbP.innerHTML = 'No layer with colorbar to show values of';
+        rgbP.style.color = 'black';
         button.disabled = true;
         if (clrbarLocation != null) {
-            clrbarP.style.display = "block";
-            clrbarP.innerHTML = "colorbar location: " + clrbarLocation;
+            clrbarP.style.display = 'block';
+            clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
             rgbP.style.color = `rgb(${this.rgb[0]},${this.rgb[1]},${this.rgb[2]})`;
             rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
             button.disabled = false;

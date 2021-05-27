@@ -6,11 +6,11 @@ jest.mock('../util.js', () => ({
         sortedTimestamps: [],
         rasters: ({
             1: {
-                "2020": {"raster": {}}
+                '2020': {'raster': {}}
             },
             2: {
-                "2020": {"raster": {}},
-                "2021": {"raster": {}}
+                '2020': {'raster': {}},
+                '2021': {'raster': {}}
             } 
         })
     })
@@ -41,14 +41,16 @@ describe('Domain Selector Tests', () => {
 
     test('Tests setUpForDomain', () => {
         domainSelector.setUpForDomain(1);
-        expect(util.simVars.sortedTimestamps).toEqual(["2020"]);
+
+        expect(util.simVars.sortedTimestamps).toEqual(['2020']);
         expect(currentDomain).toEqual(1);
     });
 
     test('Tests calling setUpForDomain twice', () => {
         domainSelector.setUpForDomain(1);
         domainSelector.setUpForDomain(2);
-        expect(util.simVars.sortedTimestamps).toEqual(["2020", "2021"]);
+
+        expect(util.simVars.sortedTimestamps).toEqual(['2020', '2021']);
         expect(currentDomain).toEqual(2);
     });
 });

@@ -5,7 +5,7 @@ global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagat
 const util = require('../util.js');
 jest.mock('../util.js', () => ({
     simVars: ({
-        sorted_timestamps: ["2020", "2021"],
+        sorted_timestamps: ['2020', '2021'],
         currentSimulation: 'currentSimulation',
     }), 
     utcToLocal: (timestamp) => timestamp,
@@ -23,27 +23,6 @@ jest.mock('../components/Controller.js', () => ({
             setValue: jest.fn()
         }),
     }),
-    // overlayOrder: ["layer"],
-    // rasters: ({
-    //     getValue: () => ({
-    //         1: {
-    //             "2020": {"layer": {raster: "raster test 1: 2020", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 1: 2020"}},
-    //             "2021": {"layer": {raster: "raster test 1: 2021", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 1: 2021"}}
-    //         },
-    //         2: {
-    //             "2020": {"layer": {raster: "raster test 2: 2020", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2020"}},
-    //             "2020.5": {"layer": {raster: "raster test 2: 2020.5", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2020.5"}},
-    //             "2021": {"layer": {raster: "raster test 2: 2021", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2021"}},
-    //             "2021.5": {"layer": {raster: "raster test 2: 2021.5", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "colorbar 2: 2021.5"}}
-    //         }
-    //     })
-    // }),
-    // raster_base: ({
-    //     getValue: () => "test_base/"
-    // }),
-    // organization: ({
-    //     getValue: () => "SJSU"
-    // })
 }));
 
 describe('Simulation Controller Tests', () => {
@@ -63,32 +42,17 @@ describe('Simulation Controller Tests', () => {
         simulationController = await document.body.appendChild(new SimulationController());
         simulationController.currentFrame = 0;
     });
-
-    // test('Images and their colorbars should preload', () => {
-    //     simulationController.preloadVariables(0, 2);
-    //     expect("layer" in simulationController.preloaded).toEqual(true);
-    //     expect("layer_cb" in simulationController.preloaded).toEqual(true);
-    //     expect(Object.keys(simulationController.preloaded["layer"][1]).length).toEqual(2);
-    //     expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
-    // });
-
-    // test('Attempting to preload more images than exist should not crash', () => {
-    //     simulationController.preloadVariables(0, 5);
-    //     expect("layer" in simulationController.preloaded).toEqual(true);
-    //     expect("layer_cb" in simulationController.preloaded).toEqual(true);
-    //     expect(Object.keys(simulationController.preloaded["layer"][1]).length).toEqual(2);
-    //     expect(Object.keys(simulationController.preloaded["layer_cb"]).length).toEqual(2);
-    // });
     
     test('SetUp For Time should change the current timestamp', () => {
         simulationController.setupForTime(0);
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
     });
 
     test('Selecting nextFrame should advance frame', () => {
-        // simulationController.preloadVariables(0, 2);
         simulationController.updateSlider();
         simulationController.nextFrame(3);
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
@@ -96,6 +60,7 @@ describe('Simulation Controller Tests', () => {
         simulationController.currentFrame = 1;
         simulationController.updateSlider();
         simulationController.prevFrame(3);
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
     });
 
@@ -105,6 +70,7 @@ describe('Simulation Controller Tests', () => {
         controller.controllers.currentDomain.getValue = () => 2;
         util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
         simulationController.resetSlider();
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
@@ -118,6 +84,7 @@ describe('Simulation Controller Tests', () => {
         controller.controllers.currentDomain.getValue = () => 1;
         util.simVars.sortedTimestamps = ['2020', '2021'];
         simulationController.resetSlider();
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
     });
 
@@ -127,6 +94,7 @@ describe('Simulation Controller Tests', () => {
         simulationController.resetSlider();
         util.simVars.currentSimulation = 'new Simulation';
         simulationController.resetSlider();
+
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
     });
 });

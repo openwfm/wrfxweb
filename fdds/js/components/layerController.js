@@ -9,7 +9,7 @@ export class LayerController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel="stylesheet" href="css/layerController.css"/>
+            <link rel='stylesheet' href='css/layerController.css'/>
             <div id='layer-controller-container'>
                 <div id='base-maps' class='layer-group' style='border-bottom: 2px'>
                     <span>Base Maps</span>
@@ -132,8 +132,8 @@ export class LayerController extends HTMLElement {
         }
         simVars.displayedColorbar = null;
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        rasterColorbar.src = "";
-        rasterColorbar.style.display = "none";
+        rasterColorbar.src = '';
+        rasterColorbar.style.display = 'none';
         // if on a new simulation entirely, reset selected layers
         if (this.currentSimulation != simVars.currentSimulation) {
             simVars.overlayOrder.length = 0;

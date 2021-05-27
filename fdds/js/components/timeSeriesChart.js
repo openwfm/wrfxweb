@@ -4,35 +4,35 @@ export class TimeSeriesChart extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel="stylesheet" href="css/timeSeriesChart.css"/>
-            <div id="timeSeriesChartContainer">
-                <div id="zoomBox"></div>
-                <span id="closeTimeSeriesChart">x</span>
-                <button id="undo-zoom" style="display:none">
+            <link rel='stylesheet' href='css/timeSeriesChart.css'/>
+            <div id='timeSeriesChartContainer'>
+                <div id='zoomBox'></div>
+                <span id='closeTimeSeriesChart'>x</span>
+                <button id='undo-zoom' style='display:none'>
                     <img height=10 width=10 src='icons/undo_black_24dp.svg'></img>
                 </button>
-                <canvas id="timeSeriesChart" width="400px" height="400px"></canvas>
-                <div id="break" style="width: 100%; height: 1px; background: #5d5d5d"></div>
-                <div id="add-threshold" style="margin-top: 10px">
-                    <label style="display: inline-block; width: 100px" for="threshold-setter">y-axis threshold: </label>
-                    <input id="threshold-setter" style="margin-right:10px"></input>
-                    <label style="display: inline-block; width: 100px" for="threshold-label">threshold label: </label>
-                    <input id="threshold-label"></input>
+                <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
+                <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
+                <div id='add-threshold' style='margin-top: 10px'>
+                    <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
+                    <input id='threshold-setter' style='margin-right:10px'></input>
+                    <label style='display: inline-block; width: 100px' for='threshold-label'>threshold label: </label>
+                    <input id='threshold-label'></input>
                 </div>
-                <div id="zoomIn" style="display: inline-block; margin-top: 10px">
-                    <label style="display: inline-block; width: 100px" for="zoom-start">zoom in start: </label>
-                    <select id="zoom-start" style="width: 160px; margin-right:10px"></select>
-                    <label style="display: inline-block; width: 100px" for="zoom-end">zoom in end: </label>
-                    <select id="zoom-end" style="width: 160px"></select>
+                <div id='zoomIn' style='display: inline-block; margin-top: 10px'>
+                    <label style='display: inline-block; width: 100px' for='zoom-start'>zoom in start: </label>
+                    <select id='zoom-start' style='width: 160px; margin-right:10px'></select>
+                    <label style='display: inline-block; width: 100px' for='zoom-end'>zoom in end: </label>
+                    <select id='zoom-end' style='width: 160px'></select>
                 </div>
             </div>
         `;
         this.ctx = null;
         this.chart = null;
         this.data = null;
-        this.val = "";
-        this.label = "";
-        this.labels = "";
+        this.val = '';
+        this.label = '';
+        this.labels = '';
         this.xAdjust = null;
     }
 
@@ -59,10 +59,10 @@ export class TimeSeriesChart extends HTMLElement {
             this.populateChart(this.data, zoomStart.value, zoomEnd.value);
         }
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
-            thresholdSetter.value = "";
-            labelSetter.value = "";
-            this.val = "";
-            this.label = "";
+            thresholdSetter.value = '';
+            labelSetter.value = '';
+            this.val = '';
+            this.label = '';
             timeSeriesChart.style.display = 'none';
         }
         const zoomChange = () => {
@@ -77,7 +77,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
     }
 
-    zoomDate(startDate = "", endDate = "", yMin = NaN, yMax = NaN) {
+    zoomDate(startDate = '', endDate = '', yMin = NaN, yMax = NaN) {
         const zoomStart = this.querySelector('#zoom-start');
         const zoomEnd = this.querySelector('#zoom-end');
         const undoZoom = this.querySelector('#undo-zoom');
@@ -108,10 +108,10 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateZoomSelectors(timeStamps, startDate, endDate) {
-        if (startDate == "") {
+        if (startDate == '') {
             startDate = timeStamps[0]
         }
-        if (endDate == "") {
+        if (endDate == '') {
             endDate = timeStamps[timeStamps.length - 1];
         }
         const zoomStart = this.querySelector('#zoom-start');
@@ -127,7 +127,7 @@ export class TimeSeriesChart extends HTMLElement {
         linkSelects(zoomStart, zoomEnd);
     }
 
-    populateChart(data, startDate="", endDate="") {
+    populateChart(data, startDate='', endDate='') {
         if (data.length == 0) {
             return;
         }
@@ -159,7 +159,7 @@ export class TimeSeriesChart extends HTMLElement {
             let rgb = timeSeriesDataset.rgb; // use let here to create block scope
             let color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;  
             var timeSeriesData = {
-                    label: timeSeriesDataset.label + " values at lat: " + roundLatLon(timeSeriesDataset.latLon.lat) + " lon: " + roundLatLon(timeSeriesDataset.latLon.lng),
+                    label: timeSeriesDataset.label + ' values at lat: ' + roundLatLon(timeSeriesDataset.latLon.lat) + ' lon: ' + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
@@ -167,7 +167,7 @@ export class TimeSeriesChart extends HTMLElement {
                     pointBackgroundColor: (context) => {
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];
-                        if (this.val === "" || isNaN(this.val) || value > this.val) {
+                        if (this.val === '' || isNaN(this.val) || value > this.val) {
                             return color;
                         }
                         return complementColor(rgb);
@@ -180,7 +180,7 @@ export class TimeSeriesChart extends HTMLElement {
         var xAxisOptions = {
             title: {
                 display: true,
-                text: "Timestamp"
+                text: 'Timestamp'
             }
         };
         if (startDate) {
@@ -211,7 +211,7 @@ export class TimeSeriesChart extends HTMLElement {
                 plugins: {
                     annotation: {
                         annotations: [{
-                            display: this.val !== "" && !isNaN(this.val),
+                            display: this.val !== '' && !isNaN(this.val),
                             type: 'line',
                             mode: 'horizontal',
                             scaleID: 'yAxes',
@@ -219,7 +219,7 @@ export class TimeSeriesChart extends HTMLElement {
                             borderColor: 'rgb(255, 99, 132)',
                             borderWidth: 2,
                             label: {
-                                enabled: this.label != "",
+                                enabled: this.label != '',
                                 content: this.label,
                                 xAdjust: this.xAdjust - 2*this.label.length
                             }
