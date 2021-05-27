@@ -213,7 +213,7 @@ describe('Tests for preloading', () => {
                 '2021.5': {'layer': {raster: 'rasterTest2/2021.5', coords: testCoords, 'colorbar': 'colorbar2/2021.5'}}
             }
         })
-        util.simVars.overlayOrder = []
+        util.simVars.overlayOrder = [];
          
         const div = document.createElement('div');
         div.id = 'raster-colorbar';
@@ -224,10 +224,40 @@ describe('Tests for preloading', () => {
         layerController.loadWithPriority = jest.fn()
     });
 
+    test('UpdateTime should not load if no layers currently added', () => {
+        layerController.updateTime();
+        expect(imageUrl).toEqual('');
+    })
+
     test('UpdateTime should load a preloaded URL', () => {
         util.simVars.overlayOrder = ['layer'];
-        layerController.preloaded['testBase/rasterTest1/2020'] = 'preloadedRasterTest1/2020';
+        var preloadedUrl = 'preloadedRasterTest1/2020';
+        var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
+        var currentUrl = util.simVars.rasterBase + currentRasters[controller.controllers.currentTimestamp.getValue()]['layer'].raster;
+        layerController.preloaded[currentUrl] = preloadedUrl;
         layerController.updateTime();
-        expect(imageUrl).toEqual('preloadedRasterTest1/2020');
+        expect(imageUrl).toEqual(preloadedUrl);
+    });
+
+    test('UpdateTime should load URLs not preloaded', () => {
+        util.simVars.overlayOrder = ['layer'];
+        layerController.updateTime();
+        expect(imageUrl).toEqual('testBase/rasterTest1/2020');
+
+    });
+
+    test('UpdateTime should preload future times when current time not loaded', () => {
+        util.simVars.overlayOrder = ['layer'];
+        layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
+            layerController.preloaded['testBase/rasterTest1/2021'] = 'preloadedRasterTest1/2021';
+        }
+        layerController.updateTime();
+        controller.controllers.currentTimestamp.getValue = () => '2021';
+        layerController.updateTime();
+
+    });
+
+    test('Switching domains with a layer added should preload times', () => {
+        expect(true).toEqual(true);
     });
 });
