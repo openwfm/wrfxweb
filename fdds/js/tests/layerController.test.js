@@ -196,6 +196,7 @@ describe('Tests for preloading', () => {
 
     beforeEach(async () => {
         globalMap = {};
+        imageUrl = '';
 
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
@@ -223,7 +224,10 @@ describe('Tests for preloading', () => {
         layerController.loadWithPriority = jest.fn()
     });
 
-    test('test test', () => {
-        expect(true).toEqual(true);
+    test('UpdateTime should load a preloaded URL', () => {
+        util.simVars.overlayOrder = ['layer'];
+        layerController.preloaded['testBase/rasterTest1/2020'] = 'preloadedRasterTest1/2020';
+        layerController.updateTime();
+        expect(imageUrl).toEqual('preloadedRasterTest1/2020');
     });
 });
