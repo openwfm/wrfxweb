@@ -26,12 +26,10 @@ export async function getCatalogEntries() {
 
 /** Service request for fetching a selected simulation from the menu. */
 export function getSimulation(path) {
-    // fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
-    fetch(path.replaceAll(":", "_")).then(response => response.json()).then(function(selectedSimulation) {
+    fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
         // store in global state
         simVars.rasters = selectedSimulation;
-        // simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
-        simVars.rasterBase = path.replaceAll(":", "_").substring(0, path.lastIndexOf('/') + 1);
+        simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
         // retrieve all domains
         controllers.domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
