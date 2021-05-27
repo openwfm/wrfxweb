@@ -1,5 +1,6 @@
 import { controllers } from './components/Controller.js';
 import { simVars } from './util.js';
+
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
     let json = {};
