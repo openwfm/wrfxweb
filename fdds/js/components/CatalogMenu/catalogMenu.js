@@ -16,48 +16,48 @@ export class CatalogMenu extends HTMLElement {
         this.satelliteList = [];
         this.addOrder = [];
         this.innerHTML = `
-            <div class="catalog-menu">
-                <div id="menu-title" class="menu-title">
+            <div class='catalog-menu'>
+                <div id='menu-title' class='menu-title'>
                     <h3>Select Simulation...</h3>
                     <div> 
-                        <span id="menu-close">x</span>
+                        <span id='menu-close'>x</span>
                     </div>
                 </div>
-                <div class="search-header">
-                    <div class="search-header-block">
-                        <label for="sort-by" style="display: block; font-size:.75rem">order/search by</label>
-                        <select id="sort-by" class="selector">
-                            <option value="original-order">original order</option>
-                            <option value="description">description</option>
-                            <option value="start-date">start date</option>
-                            <option value="end-date">end date</option>
+                <div class='search-header'>
+                    <div class='search-header-block'>
+                        <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
+                        <select id='sort-by' class='selector'>
+                            <option value='original-order'>original order</option>
+                            <option value='description'>description</option>
+                            <option value='start-date'>start date</option>
+                            <option value='end-date'>end date</option>
                         </select>
                     </div>
-                    <div class="search-header-block">
-                        <label id="reverse-label" for="reverse-order">Reverse Order</label>
-                        <input type="checkbox" id="reverse-order" style="display:inline-block"></input>
+                    <div class='search-header-block'>
+                        <label id='reverse-label' for='reverse-order'>Reverse Order</label>
+                        <input type='checkbox' id='reverse-order' style='display:inline-block'></input>
                     </div>
-                    <div class="search-header-block">
-                        <input id="search-for" class="menu-search" type="text"></input>
+                    <div class='search-header-block'>
+                        <input id='search-for' class='menu-search' type='text'></input>
                     </div>
                 </div>
-                <div class="menu-columns">
-                    <select id="mobile-selector">
-                        <option value="Fires">Fires</option>
-                        <option value="Fuel Moisture">Fuel Moisture</option>
-                        <option value="Satellite Data">Satellite Data</option>
+                <div class='menu-columns'>
+                    <select id='mobile-selector'>
+                        <option value='Fires'>Fires</option>
+                        <option value='Fuel Moisture'>Fuel Moisture</option>
+                        <option value='Satellite Data'>Satellite Data</option>
                     </select>
-                    <div id="fires-column" class="column">
-                        <h3 class="column-header">Fires</h3>
-                        <ul id="catalog-fires" class="catalog-list"> </ul>
+                    <div id='fires-column' class='column'>
+                        <h3 class='column-header'>Fires</h3>
+                        <ul id='catalog-fires' class='catalog-list'> </ul>
                     </div>
-                    <div id="fuel-moisture-column" class="column">
-                        <h3 class="column-header">Fuel moisture</h3>
-                        <ul id="catalog-fuel-moisture" class="catalog-list"> </ul>
+                    <div id='fuel-moisture-column' class='column'>
+                        <h3 class='column-header'>Fuel moisture</h3>
+                        <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
                     </div>
-                    <div id="satellite-column" class="column">
-                        <h3 class="column-header">Satellite Data</h3>
-                        <ul id="catalog-satellite-data" class="catalog-list"> </ul>
+                    <div id='satellite-column' class='column'>
+                        <h3 class='column-header'>Satellite Data</h3>
+                        <ul id='catalog-satellite-data' class='catalog-list'> </ul>
                     </div>
                 </div>
             </div>
@@ -75,9 +75,9 @@ export class CatalogMenu extends HTMLElement {
         const menuSearch = this.querySelector('#search-for');
         const menuSelect = this.querySelector('#mobile-selector');
         // change labels, sizes and positions based on screen size
-        reverseLabel.innerText = (clientWidth < 769) ? "Reverse" : "Reverse Order";
-        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + "px";
-        var searchDescription = (clientWidth < 769) ? "Search..." : "Search for Simulation...";
+        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
+        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
+        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
         // Makes sure that map events like zooming and panning are disabled from within menu div
         L.DomEvent.disableClickPropagation(catalogMenu);
         // Closes the menu when the x is clicked
@@ -85,7 +85,7 @@ export class CatalogMenu extends HTMLElement {
             catalogMenu.style.display = 'none';
         }
         // Implements repositioning menu
-        dragElement(catalogMenu, "menu-title");
+        dragElement(catalogMenu, 'menu-title');
         menuSearch.placeholder = searchDescription;
         menuSearch.onpointerdown = (e) => {
             e.stopPropagation();
@@ -156,19 +156,19 @@ export class CatalogMenu extends HTMLElement {
      * the order should be reversed. */
     sortBy(sortBy, reverseOrder) {
         const catalogSearch = this.querySelector('#search-for');
-        catalogSearch.value = "";
+        catalogSearch.value = '';
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
-            if (sortBy == "original-order") {
+            if (sortBy == 'original-order') {
                 result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
             }
-            if (sortBy == "description") {
+            if (sortBy == 'description') {
                 result = listElem1.description > listElem2.description; 
             }
-            if (sortBy == "start-date") {
+            if (sortBy == 'start-date') {
                 result = listElem1.from_utc > listElem2.from_utc;
             }
-            if (sortBy == "end-date") {
+            if (sortBy == 'end-date') {
                 result = listElem1.to_utc > listElem2.to_utc;
             }
             if (reverseOrder) {
@@ -203,11 +203,11 @@ export class CatalogMenu extends HTMLElement {
      * Hides all columns and then shows the selected column. */
     selectCategory(selection) {
         const firesListDOM = this.querySelector('#fires-column');
-        firesListDOM.style.display = "none";
+        firesListDOM.style.display = 'none';
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-        fuelMoistureListDOM.style.display = "none";
+        fuelMoistureListDOM.style.display = 'none';
         const satelliteListDOM = this.querySelector('#satellite-column');
-        satelliteListDOM.style.display = "none";
+        satelliteListDOM.style.display = 'none';
         if (selection == 'Fires') {
             firesListDOM.style.display = 'block';
         } else if (selection == 'Fuel Moisture') {
