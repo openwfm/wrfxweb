@@ -156,16 +156,24 @@ export class TimeSeriesController extends LayerController {
      * given img elements. Updates the map of rgb values to colorbar locations. Updates every 
      * marker to reflec values in the new img and colorbar */
     updateCanvases(layerImg, colorbarImg) {
+        const updateMarkers = () => {
+            for (var marker of this.markers) {
+                this.updateMarker(marker);
+            }
+        }
+
+        if (simVars.displayedColorbar == null) {
+            updateMarkers();
+            return;
+        }
+
         this.imgCanvas = this.drawCanvas(layerImg);
         var clrbarImg = new Image();
         clrbarImg.src = colorbarImg.src;
         clrbarImg.onload = () => {
             this.clrbarCanvas = this.drawCanvas(clrbarImg);
-            // this.clrbarCanvas = this.drawCanvas(colorbarImg);
             this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
-            for (var marker of this.markers) {
-                this.updateMarker(marker);
-            }
+            updateMarkers();
         }
     }
 
@@ -190,7 +198,7 @@ export class TimeSeriesController extends LayerController {
     updateMarker(marker) {
         var rgb = [0, 0, 0];
         var clrbarLocation = null;
-        if (this.imgCanvas) {
+        if (this.imgCanvas && simVars.displayedColorbar != null) {
             var [xCoord, yCoord] = marker.imageCoords;
             var x = Math.floor(xCoord * this.imgCanvas.width);
             var y = Math.floor(yCoord * this.imgCanvas.height);
