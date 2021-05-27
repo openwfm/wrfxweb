@@ -36,14 +36,14 @@ jest.mock('../util.js', () => ({
         currentSimulation: 'test',
         rasters: ({
             1: {
-                "2020": {"raster": {raster: "raster test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "test colorbar raster"}, 
-                    "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, "colorbar": "test colorbar overlay" }},
-                "2021": {"raster": {raster: "raster test current timestamp", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                    "overlay": {raster: "overlay test", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+                '2020': {'raster': {raster: 'raster test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'test colorbar raster'}, 
+                    'overlay': {raster: 'overlay test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'test colorbar overlay' }},
+                '2021': {'raster': {raster: 'raster test current timestamp', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
+                    'overlay': {raster: 'overlay test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
             },
             2: {
-                "2020": {"raster": {raster: "raster test 2", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                    "overlay": {raster: "overlay test 2", coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+                '2020': {'raster': {raster: 'raster test 2', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
+                    'overlay': {raster: 'overlay test 2', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
             }
         }),
         rasterBase: 'testBase/',
@@ -186,5 +186,42 @@ describe('Tests for adding layers with colorbars', () => {
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
         expect(util.simVars.displayedColorbar).toEqual(null);
+    });
+});
+
+describe('Tests for preloading', () => {
+    var layerController;
+
+    beforeEach(async () => {
+        globalMap = {};
+
+        controller.controllers.currentDomain.getValue = () => 1;
+        controller.controllers.currentTimestamp.getValue = () =>'2020';
+
+        util.simVars.rasters = ({
+            1: {
+                '2020': {'layer': {raster: 'rasterTest1/2020', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar1/2020'}},
+                '2021': {'layer': {raster: 'rasterTest1/2021', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar1/2021'}}
+            },
+            2: {
+                '2020': {'layer': {raster: 'rasterTest2/2020', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2020'}},
+                '2020.5': {'layer': {raster: 'rasterTest2/2020.5', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2020.5'}},
+                '2021': {'layer': {raster: 'rasterTest2/2021', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2021'}},
+                '2021.5': {'layer': {raster: 'rasterTest2/2021.5', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2021.5'}}
+            }
+        })
+        util.simVars.overlayOrder = []
+         
+        const div = document.createElement('div');
+        div.id = 'raster-colorbar';
+        await document.body.appendChild(div);
+
+        layerController = await document.body.appendChild(new LayerController());
+        layerController.domainSwitch();
+        layerController.loadWithPriority = jest.fn()
+    });
+
+    test('test test', () => {
+        expect(true).toEqual(true);
     });
 });
