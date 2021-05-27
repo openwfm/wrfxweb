@@ -200,6 +200,7 @@ describe('Tests for preloading', () => {
 
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
+        util.simVars.sortedTimestamps = ['2020', '2021'];
 
         util.simVars.rasters = ({
             1: {
@@ -243,18 +244,21 @@ describe('Tests for preloading', () => {
         util.simVars.overlayOrder = ['layer'];
         layerController.updateTime();
         expect(imageUrl).toEqual('testBase/rasterTest1/2020');
-
     });
 
     test('UpdateTime should preload future times when current time not loaded', () => {
         util.simVars.overlayOrder = ['layer'];
+        var futureTimeStamp = '2021';
+        var preloadedFutureUrl = 'preloadedFutureUrl';
         layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
-            layerController.preloaded['testBase/rasterTest1/2021'] = 'preloadedRasterTest1/2021';
+            var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
+            var futureUrl = util.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
+            layerController.preloaded[futureUrl] = preloadedFutureUrl;
         }
         layerController.updateTime();
-        controller.controllers.currentTimestamp.getValue = () => '2021';
+        controller.controllers.currentTimestamp.getValue = () => futureTimeStamp;
         layerController.updateTime();
-
+        expect(imageUrl).toEqual(preloadedFutureUrl);
     });
 
     test('Switching domains with a layer added should preload times', () => {
