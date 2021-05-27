@@ -30,20 +30,22 @@ jest.mock('../components/Controller.js', () => ({
     
 }));
 
+const testCoords = ({0: [0,0], 1: [0, 1], 2: [1, 0], 3: [1, 1]});
+
 const util = require('../util.js');
 jest.mock('../util.js', () => ({
     simVars: ({
         currentSimulation: 'test',
         rasters: ({
             1: {
-                '2020': {'raster': {raster: 'raster test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'test colorbar raster'}, 
-                    'overlay': {raster: 'overlay test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'test colorbar overlay' }},
-                '2021': {'raster': {raster: 'raster test current timestamp', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                    'overlay': {raster: 'overlay test', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+                '2020': {'raster': {raster: 'rasterTest', coords: testCoords, 'colorbar': 'testColorbar/raster'}, 
+                    'overlay': {raster: 'overlayTest', coords: testCoords, 'colorbar': 'testColorbar/overlay' }},
+                '2021': {'raster': {raster: 'rasterTest/currentTimestamp', coords: testCoords}, 
+                    'overlay': {raster: 'overlayTest', coords: testCoords }}
             },
             2: {
-                '2020': {'raster': {raster: 'raster test 2', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}}, 
-                    'overlay': {raster: 'overlay test 2', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]} }}
+                '2020': {'raster': {raster: 'rasterTest2', coords: testCoords }, 
+                    'overlay': {raster: 'overlayTest2', coords: testCoords }}
             }
         }),
         rasterBase: 'testBase/',
@@ -98,14 +100,14 @@ describe('Tests for adding layers to menu and selecting layers', () => {
 
     test('Layers should be correctly added to the map when selected', () => {
         layerController.handleOverlayadd('raster');
-        expect('testBase/raster test' in globalMap).toEqual(true);
+        expect('testBase/rasterTest' in globalMap).toEqual(true);
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
 
     test('Layers should be correctly removed from the map when selected', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayRemove('raster');
-        expect('testBase/raster test' in globalMap).toEqual(false);
+        expect('testBase/rasterTest' in globalMap).toEqual(false);
     });
 
     test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
@@ -113,8 +115,8 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
         expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
-        expect('testBase/raster test 2' in globalMap).toEqual(true);
-        expect('testBase/raster test' in globalMap).toEqual(false);
+        expect('testBase/rasterTest2' in globalMap).toEqual(true);
+        expect('testBase/rasterTest' in globalMap).toEqual(false);
     });
 
     test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
@@ -128,13 +130,13 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     test('Layer Controller should show the current_timestamp', () => {
         controller.controllers.currentTimestamp.getValue = () => '2021';
         layerController.handleOverlayadd('raster');
-        expect('testBase/raster test current timestamp' in globalMap).toEqual(true);
+        expect('testBase/rasterTest/currentTimestamp' in globalMap).toEqual(true);
     });
 
     test('updateSlider should set img according to currentTimestamp', () => {
         controller.controllers.currentTimestamp.getValue = () => '2021';
         layerController.handleOverlayadd('raster');
-        expect(imageUrl).toEqual('testBase/raster test current timestamp');
+        expect(imageUrl).toEqual('testBase/rasterTest/currentTimestamp');
     });
 });
 
@@ -200,14 +202,14 @@ describe('Tests for preloading', () => {
 
         util.simVars.rasters = ({
             1: {
-                '2020': {'layer': {raster: 'rasterTest1/2020', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar1/2020'}},
-                '2021': {'layer': {raster: 'rasterTest1/2021', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar1/2021'}}
+                '2020': {'layer': {raster: 'rasterTest1/2020', coords: testCoords, 'colorbar': 'colorbar1/2020'}},
+                '2021': {'layer': {raster: 'rasterTest1/2021', coords: testCoords, 'colorbar': 'colorbar1/2021'}}
             },
             2: {
-                '2020': {'layer': {raster: 'rasterTest2/2020', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2020'}},
-                '2020.5': {'layer': {raster: 'rasterTest2/2020.5', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2020.5'}},
-                '2021': {'layer': {raster: 'rasterTest2/2021', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2021'}},
-                '2021.5': {'layer': {raster: 'rasterTest2/2021.5', coords: {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}, 'colorbar': 'colorbar2/2021.5'}}
+                '2020': {'layer': {raster: 'rasterTest2/2020', coords: testCoords, 'colorbar': 'colorbar2/2020'}},
+                '2020.5': {'layer': {raster: 'rasterTest2/2020.5', coords: testCoords, 'colorbar': 'colorbar2/2020.5'}},
+                '2021': {'layer': {raster: 'rasterTest2/2021', coords: testCoords, 'colorbar': 'colorbar2/2021'}},
+                '2021.5': {'layer': {raster: 'rasterTest2/2021.5', coords: testCoords, 'colorbar': 'colorbar2/2021.5'}}
             }
         })
         util.simVars.overlayOrder = []
