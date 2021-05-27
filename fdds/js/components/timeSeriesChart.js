@@ -178,8 +178,10 @@ export class TimeSeriesChart extends HTMLElement {
             dataset.push(timeSeriesData);
         }
         var xAxisOptions = {
-            display: true,
-            text: "Timestamp"
+            title: {
+                display: true,
+                text: "Timestamp"
+            }
         };
         if (startDate) {
             xAxisOptions.min = startDate;
