@@ -62,6 +62,16 @@ export class TimeSeriesController extends LayerController {
         while (this.markers.length > 0) {
             this.markers[0].removeFrom(map);
         }
+
+        this.handleOverlayadd('T2');
+        // const timeSeriesChart = document.querySelector('timeseries-chart');
+        // simVars.displayedColorbar = 'test';
+        // var dataset = [];
+        // dataset.push({label: 'test', latLon: {lat: 1, lng: 0}, rgb: [0, 0, 0], 
+        //                  dataset: {'2020-10-15 17:00:00': 12, '2020-10-15 18:00:00': 19, '2020-10-15 19:00:00': 20}});
+        // dataset.push({label: 'test2', latLon: {lat: 1, lng: 0}, rgb: [0, 180, 0],
+        //                     dataset: {'2020-10-15 17:00:00': 18, '2020-10-15 18:00:00': 12, '2020-10-15 19:00:00': 10}});
+        // timeSeriesChart.populateChart(dataset);
     }
 
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
