@@ -43,10 +43,6 @@
     margin: 0;
 }
 
-button.pressed { 
-    background: #e5e5e5;
-}
-
 .slider-container button:hover:not([disabled]) {
     background: #e5e5e5;
 }
@@ -128,5 +124,9 @@ button[disabled] {
 
     #slider-header {
         height:60px;
+    }
+
+    .slider-container button:hover:not([disabled]) {
+        background: #d6d6d6;
     }
 }
