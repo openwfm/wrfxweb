@@ -70,19 +70,19 @@ export class SimulationController extends HTMLElement {
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
-        this.querySelector('#slider-play-pause').onclick = () => {
+        this.querySelector('#slider-play-pause').onpointerdown = () => {
             this.playPause();
         }
-        this.querySelector('#slider-prev').onclick = () => {
+        this.querySelector('#slider-prev').onpointerdown = () => {
             this.prevFrame(5);
         }
-        this.querySelector('#slider-next').onclick = () => {
+        this.querySelector('#slider-next').onpointerdown = () => {
             this.nextFrame(5);
         }
-        this.querySelector('#slider-fast-forward').onclick = () => {
+        this.querySelector('#slider-fast-forward').onpointerdown = () => {
             this.toggleSpeedUp();
         }
-        this.querySelector('#slider-slow-down').onclick = () => {
+        this.querySelector('#slider-slow-down').onpointerdown = () => {
             this.toggleSlowDown();
         }
         const domainSubscription = () => {
