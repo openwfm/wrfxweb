@@ -70,6 +70,18 @@ export class SimulationController extends HTMLElement {
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
+        const toggleRate = (rate, togglePrimary, toggleSecondary) => {
+            var unPressedColor = '#d6d6d6';
+            togglePrimary.style.background = unPressedColor;
+            toggleSecondary.style.background = unPressedColor;
+    
+            if (this.frameRate == rate) {
+                this.frameRate = this.normalRate;
+            } else {
+                this.frameRate = rate;
+                togglePrimary.style.background = '#e5e5e5';
+            }
+        }
         this.querySelector('#slider-play-pause').onpointerdown = () => {
             this.playPause();
         }
@@ -79,11 +91,13 @@ export class SimulationController extends HTMLElement {
         this.querySelector('#slider-next').onpointerdown = () => {
             this.nextFrame(5);
         }
-        this.querySelector('#slider-fast-forward').onpointerdown = () => {
-            this.toggleSpeedUp();
+        const speedUp = this.querySelector('#slider-fast-forward');
+        const slowDown = this.querySelector('#slider-slow-down');
+        speedUp.onpointerdown = () => {
+            toggleRate(this.fastRate, speedUp, slowDown);
         }
-        this.querySelector('#slider-slow-down').onpointerdown = () => {
-            this.toggleSlowDown();
+        slowDown.onpointerdown = () => {
+            toggleRate(this.slowRate, slowDown, speedUp);
         }
         const domainSubscription = () => {
             this.resetSlider();
@@ -145,30 +159,6 @@ export class SimulationController extends HTMLElement {
             } else {
                 window.setTimeout(() => this.play(), this.frameRate);
             }
-        }
-    }
-
-    toggleSpeedUp() {
-        const speedUp = this.querySelector('#slider-fast-forward');
-        speedUp.classList.remove('pressed');
-        this.querySelector('#slider-slow-down').classList.remove('pressed');
-        if (this.frameRate > this.fastRate) {
-            this.frameRate = this.fastRate;
-            speedUp.classList.add('pressed');
-        } else {
-            this.frameRate = this.normalRate;
-        }
-    }
-
-    toggleSlowDown() {
-        const slowDown = this.querySelector('#slider-slow-down');
-        slowDown.classList.remove('pressed');
-        this.querySelector('#slider-fast-forward').classList.remove('pressed');
-        if (this.frameRate < this.slowRate) {
-            this.frameRate = this.slowRate;
-            slowDown.classList.add('pressed');
-        } else {
-            this.frameRate = this.slowRate;
         }
     }
 
