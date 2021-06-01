@@ -161,8 +161,9 @@ export class TimeSeriesController extends LayerController {
         var clrbarImg = new Image();
         clrbarImg.src = colorbarImg.src;
         clrbarImg.onload = () => {
+            var currentTimestamp = controllers.currentTimestamp.getValue();
             this.clrbarCanvas = this.drawCanvas(clrbarImg);
-            this.clrbarMap = this.buildColorMap(this.clrbarCanvas);
+            this.clrbarMap = this.buildColorMap(this.clrbarCanvas, currentTimestamp);
             updateMarkers();
         }
     }
@@ -265,7 +266,7 @@ export class TimeSeriesController extends LayerController {
             }
             clrbarImg.onload = () => {
                 var clrbarCanvas = this.drawCanvas(clrbarImg);
-                clrbarMap = this.buildColorMap(clrbarCanvas);
+                clrbarMap = this.buildColorMap(clrbarCanvas, timeStamp);
                 syncController.increment(1);
             }
             var imgURL = simVars.rasterBase + rasterInfo.raster;
@@ -305,14 +306,15 @@ export class TimeSeriesController extends LayerController {
         return timeSeriesData;
     }
 
-    mapLevels(clrbarCanvas, clrbarMap) {
+    mapLevels(clrbarCanvas, clrbarMap, timeStamp) {
+        var currentDomain = controllers.currentDomain.getValue();
         var levelMap = {};
         if (simVars.displayedColorbar == null) {
             return;
         }
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        var raster_info = rasters_now[simVars.displayedColorbar];
-        var levels = raster_info.levels;
+        var rastersAtTime = simVars.rasters[currentDomain][timeStamp];
+        var rasterInfo = rastersAtTime[simVars.displayedColorbar];
+        var levels = rasterInfo.levels;
         var x = clrbarMap.left - 5;
         if (!levels) {
             return;
@@ -374,7 +376,7 @@ export class TimeSeriesController extends LayerController {
      * more pixel away to avoid distortion and sets this as the xCoordinate band that the colorbard spans. Then
      * iterates over the height of the colorbar keeping the xCoord constant mapping the value of the rgb value 
      * to the yCoord. */
-    buildColorMap(clrbarCanvas) {
+    buildColorMap(clrbarCanvas, timeStamp) {
         var clrbarMap = {};
         if (!clrbarCanvas) {
             return clrbarMap;
@@ -423,7 +425,7 @@ export class TimeSeriesController extends LayerController {
         clrbarMap.end = end;
         clrbarMap.right = right;
         clrbarMap.left = left;
-        this.mapLevels(clrbarCanvas, clrbarMap);
+        this.mapLevels(clrbarCanvas, clrbarMap, timeStamp);
         return clrbarMap;
     }
 }
