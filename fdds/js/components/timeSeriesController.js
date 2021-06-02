@@ -26,24 +26,17 @@ export class TimeSeriesController extends LayerController {
         timeSeriesDiv.appendChild(span);
         timeSeriesDiv.appendChild(this.timeSeriesButton);
         container.appendChild(timeSeriesDiv);
-        this.imgCanvas = null;
-        this.clrbarCanvas = null;
         this.clrbarMap = {};
         this.markers = [];
         this.canvasMaxHeight = 10000;
+        this.imgCanvas = document.createElement('canvas');
+        this.clrbarCanvas = document.createElement('canvas');
     }
 
     connectedCallback() {
         super.connectedCallback();
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
-        const syncImageSubscription = () => {
-            if (simVars.displayedColorbar) {
-                const rasterColorbar = document.querySelector('#raster-colorbar');
-                var layerImage = this.getLayer(simVars.displayedColorbar)._image;
-                this.updateCanvases(layerImage, rasterColorbar);
-            }
-        }
-        controllers.syncImageLoad.subscribe(syncImageSubscription);
+        controllers.syncImageLoad.subscribe(() => this.updateCanvases());
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
@@ -79,12 +72,11 @@ export class TimeSeriesController extends LayerController {
      * build a new marker when the new layer is double clicked. */
     handleOverlayadd(name) {
         super.handleOverlayadd(name);
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        var raster_info = rasters_now[name];
+        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var layer = this.getLayer(name);
         var img = layer._image;
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        if ('colorbar' in raster_info) {
+        if ('colorbar' in rastersNow[name]) {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
@@ -99,15 +91,17 @@ export class TimeSeriesController extends LayerController {
             rasterColorbar.onload = () => {
                 controllers.syncImageLoad.increment(1);
             }
-            map.on('zoomend', () => {
-                if (img.height < this.canvasMaxHeight) {
-                    this.imgCanvas = this.drawCanvas(img);
-                }
-            });
+            // map.on('zoomend', () => {
+            //     if (img.height < this.canvasMaxHeight) {
+            //         this.imgCanvas = this.drawCanvas(img);
+            //     }
+            // });
             if (this.markers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
             }
-        } else img.style.pointerEvents = 'none';
+        } else {
+            img.style.pointerEvents = 'none';
+        }
     }
 
     createNewMarker(latLon, xCoord, yCoord) {
@@ -137,7 +131,6 @@ export class TimeSeriesController extends LayerController {
      * to that layer. */
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
-        const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var img = null;
         for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
@@ -149,43 +142,39 @@ export class TimeSeriesController extends LayerController {
         if (!simVars.displayedColorbar) {
             this.timeSeriesButton.getButton().disabled = true;
         }
-        this.updateCanvases(img, rasterColorbar);
+        this.updateCanvases();
     }
 
     /** Redraws the clrbarCanvas and imgCanvas used to map values for the timeSeries with 
      * given img elements. Updates the map of rgb values to colorbar locations. Updates every 
      * marker to reflec values in the new img and colorbar */
-    updateCanvases(layerImg, colorbarImg) {
-        const updateMarkers = () => {
+    updateCanvases() {
+        if (simVars.displayedColorbar == null) {
             for (var marker of this.markers) {
                 this.updateMarker(marker);
             }
-        }
-
-        if (simVars.displayedColorbar == null) {
-            updateMarkers();
             return;
         }
-
-        this.imgCanvas = this.drawCanvas(layerImg);
+        const rasterColorbar = document.querySelector('#raster-colorbar');
         var clrbarImg = new Image();
-        clrbarImg.src = colorbarImg.src;
         clrbarImg.onload = () => {
             var currentTimestamp = controllers.currentTimestamp.getValue();
-            this.clrbarCanvas = this.drawCanvas(clrbarImg);
+            this.drawColorbarCanvas(clrbarImg);
             this.clrbarMap = this.buildColorMap(this.clrbarCanvas, currentTimestamp);
-            updateMarkers();
+            for (marker of this.markers) {
+                this.updateMarker(marker);
+            }
         }
+        clrbarImg.src = rasterColorbar.src;
     }
 
-    makeCanvas(img) {
-        var canvas = null;
+    setUpCanvas(img, canvas) {
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
         if (img != null) {
             var factor = 1; 
             if (img.height > this.canvasMaxHeight) {
                 factor = this.canvasMaxHeight / img.height;
             }
-            canvas = document.createElement('canvas');
             canvas.width = img.width * factor;
             canvas.height = img.height * factor;
         }
@@ -194,29 +183,33 @@ export class TimeSeriesController extends LayerController {
 
     drawMarkersOnCanvas(img, markers) {
         var markerData = [];
-        var canvas = this.drawCanvas(img);
+        this.setUpCanvas(img, this.imgCanvas);
         if (canvas != null) {
             for (var marker of markers) {
-                var [xCoord, yCoord] = marker.imageCoords;
-                var canvasX = Math.floor(xCoord * canvas.width);
-                var canvasY = Math.floor(yCoord * canvas.height);
-                var imgX = Math.floor(xCoord * img.width);
-                var imgY = Math.floor(yCoord * img.height);
-                canvas.getContext('2d').drawImage(img, imgX-2, imgY-2, 5, 5, canvasX - 2, canvasY - 2, 5, 5);
-                var pixelData = canvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
-                markerData.push([pixelData[0], pixelData[1], pixelData[2]]);
+                var rgbArray = this.drawMarkerOnCanvas(img, marker);
+                markerData.push(rgbArray);
             }
         }
         return markerData;
     }
 
+    drawMarkerOnCanvas(img, marker) {
+        var [xCoord, yCoord] = marker.imageCoords;
+        var canvasX = Math.floor(xCoord * this.imgCanvas.width);
+        var canvasY = Math.floor(yCoord * this.imgCanvas.height);
+        var imgX = Math.floor(xCoord * img.width);
+        var imgY = Math.floor(yCoord * img.height);
+        this.imgCanvas.getContext('2d').drawImage(img, imgX-2, imgY-2, 5, 5, canvasX - 2, canvasY - 2, 5, 5);
+        var pixelData = this.imgCanvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
+        return [pixelData[0], pixelData[1], pixelData[2]];
+    }
+
     /** returns a canvas drawn with given image. */
-    drawCanvas(img) {
-        var canvas = this.makeCanvas(img);
-        if (canvas != null) {
-            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    drawColorbarCanvas(colorbarImg) {
+        this.setUpCanvas(colorbarImg, this.clrbarCanvas);
+        if (simVars.displayedColorbar != null) {
+            this.clrbarCanvas.getContext('2d').drawImage(colorbarImg, 0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
         }
-        return canvas;
     }
 
     /** Maps location of marker to position on colorbar for current layer image and colorbar.
@@ -225,11 +218,8 @@ export class TimeSeriesController extends LayerController {
         var rgb = [0, 0, 0];
         var clrbarLocation = null;
         if (this.imgCanvas && simVars.displayedColorbar != null) {
-            var [xCoord, yCoord] = marker.imageCoords;
-            var x = Math.floor(xCoord * this.imgCanvas.width);
-            var y = Math.floor(yCoord * this.imgCanvas.height);
-            var pixelData = this.imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
-            rgb = [pixelData[0], pixelData[1], pixelData[2]];
+            var layerImg = this.getLayer(simVars.displayedColorbar)._image;
+            rgb = this.drawMarkerOnCanvas(layerImg, marker);
             clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
         }
         marker.getContent().setRGBValues(rgb, clrbarLocation);
@@ -287,8 +277,9 @@ export class TimeSeriesController extends LayerController {
                 syncController.increment(0);
             }
             clrbarImg.onload = () => {
-                var clrbarCanvas = this.drawCanvas(clrbarImg);
-                clrbarMap = this.buildColorMap(clrbarCanvas, timeStamp);
+                // var clrbarCanvas = this.drawColorbarCanvas(clrbarImg);
+                this.drawColorbarCanvas(clrbarImg);
+                clrbarMap = this.buildColorMap(this.clrbarCanvas, timeStamp);
                 syncController.increment(1);
             }
             var imgURL = simVars.rasterBase + rasterInfo.raster;
@@ -312,8 +303,8 @@ export class TimeSeriesController extends LayerController {
     async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
-        var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        // var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
+        // var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
