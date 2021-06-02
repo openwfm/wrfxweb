@@ -178,8 +178,7 @@ export class TimeSeriesController extends LayerController {
         }
     }
 
-    /** returns a canvas drawn with given image. */
-    drawCanvas(img) {
+    makeCanvas(img) {
         var canvas = null;
         if (img != null) {
             var factor = 1; 
@@ -189,7 +188,33 @@ export class TimeSeriesController extends LayerController {
             canvas = document.createElement('canvas');
             canvas.width = img.width * factor;
             canvas.height = img.height * factor;
-            canvas.getContext('2d').drawImage(img, 0, 0, img.width*factor, img.height*factor);
+        }
+        return canvas;
+    }
+
+    drawMarkersOnCanvas(img, markers) {
+        var markerData = [];
+        var canvas = this.drawCanvas(img);
+        if (canvas != null) {
+            for (var marker of markers) {
+                var [xCoord, yCoord] = marker.imageCoords;
+                var canvasX = Math.floor(xCoord * canvas.width);
+                var canvasY = Math.floor(yCoord * canvas.height);
+                var imgX = Math.floor(xCoord * img.width);
+                var imgY = Math.floor(yCoord * img.height);
+                canvas.getContext('2d').drawImage(img, imgX-2, imgY-2, 5, 5, canvasX - 2, canvasY - 2, 5, 5);
+                var pixelData = canvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
+                markerData.push([pixelData[0], pixelData[1], pixelData[2]]);
+            }
+        }
+        return markerData;
+    }
+
+    /** returns a canvas drawn with given image. */
+    drawCanvas(img) {
+        var canvas = this.makeCanvas(img);
+        if (canvas != null) {
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
         }
         return canvas;
     }
@@ -242,36 +267,23 @@ export class TimeSeriesController extends LayerController {
      * colorbar have been loaded and the timeSeriesData has been populated. */
     async loadImageAndColorbar(timeSeriesData, timeStamp, markers) {
         var rasterDomains = simVars.rasters[controllers.currentDomain.getValue()];
-        var layerImg = this.getLayer(simVars.displayedColorbar)._image;
-        var factor = 1;
-        if (layerImg.height >= this.canvasMaxHeight) {
-            factor = this.canvasMaxHeight / layerImg.height;
-        }
         var img = new Image();
-        img.width = layerImg.width*factor;
-        img.height = layerImg.height*factor;
-        var convertX = (xCoord) => Math.floor(xCoord * layerImg.width*factor);
-        var convertY = (yCoord) => Math.floor(yCoord * layerImg.height*factor);
         var clrbarImg = new Image();
         // Returns a promise so that loadImageAndColorbar can be called with await. 
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[simVars.displayedColorbar];
             var clrbarMap = {};
-            var imgCanvas;
+            var markerData = [];
             var syncController = new SyncController();
             syncController.subscribe(() => {
-                for (var i = 0; i < markers.length; i++) {
-                    var [xCoord, yCoord] = markers[i].imageCoords;
-                    var x = convertX(xCoord);
-                    var y = convertY(yCoord);
-                    var pixelData = imgCanvas.getContext('2d').getImageData(x, y, 1, 1).data; 
-                    timeSeriesData[i].dataset[timeStamp] = this.findClosestKey([pixelData[0], pixelData[1], pixelData[2]], clrbarMap)
+                for (var i = 0; i < markerData.length; i++) {
+                    timeSeriesData[i].dataset[timeStamp] = this.findClosestKey(markerData[i], clrbarMap);
                 }
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
             img.onload = () => {
-                imgCanvas = this.drawCanvas(img);
+                markerData = this.drawMarkersOnCanvas(img, markers);
                 syncController.increment(0);
             }
             clrbarImg.onload = () => {
@@ -300,7 +312,8 @@ export class TimeSeriesController extends LayerController {
     async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
-        var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        // var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
