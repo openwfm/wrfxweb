@@ -31,7 +31,6 @@ export class TimeSeriesController extends LayerController {
         this.canvasMaxHeight = 10000;
         this.imgCanvas = document.createElement('canvas');
         this.clrbarCanvas = document.createElement('canvas');
-        this.count = 0;
     }
 
     connectedCallback() {
@@ -81,14 +80,8 @@ export class TimeSeriesController extends LayerController {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
-                var boundingRect = img.getBoundingClientRect();
-                var xCoord = e.clientX - boundingRect.x;
-                var yCoord = e.clientY - boundingRect.y;
-                // var xCoord = e.offsetX / img.width;
-                // var yCoord = e.offsetY / img.height;
-                // var xCoord = e.offsetX;
-                // var yCoord = e.offsetY;
-                console.log(e);
+                var xCoord = e.offsetX / img.width;
+                var yCoord = e.offsetY / img.height;
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
@@ -197,38 +190,31 @@ export class TimeSeriesController extends LayerController {
         var canvasY = Math.floor(yCoord * this.imgCanvas.height);
         var imgX = Math.floor(xCoord * img.width);
         var imgY = Math.floor(yCoord * img.height);
-        // console.log(img.width);
-        // console.log(img);
-        console.log(xCoord + ' ' + yCoord);
-        // console.log(img.width + ' ' + img.height);
-        // var factor = this.imgCanvas.width / img.width;
-        // console.log(xCoord + ' ' + yCoord);
-        // console.log(canvasX + ' ' + canvasY + ' ' + imgX + ' ' + imgY);
-        // console.log(this.imgCanvas.width/img.width + ' ' + this.imgCanvas.height/img.height);
-        // console.log(this.imgCanvas.width + ' ' + this.imgCanvas.height);
-        // console.log(img.width + ' ' + img.height);
-        // this.imgCanvas.getContext('2d').drawImage(img, imgX-49, imgY-49, 100, 100, canvasX-(49*factor), canvasY-(49*factor), 100*factor, 100*factor);
-        // this.imgCanvas.getContext('2d').clearRect(0, 0, this.imgCanvas.width, this.imgCanvas.height);
-        // this.imgCanvas.getContext('2d').drawImage(img, 100*this.count, 100*this.count, 100, 100, 100*this.count, 100*this.count, 100, 100);
-        // this.imgCanvas.getContext('2d').drawImage(img, 0, 100*this.count, 100, 100, 0, 100*this.count, 100, 100);
-        console.log(img.getBoundingClientRect());
-        console.log(img);
-        
-        this.imgCanvas.getContext('2d').drawImage(img, 0, 0, 100, 100, 0, 0, 100, 100);
-        this.imgCanvas.getContext('2d').drawImage(img, xCoord, yCoord, 100, 100, xCoord, yCoord, 100, 100);
-        this.count += 1;
-        // this.imgCanvas.getContext('2d').drawImage(img, 0, 0, this.imgCanvas.width, this.imgCanvas.height);
+
+        var canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+
+        console.log('relative coordinates: ' + xCoord + ',' + yCoord);
+        console.log('image dimensions: ' + img.width + ' x ' + img.height);
+        console.log('image coords: ' + imgX + ',' + imgY);
+        console.log('canvas dimensions: ' + this.imgCanvas.width + ' x ' + this.imgCanvas.height);
+        console.log('canvas coords: ' + canvasX + ',' + canvasY);
+
+        // canvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, 0, 0, 100, 100);
+        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, canvasX, canvasY, 100, 100);
         var pixelData = this.imgCanvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
+        // var pixelData = canvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
 
         const testingCanvas = document.querySelector('#testingCanvas');
         testingCanvas.innerHTML = '';
         testingCanvas.appendChild(this.imgCanvas);
+        // testingCanvas.appendChild(canvas);
         testingCanvas.onclick = () => {
             testingCanvas.style.display = 'none';
         }
         testingCanvas.style.display = 'block';
 
-        // console.log(pixelData);
         return [pixelData[0], pixelData[1], pixelData[2]];
     }
 
