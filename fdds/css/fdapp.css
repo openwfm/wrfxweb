@@ -6,28 +6,6 @@ html {
   overflow-y: hidden;
 }
 
-
-#testingCanvas {
-  display: none;
-  position: absolute;
-  padding-right: 20px;
-  padding-top: 10px;
-  padding-left: 10px;
-  padding-bottom: 85px;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 9000;
-  margin: auto;
-  height: 550px;
-  width: 560px;
-  background: white;
-  border-radius: .4rem;
-  border: 1px solid #5d5d5d;
-  cursor: pointer;
-}
-
 .body {
   font-family: helvetica;
 }
