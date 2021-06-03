@@ -120,7 +120,7 @@ export class CatalogMenu extends HTMLElement {
             this.addOrder.push(catEntry.job_id);
             let desc = catEntry.description;
             var newLI = new CatalogItem(catEntry, navJobId);
-            if(desc.indexOf('GACC') >= 0) {
+            if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
                 this.fuelMoistureList.push(catEntry);
                 fuelMoistureListDOM.appendChild(newLI);
             } else if(desc.indexOf('SAT') >= 0) {
