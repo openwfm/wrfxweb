@@ -173,11 +173,6 @@ export class TimeSeriesController extends LayerController {
         this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 1, 1, 0, 0, 1, 1);
         var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
 
-        const testingCanvas = document.querySelector('#testingCanvas');
-        testingCanvas.innerHTML = '';
-        testingCanvas.onclick = () => {
-            testingCanvas.style.display = 'none';
-        }
         return [pixelData[0], pixelData[1], pixelData[2]];
     }
 
