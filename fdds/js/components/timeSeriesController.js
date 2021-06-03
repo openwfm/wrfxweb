@@ -36,6 +36,8 @@ export class TimeSeriesController extends LayerController {
     connectedCallback() {
         super.connectedCallback();
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
+        this.imgCanvas.width = 100;
+        this.imgCanvas.height = 100;
         controllers.syncImageLoad.subscribe(() => this.updateCanvases());
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
@@ -86,17 +88,11 @@ export class TimeSeriesController extends LayerController {
                 this.timeSeriesButton.getButton().disabled = false;
             }
             img.onload = () => {
-                this.setUpCanvas(img, this.imgCanvas);
                 controllers.syncImageLoad.increment(0);
             }
             rasterColorbar.onload = () => {
                 controllers.syncImageLoad.increment(1);
             }
-            // map.on('zoomend', () => {
-            //     if (img.height < this.canvasMaxHeight) {
-            //         this.imgCanvas = this.drawCanvas(img);
-            //     }
-            // });
             if (this.markers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
             }
@@ -161,22 +157,8 @@ export class TimeSeriesController extends LayerController {
         clrbarImg.src = rasterColorbar.src;
     }
 
-    setUpCanvas(img, canvas) {
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        if (img != null) {
-            var factor = 1; 
-            if (img.height > this.canvasMaxHeight) {
-                factor = this.canvasMaxHeight / img.height;
-            }
-            canvas.width = img.width * factor;
-            canvas.height = img.height * factor;
-        }
-        return canvas;
-    }
-
     drawMarkersOnCanvas(img, markers) {
         var markerData = [];
-        this.setUpCanvas(img, this.imgCanvas);
         for (var marker of markers) {
             var rgbArray = this.drawMarkerOnCanvas(img, marker);
             markerData.push(rgbArray);
@@ -188,42 +170,29 @@ export class TimeSeriesController extends LayerController {
         var [xCoord, yCoord] = marker.imageCoords;
         var canvasX = Math.floor(xCoord * this.imgCanvas.width);
         var canvasY = Math.floor(yCoord * this.imgCanvas.height);
-        var imgX = Math.floor(xCoord * img.width);
-        var imgY = Math.floor(yCoord * img.height);
+        var imgX = Math.floor(xCoord * img.naturalWidth);
+        var imgY = Math.floor(yCoord * img.naturalHeight);
 
-        var canvas = document.createElement('canvas');
-        canvas.width = 100;
-        canvas.height = 100;
-
-        console.log('relative coordinates: ' + xCoord + ',' + yCoord);
-        console.log('image dimensions: ' + img.width + ' x ' + img.height);
-        console.log('image coords: ' + imgX + ',' + imgY);
-        console.log('canvas dimensions: ' + this.imgCanvas.width + ' x ' + this.imgCanvas.height);
-        console.log('canvas coords: ' + canvasX + ',' + canvasY);
-
-        // canvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, 0, 0, 100, 100);
-        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, canvasX, canvasY, 100, 100);
-        var pixelData = this.imgCanvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
-        // var pixelData = canvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
+        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, 0, 0, canvasX, canvasY);
+        var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
 
         const testingCanvas = document.querySelector('#testingCanvas');
         testingCanvas.innerHTML = '';
-        testingCanvas.appendChild(this.imgCanvas);
-        // testingCanvas.appendChild(canvas);
         testingCanvas.onclick = () => {
             testingCanvas.style.display = 'none';
         }
-        testingCanvas.style.display = 'block';
-
         return [pixelData[0], pixelData[1], pixelData[2]];
     }
 
     /** returns a canvas drawn with given image. */
     drawColorbarCanvas(colorbarImg) {
-        this.setUpCanvas(colorbarImg, this.clrbarCanvas);
-        if (simVars.displayedColorbar != null) {
-            this.clrbarCanvas.getContext('2d').drawImage(colorbarImg, 0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
+        this.clrbarCanvas.getContext('2d').clearRect(0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
+        if (colorbarImg == null || simVars.displayedColorbar == null) {
+            return;
         }
+        this.clrbarCanvas.width = colorbarImg.width;
+        this.clrbarCanvas.height = colorbarImg.height;
+        this.clrbarCanvas.getContext('2d').drawImage(colorbarImg, 0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
     }
 
     /** Maps location of marker to position on colorbar for current layer image and colorbar.
