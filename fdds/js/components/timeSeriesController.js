@@ -31,6 +31,7 @@ export class TimeSeriesController extends LayerController {
         this.canvasMaxHeight = 10000;
         this.imgCanvas = document.createElement('canvas');
         this.clrbarCanvas = document.createElement('canvas');
+        this.count = 0;
     }
 
     connectedCallback() {
@@ -80,12 +81,19 @@ export class TimeSeriesController extends LayerController {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
-                var xCoord = e.offsetX / img.width;
-                var yCoord = e.offsetY / img.height;
+                var boundingRect = img.getBoundingClientRect();
+                var xCoord = e.clientX - boundingRect.x;
+                var yCoord = e.clientY - boundingRect.y;
+                // var xCoord = e.offsetX / img.width;
+                // var yCoord = e.offsetY / img.height;
+                // var xCoord = e.offsetX;
+                // var yCoord = e.offsetY;
+                console.log(e);
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
             img.onload = () => {
+                this.setUpCanvas(img, this.imgCanvas);
                 controllers.syncImageLoad.increment(0);
             }
             rasterColorbar.onload = () => {
@@ -131,14 +139,6 @@ export class TimeSeriesController extends LayerController {
      * to that layer. */
     handleOverlayRemove(name) {
         super.handleOverlayRemove(name);
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        var img = null;
-        for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
-            if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
-                img = this.getLayer(simVars.overlayOrder[i])._image;
-                break;
-            }
-        }
         if (!simVars.displayedColorbar) {
             this.timeSeriesButton.getButton().disabled = true;
         }
@@ -184,11 +184,9 @@ export class TimeSeriesController extends LayerController {
     drawMarkersOnCanvas(img, markers) {
         var markerData = [];
         this.setUpCanvas(img, this.imgCanvas);
-        if (canvas != null) {
-            for (var marker of markers) {
-                var rgbArray = this.drawMarkerOnCanvas(img, marker);
-                markerData.push(rgbArray);
-            }
+        for (var marker of markers) {
+            var rgbArray = this.drawMarkerOnCanvas(img, marker);
+            markerData.push(rgbArray);
         }
         return markerData;
     }
@@ -199,8 +197,38 @@ export class TimeSeriesController extends LayerController {
         var canvasY = Math.floor(yCoord * this.imgCanvas.height);
         var imgX = Math.floor(xCoord * img.width);
         var imgY = Math.floor(yCoord * img.height);
-        this.imgCanvas.getContext('2d').drawImage(img, imgX-2, imgY-2, 5, 5, canvasX - 2, canvasY - 2, 5, 5);
+        // console.log(img.width);
+        // console.log(img);
+        console.log(xCoord + ' ' + yCoord);
+        // console.log(img.width + ' ' + img.height);
+        // var factor = this.imgCanvas.width / img.width;
+        // console.log(xCoord + ' ' + yCoord);
+        // console.log(canvasX + ' ' + canvasY + ' ' + imgX + ' ' + imgY);
+        // console.log(this.imgCanvas.width/img.width + ' ' + this.imgCanvas.height/img.height);
+        // console.log(this.imgCanvas.width + ' ' + this.imgCanvas.height);
+        // console.log(img.width + ' ' + img.height);
+        // this.imgCanvas.getContext('2d').drawImage(img, imgX-49, imgY-49, 100, 100, canvasX-(49*factor), canvasY-(49*factor), 100*factor, 100*factor);
+        // this.imgCanvas.getContext('2d').clearRect(0, 0, this.imgCanvas.width, this.imgCanvas.height);
+        // this.imgCanvas.getContext('2d').drawImage(img, 100*this.count, 100*this.count, 100, 100, 100*this.count, 100*this.count, 100, 100);
+        // this.imgCanvas.getContext('2d').drawImage(img, 0, 100*this.count, 100, 100, 0, 100*this.count, 100, 100);
+        console.log(img.getBoundingClientRect());
+        console.log(img);
+        
+        this.imgCanvas.getContext('2d').drawImage(img, 0, 0, 100, 100, 0, 0, 100, 100);
+        this.imgCanvas.getContext('2d').drawImage(img, xCoord, yCoord, 100, 100, xCoord, yCoord, 100, 100);
+        this.count += 1;
+        // this.imgCanvas.getContext('2d').drawImage(img, 0, 0, this.imgCanvas.width, this.imgCanvas.height);
         var pixelData = this.imgCanvas.getContext('2d').getImageData(canvasX, canvasY, 1, 1).data; 
+
+        const testingCanvas = document.querySelector('#testingCanvas');
+        testingCanvas.innerHTML = '';
+        testingCanvas.appendChild(this.imgCanvas);
+        testingCanvas.onclick = () => {
+            testingCanvas.style.display = 'none';
+        }
+        testingCanvas.style.display = 'block';
+
+        // console.log(pixelData);
         return [pixelData[0], pixelData[1], pixelData[2]];
     }
 
@@ -277,7 +305,6 @@ export class TimeSeriesController extends LayerController {
                 syncController.increment(0);
             }
             clrbarImg.onload = () => {
-                // var clrbarCanvas = this.drawColorbarCanvas(clrbarImg);
                 this.drawColorbarCanvas(clrbarImg);
                 clrbarMap = this.buildColorMap(this.clrbarCanvas, timeStamp);
                 syncController.increment(1);
@@ -303,8 +330,8 @@ export class TimeSeriesController extends LayerController {
     async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
-        // var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
+        var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        // var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
