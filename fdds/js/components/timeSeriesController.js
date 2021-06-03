@@ -28,7 +28,6 @@ export class TimeSeriesController extends LayerController {
         container.appendChild(timeSeriesDiv);
         this.clrbarMap = {};
         this.markers = [];
-        this.canvasMaxHeight = 10000;
         this.imgCanvas = document.createElement('canvas');
         this.clrbarCanvas = document.createElement('canvas');
     }
@@ -36,8 +35,8 @@ export class TimeSeriesController extends LayerController {
     connectedCallback() {
         super.connectedCallback();
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
-        this.imgCanvas.width = 100;
-        this.imgCanvas.height = 100;
+        this.imgCanvas.width = 1;
+        this.imgCanvas.height = 1;
         controllers.syncImageLoad.subscribe(() => this.updateCanvases());
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
@@ -168,12 +167,10 @@ export class TimeSeriesController extends LayerController {
 
     drawMarkerOnCanvas(img, marker) {
         var [xCoord, yCoord] = marker.imageCoords;
-        var canvasX = Math.floor(xCoord * this.imgCanvas.width);
-        var canvasY = Math.floor(yCoord * this.imgCanvas.height);
         var imgX = Math.floor(xCoord * img.naturalWidth);
         var imgY = Math.floor(yCoord * img.naturalHeight);
 
-        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 100, 100, 0, 0, canvasX, canvasY);
+        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 1, 1, 0, 0, 1, 1);
         var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
 
         const testingCanvas = document.querySelector('#testingCanvas');
