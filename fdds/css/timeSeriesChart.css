@@ -59,11 +59,6 @@
   cursor: pointer;
 }
 
-/* #timeSeriesChartContainer button.undo-zoom:hover:not([disabled]) {
-  cursor: pointer;
-  opacity: 100%;
-} */
-
 #timeSeriesChart {
   display: block;
   margin-left:10px;

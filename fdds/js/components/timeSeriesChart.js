@@ -15,9 +15,9 @@ export class TimeSeriesChart extends HTMLElement {
                 <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
                 <div id='add-threshold' style='margin-top: 10px'>
                     <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
-                    <input id='threshold-setter' style='margin-right:10px'></input>
+                    <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
                     <label style='display: inline-block; width: 100px' for='threshold-label'>threshold label: </label>
-                    <input id='threshold-label'></input>
+                    <input id='threshold-label' style='width: 150px'></input>
                 </div>
                 <div id='zoomIn' style='display: inline-block; margin-top: 10px'>
                     <label style='display: inline-block; width: 100px' for='zoom-start'>zoom in start: </label>
