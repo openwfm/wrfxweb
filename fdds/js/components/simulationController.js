@@ -196,7 +196,6 @@ export class SimulationController extends HTMLElement {
     }
 
     setLoadedTimestamp(timestamp) {
-        console.log(timestamp);
         var timestampFrame = simVars.sortedTimestamps.indexOf(timestamp) + 1;
         var percentage = Math.floor((timestampFrame / simVars.sortedTimestamps.length)*340);
         const progressBar = this.querySelector('#slider-progress'); 
