@@ -102,6 +102,7 @@ export class LayerController extends HTMLElement {
                 worker.postMessage({url: imageURL, time: timeStamp});
             }
         }
+        const simController = document.querySelector('simulation-controller');
         for (var timeStamp of simVars.sortedTimestamps) {
             var raster = simVars.rasters[controllers.currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
@@ -113,6 +114,8 @@ export class LayerController extends HTMLElement {
                         var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
                         nowOrLater(timeStamp, colorbarURL);
                     }
+                } else {
+                    simController.setLoadedTimestamp(timeStamp);
                 }
             }
         }
