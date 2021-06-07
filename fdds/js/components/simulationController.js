@@ -37,6 +37,7 @@ export class SimulationController extends HTMLElement {
                 </div>
                 <div id='slider'>
                     <div id='slider-bar'></div>
+                    <div id='slider-progress'></div>
                     <div id='slider-head'></div>
                 </div>
             </div>
@@ -192,6 +193,14 @@ export class SimulationController extends HTMLElement {
         // set current time
         document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
         controllers.currentTimestamp.setValue(timestamp);
+    }
+
+    setLoadedTimestamp(timestamp) {
+        console.log(timestamp);
+        var timestampFrame = simVars.sortedTimestamps.indexOf(timestamp) + 1;
+        var percentage = Math.floor((timestampFrame / simVars.sortedTimestamps.length)*340);
+        const progressBar = this.querySelector('#slider-progress'); 
+        progressBar.style.width = percentage + 'px';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates

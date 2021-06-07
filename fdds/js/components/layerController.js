@@ -96,12 +96,13 @@ export class LayerController extends HTMLElement {
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
             if (timeStamp < startTime || timeStamp > endTime) {
-                loadLater.push(imageURL);
+                loadLater.push({url: imageURL, time: timeStamp});
             }    
             else {
-                worker.postMessage(imageURL);
+                worker.postMessage({url: imageURL, time: timeStamp});
             }
         }
+        const simController = document.querySelector('simulation-controller');
         for (var timeStamp of simVars.sortedTimestamps) {
             var raster = simVars.rasters[controllers.currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
@@ -113,11 +114,13 @@ export class LayerController extends HTMLElement {
                         var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
                         nowOrLater(timeStamp, colorbarURL);
                     }
+                } else {
+                    simController.setLoadedTimestamp(timeStamp);
                 }
             }
         }
-        for (var imageURL of loadLater) {
-            worker.postMessage(imageURL);
+        for (var urlData of loadLater) {
+            worker.postMessage(urlData);
         }
     }
 
@@ -212,10 +215,13 @@ export class LayerController extends HTMLElement {
         worker.addEventListener('message', event => {
             const imageData = event.data;
             const imageURL = imageData.imageURL;
+            const timestamp = imageData.timestamp;
             const objectURL = URL.createObjectURL(imageData.blob);
             const img = new Image();
             img.onload = () => {
                 this.preloaded[imageURL] = objectURL;
+                const simController = document.querySelector('simulation-controller');
+                simController.setLoadedTimestamp(timestamp);
             }
             img.src = objectURL;
         });
