@@ -195,6 +195,11 @@ export class SimulationController extends HTMLElement {
         controllers.currentTimestamp.setValue(timestamp);
     }
 
+    updateFrameToTime(timeStamp) {
+        this.currentFrame = simVars.sortedTimestamps.indexOf(timeStamp);
+        this.updateSlider();
+    }
+
     setLoadedTimestamp(progress) {
         // var timestampFrame = simVars.sortedTimestamps.indexOf(timestamp) + 1;
         // var percentage = Math.floor((timestampFrame / simVars.sortedTimestamps.length)*340);
