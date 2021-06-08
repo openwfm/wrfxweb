@@ -33,6 +33,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.preloaded = {};
+        this.progressSet = new Set();
         this.worker; 
     }
 
@@ -92,6 +93,7 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
+        this.progressSet.clear();
         var worker = this.createWorker();
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
@@ -115,7 +117,8 @@ export class LayerController extends HTMLElement {
                         nowOrLater(timeStamp, colorbarURL);
                     }
                 } else {
-                    simController.setLoadedTimestamp(timeStamp);
+                    this.progressSet.add(timeStamp);
+                    simController.setLoadedTimestamp(this.progressSet.size / simVars.sortedTimestamps.length);
                 }
             }
         }
@@ -221,7 +224,8 @@ export class LayerController extends HTMLElement {
             img.onload = () => {
                 this.preloaded[imageURL] = objectURL;
                 const simController = document.querySelector('simulation-controller');
-                simController.setLoadedTimestamp(timestamp);
+                this.progressSet.add(timestamp);
+                simController.setLoadedTimestamp(this.progressSet.size / simVars.sortedTimestamps.length);
             }
             img.src = objectURL;
         });
