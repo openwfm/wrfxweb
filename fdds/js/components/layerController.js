@@ -33,8 +33,9 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.preloaded = {};
-        this.progressSet = new Set();
+        this.progressSet = 0;
         this.worker; 
+        this.nImages = 0;
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -93,7 +94,7 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
-        this.progressSet.clear();
+        this.progressSet = 0;
         var worker = this.createWorker();
         var loadLater = [];
         const nowOrLater = (timeStamp, imageURL) => {
@@ -117,8 +118,11 @@ export class LayerController extends HTMLElement {
                         nowOrLater(timeStamp, colorbarURL);
                     }
                 } else {
-                    this.progressSet.add(timeStamp);
-                    simController.setLoadedTimestamp(this.progressSet.size / simVars.sortedTimestamps.length);
+                    this.progressSet += 1;
+                    if ('colorbar' in rasterInfo) {
+                        this.progressSet += 1;
+                    }
+                    simController.setLoadedTimestamp(this.progressSet / this.nImages);
                 }
             }
         }
@@ -130,6 +134,7 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
+        this.nImages = 0;
         if (this.worker) {
             this.worker.terminate();
         }
@@ -197,7 +202,9 @@ export class LayerController extends HTMLElement {
         layer.setUrl(simVars.rasterBase + raster_info.raster,
                     [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
                     { attribution: simVars.organization, opacity: 0.5 });
+        this.nImages += simVars.sortedTimestamps.length;
         if('colorbar' in raster_info) {
+            this.nImages += simVars.sortedTimestamps.length;
             var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
@@ -224,8 +231,8 @@ export class LayerController extends HTMLElement {
             img.onload = () => {
                 this.preloaded[imageURL] = objectURL;
                 const simController = document.querySelector('simulation-controller');
-                this.progressSet.add(timestamp);
-                simController.setLoadedTimestamp(this.progressSet.size / simVars.sortedTimestamps.length);
+                this.progressSet += 1;
+                simController.setLoadedTimestamp(this.progressSet / this.nImages);
             }
             img.src = objectURL;
         });
@@ -241,8 +248,11 @@ export class LayerController extends HTMLElement {
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
+        this.nImages = 0;
         for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
+            this.nImages += simVars.sortedTimestamps.length;
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
+                this.nImages += simVars.sortedTimestamps.length;
                 mostRecentColorbar = simVars.overlayOrder[i];
                 colorbarSrc = simVars.rasterBase + rasters_now[simVars.overlayOrder[i]].colorbar;
                 colorbarDisplay = 'block';
