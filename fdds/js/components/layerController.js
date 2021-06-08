@@ -95,9 +95,10 @@ export class LayerController extends HTMLElement {
 
     loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
-        this.progressSet = 0;
         var worker = this.createWorker();
         var loadLater = [];
+        this.progressSet = 0;
+
         const nowOrLater = (timeStamp, imageURL, layerName) => {
             if (timeStamp < startTime || timeStamp > endTime) {
                 loadLater.push({
@@ -265,15 +266,19 @@ export class LayerController extends HTMLElement {
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
-        this.nImages = 0;
         for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
-            this.nImages += simVars.sortedTimestamps.length;
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
-                this.nImages += simVars.sortedTimestamps.length;
                 mostRecentColorbar = simVars.overlayOrder[i];
                 colorbarSrc = simVars.rasterBase + rasters_now[simVars.overlayOrder[i]].colorbar;
                 colorbarDisplay = 'block';
                 break;
+            }
+        }
+        this.nImages = 0;
+        for (var overlay of simVars.overlayOrder) {
+            this.nImages += simVars.sortedTimestamps.length;
+            if ('colorbar' in rasters_now[overlay]) {
+                this.nImages += simVars.sortedTimestamps.length;
             }
         }
         simVars.displayedColorbar = mostRecentColorbar;
