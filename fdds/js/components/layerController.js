@@ -94,15 +94,26 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
+        var currentDomain = controllers.currentDomain.getValue();
         this.progressSet = 0;
         var worker = this.createWorker();
         var loadLater = [];
-        const nowOrLater = (timeStamp, imageURL) => {
+        const nowOrLater = (timeStamp, imageURL, layerName) => {
             if (timeStamp < startTime || timeStamp > endTime) {
-                loadLater.push({url: imageURL, time: timeStamp});
+                loadLater.push({
+                                    imageURL: imageURL, 
+                                    timeStamp: timeStamp,
+                                    layerName: layerName,
+                                    layerDomain: currentDomain,
+                                });
             }    
             else {
-                worker.postMessage({url: imageURL, time: timeStamp});
+                worker.postMessage({
+                                    imageURL: imageURL, 
+                                    timeStamp: timeStamp,
+                                    layerName: layerName,
+                                    layerDomain: currentDomain,
+                                });
             }
         }
         const simController = document.querySelector('simulation-controller');
@@ -112,12 +123,12 @@ export class LayerController extends HTMLElement {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
                 if (!(imageURL in this.preloaded)) {
-                    nowOrLater(timeStamp, imageURL);
+                    nowOrLater(timeStamp, imageURL, layerName);
                     if ('colorbar' in rasterInfo) {
                         var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-                        nowOrLater(timeStamp, colorbarURL);
+                        nowOrLater(timeStamp, colorbarURL, layerName);
                     }
-                } else {
+                } else if (simVars.overlayOrder.includes(layerName)) {
                     this.progressSet += 1;
                     if ('colorbar' in rasterInfo) {
                         this.progressSet += 1;
@@ -134,10 +145,10 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
-        this.nImages = 0;
         if (this.worker) {
             this.worker.terminate();
         }
+        this.nImages = 0;
         for (var layerName of simVars.overlayOrder) {
             this.getLayer(layerName).remove(map);
         }
@@ -225,14 +236,20 @@ export class LayerController extends HTMLElement {
         worker.addEventListener('message', event => {
             const imageData = event.data;
             const imageURL = imageData.imageURL;
-            const timestamp = imageData.timestamp;
+            const timeStamp = imageData.timeStamp;
+            const layerName = imageData.layerName;
+            const layerDomain = imageData.layerDomain;
+
             const objectURL = URL.createObjectURL(imageData.blob);
             const img = new Image();
             img.onload = () => {
+                var currentDomain = controllers.currentDomain.getValue();
                 this.preloaded[imageURL] = objectURL;
                 const simController = document.querySelector('simulation-controller');
-                this.progressSet += 1;
-                simController.setLoadedTimestamp(this.progressSet / this.nImages);
+                if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
+                    this.progressSet += 1;
+                    simController.setLoadedTimestamp(this.progressSet / this.nImages);
+                }
             }
             img.src = objectURL;
         });
