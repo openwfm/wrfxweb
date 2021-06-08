@@ -30,6 +30,7 @@ export class TimeSeriesController extends LayerController {
         this.markers = [];
         this.imgCanvas = document.createElement('canvas');
         this.clrbarCanvas = document.createElement('canvas');
+        this.timeSeriesDatasets = {};
     }
 
     connectedCallback() {
@@ -55,6 +56,9 @@ export class TimeSeriesController extends LayerController {
         super.domainSwitch();
         while (this.markers.length > 0) {
             this.markers[0].removeFrom(map);
+        }
+        if (this.currentSimulation != simVars.currentSimulation) {
+            this.timeSeriesDatasets = {};
         }
     }
 
@@ -225,6 +229,12 @@ export class TimeSeriesController extends LayerController {
         var img = new Image();
         var clrbarImg = new Image();
         // Returns a promise so that loadImageAndColorbar can be called with await. 
+        const generateKey = (marker) => {
+            var [xCoord, yCoord] = marker.imageCoords;
+            var currentDomain = controllers.currentDomain.getValue();
+            var key = simVars.displayedColorbar + currentDomain + ',' + xCoord + ',' + yCoord + timeStamp;
+            return key;
+        }
         return new Promise(resolve => {
             var rasterAtTime = rasterDomains[timeStamp];
             var rasterInfo = rasterAtTime[simVars.displayedColorbar];
@@ -233,31 +243,52 @@ export class TimeSeriesController extends LayerController {
             var syncController = new SyncController();
             syncController.subscribe(() => {
                 for (var i = 0; i < markerData.length; i++) {
-                    timeSeriesData[i].dataset[timeStamp] = this.findClosestKey(markerData[i], clrbarMap);
+                    var dataValue = this.findClosestKey(markerData[i], clrbarMap);
+                    var key = generateKey(markers[i]);
+
+                    this.timeSeriesDatasets[key] = dataValue;
+                    timeSeriesData[i].dataset[timeStamp] = dataValue;
                 }
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             });
-            img.onload = () => {
-                markerData = this.drawMarkersOnCanvas(img, markers);
-                syncController.increment(0);
+
+            var check = true;
+            for (var marker of markers) {
+                var key = generateKey(marker);
+                if (!this.timeSeriesDatasets[key]) {
+                    console.log('here')
+                    check = false;
+                }
             }
-            clrbarImg.onload = () => {
-                this.drawColorbarCanvas(clrbarImg);
-                clrbarMap = this.buildColorMap(this.clrbarCanvas, timeStamp);
-                syncController.increment(1);
-            }
-            var imgURL = simVars.rasterBase + rasterInfo.raster;
-            var clrbarURL = simVars.rasterBase + rasterInfo.colorbar;
-            if (imgURL in this.preloaded && clrbarURL in this.preloaded) {
-                imgURL = this.preloaded[imgURL];
-                clrbarURL = this.preloaded[clrbarURL];
+            if (check) {
+                for (var i = 0; i < markers.length; i++) {
+                    var key = generateKey(markers[i]);
+                    timeSeriesData[i].dataset[timeStamp] = this.timeSeriesDatasets[key];
+                }
+                resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             } else {
-                this.worker.terminate();
-                this.preloaded[imgURL] = imgURL;
-                this.preloaded[clrbarURL] = clrbarURL;
+                img.onload = () => {
+                    markerData = this.drawMarkersOnCanvas(img, markers);
+                    syncController.increment(0);
+                }
+                clrbarImg.onload = () => {
+                    this.drawColorbarCanvas(clrbarImg);
+                    clrbarMap = this.buildColorMap(this.clrbarCanvas, timeStamp);
+                    syncController.increment(1);
+                }
+                var imgURL = simVars.rasterBase + rasterInfo.raster;
+                var clrbarURL = simVars.rasterBase + rasterInfo.colorbar;
+                if (imgURL in this.preloaded && clrbarURL in this.preloaded) {
+                    imgURL = this.preloaded[imgURL];
+                    clrbarURL = this.preloaded[clrbarURL];
+                } else {
+                    this.worker.terminate();
+                    this.preloaded[imgURL] = imgURL;
+                    this.preloaded[clrbarURL] = clrbarURL;
+                }
+                img.src = imgURL;
+                clrbarImg.src = clrbarURL;
             }
-            img.src = imgURL;
-            clrbarImg.src = clrbarURL;
         });
     }
 
