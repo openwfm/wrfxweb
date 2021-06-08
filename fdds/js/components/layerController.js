@@ -202,10 +202,12 @@ export class LayerController extends HTMLElement {
         if (!(simVars.overlayOrder.includes(name))) {
             simVars.overlayOrder.push(name);
         }
-        if (simVars.overlayList.indexOf(name) >= 0) {
-            layer.bringToFront();
-        } else {
-            layer.bringToBack();
+        layer.bringToFront();
+        for (var overlay of simVars.overlayOrder) {
+            if (simVars.overlayList.includes(overlay)) {
+                var overlayLayer = this.getLayer(overlay);
+                overlayLayer.bringToFront();
+            }
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
@@ -274,6 +276,7 @@ export class LayerController extends HTMLElement {
                 break;
             }
         }
+        
         this.nImages = 0;
         for (var overlay of simVars.overlayOrder) {
             this.nImages += simVars.sortedTimestamps.length;
