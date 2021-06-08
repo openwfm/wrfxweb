@@ -256,7 +256,6 @@ export class TimeSeriesController extends LayerController {
             for (var marker of markers) {
                 var key = generateKey(marker);
                 if (!this.timeSeriesDatasets[key]) {
-                    console.log('here')
                     check = false;
                 }
             }
