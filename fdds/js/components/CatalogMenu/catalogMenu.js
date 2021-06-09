@@ -160,7 +160,6 @@ export class CatalogMenu extends HTMLElement {
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
             if (sortBy == 'original-order') {
-                console.log(listElem1)
                 var desc = listElem1.description;
                 if (desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
                     result = listElem1.description > listElem2.description; 
