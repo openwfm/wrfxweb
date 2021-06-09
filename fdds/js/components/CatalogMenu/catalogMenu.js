@@ -160,16 +160,30 @@ export class CatalogMenu extends HTMLElement {
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
             if (sortBy == 'original-order') {
-                result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+                console.log(listElem1)
+                var desc = listElem1.description;
+                if (desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
+                    result = listElem1.description > listElem2.description; 
+                } else {
+                    result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+                }
             }
             if (sortBy == 'description') {
                 result = listElem1.description > listElem2.description; 
             }
             if (sortBy == 'start-date') {
-                result = listElem1.from_utc > listElem2.from_utc;
+                if (listElem1.from_utc == listElem2.from_utc) {
+                    result = listElem1.description > listElem2.description; 
+                } else {
+                    result = listElem1.from_utc > listElem2.from_utc;
+                }
             }
             if (sortBy == 'end-date') {
-                result = listElem1.to_utc > listElem2.to_utc;
+                if (listElem1.to_utc == listElem2.to_utc) {
+                    result = listElem1.description > listElem2.description; 
+                } else {
+                    result = listElem1.to_utc > listElem2.to_utc;
+                }
             }
             if (reverseOrder) {
                 result = !result;
