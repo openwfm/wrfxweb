@@ -131,6 +131,7 @@ export class CatalogMenu extends HTMLElement {
                 firesListDOM.appendChild(newLI);
             }
         }
+        this.sortBy('original-order', false);
     }
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
@@ -160,16 +161,29 @@ export class CatalogMenu extends HTMLElement {
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
             if (sortBy == 'original-order') {
-                result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+                var desc = listElem1.description;
+                if (desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
+                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+                } else {
+                    result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+                }
             }
             if (sortBy == 'description') {
-                result = listElem1.description > listElem2.description; 
+                result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
             }
             if (sortBy == 'start-date') {
-                result = listElem1.from_utc > listElem2.from_utc;
+                if (listElem1.from_utc == listElem2.from_utc) {
+                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+                } else {
+                    result = listElem1.from_utc > listElem2.from_utc;
+                }
             }
             if (sortBy == 'end-date') {
-                result = listElem1.to_utc > listElem2.to_utc;
+                if (listElem1.to_utc == listElem2.to_utc) {
+                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+                } else {
+                    result = listElem1.to_utc > listElem2.to_utc;
+                }
             }
             if (reverseOrder) {
                 result = !result;
