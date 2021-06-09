@@ -60,7 +60,7 @@ export class TimeSeriesController extends LayerController {
         if (this.currentSimulation != simVars.currentSimulation) {
             this.timeSeriesDatasets = {};
         }
-        this.handleOverlayadd('T2');
+        // this.handleOverlayadd('T2');
         // const timeSeriesChart = document.querySelector('timeseries-chart');
         // simVars.displayedColorbar = 'test';
         // var dataset = [];

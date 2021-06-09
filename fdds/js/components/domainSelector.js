@@ -19,6 +19,7 @@ export class DomainSelector extends HTMLElement {
         const domainSubscription = () => {
             this.buildDomains();
         }
+
         controllers.domainInstance.subscribe(domainSubscription);
     }
 
@@ -36,7 +37,13 @@ export class DomainSelector extends HTMLElement {
         this.querySelector('#domain-selector').style.display = 'block';
         document.querySelector('#domain-button').style.display = 'inline-block';
         document.querySelector('#layers-button').style.display = 'inline-block';
-        this.setUpForDomain(domains[0]);
+        var domainId = domains[0];
+        // console.log('buid domain: ' + simVars.presets.domain);
+        if (domains.includes(simVars.presets.domain)) {
+            domainId = simVars.presets.domain;
+            simVars.presets.domain = null;
+        }
+        this.setUpForDomain(domainId);
     }
 
     /** Create a div element for each domain checkbox. When clicked an element is clicked, 
@@ -70,6 +77,7 @@ export class DomainSelector extends HTMLElement {
     setUpForDomain(dom_id) {
         // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
         simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
+        // console.log('setupForDomain: ' + dom_id);
         controllers.currentDomain.setValue(dom_id);
     }
 }
