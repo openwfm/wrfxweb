@@ -56,6 +56,7 @@ export const map = L.map('map-fd', {
 export function setURL() {
   var historyData = {};
   var urlVars = '';
+
   const addData = (key, data) => {
     if (data) {
       historyData[key] = data;
@@ -64,7 +65,7 @@ export function setURL() {
   }
   addData('job_id', simVars.currentSimulation);
   addData('domain', controllers.currentDomain.getValue());
-  console.log(urlVars);
+
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
     history.pushState(historyData, 'Data', urlVars);

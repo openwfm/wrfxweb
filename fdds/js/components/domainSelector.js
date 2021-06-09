@@ -1,5 +1,6 @@
 import { controllers } from './Controller.js';
 import { simVars } from '../util.js';
+
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
     constructor() {
@@ -26,30 +27,32 @@ export class DomainSelector extends HTMLElement {
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
         var domains = controllers.domainInstance.getValue();
+
+        var presetDomain = domains[0];
+        if (domains.includes(simVars.presets.domain)) {
+            presetDomain = simVars.presets.domain;
+            simVars.presets.domain = null;
+        }
+
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
         for(var dom in domains) {
             var dom_id = domains[dom];
-            var domainCheckbox = this.buildDomainCheckbox(dom_id);
+            var domainCheckbox = this.buildDomainCheckbox(dom_id, presetDomain);
             domainCheckboxes.appendChild(domainCheckbox);
         }
 
         this.querySelector('#domain-selector').style.display = 'block';
         document.querySelector('#domain-button').style.display = 'inline-block';
         document.querySelector('#layers-button').style.display = 'inline-block';
-        var domainId = domains[0];
-        // console.log('buid domain: ' + simVars.presets.domain);
-        if (domains.includes(simVars.presets.domain)) {
-            domainId = simVars.presets.domain;
-            simVars.presets.domain = null;
-        }
-        this.setUpForDomain(domainId);
+
+        this.setUpForDomain(presetDomain);
     }
 
     /** Create a div element for each domain checkbox. When clicked an element is clicked, 
      * it should call setUpForDomain
      */
-    buildDomainCheckbox(dom_id) {
+    buildDomainCheckbox(dom_id, presetDomain) {
         var div = document.createElement('div');
         div.className = 'domain-checkbox';
 
@@ -57,7 +60,7 @@ export class DomainSelector extends HTMLElement {
         input.type = 'radio';
         input.name = 'domains';
         input.id = dom_id;
-        if (dom_id == '1') {
+        if (dom_id == presetDomain) {
             input.checked = 'yes';
         }
         input.onclick = () => {
@@ -77,7 +80,6 @@ export class DomainSelector extends HTMLElement {
     setUpForDomain(dom_id) {
         // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
         simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
-        // console.log('setupForDomain: ' + dom_id);
         controllers.currentDomain.setValue(dom_id);
     }
 }

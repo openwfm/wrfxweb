@@ -1,4 +1,4 @@
-import { map, dragElement, debounce, simVars } from '../util.js';
+import { map, dragElement, debounce, setURL, simVars } from '../util.js';
 import { controllers } from './Controller.js';
 
 /**
@@ -91,6 +91,7 @@ export class LayerController extends HTMLElement {
                 rasterColorbar.src = colorbarURL;
             }
         }
+        setURL();
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
@@ -191,6 +192,7 @@ export class LayerController extends HTMLElement {
             }
         };
         this.buildLayerBoxes();
+        setURL();
     }
 
     /** Called when a layer is selected. */
