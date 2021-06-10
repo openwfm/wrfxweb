@@ -71,6 +71,18 @@ export class SimulationController extends HTMLElement {
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
+
+        const RECURSION_DEPTH = 5;
+        this.querySelector('#slider-play-pause').onpointerdown = () => {
+            this.playPause();
+        }
+        this.querySelector('#slider-prev').onpointerdown = () => {
+            this.prevFrame(RECURSION_DEPTH);
+        }
+        this.querySelector('#slider-next').onpointerdown = () => {
+            this.nextFrame(RECURSION_DEPTH);
+        }
+
         const toggleRate = (rate, togglePrimary, toggleSecondary) => {
             var unPressedColor = '#d6d6d6';
             togglePrimary.style.background = unPressedColor;
@@ -83,50 +95,62 @@ export class SimulationController extends HTMLElement {
                 togglePrimary.style.background = '#e5e5e5';
             }
         }
-        this.querySelector('#slider-play-pause').onpointerdown = () => {
-            this.playPause();
-        }
-        this.querySelector('#slider-prev').onpointerdown = () => {
-            this.prevFrame(5);
-        }
-        this.querySelector('#slider-next').onpointerdown = () => {
-            this.nextFrame(5);
-        }
         const speedUp = this.querySelector('#slider-fast-forward');
-        const slowDown = this.querySelector('#slider-slow-down');
         speedUp.onpointerdown = () => {
             toggleRate(this.fastRate, speedUp, slowDown);
         }
+        const slowDown = this.querySelector('#slider-slow-down');
         slowDown.onpointerdown = () => {
             toggleRate(this.slowRate, slowDown, speedUp);
         }
+
         const domainSubscription = () => {
             this.resetSlider();
         }
         controllers.currentDomain.subscribe(domainSubscription);
+
+        const currentTimestampSubscription = () => {
+            this.updateSlider();
+        }
+        controllers.currentTimestamp.subscribe(currentTimestampSubscription);
     }
 
     resetSlider() {
         if (this.playing) {
             this.playPause();
         }
+
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
-        let percentage = this.currentFrame / this.frameTotal;
+
+        var percentage = this.currentFrame / this.frameTotal;
+
+        this.frameTotal = simVars.sortedTimestamps.length;
         this.currentFrame = Math.floor((simVars.sortedTimestamps.length) * percentage);
         if (this.currentSimulation != simVars.currentSimulation) {
+            console.log('here');
             this.currentSimulation = simVars.currentSimulation;
-            percentage = 0;
+            // percentage = 0;
             this.currentFrame = 0;
         }
-        this.setupForTime(this.currentFrame);
-        this.frameTotal = simVars.sortedTimestamps.length;
-        this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + '%';
+        var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
+
+        controllers.currentTimestamp.setValue(currentTimestamp);
+        
+        // this.setupForTime(this.currentFrame);
+        // this.frameTotal = simVars.sortedTimestamps.length;
+        // this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + '%';
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
-        this.setupForTime(this.currentFrame);
+        // set current time
+        var currentTimestamp = controllers.currentTimestamp.getValue();
+        document.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
+
+        var timeIndex = simVars.sortedTimestamps.indexOf(currentTimestamp);
+        this.currentFrame = timeIndex;
+
         const sliderHead = this.querySelector('#slider-head');
         let percentage = Math.floor((this.currentFrame / simVars.sortedTimestamps.length) * 92);
         sliderHead.style.left = percentage + '%';
@@ -169,9 +193,11 @@ export class SimulationController extends HTMLElement {
             console.log('recursion depth reached');
             return;
         }
-        let nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
-        this.currentFrame = nextFrame;
-        this.updateSlider();
+
+        var nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
+        var nextTimestamp = simVars.sortedTimestamps[nextFrame];
+
+        controllers.currentTimestamp.setValue(nextTimestamp);
     }
 
     /** Moves one frame to the left. */
@@ -179,30 +205,17 @@ export class SimulationController extends HTMLElement {
         if (recursionDepth == 0) {
             return;
         }
-        let prevFrame = (this.currentFrame - 1) % simVars.sortedTimestamps.length;
+
+        var prevFrame = (this.currentFrame - 1) % simVars.sortedTimestamps.length;
         if (prevFrame < 0) {
             prevFrame += simVars.sortedTimestamps.length;
         }
-        this.currentFrame = prevFrame;
-        this.updateSlider();
-    }
+        var prevTimestamp = simVars.sortedTimestamps[prevFrame];
 
-    // this function should assume that the correct layers are already displayed
-    setupForTime(frame_ndx) {
-        var timestamp = simVars.sortedTimestamps[frame_ndx];
-        // set current time
-        document.querySelector('#timestamp').innerText = utcToLocal(timestamp);
-        controllers.currentTimestamp.setValue(timestamp);
-    }
-
-    updateFrameToTime(timeStamp) {
-        this.currentFrame = simVars.sortedTimestamps.indexOf(timeStamp);
-        this.updateSlider();
+        controllers.currentTimestamp.setValue(prevTimestamp);
     }
 
     setLoadedTimestamp(progress) {
-        // var timestampFrame = simVars.sortedTimestamps.indexOf(timestamp) + 1;
-        // var percentage = Math.floor((timestampFrame / simVars.sortedTimestamps.length)*340);
         var progressWidth = progress*340;
         const progressBar = this.querySelector('#slider-progress'); 
         progressBar.style.width = progressWidth + 'px';
@@ -230,9 +243,11 @@ export class SimulationController extends HTMLElement {
             // calculate the new cursor position:
             let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
 
-            let newFrame = originalFrame + diff;
-            this.currentFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-            this.updateSlider();
+            var newFrame = originalFrame + diff;
+            newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
+            var newTimestamp = simVars.sortedTimestamps[newFrame];
+
+            controllers.currentTimestamp.setValue(newTimestamp);
           }
     }
 
@@ -243,9 +258,11 @@ export class SimulationController extends HTMLElement {
         const head = this.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / 300 * simVars.sortedTimestamps.length - 1);
 
-        let newFrame = this.currentFrame + diff;
-        this.currentFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-        this.updateSlider();
+        var newFrame = this.currentFrame + diff;
+        newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
+        var newTimestamp = simVars.sortedTimestamps[newFrame];
+
+        controllers.currentTimestamp.setValue(newTimestamp);
     }
 }
 

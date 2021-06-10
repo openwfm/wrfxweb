@@ -1,4 +1,5 @@
 import { utcToLocal, createOption, linkSelects, simVars } from '../util.js';
+import { controllers } from '../components/Controller.js';
 
 export class TimeSeriesChart extends HTMLElement {
     constructor() {
@@ -200,15 +201,13 @@ export class TimeSeriesChart extends HTMLElement {
                     duration: 0
                 },
                 onClick: (evt) => {
-                    const simController = document.querySelector('simulation-controller');
-
                     const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
                     if (points.length) {
                         const firstPoint = points[0];
                         var label = this.chart.data.labels[firstPoint.index];
                         for (var timeStamp of simVars.sortedTimestamps) {
                             if (utcToLocal(timeStamp) == label) {
-                                simController.updateFrameToTime(timeStamp);
+                                controllers.currentTimestamp.setValue(timeStamp);
                             }
                         }
                     }
