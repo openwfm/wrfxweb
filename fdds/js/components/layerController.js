@@ -211,6 +211,21 @@ export class LayerController extends HTMLElement {
             }
         };
 
+        var zoom = simVars.presets.zoom;
+        if (zoom && !isNaN(zoom)) {
+            map.setZoom(zoom);
+            simVars.presets.zoom = null;
+        }
+
+        var pan = simVars.presets.pan;
+        if (pan && pan.length == 2) {
+            if (!isNaN(pan[0]) && !isNaN(pan[1])) {
+                console.log(pan);
+                map.panTo(pan);
+            }
+            simVars.presets.pan = null;
+        }
+
         this.buildLayerBoxes();
     }
 

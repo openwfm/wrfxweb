@@ -12,6 +12,12 @@ var presets = (function loadPresets() {
     rasters: null,
   });
 
+  var pan = urlParams.get('pan');
+  if (pan) {
+    pan = pan.split(',').map(coord => Number(coord));
+    presetVars.pan = pan;
+  }
+
   var rasters = urlParams.get('rasters');
   if (rasters) {
     rasters = rasters.split('-');
@@ -61,6 +67,10 @@ export const map = (function buildMap() {
     setURL();
   });
 
+  leafletMap.on('moveend', function() {
+    setURL();
+  });
+
   leafletMap.doubleClickZoom.disable();
   leafletMap.scrollWheelZoom.disable();
 
@@ -83,6 +93,9 @@ export function setURL() {
 
   var zoom = map.getZoom();
   addData('zoom', zoom);
+  var center = map.getCenter();
+  var pan = center.lat.toFixed(2) + ',' + center.lng.toFixed(2);
+  addData('pan', pan);
   var currentSimulation = simVars.currentSimulation;
   addData('job_id', currentSimulation);
   var currentDomain = controllers.currentDomain.getValue();

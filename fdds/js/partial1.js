@@ -29,12 +29,4 @@ async function loadConfig() {
     });
   }
 
-  if (simVars.presets.pan) {
-    simVars.presets.pan = null;
-  }
-  var zoom = simVars.presets.zoom;
-  if (zoom && !isNaN(zoom)) {
-    map.setZoom(zoom);
-    simVars.presets.zoom = null;
-  }
 }
