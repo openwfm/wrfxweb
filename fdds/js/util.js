@@ -65,6 +65,7 @@ export function setURL() {
   }
   addData('job_id', simVars.currentSimulation);
   addData('domain', controllers.currentDomain.getValue());
+  addData('timestamp', controllers.currentTimestamp.getValue());
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);

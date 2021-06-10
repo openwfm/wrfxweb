@@ -192,7 +192,6 @@ export class LayerController extends HTMLElement {
             }
         };
         this.buildLayerBoxes();
-        setURL();
     }
 
     /** Called when a layer is selected. */
