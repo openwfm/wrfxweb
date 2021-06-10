@@ -188,7 +188,6 @@ export class LayerController extends HTMLElement {
         var vars = Object.keys(first_rasters);
 
         var cs = first_rasters[vars[0]].coords;
-        map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
 
         this.rasterDict = {};
         this.overlayDict = {};    
@@ -213,6 +212,8 @@ export class LayerController extends HTMLElement {
 
         if (simVars.presets.pan || simVars.presets.zoom) {
             this.setPresetView();
+        } else { 
+            map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
         }
         
         this.buildLayerBoxes();
