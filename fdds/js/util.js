@@ -2,6 +2,7 @@ import { controllers } from './components/Controller.js';
 
 var presets = (function loadPresets() {
   const urlParams = new URLSearchParams(window.location.search);
+
   var presetVars = ({
     zoom: urlParams.get('zoom'),
     pan: urlParams.get('pan'),
@@ -10,11 +11,19 @@ var presets = (function loadPresets() {
     timestamp: urlParams.get('timestamp'),
     rasters: null,
   });
+
+  var pan = urlParams.get('pan');
+  if (pan) {
+    pan = pan.split(',').map(coord => Number(coord));
+    presetVars.pan = pan;
+  }
+
   var rasters = urlParams.get('rasters');
   if (rasters) {
     rasters = rasters.split('-');
     presetVars.rasters = rasters;
   }
+
   return presetVars;
 })();
 
@@ -45,13 +54,30 @@ export const simVars = {
 };
 
 // construct map with the base layers
-export const map = L.map('map-fd', {
-  center: [37.34, -121.89],
-  zoom: 7,
-  layers: [simVars.baseLayerDict['OSM']],
-  zoomControl: true,
-  minZoom: 3
-});
+export const map = (function buildMap() {
+  var leafletMap = L.map('map-fd', {
+    zoom: 7,
+    layers: [simVars.baseLayerDict['OSM']],
+    zoomControl: true,
+    minZoom: 3
+  });
+
+  leafletMap.on('zoomend', function() {
+    setURL();
+  });
+
+  leafletMap.on('moveend', function() {
+    setURL();
+  });
+
+  leafletMap.doubleClickZoom.disable();
+  leafletMap.scrollWheelZoom.disable();
+
+  // add scale & zoom controls to the map
+  L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
+
+  return leafletMap;
+})();
 
 export function setURL() {
   var historyData = {};
@@ -63,9 +89,18 @@ export function setURL() {
       urlVars += '&' + key + '=' + data;
     }
   }
-  addData('job_id', simVars.currentSimulation);
-  addData('domain', controllers.currentDomain.getValue());
-  addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
+
+  var zoom = map.getZoom();
+  addData('zoom', zoom);
+  var center = map.getCenter();
+  var pan = center.lat.toFixed(2) + ',' + center.lng.toFixed(2);
+  addData('pan', pan);
+  var currentSimulation = simVars.currentSimulation;
+  addData('job_id', currentSimulation);
+  var currentDomain = controllers.currentDomain.getValue();
+  addData('domain', currentDomain);
+  var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
+  addData('timestamp', timestamp);
   var rasterURL = simVars.overlayOrder.join('-');
   addData('rasters', rasterURL);
 

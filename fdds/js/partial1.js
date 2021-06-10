@@ -3,29 +3,26 @@ import { getConfigurations } from './services.js';
 import { map, simVars } from './util.js';
 
 window.onload = () => {
-  map.doubleClickZoom.disable();
-  map.scrollWheelZoom.disable();
-
   loadConfig();
-
-  // add scale & zoom controls to the map
-  L.control.scale({ position: 'bottomright' }).addTo(map);
 }
 
 /** Function that retrieves conf.json and sets the document title and flags if they exist. */
 async function loadConfig() {
   var configData = await getConfigurations();
+
   if (configData.organization) {
     simVars.organization = configData.organization;
     if (!simVars.organization.includes('SJSU')) {
-        map.panTo([39.7392, -104.9903]);
+      map.panTo([39.7392, -104.9903]);
+    } else { 
+      map.panTo([37.34, -121.89]);
     }
     document.title = simVars.organization;
   }
 
   if (configData.flags) {
-    let flags = configData.flags;
     const simulationFlags = document.querySelector('#simulation-flags');
+    var flags = configData.flags;
     flags.map(flag => {
         var spanElement = document.createElement('span');
         spanElement.className = 'displayTest';
@@ -33,4 +30,5 @@ async function loadConfig() {
         simulationFlags.appendChild(spanElement);
     });
   }
+
 }
