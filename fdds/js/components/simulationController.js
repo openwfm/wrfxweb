@@ -119,8 +119,6 @@ export class SimulationController extends HTMLElement {
         if (this.playing) {
             this.playPause();
         }
-        
-        console.log('reset slider first: ' + controllers.currentTimestamp.getValue());
 
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
@@ -130,19 +128,12 @@ export class SimulationController extends HTMLElement {
         this.frameTotal = simVars.sortedTimestamps.length;
         this.currentFrame = Math.floor((simVars.sortedTimestamps.length) * percentage);
         if (this.currentSimulation != simVars.currentSimulation) {
-            console.log('here');
             this.currentSimulation = simVars.currentSimulation;
-            // percentage = 0;
             this.currentFrame = 0;
         }
         var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
 
         controllers.currentTimestamp.setValue(currentTimestamp);
-        console.log('reset slider second: ' + controllers.currentTimestamp.getValue());
-        
-        // this.setupForTime(this.currentFrame);
-        // this.frameTotal = simVars.sortedTimestamps.length;
-        // this.querySelector('#slider-head').style.left = Math.floor(percentage * 92) + '%';
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
@@ -165,6 +156,7 @@ export class SimulationController extends HTMLElement {
         const playPauseButton = document.querySelector('#slider-play-pause');
         const prevButton = document.querySelector('#slider-prev');
         const nextButton = document.querySelector('#slider-next');
+
         this.playing = !this.playing;
         if (!this.playing) {
             playPauseButton.firstElementChild.src = 'icons/play_arrow-24px.svg';
