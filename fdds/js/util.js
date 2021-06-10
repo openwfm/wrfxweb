@@ -2,6 +2,7 @@ import { controllers } from './components/Controller.js';
 
 var presets = (function loadPresets() {
   const urlParams = new URLSearchParams(window.location.search);
+
   var presetVars = ({
     zoom: urlParams.get('zoom'),
     pan: urlParams.get('pan'),
@@ -10,11 +11,13 @@ var presets = (function loadPresets() {
     timestamp: urlParams.get('timestamp'),
     rasters: null,
   });
+
   var rasters = urlParams.get('rasters');
   if (rasters) {
     rasters = rasters.split('-');
     presetVars.rasters = rasters;
   }
+
   return presetVars;
 })();
 
@@ -55,8 +58,7 @@ export const map = (function buildMap() {
   });
 
   leafletMap.on('zoomend', function() {
-    // console.log('zoom zoom zoom');
-    // setURL();
+    setURL();
   });
 
   leafletMap.doubleClickZoom.disable();
@@ -78,13 +80,17 @@ export function setURL() {
       urlVars += '&' + key + '=' + data;
     }
   }
-  // addData('zoom', )
-  addData('job_id', simVars.currentSimulation);
-  addData('domain', controllers.currentDomain.getValue());
-  addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
+
+  var zoom = map.getZoom();
+  addData('zoom', zoom);
+  var currentSimulation = simVars.currentSimulation;
+  addData('job_id', currentSimulation);
+  var currentDomain = controllers.currentDomain.getValue();
+  addData('domain', currentDomain);
+  var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
+  addData('timestamp', timestamp);
   var rasterURL = simVars.overlayOrder.join('-');
   addData('rasters', rasterURL);
-
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
