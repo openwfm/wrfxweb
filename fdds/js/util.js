@@ -45,13 +45,28 @@ export const simVars = {
 };
 
 // construct map with the base layers
-export const map = L.map('map-fd', {
-  center: [37.34, -121.89],
-  zoom: 7,
-  layers: [simVars.baseLayerDict['OSM']],
-  zoomControl: true,
-  minZoom: 3
-});
+export const map = (function buildMap() {
+  var leafletMap = L.map('map-fd', {
+    center: [37.34, -121.89],
+    zoom: 7,
+    layers: [simVars.baseLayerDict['OSM']],
+    zoomControl: true,
+    minZoom: 3
+  });
+
+  leafletMap.on('zoomend', function() {
+    // console.log('zoom zoom zoom');
+    // setURL();
+  });
+
+  leafletMap.doubleClickZoom.disable();
+  leafletMap.scrollWheelZoom.disable();
+
+  // add scale & zoom controls to the map
+  L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
+
+  return leafletMap;
+})();
 
 export function setURL() {
   var historyData = {};
@@ -63,11 +78,13 @@ export function setURL() {
       urlVars += '&' + key + '=' + data;
     }
   }
+  // addData('zoom', )
   addData('job_id', simVars.currentSimulation);
   addData('domain', controllers.currentDomain.getValue());
   addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
   var rasterURL = simVars.overlayOrder.join('-');
   addData('rasters', rasterURL);
+
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);

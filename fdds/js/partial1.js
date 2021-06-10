@@ -3,13 +3,7 @@ import { getConfigurations } from './services.js';
 import { map, simVars } from './util.js';
 
 window.onload = () => {
-  map.doubleClickZoom.disable();
-  map.scrollWheelZoom.disable();
-
   loadConfig();
-
-  // add scale & zoom controls to the map
-  L.control.scale({ position: 'bottomright' }).addTo(map);
 }
 
 /** Function that retrieves conf.json and sets the document title and flags if they exist. */
