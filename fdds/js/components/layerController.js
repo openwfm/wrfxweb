@@ -144,6 +144,24 @@ export class LayerController extends HTMLElement {
         }
     }
 
+    resetLayerController() {
+        this.currentSimulation = simVars.currentSimulation;
+
+        simVars.overlayOrder = [];
+        var presetRasters = simVars.presets.rasters;
+        if (presetRasters) {
+            simVars.overlayOrder = presetRasters;
+            simVars.presets.rasters = null;
+        }
+
+        for (var imgURL in this.preloaded) {
+            URL.revokeObjectURL(this.preloaded[imgURL]);
+        }
+        this.preloaded = {};
+
+        this.querySelector('#layer-controller-container').style.display = 'block';
+    }
+
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
@@ -152,7 +170,10 @@ export class LayerController extends HTMLElement {
         }
         this.nImages = 0;
         for (var layerName of simVars.overlayOrder) {
-            this.getLayer(layerName).remove(map);
+            var layer = this.getLayer(layerName);
+            if (layer) {
+                layer.remove(map);
+            }
         }
         simVars.displayedColorbar = null;
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -160,21 +181,18 @@ export class LayerController extends HTMLElement {
         rasterColorbar.style.display = 'none';
         // if on a new simulation entirely, reset selected layers
         if (this.currentSimulation != simVars.currentSimulation) {
-            simVars.overlayOrder.length = 0;
-            this.currentSimulation = simVars.currentSimulation;
-            this.querySelector('#layer-controller-container').style.display = 'block';
-            for (var imgURL in this.preloaded) {
-                URL.revokeObjectURL(this.preloaded[imgURL]);
-            }
-            this.preloaded = {};
+            this.resetLayerController();
         }
         // build the layer groups of the current domain
         var first_rasters = simVars.rasters[controllers.currentDomain.getValue()][simVars.sortedTimestamps[0]];
         var vars = Object.keys(first_rasters);
+
         var cs = first_rasters[vars[0]].coords;
         map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+
         this.rasterDict = {};
         this.overlayDict = {};    
+
         for (var r in first_rasters) {
             var raster_info = first_rasters[r];
             var cs = raster_info.coords;
@@ -185,12 +203,14 @@ export class LayerController extends HTMLElement {
                                             opacity: 0.5,
                                             interactive: true
                                         });
+
             if(simVars.overlayList.indexOf(r) >= 0) {
                 this.overlayDict[r] = layer;
             } else {
                 this.rasterDict[r] = layer;
             }
         };
+
         this.buildLayerBoxes();
     }
 
@@ -229,6 +249,7 @@ export class LayerController extends HTMLElement {
         var startDate = controllers.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+        setURL();
     }
 
     createWorker() {
@@ -291,6 +312,7 @@ export class LayerController extends HTMLElement {
         var startDate = controllers.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+        setURL();
     }
 
     /** Returns the layer associated with a given name */

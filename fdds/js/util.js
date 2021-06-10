@@ -10,10 +10,10 @@ var presets = (function loadPresets() {
     timestamp: urlParams.get('timestamp'),
     rasters: null,
   });
-  const rasters = urlParams.get('rasters');
+  var rasters = urlParams.get('rasters');
   if (rasters) {
-    rasters = rasters.split(',');
-    prestVars.rasters = rasters;
+    rasters = rasters.split('-');
+    presetVars.rasters = rasters;
   }
   return presetVars;
 })();
@@ -66,6 +66,8 @@ export function setURL() {
   addData('job_id', simVars.currentSimulation);
   addData('domain', controllers.currentDomain.getValue());
   addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
+  var rasterURL = simVars.overlayOrder.join('-');
+  addData('rasters', rasterURL);
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
