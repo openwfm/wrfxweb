@@ -1,5 +1,5 @@
 import { controllers } from './Controller.js';
-import { simVars } from '../util.js';
+import { simVars, localToUTC } from '../util.js';
 
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
@@ -82,11 +82,11 @@ export class DomainSelector extends HTMLElement {
         simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
         controllers.currentDomain.setValue(dom_id);
 
-        var presetTimestamp = simVars.presets.timestamp;
+        var presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (simVars.sortedTimestamps.includes(presetTimestamp)) {
-            console.log('preset to: ' + presetTimestamp);
             controllers.currentTimestamp.setValue(presetTimestamp);
         }
+        simVars.presets.timestamp = null;
     }
 }
 

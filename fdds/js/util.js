@@ -65,7 +65,7 @@ export function setURL() {
   }
   addData('job_id', simVars.currentSimulation);
   addData('domain', controllers.currentDomain.getValue());
-  addData('timestamp', controllers.currentTimestamp.getValue());
+  addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
@@ -89,9 +89,26 @@ export function debounce(callback, delay) {
 
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
+  if (!utcTime) {
+    return;
+  }
+
   var timezone = 'America/Los_Angeles';
-  var a = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
-  return a.format('YYYY-MM-DD HH:mm:ss');
+  var localTime = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
+
+  return localTime.format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function localToUTC(localTime) {
+  if (!localTime) {
+    return;
+  }
+
+  var timezone = 'America/Los_Angeles';
+  var localTimeDayJS = dayjs(localTime).tz(timezone);
+  var utcTime = localTimeDayJS.tz('UTC');
+
+  return utcTime.format('YYYY-MM-DD_HH:mm:ss');
 }
 
 export function createOption(timeStamp, utcValue) {

@@ -119,6 +119,8 @@ export class SimulationController extends HTMLElement {
         if (this.playing) {
             this.playPause();
         }
+        
+        console.log('reset slider first: ' + controllers.currentTimestamp.getValue());
 
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
@@ -136,6 +138,7 @@ export class SimulationController extends HTMLElement {
         var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
 
         controllers.currentTimestamp.setValue(currentTimestamp);
+        console.log('reset slider second: ' + controllers.currentTimestamp.getValue());
         
         // this.setupForTime(this.currentFrame);
         // this.frameTotal = simVars.sortedTimestamps.length;
