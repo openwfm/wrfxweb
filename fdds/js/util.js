@@ -56,7 +56,6 @@ export const simVars = {
 // construct map with the base layers
 export const map = (function buildMap() {
   var leafletMap = L.map('map-fd', {
-    center: [37.34, -121.89],
     zoom: 7,
     layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,

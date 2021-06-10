@@ -13,7 +13,9 @@ async function loadConfig() {
   if (configData.organization) {
     simVars.organization = configData.organization;
     if (!simVars.organization.includes('SJSU')) {
-        map.panTo([39.7392, -104.9903]);
+      map.panTo([39.7392, -104.9903]);
+    } else { 
+      map.panTo([37.34, -121.89]);
     }
     document.title = simVars.organization;
   }
