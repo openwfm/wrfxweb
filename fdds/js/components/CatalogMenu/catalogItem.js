@@ -1,5 +1,5 @@
 import { getSimulation } from '../../services.js';
-import { utcToLocal, simVars } from '../../util.js';
+import { setURL, utcToLocal, simVars } from '../../util.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -98,10 +98,12 @@ export class CatalogItem extends HTMLElement {
      */
     handle_catalog_click(entryID, path, description) {
         // close selection dialog
-        simVars.currentSimulation = description;
+        // simVars.currentSimulation = description;
+        simVars.currentSimulation = entryID;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').style.display = 'none';
-        history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
+        // setURL();
+        // history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
 
         document.querySelector('#simulation-flags').style.display = 'block';
         getSimulation(path);

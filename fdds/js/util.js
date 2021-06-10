@@ -1,3 +1,23 @@
+import { controllers } from './components/Controller.js';
+
+var presets = (function loadPresets() {
+  const urlParams = new URLSearchParams(window.location.search);
+  var presetVars = ({
+    zoom: urlParams.get('zoom'),
+    pan: urlParams.get('pan'),
+    jobId: urlParams.get('job_id'),
+    domain: urlParams.get('domain'),
+    timestamp: urlParams.get('timestamp'),
+    rasters: null,
+  });
+  var rasters = urlParams.get('rasters');
+  if (rasters) {
+    rasters = rasters.split('-');
+    presetVars.rasters = rasters;
+  }
+  return presetVars;
+})();
+
 // Set needed global variables 
 export const simVars = {
   currentSimulation: '',
@@ -21,16 +41,39 @@ export const simVars = {
     'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
   },
+  presets: presets
 };
 
 // construct map with the base layers
 export const map = L.map('map-fd', {
-    center: [37.34, -121.89],
-    zoom: 7,
-    layers: [simVars.baseLayerDict['OSM']],
-    zoomControl: true,
-    minZoom: 3
+  center: [37.34, -121.89],
+  zoom: 7,
+  layers: [simVars.baseLayerDict['OSM']],
+  zoomControl: true,
+  minZoom: 3
 });
+
+export function setURL() {
+  var historyData = {};
+  var urlVars = '';
+
+  const addData = (key, data) => {
+    if (data) {
+      historyData[key] = data;
+      urlVars += '&' + key + '=' + data;
+    }
+  }
+  addData('job_id', simVars.currentSimulation);
+  addData('domain', controllers.currentDomain.getValue());
+  addData('timestamp', utcToLocal(controllers.currentTimestamp.getValue()));
+  var rasterURL = simVars.overlayOrder.join('-');
+  addData('rasters', rasterURL);
+
+  if (urlVars != '') {
+    urlVars = '?' + urlVars.substr(1);
+    history.pushState(historyData, 'Data', urlVars);
+  }
+}
 
 export function debounce(callback, delay) {
   let timeout; 
@@ -48,9 +91,26 @@ export function debounce(callback, delay) {
 
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
+  if (!utcTime) {
+    return;
+  }
+
   var timezone = 'America/Los_Angeles';
-  var a = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
-  return a.format('YYYY-MM-DD HH:mm:ss');
+  var localTime = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
+
+  return localTime.format('YYYY-MM-DD HH:mm:ss');
+}
+
+export function localToUTC(localTime) {
+  if (!localTime) {
+    return;
+  }
+
+  var timezone = 'America/Los_Angeles';
+  var localTimeDayJS = dayjs(localTime).tz(timezone);
+  var utcTime = localTimeDayJS.tz('UTC');
+
+  return utcTime.format('YYYY-MM-DD_HH:mm:ss');
 }
 
 export function createOption(timeStamp, utcValue) {
