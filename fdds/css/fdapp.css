@@ -61,6 +61,24 @@ html, body {
   display: none;
 }
 
+#copyLink {
+  position: fixed;
+  z-index: 2000;
+  background:#e8e8e8;
+  color: #555555;
+  padding: 10px;
+  top: 155px;
+  left: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+#copyLink:hover {
+  background: #ececec;
+  cursor: pointer;
+}
+
 .displayTest {
   display: block;
   color: #555555;
@@ -87,7 +105,7 @@ html, body {
 }
 
 .leaflet-top {
-  margin-top: 160px !important;
+  margin-top: 215px !important;
   z-index: 5000 !important;
 }
 

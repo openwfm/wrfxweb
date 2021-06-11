@@ -4,6 +4,13 @@ import { map, simVars } from './util.js';
 
 window.onload = () => {
   loadConfig();
+  const copyLink = document.querySelector('#copyLink');
+  copyLink.onclick = () => {
+    const input = document.createElement('input');
+    input.value = window.location;
+    document.execCommand('copy');
+
+  }
 }
 
 /** Function that retrieves conf.json and sets the document title and flags if they exist. */

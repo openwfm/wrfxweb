@@ -1,6 +1,7 @@
 import { controllers } from './components/Controller.js';
 
-var presets = (function loadPresets() {
+// Set needed global variables 
+export const simVars = (function createSimVars() {
   const urlParams = new URLSearchParams(window.location.search);
 
   var presetVars = ({
@@ -24,34 +25,33 @@ var presets = (function loadPresets() {
     presetVars.rasters = rasters;
   }
 
-  return presetVars;
-})();
+  var simVars = ({
+    currentSimulation: '',
+    rasters: [],
+    rasterBase: '',
+    sortedTimestamps: [],
+    overlayOrder: [],
+    displayedColorbar: null,
+    organization: null,
+    overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
+    baseLayerDict: {
+    /*
+      'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+                              attribution: 'Data and imagery by MapQuest',
+                              subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+    */
+      'MapQuest' : MQ.mapLayer(),
+    /*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+                                  attribution: 'Data and imagery by MapQuest',
+                                  subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
+      'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
+    },
+    presets: presetVars
+  });
 
-// Set needed global variables 
-export const simVars = {
-  currentSimulation: '',
-  rasters: [],
-  rasterBase: '',
-  sortedTimestamps: [],
-  overlayOrder: [],
-  displayedColorbar: null,
-  organization: null,
-  overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
-  baseLayerDict: {
-  /*
-    'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-                            attribution: 'Data and imagery by MapQuest',
-                            subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
-  */
-    'MapQuest' : MQ.mapLayer(),
-  /*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-                                attribution: 'Data and imagery by MapQuest',
-                                subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
-    'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
-  },
-  presets: presets
-};
+  return simVars;
+})();
 
 // construct map with the base layers
 export const map = (function buildMap() {
