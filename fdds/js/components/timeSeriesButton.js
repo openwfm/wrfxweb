@@ -26,11 +26,13 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        const dateChange =() => {
+        const dateChange = () => {
             linkSelects(startDate, endDate)
         }
-        startDate.onchange = dateChange;
-        endDate.onchange = dateChange;
+        startDate.addEventListener('change', dateChange);
+        endDate.addEventListener('change', dateChange);
+        // startDate.onchange = dateChange;
+        // endDate.onchange = dateChange;
     }
 
     setProgress(progress) {
@@ -68,6 +70,14 @@ export class TimeSeriesButton extends HTMLElement {
 
     getEndDate() {
         return this.querySelector('#endDate').value;
+    }
+
+    getStartSelector() {
+        return this.querySelector('#startDate');
+    }
+
+    getEndSelector() {
+        return this.querySelector('#endDate');
     }
 }
 

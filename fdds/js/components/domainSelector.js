@@ -77,13 +77,50 @@ export class DomainSelector extends HTMLElement {
     }
 
     /** Function called when a new domain is selected. */
-    setUpForDomain(dom_id) {
+    setUpForDomain(domId) {
         // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
-        simVars.sortedTimestamps = Object.keys(simVars.rasters[dom_id]).sort();
-        controllers.currentDomain.setValue(dom_id);
+        var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
+        var prevTimestamps = simVars.sortedTimestamps;
+
+        simVars.sortedTimestamps = nextTimestamps;
+        const findNewTimestamp = (oldTimestamp) => {
+            var oldIndex = prevTimestamps.indexOf(oldTimestamp);
+            var percentage = oldIndex / prevTimestamps.length;
+            var newIndex = Math.floor(nextTimestamps.length * percentage);
+            return nextTimestamps[newIndex];
+        }
+
+        var startDate = controllers.startDate.getValue();
+        if (!startDate) {
+            startDate = nextTimestamps[0];
+            var presetStartDate = localToUTC(simVars.presets.startDate);
+            if (nextTimestamps.includes(presetStartDate)) {
+                startDate = presetStartDate;
+                simVars.presets.startDate = null;
+            }
+        } else {
+            startDate = findNewTimestamp(startDate);
+        }
+        controllers.startDate.setValue(startDate);
+
+        var endDate = controllers.endDate.getValue();
+        if (!endDate) {
+            endDate = nextTimestamps[nextTimestamps.length - 1];
+            var presetEndDate = localToUTC(simVars.presets.endDate);
+            if (nextTimestamps.includes(presetEndDate)) {
+                endDate = presetEndDate;
+                simVars.presets.endDate = null;
+            }
+        } else {
+            endDate = findNewTimestamp(endDate);
+        }
+        controllers.endDate.setValue(endDate);
+        controllers.currentDomain.setValue(domId);
+
+
 
         var presetTimestamp = localToUTC(simVars.presets.timestamp);
-        if (simVars.sortedTimestamps.includes(presetTimestamp)) {
+        if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
             controllers.currentTimestamp.setValue(presetTimestamp);
         }
         simVars.presets.timestamp = null;

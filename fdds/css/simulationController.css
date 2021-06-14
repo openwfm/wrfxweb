@@ -79,8 +79,22 @@ button[disabled] {
     border-color: #cccccc;
 }
 
+.slider-marker {
+    position: absolute;
+    margin: auto 0;
+    top: 0; bottom: 0; left: 0; right: 0;
+    background: #5d5d5d;
+    width: 2px;
+    height: 11px;
+}
+
+#slider-end {
+    left: 340px;
+}
+
 #slider-progress {
     position:absolute;
+    display: none;
     margin: auto 0;
     top: 0; bottom: 0; left: 0; right: 0;
     width: 1%;
@@ -109,6 +123,7 @@ button[disabled] {
     border-width: .5px;
     border-color: #cccccc;
     cursor: pointer;
+    z-index: 3000;
 }
 
 #slider-head:hover {
