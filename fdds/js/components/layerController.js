@@ -99,6 +99,7 @@ export class LayerController extends HTMLElement {
         var worker = this.createWorker();
         var loadLater = [];
         this.progressSet = 0;
+        const simController = document.querySelector('simulation-controller');
 
         const nowOrLater = (timeStamp, imageURL, layerName) => {
             if (timeStamp < startTime || timeStamp > endTime) {
@@ -118,8 +119,14 @@ export class LayerController extends HTMLElement {
                                 });
             }
         }
-        const simController = document.querySelector('simulation-controller');
-        for (var timeStamp of simVars.sortedTimestamps) {
+
+        var filteredTimeStamps = simVars.sortedTimestamps.filter((timestamp) => {
+            var lowestTime = controllers.startDate.getValue();
+            var greatestTime = controllers.endDate.getValue();
+            return (timestamp >= lowestTime && timestamp <= greatestTime);
+        });
+        // for (var timeStamp of simVars.sortedTimestamps) {
+        for (var timeStamp of filteredTimeStamps) {
             var raster = simVars.rasters[controllers.currentDomain.getValue()][timeStamp];
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
@@ -269,7 +276,8 @@ export class LayerController extends HTMLElement {
             simVars.displayedColorbar = name;
         }
         var startDate = controllers.currentTimestamp.getValue();
-        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        // var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        var endDate = controllers.endDate.getValue();
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         setURL();
     }

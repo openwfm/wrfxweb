@@ -44,5 +44,35 @@ export const controllers = {
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
-    syncImageLoad: new SyncController()
+    syncImageLoad: new SyncController(),
+    startDate: (function createStartDate() {
+        var startDateController = new Controller();
+
+        const subscriptionFunction = () => {
+            var newStartDate = startDateController.getValue();
+            var currentTimestamp = controllers.currentTimestamp.getValue();
+
+            if (newStartDate > currentTimestamp) {
+                controllers.currentTimestamp.setValue(newStartDate);
+            }
+        }
+        startDateController.subscribe(subscriptionFunction);
+
+        return startDateController;
+    })(),
+    endDate: (function createEndDate() {
+        var endDateController = new Controller();
+
+        const subscriptionFunction = ()=> {
+            var newEndDate = endDateController.getValue();
+            var currentTimestamp = controllers.currentTimestamp.getValue();
+
+            if (newEndDate < currentTimestamp) {
+                controllers.currentTimestamp.setValue(newEndDate);
+            }
+        }
+        endDateController.subscribe(subscriptionFunction);
+
+        return endDateController;
+    })(),
 };

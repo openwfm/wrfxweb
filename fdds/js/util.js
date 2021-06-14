@@ -31,6 +31,8 @@ export const simVars = (function createSimVars() {
     rasterBase: '',
     sortedTimestamps: [],
     overlayOrder: [],
+    startTime: null,
+    endTime: null,
     displayedColorbar: null,
     organization: null,
     overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
