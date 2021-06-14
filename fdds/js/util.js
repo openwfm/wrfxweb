@@ -11,6 +11,8 @@ export const simVars = (function createSimVars() {
     domain: urlParams.get('domain'),
     timestamp: urlParams.get('timestamp'),
     rasters: null,
+    startDate: urlParams.get('startDate'),
+    endDate: urlParams.get('endDate'),
   });
 
   var pan = urlParams.get('pan');
@@ -102,6 +104,10 @@ export function setURL() {
   addData('domain', currentDomain);
   var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
   addData('timestamp', timestamp);
+  var startDate = utcToLocal(controllers.startDate.getValue());
+  addData('startDate', startDate);
+  var endDate = utcToLocal(controllers.endDate.getValue());
+  addData('endDate', endDate);
   var rasterURL = simVars.overlayOrder.join('-');
   addData('rasters', rasterURL);
 

@@ -94,6 +94,7 @@ button[disabled] {
 
 #slider-progress {
     position:absolute;
+    display: none;
     margin: auto 0;
     top: 0; bottom: 0; left: 0; right: 0;
     width: 1%;

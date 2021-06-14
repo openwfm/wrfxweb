@@ -38,6 +38,7 @@ export class SimulationController extends HTMLElement {
                 <div id='slider'>
                     <div id='slider-bar'></div>
                     <div id='slider-progress'></div>
+                    <div id='slider-progress-later'></div>
                     <div id='slider-head'></div>
                     <div class='slider-marker' id='slider-start'></div>
                     <div class='slider-marker' id='slider-end'></div>
@@ -240,6 +241,7 @@ export class SimulationController extends HTMLElement {
     setLoadedTimestamp(progress) {
         var progressWidth = progress*340;
         const progressBar = this.querySelector('#slider-progress'); 
+        progressBar.style.display = 'block';
         progressBar.style.width = progressWidth + 'px';
         var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);

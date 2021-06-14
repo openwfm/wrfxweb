@@ -83,8 +83,6 @@ export class DomainSelector extends HTMLElement {
         var prevTimestamps = simVars.sortedTimestamps;
 
         simVars.sortedTimestamps = nextTimestamps;
-        controllers.currentDomain.setValue(domId);
-
         const findNewTimestamp = (oldTimestamp) => {
             var oldIndex = prevTimestamps.indexOf(oldTimestamp);
             var percentage = oldIndex / prevTimestamps.length;
@@ -95,6 +93,11 @@ export class DomainSelector extends HTMLElement {
         var startDate = controllers.startDate.getValue();
         if (!startDate) {
             startDate = nextTimestamps[0];
+            var presetStartDate = localToUTC(simVars.presets.startDate);
+            if (nextTimestamps.includes(presetStartDate)) {
+                startDate = presetStartDate;
+                simVars.presets.startDate = null;
+            }
         } else {
             startDate = findNewTimestamp(startDate);
         }
@@ -103,10 +106,18 @@ export class DomainSelector extends HTMLElement {
         var endDate = controllers.endDate.getValue();
         if (!endDate) {
             endDate = nextTimestamps[nextTimestamps.length - 1];
+            var presetEndDate = localToUTC(simVars.presets.endDate);
+            if (nextTimestamps.includes(presetEndDate)) {
+                endDate = presetEndDate;
+                simVars.presets.endDate = null;
+            }
         } else {
             endDate = findNewTimestamp(endDate);
         }
         controllers.endDate.setValue(endDate);
+        controllers.currentDomain.setValue(domId);
+
+
 
         var presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {

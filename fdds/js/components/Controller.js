@@ -1,3 +1,5 @@
+import { setURL } from "../util.js";
+
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
  * then be called whenever the value in the controller is updated. */
 export class Controller {
@@ -55,6 +57,8 @@ export const controllers = {
             if (newStartDate > currentTimestamp) {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
+
+            setURL();
         }
         startDateController.subscribe(subscriptionFunction);
 
@@ -70,6 +74,8 @@ export const controllers = {
             if (newEndDate < currentTimestamp) {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
+
+            setURL();
         }
         endDateController.subscribe(subscriptionFunction);
 
