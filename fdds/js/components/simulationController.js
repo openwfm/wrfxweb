@@ -39,10 +39,13 @@ export class SimulationController extends HTMLElement {
                     <div id='slider-bar'></div>
                     <div id='slider-progress'></div>
                     <div id='slider-head'></div>
+                    <div class='slider-marker' id='slider-start'></div>
+                    <div class='slider-marker' id='slider-end'></div>
                 </div>
             </div>
         `;
-
+        
+        this.sliderWidth = 340;
         this.currentSimulation = '';
         this.currentFrame = 0;
         this.frameTotal = 1;
@@ -113,6 +116,24 @@ export class SimulationController extends HTMLElement {
             this.updateSlider();
         }
         controllers.currentTimestamp.subscribe(currentTimestampSubscription);
+        
+        controllers.startDate.subscribe(() => {
+            const startMarker = this.querySelector('#slider-start');
+            var startDate = controllers.startDate.getValue();
+            var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+            var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+
+            startMarker.style.left = left + 'px';
+        });
+
+        controllers.endDate.subscribe(() => {
+            const endMarker = this.querySelector('#slider-end');
+            var endDate = controllers.endDate.getValue();
+            var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
+            var left = Math.floor((endIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+
+            endMarker.style.left = left + 'px';
+        });
     }
 
     resetSlider() {
@@ -191,6 +212,9 @@ export class SimulationController extends HTMLElement {
 
         var nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
         var nextTimestamp = simVars.sortedTimestamps[nextFrame];
+        if (nextTimestamp > controllers.endDate.getValue()) {
+            nextTimestamp = controllers.startDate.getValue();
+        }
 
         controllers.currentTimestamp.setValue(nextTimestamp);
     }
@@ -206,6 +230,9 @@ export class SimulationController extends HTMLElement {
             prevFrame += simVars.sortedTimestamps.length;
         }
         var prevTimestamp = simVars.sortedTimestamps[prevFrame];
+        if (prevTimestamp < controllers.startDate.getValue()) {
+            prevTimestamp = controllers.endDate.getValue();
+        }
 
         controllers.currentTimestamp.setValue(prevTimestamp);
     }
@@ -214,6 +241,11 @@ export class SimulationController extends HTMLElement {
         var progressWidth = progress*340;
         const progressBar = this.querySelector('#slider-progress'); 
         progressBar.style.width = progressWidth + 'px';
+        var startDate = controllers.startDate.getValue();
+        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+        progressBar.style.left = left + 'px';
+
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
@@ -242,6 +274,13 @@ export class SimulationController extends HTMLElement {
             newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
             var newTimestamp = simVars.sortedTimestamps[newFrame];
 
+            if (newTimestamp > controllers.endDate.getValue()) {
+                newTimestamp = controllers.endDate.getValue();
+            }
+            if (newTimestamp < controllers.startDate.getValue()) {
+                newTimestamp = controllers.startDate.getValue();
+            }
+
             controllers.currentTimestamp.setValue(newTimestamp);
           }
     }
@@ -256,6 +295,13 @@ export class SimulationController extends HTMLElement {
         var newFrame = this.currentFrame + diff;
         newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
         var newTimestamp = simVars.sortedTimestamps[newFrame];
+
+        if (newTimestamp > controllers.endDate.getValue()) {
+            newTimestamp = controllers.endDate.getValue();
+        }
+        if (newTimestamp < controllers.startDate.getValue()) {
+            newTimestamp = controllers.startDate.getValue();
+        }
 
         controllers.currentTimestamp.setValue(newTimestamp);
     }
