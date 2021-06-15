@@ -71,6 +71,14 @@ export class TimeSeriesController extends LayerController {
         if (this.currentSimulation != simVars.currentSimulation) {
             this.timeSeriesDatasets = {};
         }
+
+        const startSelector = this.timeSeriesButton.getStartSelector();
+        var startDate = controllers.startDate.getValue();
+        startSelector.value = startDate;
+
+        const endSelector = this.timeSeriesButton.getEndSelector();
+        var endDate = controllers.endDate.getValue();
+        endSelector.value = endDate;
     }
 
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:

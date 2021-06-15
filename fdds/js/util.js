@@ -62,7 +62,9 @@ export const map = (function buildMap() {
   var leafletMap = L.map('map-fd', {
     layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,
-    minZoom: 3
+    minZoom: 3,
+    center: [39.7392, -104.9903],
+    zoom: 6
   });
 
   leafletMap.on('zoomend', function() {

@@ -3,7 +3,7 @@ import { getConfigurations } from './services.js';
 import { map, simVars } from './util.js';
 
 window.onload = () => {
-  loadConfig();
+  await loadConfig();
   const copyLink = document.querySelector('#copyLink');
   copyLink.onclick = () => {
     var input = document.body.appendChild(document.createElement("input"));

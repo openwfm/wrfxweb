@@ -52,6 +52,7 @@ export class LayerController extends HTMLElement {
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
         this.buildMapBase();
+
     }
 
     /** Triggered whenever currentTimestamp is changed. For every layer currently selected 
@@ -125,9 +126,8 @@ export class LayerController extends HTMLElement {
             var greatestTime = controllers.endDate.getValue();
             return (timestamp >= lowestTime && timestamp <= greatestTime);
         });
-        // for (var timeStamp of simVars.sortedTimestamps) {
         for (var timeStamp of filteredTimeStamps) {
-            var raster = simVars.rasters[controllers.currentDomain.getValue()][timeStamp];
+            var raster = simVars.rasters[currentDomain][timeStamp];
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
@@ -165,6 +165,14 @@ export class LayerController extends HTMLElement {
             URL.revokeObjectURL(this.preloaded[imgURL]);
         }
         this.preloaded = {};
+
+        const reload = () => {
+            var startDate = controllers.startDate.getValue();
+            var endDate = controllers.endDate.getValue();
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+        }
+        controllers.startDate.subscribe(reload);
+        controllers.endDate.subscribe(reload);
 
         this.querySelector('#layer-controller-container').style.display = 'block';
     }
