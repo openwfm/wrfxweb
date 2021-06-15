@@ -154,6 +154,13 @@ export class SimulationController extends HTMLElement {
             this.currentFrame = 0;
         }
         var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
+        var startDate = controllers.startDate.getValue();
+        if (currentTimestamp < startDate) {
+            currentTimestamp = startDate;
+        }
+        if (currentTimestamp > endDate) {
+            currentTimstamp = endDate;
+        }
 
         controllers.currentTimestamp.setValue(currentTimestamp);
     }

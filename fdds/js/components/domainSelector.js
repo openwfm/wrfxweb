@@ -115,9 +115,8 @@ export class DomainSelector extends HTMLElement {
             endDate = findNewTimestamp(endDate);
         }
         controllers.endDate.setValue(endDate);
+
         controllers.currentDomain.setValue(domId);
-
-
 
         var presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
