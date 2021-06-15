@@ -70,8 +70,52 @@ export class SimulationController extends HTMLElement {
         const sliderHead = this.querySelector('#slider-head');
         const sliderBar = this.querySelector('#slider-bar');
         sliderHead.onpointerdown = (e) => {
-            this.dragSliderHead(e);
+            const updateCallback = (newTimestamp) => {
+                if (newTimestamp > controllers.endDate.getValue()) {
+                    newTimestamp = controllers.endDate.getValue();
+                }
+                if (newTimestamp < controllers.startDate.getValue()) {
+                    newTimestamp = controllers.startDate.getValue();
+                }
+                controllers.currentTimestamp.setValue(newTimestamp);
+            }
+
+            this.dragSliderHead(e, this.currentFrame, updateCallback);
         }
+
+        const startDateSeeker = this.querySelector('#slider-start');
+        startDateSeeker.onpointerdown = (e) => {
+            const updateCallback = (newTimestamp) => {
+                var endDate = controllers.endDate.getValue();
+                if (newTimestamp >= endDate) {
+                    var index = simVars.sortedTimestamps.indexOf(endDate) - 1;
+                    newTimestamp = simVars.sortedTimestamps[index];
+                }
+
+                controllers.startDate.setValue(newTimestamp);
+            }
+            var startDate = controllers.startDate.getValue();
+            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
+
+            this.dragSliderHead(e, originalFrame, updateCallback);
+        }
+        const endDateSeeker = this.querySelector('#slider-end');
+        endDateSeeker.onpointerdown = (e) => {
+            const updateCallback = (newTimestamp) => {
+                var startDate = controllers.startDate.getValue();
+                if (newTimestamp <= startDate) {
+                    var index = simVars.sortedTimestamps.indexOf(startDate) + 1;
+                    newTimestamp = simVars.sortedTimestamps[index];
+                }
+
+                controllers.endDate.setValue(newTimestamp);
+            }
+            var endDate = controllers.endDate.getValue();
+            var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
+            
+            this.dragSliderHead(e, originalFrame, updateCallback);
+        }
+
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
@@ -260,38 +304,40 @@ export class SimulationController extends HTMLElement {
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
-    dragSliderHead(e) {
-          e = e || window.event;
-          e.stopPropagation();
-          e.preventDefault();
-          // get the mouse cursor position at startup:
-          var pos3 = e.clientX;
-          var originalFrame = this.currentFrame;
-          document.onpointerup = () => {
-            document.onpointerup = null;
-            document.onpointermove = null;
-          };
-          // call a function whenever the cursor moves:
-          document.onpointermove = (e2) => {
-            e2 = e2 || window.event;
-            e2.preventDefault();
-            e2.stopPropagation();
-            // calculate the new cursor position:
-            let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
+    dragSliderHead(e, originalFrame, updateCallback) {
+        e = e || window.event;
+        e.stopPropagation();
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        var pos3 = e.clientX;
+    //   var originalFrame = this.currentFrame;
+        document.onpointerup = () => {
+        document.onpointerup = null;
+        document.onpointermove = null;
+        };
+        // call a function whenever the cursor moves:
+        document.onpointermove = (e2) => {
+        e2 = e2 || window.event;
+        e2.preventDefault();
+        e2.stopPropagation();
+        // calculate the new cursor position:
+        let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
 
-            var newFrame = originalFrame + diff;
-            newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-            var newTimestamp = simVars.sortedTimestamps[newFrame];
+        var newFrame = originalFrame + diff;
+        newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
+        var newTimestamp = simVars.sortedTimestamps[newFrame];
 
-            if (newTimestamp > controllers.endDate.getValue()) {
-                newTimestamp = controllers.endDate.getValue();
-            }
-            if (newTimestamp < controllers.startDate.getValue()) {
-                newTimestamp = controllers.startDate.getValue();
-            }
+        // if (newTimestamp > controllers.endDate.getValue()) {
+        //     newTimestamp = controllers.endDate.getValue();
+        // }
+        // if (newTimestamp < controllers.startDate.getValue()) {
+        //     newTimestamp = controllers.startDate.getValue();
+        // }
 
-            controllers.currentTimestamp.setValue(newTimestamp);
-          }
+        // controllers.currentTimestamp.setValue(newTimestamp);
+
+        updateCallback(newTimestamp);
+        }
     }
 
     /** Called when the slider bar is cicked. Calculates distance between slider-head and click
