@@ -71,6 +71,14 @@ export class TimeSeriesController extends LayerController {
         if (this.currentSimulation != simVars.currentSimulation) {
             this.timeSeriesDatasets = {};
         }
+
+        const startSelector = this.timeSeriesButton.getStartSelector();
+        var startDate = controllers.startDate.getValue();
+        startSelector.value = startDate;
+
+        const endSelector = this.timeSeriesButton.getEndSelector();
+        var endDate = controllers.endDate.getValue();
+        endSelector.value = endDate;
         // this.handleOverlayadd('T2');
         // const timeSeriesChart = document.querySelector('timeseries-chart');
         // simVars.displayedColorbar = 'test';
