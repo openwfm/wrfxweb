@@ -20,6 +20,8 @@ html {
 
 body.waiting * {cursor: wait !important;}
 
+body.grabbing * {cursor: grabbing !important;}
+
 #map-domains {
   height: 400px;
   width: 500px;

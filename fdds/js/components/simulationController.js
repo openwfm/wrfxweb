@@ -309,38 +309,30 @@ export class SimulationController extends HTMLElement {
      * currentFrame according to the offset. 
      */
     dragSliderHead(e, originalFrame, updateCallback) {
+        document.body.classList.add('grabbing');
         e = e || window.event;
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
         var pos3 = e.clientX;
-    //   var originalFrame = this.currentFrame;
         document.onpointerup = () => {
-        document.onpointerup = null;
-        document.onpointermove = null;
+            document.body.classList.remove('grabbing');
+            document.onpointerup = null;
+            document.onpointermove = null;
         };
         // call a function whenever the cursor moves:
         document.onpointermove = (e2) => {
-        e2 = e2 || window.event;
-        e2.preventDefault();
-        e2.stopPropagation();
-        // calculate the new cursor position:
-        let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
+            e2 = e2 || window.event;
+            e2.preventDefault();
+            e2.stopPropagation();
+            // calculate the new cursor position:
+            let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
 
-        var newFrame = originalFrame + diff;
-        newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-        var newTimestamp = simVars.sortedTimestamps[newFrame];
+            var newFrame = originalFrame + diff;
+            newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
+            var newTimestamp = simVars.sortedTimestamps[newFrame];
 
-        // if (newTimestamp > controllers.endDate.getValue()) {
-        //     newTimestamp = controllers.endDate.getValue();
-        // }
-        // if (newTimestamp < controllers.startDate.getValue()) {
-        //     newTimestamp = controllers.startDate.getValue();
-        // }
-
-        // controllers.currentTimestamp.setValue(newTimestamp);
-
-        updateCallback(newTimestamp);
+            updateCallback(newTimestamp);
         }
     }
 
