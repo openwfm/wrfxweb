@@ -128,6 +128,11 @@ export class LayerController extends HTMLElement {
         });
         for (var timeStamp of filteredTimeStamps) {
             var raster = simVars.rasters[currentDomain][timeStamp];
+            if (!raster) { // not a great bit of code. needed because loadWithPriority called immediately after 
+                           // switching the domain when the start and endDates are set but the domain hasn't 
+                           // updated yet. need to better figure out the order of events.
+                return;
+            }
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
