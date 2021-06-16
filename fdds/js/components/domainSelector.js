@@ -84,6 +84,9 @@ export class DomainSelector extends HTMLElement {
 
         simVars.sortedTimestamps = nextTimestamps;
         const findNewTimestamp = (oldTimestamp) => {
+            if (nextTimestamps.includes(oldTimestamp)) {
+                return oldTimestamp;
+            }
             var oldIndex = prevTimestamps.indexOf(oldTimestamp);
             var percentage = oldIndex / prevTimestamps.length;
             var newIndex = Math.floor(nextTimestamps.length * percentage);

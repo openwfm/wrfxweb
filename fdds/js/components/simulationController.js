@@ -189,16 +189,19 @@ export class SimulationController extends HTMLElement {
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
 
-        var percentage = this.currentFrame / this.frameTotal;
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+        var currentTimestamp = controllers.currentTimestamp.getValue();
 
-        this.frameTotal = simVars.sortedTimestamps.length;
-        this.currentFrame = Math.floor((simVars.sortedTimestamps.length) * percentage);
         if (this.currentSimulation != simVars.currentSimulation) {
             this.currentSimulation = simVars.currentSimulation;
-            this.currentFrame = 0;
+            currentTimestamp = startDate;
+        } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
+            var percentage = this.currentFrame / this.frameTotal;
+            var timeIndex = Math.floor((simVars.sortedTimestamps.length) * percentage);
+            currentTimestamp = simVars.sortedTimestamps[timeIndex];
         }
-        var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
-        var startDate = controllers.startDate.getValue();
+
         if (currentTimestamp < startDate) {
             currentTimestamp = startDate;
         }
@@ -206,6 +209,7 @@ export class SimulationController extends HTMLElement {
             currentTimstamp = endDate;
         }
 
+        this.frameTotal = simVars.sortedTimestamps.length;
         controllers.currentTimestamp.setValue(currentTimestamp);
     }
 
@@ -264,7 +268,7 @@ export class SimulationController extends HTMLElement {
 
         var nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
         var nextTimestamp = simVars.sortedTimestamps[nextFrame];
-        if (nextTimestamp > controllers.endDate.getValue() || nextTimestamp == simVars.sortedTimestamps[0]) {
+        if (nextTimestamp > controllers.endDate.getValue() || nextFrame == 0) {
             nextTimestamp = controllers.startDate.getValue();
         }
 
@@ -282,7 +286,7 @@ export class SimulationController extends HTMLElement {
             prevFrame += simVars.sortedTimestamps.length;
         }
         var prevTimestamp = simVars.sortedTimestamps[prevFrame];
-        if (prevTimestamp < controllers.startDate.getValue()) {
+        if (prevTimestamp < controllers.startDate.getValue() || prevFrame == (simVars.sortedTimestamps.length - 1)) {
             prevTimestamp = controllers.endDate.getValue();
         }
 
