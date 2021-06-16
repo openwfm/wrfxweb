@@ -1,4 +1,5 @@
 import { createOption, linkSelects, simVars } from '../util.js';
+import { controllers } from './Controller.js';
 
 export class TimeSeriesButton extends HTMLElement {
     constructor() {
@@ -26,13 +27,39 @@ export class TimeSeriesButton extends HTMLElement {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        const dateChange = () => {
-            linkSelects(startDate, endDate)
-        }
-        startDate.addEventListener('change', dateChange);
-        endDate.addEventListener('change', dateChange);
-        // startDate.onchange = dateChange;
-        // endDate.onchange = dateChange;
+        // const dateChange = () => {
+        //     linkSelects(startDate, endDate)
+        // }
+        startDate.addEventListener('change', () => {
+            var simulationStartDate = controllers.startDate.getValue();
+            if (startDate.value < simulationStartDate) {
+                controllers.startDate.setValue(startDate.value);
+            }
+
+            linkSelects(startDate, endDate);
+        });
+        endDate.addEventListener('change', () => {
+            var simulationEndDate = controllers.endDate.getValue();
+            if (endDate.value > simulationEndDate) {
+                controllers.endDate.setValue(endDate.value);
+            }
+
+            linkSelects(startDate, endDate);
+        });
+        
+        controllers.startDate.subscribe(() => {
+            var simulationStartDate = controllers.startDate.getValue();
+            if (startDate.value < simulationStartDate) {
+                this.setStartDate(simulationStartDate);
+            }
+        });
+
+        controllers.endDate.subscribe(() => {
+            var simulationEndDate = controllers.endDate.getValue();
+            if (endDate.value > simulationEndDate) {
+                this.setEndDate(simulationEndDate);
+            }
+        })
     }
 
     setProgress(progress) {
@@ -57,7 +84,9 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        // endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        startDate.value = controllers.startDate.getValue();
+        endDate.value = controllers.endDate.getValue();
     }
 
     getButton() {
@@ -72,12 +101,40 @@ export class TimeSeriesButton extends HTMLElement {
         return this.querySelector('#endDate').value;
     }
 
-    getStartSelector() {
-        return this.querySelector('#startDate');
+    setStartDate(newStartDate) {
+        var newStartIndex = simVars.sortedTimestamps.indexOf(newStartDate);
+        if (newStartIndex == simVars.sortedTimestamps.length - 1) {
+            return;
+        }
+
+        const startDate = this.querySelector('#startDate');
+        const endDate = this.querySelector('#endDate');
+
+        var oldEndDate = endDate.value;
+        if (newStartDate >= oldEndDate) {
+           endDate.value =  simVars.sortedTimestamps[newStartIndex + 1];
+        }
+        startDate.value = newStartDate;
+
+        linkSelects(startDate, endDate);
     }
 
-    getEndSelector() {
-        return this.querySelector('#endDate');
+    setEndDate(newEndDate) {
+        var newEndIndex = simVars.sortedTimestamps.indexOf(newEndDate);
+        if (newEndIndex == 0) {
+            return;
+        }
+
+        const endDate = this.querySelector('#endDate');
+        const startDate = this.querySelector('#startDate');
+
+        var oldStartDate = startDate.value;
+        if (newEndDate <= oldStartDate) {
+            startDate.value = simVars.sortedTimestamps[newEndIndex - 1];
+        }
+        endDate.value = newEndDate;
+
+        linkSelects(startDate, endDate);
     }
 }
 
