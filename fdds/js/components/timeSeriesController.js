@@ -18,14 +18,14 @@ export class TimeSeriesController extends LayerController {
         
         this.timeSeriesButton = new TimeSeriesButton();
         this.timeSeriesButton.getButton().disabled = true;
-        this.timeSeriesButton.getStartSelector().addEventListener('change', () => {
-            var startDate = this.timeSeriesButton.getStartDate();
-            controllers.startDate.setValue(startDate);
-        });
-        this.timeSeriesButton.getEndSelector().addEventListener('change', () => {
-            var endDate = this.timeSeriesButton.getEndDate();
-            controllers.endDate.setValue(endDate);
-        });
+        // this.timeSeriesButton.getStartSelector().addEventListener('change', () => {
+        //     var startDate = this.timeSeriesButton.getStartDate();
+        //     controllers.startDate.setValue(startDate);
+        // });
+        // this.timeSeriesButton.getEndSelector().addEventListener('change', () => {
+        //     var endDate = this.timeSeriesButton.getEndDate();
+        //     controllers.endDate.setValue(endDate);
+        // });
 
         const container = this.querySelector('#layer-controller-container');
         const timeSeriesDiv = document.createElement('div');
@@ -72,13 +72,12 @@ export class TimeSeriesController extends LayerController {
             this.timeSeriesDatasets = {};
         }
 
-        const startSelector = this.timeSeriesButton.getStartSelector();
         var startDate = controllers.startDate.getValue();
-        startSelector.value = startDate;
+        this.timeSeriesButton.setStartDate(startDate);
 
-        const endSelector = this.timeSeriesButton.getEndSelector();
         var endDate = controllers.endDate.getValue();
-        endSelector.value = endDate;
+        this.timeSeriesButton.setEndDate(endDate);
+
         // this.handleOverlayadd('T2');
         // const timeSeriesChart = document.querySelector('timeseries-chart');
         // simVars.displayedColorbar = 'test';
