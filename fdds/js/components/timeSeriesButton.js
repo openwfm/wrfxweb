@@ -84,7 +84,9 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        // endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        startDate.value = controllers.startDate.getValue();
+        endDate.value = controllers.endDate.getValue();
     }
 
     getButton() {
@@ -109,7 +111,7 @@ export class TimeSeriesButton extends HTMLElement {
         const endDate = this.querySelector('#endDate');
 
         var oldEndDate = endDate.value;
-        if (newStartDate > oldEndDate) {
+        if (newStartDate >= oldEndDate) {
            endDate.value =  simVars.sortedTimestamps[newStartIndex + 1];
         }
         startDate.value = newStartDate;
@@ -127,7 +129,7 @@ export class TimeSeriesButton extends HTMLElement {
         const startDate = this.querySelector('#startDate');
 
         var oldStartDate = startDate.value;
-        if (oldStartDate < newEndDate) {
+        if (newEndDate <= oldStartDate) {
             startDate.value = simVars.sortedTimestamps[newEndIndex - 1];
         }
         endDate.value = newEndDate;
