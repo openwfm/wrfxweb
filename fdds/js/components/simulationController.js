@@ -189,22 +189,19 @@ export class SimulationController extends HTMLElement {
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
 
-
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
         var currentTimestamp = controllers.currentTimestamp.getValue();
+
         if (this.currentSimulation != simVars.currentSimulation) {
             this.currentSimulation = simVars.currentSimulation;
-            // this.currentFrame = 0;
-            currentTimestamp = simVars.sortedTimestamps[0];
+            currentTimestamp = startDate;
         } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
             var percentage = this.currentFrame / this.frameTotal;
-            // this.currentFrame = Math.floor((simVars.sortedTimestamps.length) * percentage);
             var timeIndex = Math.floor((simVars.sortedTimestamps.length) * percentage);
-            // currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
             currentTimestamp = simVars.sortedTimestamps[timeIndex];
         }
 
-        // var currentTimestamp = simVars.sortedTimestamps[this.currentFrame];
-        var startDate = controllers.startDate.getValue();
         if (currentTimestamp < startDate) {
             currentTimestamp = startDate;
         }
