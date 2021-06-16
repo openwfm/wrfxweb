@@ -264,7 +264,7 @@ export class SimulationController extends HTMLElement {
 
         var nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
         var nextTimestamp = simVars.sortedTimestamps[nextFrame];
-        if (nextTimestamp > controllers.endDate.getValue()) {
+        if (nextTimestamp > controllers.endDate.getValue() || nextTimestamp == simVars.sortedTimestamps[0]) {
             nextTimestamp = controllers.startDate.getValue();
         }
 
