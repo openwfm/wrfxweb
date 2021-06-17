@@ -40,6 +40,7 @@ export class SimulationController extends HTMLElement {
                     <div id='slider-progress'></div>
                     <div id='slider-progress-later'></div>
                     <div id='slider-head'></div>
+                    <div id='slider-marker-info'></div>
                     <div class='slider-marker' id='slider-start'></div>
                     <div class='slider-marker' id='slider-end'></div>
                 </div>
@@ -84,7 +85,16 @@ export class SimulationController extends HTMLElement {
         }
 
         const startDateSeeker = this.querySelector('#slider-start');
+        const endDateSeeker = this.querySelector('#slider-end');
+        const seekerInfo = this.querySelector('#slider-marker-info');
+        const finishedCallback = () => {
+            seekerInfo.style.display = 'none';
+        };
+
         startDateSeeker.onpointerdown = (e) => {
+            seekerInfo.style.display = 'block';
+            seekerInfo.innerHTML = utcToLocal(controllers.startDate.getValue()); 
+
             const updateCallback = (newTimestamp) => {
                 var endDate = controllers.endDate.getValue();
                 if (newTimestamp >= endDate) {
@@ -92,15 +102,19 @@ export class SimulationController extends HTMLElement {
                     newTimestamp = simVars.sortedTimestamps[index];
                 }
 
+                seekerInfo.innerHTML = utcToLocal(newTimestamp);
                 controllers.startDate.setValue(newTimestamp);
             }
+
             var startDate = controllers.startDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
 
-            this.dragSliderHead(e, originalFrame, updateCallback);
+            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
-        const endDateSeeker = this.querySelector('#slider-end');
         endDateSeeker.onpointerdown = (e) => {
+            seekerInfo.style.display = 'block';
+            seekerInfo.innerHTML = utcToLocal(controllers.endDate.getValue());
+            
             const updateCallback = (newTimestamp) => {
                 var startDate = controllers.startDate.getValue();
                 if (newTimestamp <= startDate) {
@@ -108,12 +122,14 @@ export class SimulationController extends HTMLElement {
                     newTimestamp = simVars.sortedTimestamps[index];
                 }
 
+                seekerInfo.innerHTML = utcToLocal(newTimestamp);
                 controllers.endDate.setValue(newTimestamp);
             }
+
             var endDate = controllers.endDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
             
-            this.dragSliderHead(e, originalFrame, updateCallback);
+            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
 
         sliderBar.onclick = (e) => {
@@ -308,7 +324,7 @@ export class SimulationController extends HTMLElement {
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
-    dragSliderHead(e, originalFrame, updateCallback) {
+    dragSliderHead(e, originalFrame, updateCallback, finishedCallback = null) {
         document.body.classList.add('grabbing');
         e = e || window.event;
         e.stopPropagation();
@@ -316,6 +332,9 @@ export class SimulationController extends HTMLElement {
         // get the mouse cursor position at startup:
         var pos3 = e.clientX;
         document.onpointerup = () => {
+            if (finishedCallback) {
+                finishedCallback();
+            }
             document.body.classList.remove('grabbing');
             document.onpointerup = null;
             document.onpointermove = null;
