@@ -103,6 +103,14 @@ button[disabled] {
     padding: 5px 5px 8px 10px;
 }
 
+#slider-marker-info.hovered { 
+    display: block;
+}
+
+#slider-marker-info.clicked {
+    display: block;
+}
+
 #slider-end {
     left: 340px;
 }

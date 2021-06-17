@@ -87,13 +87,28 @@ export class SimulationController extends HTMLElement {
         const startDateSeeker = this.querySelector('#slider-start');
         const endDateSeeker = this.querySelector('#slider-end');
         const seekerInfo = this.querySelector('#slider-marker-info');
+
+        const setSeekerInfo = (timeStamp) => {
+            var localTime = utcToLocal(timeStamp);
+            seekerInfo.innerHTML = localTime;
+        }
         const finishedCallback = () => {
-            seekerInfo.style.display = 'none';
+            seekerInfo.classList.remove('clicked');
         };
 
+        startDateSeeker.onmouseover = () => {
+            var startDate = controllers.startDate.getValue();
+            seekerInfo.classList.add('hovered');
+            setSeekerInfo(startDate);
+        }
+        startDateSeeker.onmouseout = () => {
+            seekerInfo.classList.remove('hovered');
+        };
         startDateSeeker.onpointerdown = (e) => {
-            seekerInfo.style.display = 'block';
-            seekerInfo.innerHTML = utcToLocal(controllers.startDate.getValue()); 
+            seekerInfo.classList.add('clicked');
+            var startDate = controllers.startDate.getValue();
+            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
+            setSeekerInfo(startDate);
 
             const updateCallback = (newTimestamp) => {
                 var endDate = controllers.endDate.getValue();
@@ -102,18 +117,25 @@ export class SimulationController extends HTMLElement {
                     newTimestamp = simVars.sortedTimestamps[index];
                 }
 
-                seekerInfo.innerHTML = utcToLocal(newTimestamp);
                 controllers.startDate.setValue(newTimestamp);
+                setSeekerInfo(newTimestamp);
             }
-
-            var startDate = controllers.startDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
 
             this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
+        endDateSeeker.onmouseover = () => {
+            var endDate = controllers.endDate.getValue();
+            setSeekerInfo(endDate);
+            seekerInfo.classList.add('hovered');
+        };
+        endDateSeeker.onmouseout = () => {
+            seekerInfo.classList.remove('hovered');
+        };
         endDateSeeker.onpointerdown = (e) => {
-            seekerInfo.style.display = 'block';
-            seekerInfo.innerHTML = utcToLocal(controllers.endDate.getValue());
+            seekerInfo.classList.add('clicked');
+            var endDate = controllers.endDate.getValue();
+            var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
+            setSeekerInfo(endDate);
             
             const updateCallback = (newTimestamp) => {
                 var startDate = controllers.startDate.getValue();
@@ -122,12 +144,9 @@ export class SimulationController extends HTMLElement {
                     newTimestamp = simVars.sortedTimestamps[index];
                 }
 
-                seekerInfo.innerHTML = utcToLocal(newTimestamp);
                 controllers.endDate.setValue(newTimestamp);
+                setSeekerInfo(newTimestamp);
             }
-
-            var endDate = controllers.endDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
             
             this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
