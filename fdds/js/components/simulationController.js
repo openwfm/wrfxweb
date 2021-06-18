@@ -336,7 +336,7 @@ export class SimulationController extends HTMLElement {
         progressBar.style.width = progressWidth + 'px';
         var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
         progressBar.style.left = left + 'px';
 
     }
