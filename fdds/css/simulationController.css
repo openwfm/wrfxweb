@@ -1,7 +1,7 @@
 .slider-container {
     position: fixed;
     left: 20px;
-    bottom: 20px;
+    bottom: 30px;
     width: 360px;
     z-index: 4000;
     border-radius: 4px;
@@ -86,6 +86,29 @@ button[disabled] {
     background: #5d5d5d;
     width: 4px;
     height: 11px;
+    border-radius: 4px;
+}
+
+#slider-marker-info {
+    position: absolute;
+    margin: auto auto;
+    top: 30px; bottom: 0; left: 0; right: 0;
+    background: white;
+    width: 160px;
+    height: 20px;
+    border-radius: .4rem;
+    display: none;
+    font-weight: bold;
+    font-size: 1rem; 
+    padding: 5px 5px 8px 10px;
+}
+
+#slider-marker-info.hovered { 
+    display: block;
+}
+
+#slider-marker-info.clicked {
+    display: block;
 }
 
 #slider-end {
