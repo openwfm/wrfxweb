@@ -96,11 +96,16 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
+        const simController = document.querySelector('simulation-controller');
         var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
         var loadLater = [];
         this.progressSet = 0;
-        const simController = document.querySelector('simulation-controller');
+
+        if (layerNames.length == 0) {
+            simController.setLoadedTimestamp(0);
+            return;
+        }
 
         const nowOrLater = (timeStamp, imageURL, layerName) => {
             if (timeStamp < startTime || timeStamp > endTime) {

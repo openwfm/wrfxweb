@@ -331,14 +331,20 @@ export class SimulationController extends HTMLElement {
 
     setLoadedTimestamp(progress) {
         var progressWidth = progress*this.sliderWidth;
+
         const progressBar = this.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
         progressBar.style.width = progressWidth + 'px';
+        if (progress == 0) {
+            progressBar.style.display = 'none';
+            return;
+        }
+
         var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);
         var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
-        progressBar.style.left = left + 'px';
 
+        progressBar.style.left = left + 'px';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
