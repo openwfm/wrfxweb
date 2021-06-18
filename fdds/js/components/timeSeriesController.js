@@ -315,7 +315,6 @@ export class TimeSeriesController extends LayerController {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        // var filteredTimeStamps = [simVars.sortedTimestamps[0], simVars.sortedTimestamps[1]];
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
