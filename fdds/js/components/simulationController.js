@@ -210,7 +210,7 @@ export class SimulationController extends HTMLElement {
             const endMarker = this.querySelector('#slider-end');
             var endDate = controllers.endDate.getValue();
             var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            var left = Math.floor((endIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+            let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
 
             endMarker.style.left = left + 'px';
         });
@@ -258,8 +258,9 @@ export class SimulationController extends HTMLElement {
         this.currentFrame = timeIndex;
 
         const sliderHead = this.querySelector('#slider-head');
-        let percentage = Math.floor((this.currentFrame / simVars.sortedTimestamps.length) * 92);
-        sliderHead.style.left = percentage + '%';
+
+        let left = Math.floor(((this.currentFrame + 1 ) / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5)) - 5;
+        sliderHead.style.left = left + 'px';
     }
 
     /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
@@ -329,7 +330,7 @@ export class SimulationController extends HTMLElement {
     }
 
     setLoadedTimestamp(progress) {
-        var progressWidth = progress*340;
+        var progressWidth = progress*this.sliderWidth;
         const progressBar = this.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
         progressBar.style.width = progressWidth + 'px';

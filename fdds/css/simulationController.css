@@ -86,7 +86,7 @@ button[disabled] {
     background: #5d5d5d;
     width: 4px;
     height: 11px;
-    /* cursor: grabbing; */
+    border-radius: 4px;
 }
 
 #slider-marker-info {
