@@ -371,7 +371,7 @@ export class SimulationController extends HTMLElement {
             e2.preventDefault();
             e2.stopPropagation();
             // calculate the new cursor position:
-            let diff = Math.floor((e2.clientX - pos3) / 300 * simVars.sortedTimestamps.length - 1);
+            let diff = Math.floor((e2.clientX - pos3) / this.sliderWidth * simVars.sortedTimestamps.length - 1);
 
             var newFrame = originalFrame + diff;
             newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
