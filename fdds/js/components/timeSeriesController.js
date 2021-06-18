@@ -18,14 +18,6 @@ export class TimeSeriesController extends LayerController {
         
         this.timeSeriesButton = new TimeSeriesButton();
         this.timeSeriesButton.getButton().disabled = true;
-        // this.timeSeriesButton.getStartSelector().addEventListener('change', () => {
-        //     var startDate = this.timeSeriesButton.getStartDate();
-        //     controllers.startDate.setValue(startDate);
-        // });
-        // this.timeSeriesButton.getEndSelector().addEventListener('change', () => {
-        //     var endDate = this.timeSeriesButton.getEndDate();
-        //     controllers.endDate.setValue(endDate);
-        // });
 
         const container = this.querySelector('#layer-controller-container');
         const timeSeriesDiv = document.createElement('div');
