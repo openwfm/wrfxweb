@@ -46,6 +46,7 @@ export const controllers = {
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
+    opacity: new Controller(.5),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
         var startDateController = new Controller();

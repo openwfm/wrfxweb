@@ -1,5 +1,6 @@
 import { map, dragElement, debounce, setURL, simVars } from '../util.js';
 import { controllers } from './Controller.js';
+import { OpacitySlider } from './opacitySlider.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -26,6 +27,9 @@ export class LayerController extends HTMLElement {
                     <div id='overlay-checkboxes' class='layer-list'>
                     </div>
                 </div>
+                <div id='opacity-slider-container' class='layer-group'>
+                    <span>Top Layer Opacity</span>
+                </div>
             </div>
         `;
         this.mapType = 'OSM';
@@ -51,8 +55,11 @@ export class LayerController extends HTMLElement {
         }
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
-        this.buildMapBase();
 
+        const opacitySlider = new OpacitySlider();
+        const opacitySliderContainer = this.querySelector('#opacity-slider-container');
+        opacitySliderContainer.appendChild(opacitySlider);
+        this.buildMapBase();
     }
 
     /** Triggered whenever currentTimestamp is changed. For every layer currently selected 

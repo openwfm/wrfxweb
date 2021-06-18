@@ -32,6 +32,17 @@
     margin-left: 50px;
 }
 
+#opacity-slider-bar {
+    height: 11px;
+    width: 100%;
+    margin-top: 13px;
+    margin-bottom: 13px;
+    background: #e8e8e8;
+    border-radius: 4px;
+    border-width: .5px;
+    border-color: #cccccc;
+}
+
 
 @media (max-width: 769px) {
     #layer-controller-container {
