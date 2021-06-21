@@ -32,6 +32,11 @@ export class OpacitySlider extends HTMLElement {
             this.dragSliderHead(e, originalFrame,this.updateOpacity);
         }
 
+        const opacitySliderBar = this.querySelector('#opacity-slider-bar');
+        opacitySliderBar.onclick = (e) => {
+            this.clickBar(e);
+        }
+
         this.updateOpacity();
     }
 
@@ -41,6 +46,11 @@ export class OpacitySlider extends HTMLElement {
 
         const opacityDisplay = this.querySelector('#opacity-display');
         opacityDisplay.innerHTML = opacity;
+
+        const sliderHead = this.querySelector('#opacity-slider-head');
+        var left = Math.floor(opacity * this.sliderWidth);
+        console.log('opacity slider head left: ' + left);
+        sliderHead.style.left = left + 'px';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
@@ -74,8 +84,6 @@ export class OpacitySlider extends HTMLElement {
             var newOpacity = Math.floor(newFrame / this.numberOfTicks *100)/100;
 
             controllers.opacity.setValue(newOpacity)
-
-            // updateCallback(newTimestamp);
         }
     }
 
@@ -83,23 +91,17 @@ export class OpacitySlider extends HTMLElement {
      * location. Updates the currentFrame accordingly and calls updateSlider
      */
     clickBar(e) {
-        // const head = this.querySelector('#slider-head').getBoundingClientRect();
-        // let diff = Math.floor((e.clientX - head.left) / 300 * simVars.sortedTimestamps.length - 1);
+        const head = this.querySelector('#opacity-slider-head').getBoundingClientRect();
+        let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.numberOfTicks) / this.numberOfTicks;
 
-        // var newFrame = this.currentFrame + diff;
-        // newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-        // var newTimestamp = simVars.sortedTimestamps[newFrame];
+        var currentOpacity = controllers.opacity.getValue();
+        var newOpacity = Math.floor((currentOpacity + diff) * 100) / 100;
 
-        // if (newTimestamp > controllers.endDate.getValue()) {
-        //     newTimestamp = controllers.endDate.getValue();
-        // }
-        // if (newTimestamp < controllers.startDate.getValue()) {
-        //     newTimestamp = controllers.startDate.getValue();
-        // }
+        newOpacity = Math.max(0, newOpacity);
+        newOpacity = Math.min(1, newOpacity);
 
-        // controllers.currentTimestamp.setValue(newTimestamp);
+        controllers.opacity.setValue(newOpacity);
     }
-
 }
 
 window.customElements.define('opacity-slider', OpacitySlider);
