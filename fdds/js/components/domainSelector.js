@@ -119,6 +119,12 @@ export class DomainSelector extends HTMLElement {
         }
         controllers.endDate.setValue(endDate);
 
+        var presetOpacity = simVars.presets.opacity;
+        if (presetOpacity && !isNaN(presetOpacity)) {
+            controllers.opacity.setValue(Number(presetOpacity));
+            simVars.presets.opacity = null;
+        }
+
         controllers.currentDomain.setValue(domId);
 
         var presetTimestamp = localToUTC(simVars.presets.timestamp);

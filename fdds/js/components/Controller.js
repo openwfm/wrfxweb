@@ -46,7 +46,15 @@ export const controllers = {
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
-    opacity: new Controller(.5),
+    opacity: (function createOpacity() {
+        var opacityController = new Controller(.5);
+
+        opacityController.subscribe(() => {
+            setURL();
+        });
+
+        return opacityController;
+    })(),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
         var startDateController = new Controller();
