@@ -55,6 +55,14 @@ export class LayerController extends HTMLElement {
         }
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
+        controllers.opacity.subscribe(() => {
+            var newOpacity = controllers.opacity.getValue();
+            if (simVars.overlayOrder.length > 0) {
+                var topLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
+                var topLayer = this.getLayer(topLayerName);
+                topLayer.setOpacity(newOpacity);
+            }
+        })
 
         const opacitySlider = new OpacitySlider();
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
@@ -87,9 +95,7 @@ export class LayerController extends HTMLElement {
                 }
                 reloading = true;
             }
-            layer.setUrl(imageURL,
-                        [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                        { attribution: simVars.organization, opacity: 0.5 });
+            layer.setUrl(imageURL);
             if (layerName == simVars.displayedColorbar) {
                 const rasterColorbar = document.querySelector('#raster-colorbar');
                 var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
@@ -287,10 +293,14 @@ export class LayerController extends HTMLElement {
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var raster_info = rasters_now[name];
-        var cs = raster_info.coords;
-        layer.setUrl(simVars.rasterBase + raster_info.raster,
-                    [ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ],
-                    { attribution: simVars.organization, opacity: 0.5 });
+        var opacity = controllers.opacity.getValue();
+        layer.setUrl(simVars.rasterBase + raster_info.raster);
+        layer.setOpacity(opacity);
+        if (simVars.overlayOrder.length > 1) {
+            var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
+            var lastLayer = this.getLayer(lastLayerName);
+            lastLayer.setOpacity(.5);
+        }
         this.nImages += simVars.sortedTimestamps.length;
         if('colorbar' in raster_info) {
             this.nImages += simVars.sortedTimestamps.length;
@@ -340,6 +350,12 @@ export class LayerController extends HTMLElement {
     handleOverlayRemove(name) {
         this.getLayer(name).remove(map);
         simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(name), 1);
+        if (simVars.overlayOrder.length > 0) {
+            var topOpacity = controllers.opacity.getValue();
+            var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
+            var lastLayer = this.getLayer(lastLayerName);
+            lastLayer.setOpacity(topOpacity);
+        }
         const rasterColorbar = document.querySelector('#raster-colorbar');
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var mostRecentColorbar = null;

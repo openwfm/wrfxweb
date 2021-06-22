@@ -48,8 +48,7 @@ export class OpacitySlider extends HTMLElement {
         opacityDisplay.innerHTML = opacity;
 
         const sliderHead = this.querySelector('#opacity-slider-head');
-        var left = Math.floor(opacity * this.sliderWidth);
-        console.log('opacity slider head left: ' + left);
+        var left = Math.floor(opacity * this.sliderWidth *.95);
         sliderHead.style.left = left + 'px';
     }
 
@@ -92,10 +91,11 @@ export class OpacitySlider extends HTMLElement {
      */
     clickBar(e) {
         const head = this.querySelector('#opacity-slider-head').getBoundingClientRect();
-        let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.numberOfTicks) / this.numberOfTicks;
+        var diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.numberOfTicks);
 
-        var currentOpacity = controllers.opacity.getValue();
-        var newOpacity = Math.floor((currentOpacity + diff) * 100) / 100;
+        var currentOpacityNumber = controllers.opacity.getValue() * this.numberOfTicks;
+        var newOpacityNumber = diff + currentOpacityNumber; 
+        var newOpacity = Math.floor(newOpacityNumber / this.numberOfTicks * 100) / 100; 
 
         newOpacity = Math.max(0, newOpacity);
         newOpacity = Math.min(1, newOpacity);
