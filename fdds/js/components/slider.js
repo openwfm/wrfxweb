@@ -1,9 +1,14 @@
 const template = document.createElement('template');
 template.innerHTML = `
     <style>
+        #slider {
+            position: relative;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
         #slider-bar {
             height: 11px;
-            width: 284px;
             background: #e8e8e8;
             border-radius: 4px;
             border-width: .5px;
@@ -13,7 +18,7 @@ template.innerHTML = `
 
         #slider-head {
             position: absolute;
-            top: 25px; bottom: 0; left: 0; right: 0;
+            top: 0; bottom: 0; left: 0; right: 0;
             height: 15px;
             width: 15px;
             background: #f6f6f6;
@@ -36,20 +41,28 @@ template.innerHTML = `
 `;
 
 export class Slider extends HTMLElement {
-    constructor(nFrames, sliderWidth) {
+    constructor(sliderWidth, nFrames) {
         super();
         this.attachShadow({mode: 'open'});
-        this.nFrames = nFrames;
         this.sliderWidth = sliderWidth;
+        this.nFrames = nFrames;
         this.frame = 0;
     }
 
     connectedCallback() {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        const slider = this.shadowRoot.querySelector('#slider');
+        slider.style.width = this.sliderWidth + 'px';
         
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
         sliderHead.onpointerdown = (e) => {
             this.dragSliderHead(e);
+        }
+
+        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+        sliderBar.onclick = (e) => {
+            this.clickBar(e);
         }
     }
 
@@ -58,7 +71,7 @@ export class Slider extends HTMLElement {
         newFrame = Math.min(newFrame, this.nFrames);
         this.frame = newFrame;
 
-        const sliderHead = this.querySelector('#opacity-slider-head');
+        const sliderHead = this.shadowRoot.querySelector('#slider-head');
         var percentage = newFrame / this.nFrames;
         var left = Math.floor(percentage * this.sliderWidth *.95);
         sliderHead.style.left = left + 'px';
@@ -73,6 +86,7 @@ export class Slider extends HTMLElement {
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
+        var originalFrame = this.frame;
         var pos3 = e.clientX;
         document.onpointerup = () => {
             if (finishedCallback) {
@@ -90,7 +104,7 @@ export class Slider extends HTMLElement {
             // calculate the new cursor position:
             let diff = Math.floor((e2.clientX - pos3) / this.sliderWidth * this.nFrames);
 
-            var newFrame = this.frame + diff;
+            var newFrame = originalFrame + diff;
 
             this.updateHeadPosition(newFrame);
         }
@@ -100,7 +114,7 @@ export class Slider extends HTMLElement {
      * location. Updates the currentFrame accordingly and calls updateSlider
      */
     clickBar(e) {
-        const head = this.querySelector('#slider-head').getBoundingClientRect();
+        const head = this.shadowRoot.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.nFrames);
 
         var newFrame = this.frame + diff;
@@ -109,4 +123,4 @@ export class Slider extends HTMLElement {
     }
 }
 
-window.customElements.define('slider', Slider);
+window.customElements.define('slider-bar', Slider);
