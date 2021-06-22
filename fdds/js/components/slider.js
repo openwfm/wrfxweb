@@ -18,7 +18,7 @@ template.innerHTML = `
 
         #slider-head {
             position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
+            bottom: 3px; left: 0; right: 0;
             height: 15px;
             width: 15px;
             background: #f6f6f6;
@@ -81,7 +81,13 @@ export class Slider extends HTMLElement {
      * currentFrame according to the offset. 
      */
     dragSliderHead(e, finishedCallback = null) {
+        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+
         document.body.classList.add('grabbing');
+        sliderHead.style.cursor = 'grabbing';
+        sliderBar.style.cursor = 'grabbing';
+
         e = e || window.event;
         e.stopPropagation();
         e.preventDefault();
@@ -93,6 +99,9 @@ export class Slider extends HTMLElement {
                 finishedCallback();
             }
             document.body.classList.remove('grabbing');
+            sliderHead.style.cursor = 'grab';
+            sliderBar.style.cursor = 'pointer';
+
             document.onpointerup = null;
             document.onpointermove = null;
         };

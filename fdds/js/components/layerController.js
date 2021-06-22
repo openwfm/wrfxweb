@@ -1,8 +1,6 @@
 import { map, dragElement, debounce, setURL, simVars } from '../util.js';
 import { controllers } from './Controller.js';
-// import { OpacitySlider } from './opacitySlider.js';
-import { Slider } from './slider.js';
-import { OpacitySlider2 } from './opacitySlider2.js';
+import { OpacitySlider } from './opacitySlider.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -66,9 +64,7 @@ export class LayerController extends HTMLElement {
             }
         })
 
-        // const opacitySlider = new OpacitySlider();
-        // const opacitySlider = new Slider(284, 20);
-        const opacitySlider = new OpacitySlider2();
+        const opacitySlider = new OpacitySlider();
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
         opacitySliderContainer.appendChild(opacitySlider);
         this.buildMapBase();
