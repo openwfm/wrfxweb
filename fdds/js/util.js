@@ -13,6 +13,7 @@ export const simVars = (function createSimVars() {
     rasters: null,
     startDate: urlParams.get('startDate'),
     endDate: urlParams.get('endDate'),
+    opacity: urlParams.get('opacity'),
   });
 
   var pan = urlParams.get('pan');
@@ -112,6 +113,8 @@ export function setURL() {
   addData('endDate', endDate);
   var rasterURL = simVars.overlayOrder.join('-');
   addData('rasters', rasterURL);
+  var opacity = controllers.opacity.getValue();
+  addData('opacity', opacity);
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
