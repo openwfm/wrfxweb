@@ -13,10 +13,25 @@ export class SimulationSlider extends Slider {
         controllers.currentDomain.subscribe(() => {
             this.nFrames = simVars.sortedTimestamps.length - 1;
         })
+        const createElement = (id=null, className=null) => {
+            const div = document.createElement('div');
+            if (id) {
+                div.id = id;
+            }
+            if (className) {
+                div.className = className;
+            }
+            return div;
+        }
 
+        const slider = this.shadowRoot.querySelector('#slider');
+        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const sliderStart = createElement('slider-start', 'slider-marker');
+        const sliderEnd = createElement('slider-end', 'slider-marker');
+        const sliderProgress = createElement('slider-progress');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
-        sliderBar.style.background = '#d6d6d6';
 
+        sliderBar.style.background = '#d6d6d6';
         const style = this.shadowRoot.querySelector('style');
         style.innerText += `
             #slider-progress {
@@ -60,32 +75,7 @@ export class SimulationSlider extends Slider {
             }
         `;
 
-        const createElement = (id=null, className=null) => {
-            const div = document.createElement('div');
-            if (id) {
-                div.id = id;
-            }
-            if (className) {
-                div.className = className;
-            }
-            return div;
-        }
-
-        const slider = this.shadowRoot.querySelector('#slider');
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
-        const sliderStart = createElement('slider-start', 'slider-marker');
-        const sliderEnd = createElement('slider-end', 'slider-marker');
-        const sliderProgress = createElement('slider-progress');
-
         slider.append(sliderStart, sliderEnd, sliderProgress);
-
-        sliderHead.onpointerdown = (e) => {
-            const updateCallback = (newFrame) => {
-                this.setTimestamp(newFrame);
-            }
-
-            this.dragSliderHead(e, updateCallback);
-        }
 
         controllers.currentTimestamp.subscribe(() => {
             var currentTimestamp = controllers.currentTimestamp.getValue();
@@ -94,6 +84,11 @@ export class SimulationSlider extends Slider {
             this.updateHeadPosition(newFrame);
         })
 
+    }
+
+    updateCallback(newFrame) {
+        this.setTimestamp(newFrame);
+        return true;
     }
 
     setTimestamp(timeIndex) {

@@ -76,10 +76,14 @@ export class Slider extends HTMLElement {
         sliderHead.style.left = left + 'px';
     }
 
+    updateCallback(newFrame) {
+        return false;
+    }
+
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
-    dragSliderHead(e, updateCallback = null, finishedCallback = null) {
+    dragSliderHead(e, finishedCallback = null) {
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
 
@@ -116,10 +120,8 @@ export class Slider extends HTMLElement {
             newFrame = Math.min(newFrame, this.nFrames);
             newFrame = Math.max(newFrame, 0);
 
-            if (updateCallback == null) {
+            if (!this.updateCallback(newFrame)) {
                 this.updateHeadPosition(newFrame);
-            } else {
-                updateCallback(newFrame);
             }
         }
     }
@@ -133,7 +135,9 @@ export class Slider extends HTMLElement {
 
         var newFrame = this.frame + diff;
 
-        this.updateHeadPosition(newFrame);
+        if (!this.updateCallback(newFrame)) {
+            this.updateHeadPosition(newFrame);
+        }
     }
 }
 
