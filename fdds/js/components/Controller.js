@@ -46,6 +46,7 @@ export const controllers = {
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
+    loadingProgress: new Controller(0),
     opacity: (function createOpacity() {
         var opacityController = new Controller(.5);
 

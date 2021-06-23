@@ -19,6 +19,9 @@ export class SimulationSlider extends Slider {
 
             this.updateHeadPosition(newFrame);
         });
+        controllers.loadingProgress.subscribe(() => {
+            this.setLoadProgress();
+        });
 
         const slider = this.shadowRoot.querySelector('#slider');
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
@@ -28,7 +31,7 @@ export class SimulationSlider extends Slider {
         const sliderMarkerInfo = createElement('slider-marker-info');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
 
-        slider.append(sliderStart, sliderEnd, sliderProgress, sliderMarkerInfo);
+        slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
 
         sliderBar.style.background = '#d6d6d6';
         const style = this.shadowRoot.querySelector('style');
@@ -89,6 +92,25 @@ export class SimulationSlider extends Slider {
 
         this.configureStartSetter();
         this.configureEndSetter();
+    }
+
+    setLoadProgress() {
+        var progress = controllers.loadingProgress.getValue();
+        var progressWidth = progress*this.sliderWidth;
+
+        const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
+        progressBar.style.display = 'block';
+        progressBar.style.width = progressWidth + 'px';
+        if (progress == 0) {
+            progressBar.style.display = 'none';
+            return;
+        }
+
+        var startDate = controllers.startDate.getValue();
+        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
+
+        progressBar.style.left = left + 'px';
     }
 
     setSliderMarkerInfo(timeStamp) {

@@ -117,6 +117,7 @@ export class LayerController extends HTMLElement {
 
         if (layerNames.length == 0) {
             simController.setLoadedTimestamp(0);
+            controllers.loadingProgress.setValue(0);
             return;
         }
 
@@ -166,6 +167,7 @@ export class LayerController extends HTMLElement {
                         this.progressSet += 1;
                     }
                     simController.setLoadedTimestamp(this.progressSet / this.nImages);
+                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
                 }
             }
         }
@@ -339,6 +341,7 @@ export class LayerController extends HTMLElement {
                 if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
                     this.progressSet += 1;
                     simController.setLoadedTimestamp(this.progressSet / this.nImages);
+                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
                 }
             }
             img.src = objectURL;
