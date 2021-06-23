@@ -109,14 +109,12 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
-        const simController = document.querySelector('simulation-controller');
         var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
         var loadLater = [];
         this.progressSet = 0;
 
         if (layerNames.length == 0) {
-            simController.setLoadedTimestamp(0);
             controllers.loadingProgress.setValue(0);
             return;
         }
@@ -166,7 +164,6 @@ export class LayerController extends HTMLElement {
                     if ('colorbar' in rasterInfo) {
                         this.progressSet += 1;
                     }
-                    simController.setLoadedTimestamp(this.progressSet / this.nImages);
                     controllers.loadingProgress.setValue(this.progressSet / this.nImages);
                 }
             }
@@ -337,10 +334,8 @@ export class LayerController extends HTMLElement {
             img.onload = () => {
                 var currentDomain = controllers.currentDomain.getValue();
                 this.preloaded[imageURL] = objectURL;
-                const simController = document.querySelector('simulation-controller');
                 if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
                     this.progressSet += 1;
-                    simController.setLoadedTimestamp(this.progressSet / this.nImages);
                     controllers.loadingProgress.setValue(this.progressSet / this.nImages);
                 }
             }

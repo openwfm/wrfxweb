@@ -5,13 +5,14 @@ import { controllers } from './Controller.js';
 export class SimulationSlider extends Slider {
     constructor() {
         super(340, simVars.sortedTimestamps.length - 1);
+        this.currentSimulation = '';
     }
 
     connectedCallback() {
         super.connectedCallback();
 
         controllers.currentDomain.subscribe(() => {
-            this.nFrames = simVars.sortedTimestamps.length - 1;
+            this.resetSlider();
         });
         controllers.currentTimestamp.subscribe(() => {
             var currentTimestamp = controllers.currentTimestamp.getValue();
@@ -92,6 +93,31 @@ export class SimulationSlider extends Slider {
 
         this.configureStartSetter();
         this.configureEndSetter();
+    }
+
+    resetSlider() {
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+        var currentTimestamp = controllers.currentTimestamp.getValue();
+
+        if (this.currentSimulation != simVars.currentSimulation) {
+            this.currentSimulation = simVars.currentSimulation;
+            currentTimestamp = startDate;
+        } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
+            var percentage = this.frame / this.nFrames;
+            var timeIndex = Math.floor((simVars.sortedTimestamps.length - 1) * percentage);
+            currentTimestamp = simVars.sortedTimestamps[timeIndex];
+        }
+
+        if (currentTimestamp < startDate) {
+            currentTimestamp = startDate;
+        }
+        if (currentTimestamp > endDate) {
+            currentTimstamp = endDate;
+        }
+
+        this.nFrames = simVars.sortedTimestamps.length - 1;
+        controllers.currentTimestamp.setValue(currentTimestamp);
     }
 
     setLoadProgress() {
@@ -218,6 +244,36 @@ export class SimulationSlider extends Slider {
         }
 
         controllers.currentTimestamp.setValue(newTimestamp);
+    }
+
+    nextTimestamp() {
+        var nextFrame = (this.frame + 1) % (this.nFrames + 1);
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+
+        var nextTimestamp = simVars.sortedTimestamps[nextFrame];
+        if (nextTimestamp > endDate || nextFrame == 0) {
+            nextTimestamp = startDate;
+        }
+
+        return nextTimestamp;
+    }
+
+    prevTimestamp() {
+        var prevFrame = (this.frame - 1) % (this.nFrames + 1);
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+
+        if (prevFrame < 0) {
+            prevFrame = this.nFrames;
+        }
+
+        var prevTimestamp = simVars.sortedTimestamps[prevFrame];
+        if (prevTimestamp < startDate || prevTimestamp > endDate) {
+            prevTimestamp = endDate;
+        }
+
+        return prevTimestamp;
     }
 }
 
