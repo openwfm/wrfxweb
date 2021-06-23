@@ -1,5 +1,5 @@
-import { Slider } from "./slider.js";
-import { controllers } from "./Controller.js";
+import { Slider } from './slider.js';
+import { controllers } from './Controller.js';
 
 export class OpacitySlider extends Slider {
     constructor() {

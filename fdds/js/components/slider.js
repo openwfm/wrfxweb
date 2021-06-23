@@ -10,6 +10,7 @@ template.innerHTML = `
         #slider-bar {
             height: 11px;
             background: #e8e8e8;
+            border-style: solid;
             border-radius: 4px;
             border-width: .5px;
             border-color: #cccccc;
@@ -80,7 +81,7 @@ export class Slider extends HTMLElement {
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
-    dragSliderHead(e, finishedCallback = null) {
+    dragSliderHead(e, updateCallback = null, finishedCallback = null) {
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
 
@@ -115,7 +116,11 @@ export class Slider extends HTMLElement {
 
             var newFrame = originalFrame + diff;
 
-            this.updateHeadPosition(newFrame);
+            if (updateCallback == null) {
+                this.updateHeadPosition(newFrame);
+            } else {
+                updateCallback(newFrame);
+            }
         }
     }
 

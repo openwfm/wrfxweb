@@ -1,5 +1,6 @@
 import { controllers } from './Controller.js';
 import { utcToLocal, simVars } from '../util.js';
+import { SimulationSlider } from './simulationSlider.js';
 
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
@@ -61,6 +62,9 @@ export class SimulationController extends HTMLElement {
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
+        const slider = new SimulationSlider();
+        container.appendChild(slider);
+
         if (document.body.clientWidth < 769) {
             const timeStamp = this.querySelector('#slider-timestamp');
             const playButtons = this.querySelector('#slider-play-bar');
