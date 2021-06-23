@@ -68,8 +68,6 @@ export class Slider extends HTMLElement {
     }
 
     updateHeadPosition(newFrame) {
-        newFrame = Math.max(newFrame, 0);
-        newFrame = Math.min(newFrame, this.nFrames);
         this.frame = newFrame;
 
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
@@ -115,6 +113,8 @@ export class Slider extends HTMLElement {
             let diff = Math.floor((e2.clientX - pos3) / this.sliderWidth * this.nFrames);
 
             var newFrame = originalFrame + diff;
+            newFrame = Math.min(newFrame, this.nFrames);
+            newFrame = Math.max(newFrame, 0);
 
             if (updateCallback == null) {
                 this.updateHeadPosition(newFrame);
