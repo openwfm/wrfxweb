@@ -1,5 +1,5 @@
 import { Slider } from './slider.js';
-import { simVars } from '../util.js';
+import { simVars, utcToLocal } from '../util.js';
 import { controllers } from './Controller.js';
 
 export class SimulationSlider extends Slider {
@@ -12,7 +12,14 @@ export class SimulationSlider extends Slider {
 
         controllers.currentDomain.subscribe(() => {
             this.nFrames = simVars.sortedTimestamps.length - 1;
-        })
+        });
+        controllers.currentTimestamp.subscribe(() => {
+            var currentTimestamp = controllers.currentTimestamp.getValue();
+            var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
+
+            this.updateHeadPosition(newFrame);
+        });
+
         const createElement = (id=null, className=null) => {
             const div = document.createElement('div');
             if (id) {
@@ -29,7 +36,10 @@ export class SimulationSlider extends Slider {
         const sliderStart = createElement('slider-start', 'slider-marker');
         const sliderEnd = createElement('slider-end', 'slider-marker');
         const sliderProgress = createElement('slider-progress');
+        const sliderMarkerInfo = createElement('slider-marker-info');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+
+        slider.append(sliderStart, sliderEnd, sliderProgress, sliderMarkerInfo);
 
         sliderBar.style.background = '#d6d6d6';
         const style = this.shadowRoot.querySelector('style');
@@ -61,6 +71,12 @@ export class SimulationSlider extends Slider {
                 font-size: 1rem; 
                 padding: 5px 5px 8px 10px;
             }
+            #slider-marker-info.hovered { 
+                display: block;
+            }
+            #slider-marker-info.clicked {
+                display: block;
+            }
             .slider-marker {
                 position: absolute;
                 margin: auto 0;
@@ -75,20 +91,74 @@ export class SimulationSlider extends Slider {
             }
         `;
 
-        slider.append(sliderStart, sliderEnd, sliderProgress);
+        sliderHead.onpointerdown = (e) => {
+            this.dragSliderHead(e, this.frame, this.setTimestamp);
+        }
+        sliderBar.onclick = (e) => {
+            this.clickBar(e, this.setTimestamp);
+        }
 
-        controllers.currentTimestamp.subscribe(() => {
-            var currentTimestamp = controllers.currentTimestamp.getValue();
-            var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
+        this.configureStartSetter();
+        this.configureEndSetter();
 
-            this.updateHeadPosition(newFrame);
-        })
 
     }
 
-    updateCallback(newFrame) {
-        this.setTimestamp(newFrame);
-        return true;
+    setSliderMarkerInfo(timeStamp) {
+        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        var localTime = utcToLocal(timeStamp);
+        sliderMarkerInfo.innerHTML = localTime;
+    }
+
+    configureStartSetter() {
+        const sliderStart = this.shadowRoot.querySelector('#slider-start');
+        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+
+        const finishedCallback = () => {
+            sliderMarkerInfo.classList.remove('clicked');
+        };
+
+        sliderStart.onmouseover = () => {
+            var startDate = controllers.startDate.getValue();
+            sliderMarkerInfo.classList.add('hovered');
+            this.setSliderMarkerInfo(startDate);
+        }
+        sliderStart.onmouseout = () => {
+            sliderMarkerInfo.classList.remove('hovered');
+        }
+        sliderStart.onpointerdown = (e) => {
+            sliderMarkerInfo.classList.add('clicked');
+            var startDate = controllers.startDate.getValue();
+            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
+            this.setSliderMarkerInfo(startDate);
+
+            const updateCallback = (timeIndex) => {
+                var newTimestamp = simVars.sortedTimestamps[timeIndex];
+                var endDate = controllers.endDate.getValue();
+                if (newTimestamp >= endDate) {
+                    var index = simVars.sortedTimestamps.indexOf(endDate) - 1;
+                    newTimestamp = simVars.sortedTimestamps[index];
+                }
+
+                controllers.startDate.setValue(newTimestamp);
+                this.setSliderMarkerInfo(newTimestamp);
+            }
+
+            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
+        }
+        controllers.startDate.subscribe(() => {
+            var startDate = controllers.startDate.getValue();
+            var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+            var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+
+            sliderStart.style.left = left + 'px';
+        });
+    }
+
+    configureEndSetter() {
+        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
+        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+
     }
 
     setTimestamp(timeIndex) {

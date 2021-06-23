@@ -76,14 +76,10 @@ export class Slider extends HTMLElement {
         sliderHead.style.left = left + 'px';
     }
 
-    updateCallback(newFrame) {
-        return false;
-    }
-
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
-    dragSliderHead(e, finishedCallback = null) {
+    dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
 
@@ -95,7 +91,7 @@ export class Slider extends HTMLElement {
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
-        var originalFrame = this.frame;
+        // var originalFrame = this.frame;
         var pos3 = e.clientX;
         document.onpointerup = () => {
             if (finishedCallback) {
@@ -120,8 +116,10 @@ export class Slider extends HTMLElement {
             newFrame = Math.min(newFrame, this.nFrames);
             newFrame = Math.max(newFrame, 0);
 
-            if (!this.updateCallback(newFrame)) {
+            if (updateCallback == null) {
                 this.updateHeadPosition(newFrame);
+            } else { 
+                updateCallback(newFrame);
             }
         }
     }
@@ -129,14 +127,16 @@ export class Slider extends HTMLElement {
     /** Called when the slider bar is cicked. Calculates distance between slider-head and click
      * location. Updates the currentFrame accordingly and calls updateSlider
      */
-    clickBar(e) {
+    clickBar(e, updateCallback = null) {
         const head = this.shadowRoot.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.nFrames);
 
         var newFrame = this.frame + diff;
 
-        if (!this.updateCallback(newFrame)) {
+        if (updateCallback == null) {
             this.updateHeadPosition(newFrame);
+        } else {
+            updateCallback(newFrame);
         }
     }
 }
