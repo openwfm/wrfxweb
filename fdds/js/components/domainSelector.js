@@ -121,7 +121,10 @@ export class DomainSelector extends HTMLElement {
 
         var presetOpacity = simVars.presets.opacity;
         if (presetOpacity && !isNaN(presetOpacity)) {
-            controllers.opacity.setValue(Number(presetOpacity));
+            var opacity = Number(presetOpacity);
+            if (opacity >= 0 && opacity <= 1) {
+                controllers.opacity.setValue(Number(presetOpacity));
+            }
             simVars.presets.opacity = null;
         }
 

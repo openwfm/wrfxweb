@@ -168,6 +168,17 @@ export function createOption(timeStamp, utcValue) {
   return option;
 }
 
+export function createElement(id=null, className=null) {
+    const div = document.createElement('div');
+    if (id) {
+        div.id = id;
+    }
+    if (className) {
+        div.className = className;
+    }
+    return div;
+}
+
 export function linkSelects(selectStart, selectEnd) {
   selectStart.childNodes.forEach(startOption => {
     startOption.disabled = false;

@@ -1,5 +1,6 @@
 import { controllers } from './Controller.js';
 import { utcToLocal, simVars } from '../util.js';
+import { SimulationSlider } from './simulationSlider.js';
 
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 
@@ -35,22 +36,9 @@ export class SimulationController extends HTMLElement {
                         <span id='timestamp'></span>
                     </div>
                 </div>
-                <div id='slider'>
-                    <div id='slider-bar'></div>
-                    <div id='slider-progress'></div>
-                    <div id='slider-progress-later'></div>
-                    <div id='slider-head'></div>
-                    <div id='slider-marker-info'></div>
-                    <div class='slider-marker' id='slider-start'></div>
-                    <div class='slider-marker' id='slider-end'></div>
-                </div>
             </div>
         `;
         
-        this.sliderWidth = 340;
-        this.currentSimulation = '';
-        this.currentFrame = 0;
-        this.frameTotal = 1;
         this.playing = false;
         this.fastRate = 150;
         this.slowRate = 500;
@@ -61,6 +49,9 @@ export class SimulationController extends HTMLElement {
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
+        const slider = new SimulationSlider();
+        container.appendChild(slider);
+
         if (document.body.clientWidth < 769) {
             const timeStamp = this.querySelector('#slider-timestamp');
             const playButtons = this.querySelector('#slider-play-bar');
@@ -68,152 +59,44 @@ export class SimulationController extends HTMLElement {
         }
         L.DomEvent.disableScrollPropagation(container);
         L.DomEvent.disableClickPropagation(container);
-        const sliderHead = this.querySelector('#slider-head');
-        const sliderBar = this.querySelector('#slider-bar');
-        sliderHead.onpointerdown = (e) => {
-            const updateCallback = (newTimestamp) => {
-                if (newTimestamp > controllers.endDate.getValue()) {
-                    newTimestamp = controllers.endDate.getValue();
-                }
-                if (newTimestamp < controllers.startDate.getValue()) {
-                    newTimestamp = controllers.startDate.getValue();
-                }
-                controllers.currentTimestamp.setValue(newTimestamp);
-            }
 
-            this.dragSliderHead(e, this.currentFrame, updateCallback);
-        }
+        controllers.currentDomain.subscribe(() => {
+            this.resetSlider();
+        });
+        controllers.currentTimestamp.subscribe(() => {
+            this.updateSlider();
+        });
 
-        const startDateSeeker = this.querySelector('#slider-start');
-        const endDateSeeker = this.querySelector('#slider-end');
-        const seekerInfo = this.querySelector('#slider-marker-info');
-
-        const setSeekerInfo = (timeStamp) => {
-            var localTime = utcToLocal(timeStamp);
-            seekerInfo.innerHTML = localTime;
-        }
-        const finishedCallback = () => {
-            seekerInfo.classList.remove('clicked');
-        };
-
-        startDateSeeker.onmouseover = () => {
-            var startDate = controllers.startDate.getValue();
-            seekerInfo.classList.add('hovered');
-            setSeekerInfo(startDate);
-        }
-        startDateSeeker.onmouseout = () => {
-            seekerInfo.classList.remove('hovered');
-        };
-        startDateSeeker.onpointerdown = (e) => {
-            seekerInfo.classList.add('clicked');
-            var startDate = controllers.startDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
-            setSeekerInfo(startDate);
-
-            const updateCallback = (newTimestamp) => {
-                var endDate = controllers.endDate.getValue();
-                if (newTimestamp >= endDate) {
-                    var index = simVars.sortedTimestamps.indexOf(endDate) - 1;
-                    newTimestamp = simVars.sortedTimestamps[index];
-                }
-
-                controllers.startDate.setValue(newTimestamp);
-                setSeekerInfo(newTimestamp);
-            }
-
-            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
-        }
-        endDateSeeker.onmouseover = () => {
-            var endDate = controllers.endDate.getValue();
-            setSeekerInfo(endDate);
-            seekerInfo.classList.add('hovered');
-        };
-        endDateSeeker.onmouseout = () => {
-            seekerInfo.classList.remove('hovered');
-        };
-        endDateSeeker.onpointerdown = (e) => {
-            seekerInfo.classList.add('clicked');
-            var endDate = controllers.endDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
-            setSeekerInfo(endDate);
-            
-            const updateCallback = (newTimestamp) => {
-                var startDate = controllers.startDate.getValue();
-                if (newTimestamp <= startDate) {
-                    var index = simVars.sortedTimestamps.indexOf(startDate) + 1;
-                    newTimestamp = simVars.sortedTimestamps[index];
-                }
-
-                controllers.endDate.setValue(newTimestamp);
-                setSeekerInfo(newTimestamp);
-            }
-            
-            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
-        }
-
-        sliderBar.onclick = (e) => {
-            this.clickBar(e);
-        }
-
-        const RECURSION_DEPTH = 5;
         this.querySelector('#slider-play-pause').onpointerdown = () => {
             this.playPause();
         }
         this.querySelector('#slider-prev').onpointerdown = () => {
-            this.prevFrame(RECURSION_DEPTH);
+            this.prevFrame();
         }
         this.querySelector('#slider-next').onpointerdown = () => {
-            this.nextFrame(RECURSION_DEPTH);
-        }
-
-        const toggleRate = (rate, togglePrimary, toggleSecondary) => {
-            var unPressedColor = '#d6d6d6';
-            togglePrimary.style.background = unPressedColor;
-            toggleSecondary.style.background = unPressedColor;
-    
-            if (this.frameRate == rate) {
-                this.frameRate = this.normalRate;
-            } else {
-                this.frameRate = rate;
-                togglePrimary.style.background = '#e5e5e5';
-            }
+            this.nextFrame();
         }
         const speedUp = this.querySelector('#slider-fast-forward');
-        speedUp.onpointerdown = () => {
-            toggleRate(this.fastRate, speedUp, slowDown);
-        }
         const slowDown = this.querySelector('#slider-slow-down');
+        speedUp.onpointerdown = () => {
+            this.toggleRate(this.fastRate, speedUp, slowDown);
+        }
         slowDown.onpointerdown = () => {
-            toggleRate(this.slowRate, slowDown, speedUp);
+            this.toggleRate(this.slowRate, slowDown, speedUp);
         }
+    }
 
-        const domainSubscription = () => {
-            this.resetSlider();
+    toggleRate(rate, togglePrimary, toggleSecondary) {
+        var unPressedColor = '#d6d6d6';
+        togglePrimary.style.background = unPressedColor;
+        toggleSecondary.style.background = unPressedColor;
+
+        if (this.frameRate == rate) {
+            this.frameRate = this.normalRate;
+        } else {
+            this.frameRate = rate;
+            togglePrimary.style.background = '#e5e5e5';
         }
-        controllers.currentDomain.subscribe(domainSubscription);
-
-        const currentTimestampSubscription = () => {
-            this.updateSlider();
-        }
-        controllers.currentTimestamp.subscribe(currentTimestampSubscription);
-        
-        controllers.startDate.subscribe(() => {
-            const startMarker = this.querySelector('#slider-start');
-            var startDate = controllers.startDate.getValue();
-            var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-            var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
-
-            startMarker.style.left = left + 'px';
-        });
-
-        controllers.endDate.subscribe(() => {
-            const endMarker = this.querySelector('#slider-end');
-            var endDate = controllers.endDate.getValue();
-            var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
-
-            endMarker.style.left = left + 'px';
-        });
     }
 
     resetSlider() {
@@ -223,29 +106,6 @@ export class SimulationController extends HTMLElement {
 
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
-
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
-        var currentTimestamp = controllers.currentTimestamp.getValue();
-
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.currentSimulation = simVars.currentSimulation;
-            currentTimestamp = startDate;
-        } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
-            var percentage = this.currentFrame / this.frameTotal;
-            var timeIndex = Math.floor((simVars.sortedTimestamps.length) * percentage);
-            currentTimestamp = simVars.sortedTimestamps[timeIndex];
-        }
-
-        if (currentTimestamp < startDate) {
-            currentTimestamp = startDate;
-        }
-        if (currentTimestamp > endDate) {
-            currentTimstamp = endDate;
-        }
-
-        this.frameTotal = simVars.sortedTimestamps.length;
-        controllers.currentTimestamp.setValue(currentTimestamp);
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
@@ -253,14 +113,6 @@ export class SimulationController extends HTMLElement {
         // set current time
         var currentTimestamp = controllers.currentTimestamp.getValue();
         document.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
-
-        var timeIndex = simVars.sortedTimestamps.indexOf(currentTimestamp);
-        this.currentFrame = timeIndex;
-
-        const sliderHead = this.querySelector('#slider-head');
-
-        let left = Math.floor(((this.currentFrame + 1 ) / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5)) - 5;
-        sliderHead.style.left = left + 'px';
     }
 
     /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
@@ -286,8 +138,9 @@ export class SimulationController extends HTMLElement {
     /** Iterates to next frame while still playing */
     play() {
         if (this.playing) {
-            this.nextFrame(5);
-            if (this.currentFrame == simVars.sortedTimestamps.length-1) {
+            var endDate = controllers.endDate.getValue();
+            var nextTimestamp = this.nextFrame();
+            if (nextTimestamp == endDate) {
                 window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
                 window.setTimeout(() => this.play(), this.frameRate);
@@ -296,110 +149,21 @@ export class SimulationController extends HTMLElement {
     }
 
     /** Moves one frame to the right. */
-    nextFrame(recursionDepth) {
-        if (recursionDepth == 0) {
-            console.log('recursion depth reached');
-            return;
-        }
-
-        var nextFrame = (this.currentFrame + 1) % simVars.sortedTimestamps.length;
-        var nextTimestamp = simVars.sortedTimestamps[nextFrame];
-        if (nextTimestamp > controllers.endDate.getValue() || nextFrame == 0) {
-            nextTimestamp = controllers.startDate.getValue();
-        }
+    nextFrame() {
+        const simulationSlider = this.querySelector('simulation-slider');
+        var nextTimestamp = simulationSlider.nextTimestamp();
 
         controllers.currentTimestamp.setValue(nextTimestamp);
+        return nextTimestamp;
     }
 
     /** Moves one frame to the left. */
-    prevFrame(recursionDepth) {
-        if (recursionDepth == 0) {
-            return;
-        }
-
-        var prevFrame = (this.currentFrame - 1) % simVars.sortedTimestamps.length;
-        if (prevFrame < 0) {
-            prevFrame += simVars.sortedTimestamps.length;
-        }
-        var prevTimestamp = simVars.sortedTimestamps[prevFrame];
-        if (prevTimestamp < controllers.startDate.getValue() || prevFrame == (simVars.sortedTimestamps.length - 1)) {
-            prevTimestamp = controllers.endDate.getValue();
-        }
+    prevFrame() {
+        const simulationSlider = this.querySelector('simulation-slider');
+        var prevTimestamp = simulationSlider.prevTimestamp();
 
         controllers.currentTimestamp.setValue(prevTimestamp);
-    }
-
-    setLoadedTimestamp(progress) {
-        var progressWidth = progress*this.sliderWidth;
-
-        const progressBar = this.querySelector('#slider-progress'); 
-        progressBar.style.display = 'block';
-        progressBar.style.width = progressWidth + 'px';
-        if (progress == 0) {
-            progressBar.style.display = 'none';
-            return;
-        }
-
-        var startDate = controllers.startDate.getValue();
-        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
-
-        progressBar.style.left = left + 'px';
-    }
-
-    /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
-     * currentFrame according to the offset. 
-     */
-    dragSliderHead(e, originalFrame, updateCallback, finishedCallback = null) {
-        document.body.classList.add('grabbing');
-        e = e || window.event;
-        e.stopPropagation();
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        var pos3 = e.clientX;
-        document.onpointerup = () => {
-            if (finishedCallback) {
-                finishedCallback();
-            }
-            document.body.classList.remove('grabbing');
-            document.onpointerup = null;
-            document.onpointermove = null;
-        };
-        // call a function whenever the cursor moves:
-        document.onpointermove = (e2) => {
-            e2 = e2 || window.event;
-            e2.preventDefault();
-            e2.stopPropagation();
-            // calculate the new cursor position:
-            let diff = Math.floor((e2.clientX - pos3) / this.sliderWidth * simVars.sortedTimestamps.length - 1);
-
-            var newFrame = originalFrame + diff;
-            newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-            var newTimestamp = simVars.sortedTimestamps[newFrame];
-
-            updateCallback(newTimestamp);
-        }
-    }
-
-    /** Called when the slider bar is cicked. Calculates distance between slider-head and click
-     * location. Updates the currentFrame accordingly and calls updateSlider
-     */
-    clickBar(e) {
-        const head = this.querySelector('#slider-head').getBoundingClientRect();
-        let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * simVars.sortedTimestamps.length - 1);
-
-        var newFrame = this.currentFrame + diff;
-        newFrame = Math.max(Math.min(simVars.sortedTimestamps.length-1, newFrame), 0);
-        var newTimestamp = simVars.sortedTimestamps[newFrame];
-
-        if (newTimestamp > controllers.endDate.getValue()) {
-            newTimestamp = controllers.endDate.getValue();
-        }
-        if (newTimestamp < controllers.startDate.getValue()) {
-            newTimestamp = controllers.startDate.getValue();
-        }
-
-        controllers.currentTimestamp.setValue(newTimestamp);
+        return prevTimestamp;
     }
 }
 
