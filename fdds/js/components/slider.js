@@ -91,7 +91,6 @@ export class Slider extends HTMLElement {
         e.stopPropagation();
         e.preventDefault();
         // get the mouse cursor position at startup:
-        // var originalFrame = this.frame;
         var pos3 = e.clientX;
         document.onpointerup = () => {
             if (finishedCallback) {

@@ -167,7 +167,8 @@ export class SimulationSlider extends Slider {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
                 var endDate = controllers.endDate.getValue();
                 if (newTimestamp >= endDate) {
-                    newTimestamp = endDate;
+                    timeIndex = simVars.sortedTimestamps.indexOf(endDate) - 1;
+                    newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
                 controllers.startDate.setValue(newTimestamp);
@@ -210,7 +211,8 @@ export class SimulationSlider extends Slider {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
                 var startDate = controllers.startDate.getValue();
                 if (newTimestamp <= startDate) {
-                    newTimestamp = startDate;
+                    timeIndex = simVars.sortedTimestamps.indexOf(startDate) + 1;
+                    newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
                 controllers.endDate.setValue(newTimestamp);
