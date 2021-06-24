@@ -12,8 +12,12 @@ jest.mock('../util.js', () => ({
                 '2020': {'raster': {}},
                 '2021': {'raster': {}}
             } 
-        })
-    })
+        }),
+        presets: ({ 
+            opacity: "0.5"
+        }),
+    }),
+    localToUTC: jest.fn()
 }));
 
 const controller = require('../components/Controller.js');
@@ -27,6 +31,18 @@ jest.mock('../components/Controller.js', () => ({
             getValue: jest.fn(),
             setValue: jest.fn()
         }),
+        startDate: ({
+            getValue: () => '2020',
+            setValue: jest.fn()
+        }),
+        endDate: ({
+            getValue: () => '2021',
+            setValue: jest.fn()
+        }),
+        opacity: ({
+            getValue: () => 0.5,
+            setValue: jest.fn()
+        })
     })
 }));
 
