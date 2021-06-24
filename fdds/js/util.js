@@ -1,4 +1,5 @@
 import { controllers } from './components/Controller.js';
+import { getConfigurations } from './services.js';
 
 // Set needed global variables 
 export const simVars = (function createSimVars() {
@@ -37,7 +38,7 @@ export const simVars = (function createSimVars() {
     startTime: null,
     endTime: null,
     displayedColorbar: null,
-    organization: null,
+    organization: 'WIRC',
     overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
     baseLayerDict: {
     /*
@@ -59,13 +60,26 @@ export const simVars = (function createSimVars() {
 })();
 
 // construct map with the base layers
-export const map = (function buildMap() {
+export const map = await (async function buildMap() {
+  await getConfigurations();
+  var center = [39.7392, -104.9903];
+  var presetCenter = simVars.presets.pan;
+  if (presetCenter && presetCenter.length == 2) {
+    center = presetCenter
+  } else if (simVars.organization.includes('SJSU')) {
+    center = [37.34, -121.89];
+  }
+  var zoom = 7;
+  var presetZoom = simVars.presets.zoom;
+  if (presetZoom && !isNaN(presetZoom)) {
+    zoom = presetZoom;
+  }
   var leafletMap = L.map('map-fd', {
     layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,
     minZoom: 3,
-    center: [39.7392, -104.9903],
-    zoom: 6
+    center: center,
+    zoom: zoom
   });
 
   leafletMap.on('zoomend', function() {

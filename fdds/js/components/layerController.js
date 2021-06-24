@@ -262,13 +262,13 @@ export class LayerController extends HTMLElement {
             var mapCenter = map.getCenter();
             pan = [mapCenter.lat.toFixed(2), mapCenter.lng.toFixed(2)];
         } 
-        simVars.presets.pan = null;
+        simVars.presets.pan = true;
 
         var zoom = simVars.presets.zoom;
         if (!zoom || isNaN(zoom)) {
             zoom = map.getZoom();
         }
-        simVars.presets.zoom = null;
+        simVars.presets.zoom = true;
 
         map.setView(pan, zoom);
     }
