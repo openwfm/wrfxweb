@@ -247,6 +247,11 @@ export class LayerController extends HTMLElement {
             }
         };
 
+        var filteredOverlays = simVars.overlayOrder.filter(overlay => {
+            return (overlay in this.overlayDict) || (overlay in this.rasterDict);
+        })
+        simVars.overlayOrder = filteredOverlays;
+
         if (simVars.presets.pan || simVars.presets.zoom) {
             this.setPresetView();
         } else { 
