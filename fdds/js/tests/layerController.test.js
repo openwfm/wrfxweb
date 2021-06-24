@@ -3,9 +3,10 @@ const { LayerController } = require('../components/layerController');
 var globalMap = {};
 var imageUrl = '';
 global.L = { DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()},
-            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords, options) => {globalMap[url] = coords; imageUrl = url;}, 
+            imageOverlay: (raster, coordinates, settings) => ({setUrl: (url, coords=null, options) => {globalMap[url] = coords; imageUrl = url;}, 
                                                                addTo: (map) => {globalMap[raster] = coordinates},
                                                                remove: (map) => {delete globalMap[raster]},
+                                                               setOpacity: (opacity) => {},
                                                                bringToFront: () => {},
                                                                bringToBack: () => {},
                                                                _image: {}}), 
@@ -26,6 +27,18 @@ jest.mock('../components/Controller.js', () => ({
             getValue: () => '2020', 
             subscribe: (fun) => {}
         }),
+        opacity: ({
+            getValue: () => 0.5,
+            subscribe: (fun) => {} 
+        }),
+        startDate: ({
+            getValue: () => '2020',
+            subscribe: (fun) => {} 
+        }),
+        endDate: ({
+            getValue: () => '2021',
+            subscribe: (fun) => {} 
+        })
     }),
     
 }));
@@ -55,6 +68,9 @@ jest.mock('../util.js', () => ({
         organization: 'SJSU',
         overlayList: ['overlay'],
         baseLayerDict: {},
+        presets: {
+            rasters: null
+        }
     }),
     map: {
         addTo: jest.fn(),
@@ -62,7 +78,8 @@ jest.mock('../util.js', () => ({
         on: jest.fn()
     },
     dragElement: jest.fn(),
-    debounce: jest.fn()
+    debounce: jest.fn(),
+    setURL: jest.fn(),
 }));
 
 HTMLCanvasElement.prototype.getContext = () => { 
@@ -284,6 +301,7 @@ describe('Tests for preloading', () => {
         util.simVars.overlayOrder = ['layer'];
         util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
         controller.controllers.currentDomain.getValue = () => '2';
+        controller.controllers.endDate.getValue = () => '2021.5';
 
         var futureTimeStamp = '2021.5';
         var preloadedFutureUrl = 'preloadedFutureUrl';
