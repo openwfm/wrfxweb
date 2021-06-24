@@ -3,14 +3,25 @@ import { simVars } from './util.js';
 
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
-    let json = {};
-    try {
-        const response = await fetch('conf.json');
-        json = response.json();
-    } catch(error) {
-        console.error('Error fetching conf.json: ' + error);
-    }
-    return json;
+    fetch('conf.json').then(response => response.json()).then(function(configData) {
+        if (configData.organization) {
+            simVars.organization = configData.organization;
+        }
+        document.title = simVars.organization;
+    
+        if (configData.flags) {
+            const simulationFlags = document.querySelector('#simulation-flags');
+            var flags = configData.flags;
+            flags.map(flag => {
+                var spanElement = document.createElement('span');
+                spanElement.className = 'displayTest';
+                spanElement.innerText = flag;
+                simulationFlags.appendChild(spanElement);
+            });
+        }
+    }).catch(error => {
+        console.error('Error fetching conf.json : ' + error);
+    });
 }
 
 /** Service request for building the initial catalogMenu */
