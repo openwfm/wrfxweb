@@ -197,6 +197,7 @@ export class LayerController extends HTMLElement {
         controllers.endDate.subscribe(reload);
 
         this.querySelector('#layer-controller-container').style.display = 'block';
+        document.querySelector('#copyLink').style.display = 'block';
     }
 
     /** Called when a new domain is selected or a new simulation is selected. */
@@ -267,13 +268,13 @@ export class LayerController extends HTMLElement {
             var mapCenter = map.getCenter();
             pan = [mapCenter.lat.toFixed(2), mapCenter.lng.toFixed(2)];
         } 
-        simVars.presets.pan = true;
+        simVars.presets.pan = null;
 
         var zoom = simVars.presets.zoom;
         if (!zoom || isNaN(zoom)) {
             zoom = map.getZoom();
         }
-        simVars.presets.zoom = true;
+        simVars.presets.zoom = null;
 
         map.setView(pan, zoom);
     }
