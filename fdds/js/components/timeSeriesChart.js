@@ -1,5 +1,6 @@
-import { utcToLocal, createOption, linkSelects, simVars } from '../util.js';
+import { utcToLocal, createOption, linkSelects } from '../util.js';
 import { controllers } from '../components/Controller.js';
+import { simVars } from '../simVars.js';
 
 export class TimeSeriesChart extends HTMLElement {
     constructor() {

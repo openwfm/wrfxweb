@@ -1,6 +1,8 @@
-import { map, dragElement, debounce, setURL, simVars } from '../util.js';
+import { dragElement, debounce, setURL } from '../util.js';
 import { controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
+import { simVars } from '../simVars.js';
+import { map } from '../map.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window

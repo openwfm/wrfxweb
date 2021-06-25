@@ -1,103 +1,6 @@
 import { controllers } from './components/Controller.js';
-import { getConfigurations } from './services.js';
-
-// Set needed global variables 
-export const simVars = (function createSimVars() {
-  const urlParams = new URLSearchParams(window.location.search);
-
-  var presetVars = ({
-    zoom: urlParams.get('zoom'),
-    pan: urlParams.get('pan'),
-    jobId: urlParams.get('job_id'),
-    domain: urlParams.get('domain'),
-    timestamp: urlParams.get('timestamp'),
-    rasters: null,
-    startDate: urlParams.get('startDate'),
-    endDate: urlParams.get('endDate'),
-    opacity: urlParams.get('opacity'),
-  });
-
-  var pan = urlParams.get('pan');
-  if (pan) {
-    pan = pan.split(',').map(coord => Number(coord));
-    presetVars.pan = pan;
-  }
-
-  var rasters = urlParams.get('rasters');
-  if (rasters) {
-    rasters = rasters.split('-');
-    presetVars.rasters = rasters;
-  }
-
-  var simVars = ({
-    currentSimulation: '',
-    rasters: [],
-    rasterBase: '',
-    sortedTimestamps: [],
-    overlayOrder: [],
-    startTime: null,
-    endTime: null,
-    displayedColorbar: null,
-    organization: 'WIRC',
-    overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
-    baseLayerDict: {
-    /*
-      'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
-                              attribution: 'Data and imagery by MapQuest',
-                              subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
-    */
-      'MapQuest' : MQ.mapLayer(),
-    /*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-                                  attribution: 'Data and imagery by MapQuest',
-                                  subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
-      'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
-    },
-    presets: presetVars
-  });
-
-  return simVars;
-})();
-
-// construct map with the base layers
-export const map = await (async function buildMap() {
-  await getConfigurations();
-  var center = [39.7392, -104.9903];
-  var presetCenter = simVars.presets.pan;
-  if (presetCenter && presetCenter.length == 2) {
-    center = presetCenter
-  } else if (simVars.organization.includes('SJSU')) {
-    center = [37.34, -121.89];
-  }
-  var zoom = 7;
-  var presetZoom = simVars.presets.zoom;
-  if (presetZoom && !isNaN(presetZoom)) {
-    zoom = presetZoom;
-  }
-  var leafletMap = L.map('map-fd', {
-    layers: [simVars.baseLayerDict['OSM']],
-    zoomControl: true,
-    minZoom: 3,
-    center: center,
-    zoom: zoom
-  });
-
-  leafletMap.on('zoomend', function() {
-    setURL();
-  });
-
-  leafletMap.on('moveend', function() {
-    setURL();
-  });
-
-  leafletMap.doubleClickZoom.disable();
-  leafletMap.scrollWheelZoom.disable();
-
-  // add scale & zoom controls to the map
-  L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
-
-  return leafletMap;
-})();
+import { simVars } from './simVars.js';
+import { map } from './map.js';
 
 export function setURL() {
   var historyData = {};
@@ -135,6 +38,14 @@ export function setURL() {
     history.pushState(historyData, 'Data', urlVars);
   }
 }
+
+map.on('zoomend', function() {
+  setURL();
+});
+
+map.on('moveend', function() {
+  setURL();
+});
 
 export function debounce(callback, delay) {
   let timeout; 

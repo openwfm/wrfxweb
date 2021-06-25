@@ -1,5 +1,6 @@
 import { controllers } from './Controller.js';
-import { simVars, localToUTC } from '../util.js';
+import { localToUTC } from '../util.js';
+import { simVars } from '../simVars.js';
 
 /** Component for the Active Domain selection bar. */
 export class DomainSelector extends HTMLElement {
