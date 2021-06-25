@@ -54,26 +54,3 @@ export const simVars = (function createSimVars() {
 
   return simVars;
 })();
-
-/** Service request for fetching the conf.json file. */
-async function getConfigurations() {
-    await fetch('conf.json').then(response => response.json()).then(function(configData) {
-        if (configData.organization) {
-            simVars.organization = configData.organization;
-        }
-        document.title = simVars.organization;
-    
-        if (configData.flags) {
-            const simulationFlags = document.querySelector('#simulation-flags');
-            var flags = configData.flags;
-            flags.map(flag => {
-                var spanElement = document.createElement('span');
-                spanElement.className = 'displayTest';
-                spanElement.innerText = flag;
-                simulationFlags.appendChild(spanElement);
-            });
-        }
-    }).catch(error => {
-        console.error('Error fetching conf.json : ' + error);
-    });
-}
