@@ -1,5 +1,6 @@
-import { createOption, linkSelects, simVars } from '../util.js';
+import { createOption, linkSelects } from '../util.js';
 import { controllers } from './Controller.js';
+import { simVars } from '../simVars.js';
 
 export class TimeSeriesButton extends HTMLElement {
     constructor() {

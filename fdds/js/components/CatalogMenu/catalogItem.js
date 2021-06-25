@@ -1,5 +1,6 @@
 import { getSimulation } from '../../services.js';
-import { setURL, utcToLocal, simVars } from '../../util.js';
+import { utcToLocal } from '../../util.js';
+import { simVars } from '../../simVars.js';
 
 const template = document.createElement('template');
 template.innerHTML = `

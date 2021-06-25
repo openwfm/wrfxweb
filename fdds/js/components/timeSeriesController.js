@@ -1,6 +1,7 @@
 import { LayerController } from './layerController.js';
 import { SyncController, controllers } from './Controller.js';
-import { map, simVars } from '../util.js';
+import { simVars } from '../simVars.js';
+import { map } from '../map.js';
 import { TimeSeriesMarker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
 

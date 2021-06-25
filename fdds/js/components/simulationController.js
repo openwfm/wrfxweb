@@ -1,6 +1,7 @@
 import { controllers } from './Controller.js';
-import { utcToLocal, simVars } from '../util.js';
+import { utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
+import { simVars } from '../simVars.js';
 
 /**
  * A Component that builds the animation controller for the simulation. Creates a UI component that 

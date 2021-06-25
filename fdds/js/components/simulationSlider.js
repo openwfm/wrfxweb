@@ -1,6 +1,7 @@
 import { Slider } from './slider.js';
-import { simVars, utcToLocal, createElement } from '../util.js';
+import { utcToLocal, createElement } from '../util.js';
 import { controllers } from './Controller.js';
+import { simVars } from '../simVars.js';
 
 export class SimulationSlider extends Slider {
     constructor() {
