@@ -2,12 +2,16 @@ const { SimulationController } = require('../components/simulationController');
 
 global.L = {DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropagation: jest.fn()}};
 
-const util = require('../util.js');
-jest.mock('../util.js', () => ({
+const simVars = require('../simVars.js');
+jest.mock('../simVars.js', () => ({
     simVars: ({
         sorted_timestamps: ['2020', '2021', '2022'],
         currentSimulation: 'currentSimulation',
     }), 
+}));
+
+const util = require('../util.js');
+jest.mock('../util.js', () => ({
     utcToLocal: (timestamp) => timestamp,
     createElement: jest.fn()
 }));
@@ -48,8 +52,8 @@ describe('Simulation Controller Tests', () => {
     beforeEach(async () => {
         currentTimestamp = '2020';
 
-        util.simVars.currentSimulation = 'currentSimulation';
-        util.simVars.sortedTimestamps = ['2020', '2021', '2022'];
+        simVars.simVars.currentSimulation = 'currentSimulation';
+        simVars.simVars.sortedTimestamps = ['2020', '2021', '2022'];
         util.createElement = (id, className) => {
             const div = document.createElement('div');
             div.id = id;
@@ -90,7 +94,7 @@ describe('Simulation Controller Tests', () => {
         currentTimestamp = '2021';
 
         controller.controllers.currentDomain.getValue = () => 2;
-        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5', '2022'];
+        simVars.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5', '2022'];
         for (var fun of currentDomainSubscriptions) {
             fun();
         }
@@ -104,12 +108,12 @@ describe('Simulation Controller Tests', () => {
         }
         currentTimestamp = '2021';
         controller.controllers.currentDomain.getValue = () => 2;
-        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
+        simVars.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
         for (var fun of currentDomainSubscriptions) {
             fun();
         }
         controller.controllers.currentDomain.getValue = () => 1;
-        util.simVars.sortedTimestamps = ['2020', '2021'];
+        simVars.simVars.sortedTimestamps = ['2020', '2021'];
         for (var fun of currentDomainSubscriptions) {
             fun();
         }
@@ -125,7 +129,7 @@ describe('Simulation Controller Tests', () => {
         for (var fun of currentDomainSubscriptions) {
             fun();
         }
-        util.simVars.currentSimulation = 'new Simulation';
+        simVars.simVars.currentSimulation = 'new Simulation';
         for (var fun of currentDomainSubscriptions) {
             fun();
         }

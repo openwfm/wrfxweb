@@ -86,36 +86,6 @@ const testCoords = ({0: [0,0], 1: [0, 1], 2: [1, 0], 3: [1, 1]});
 
 const util = require('../util.js');
 jest.mock('../util.js', () => ({
-    simVars: ({
-        currentSimulation: 'test',
-        rasters: ({
-            1: {
-                '2020': {'raster': {raster: 'rasterTest', coords: testCoords, 'colorbar': 'testColorbar/raster'}, 
-                    'overlay': {raster: 'overlayTest', coords: testCoords, 'colorbar': 'testColorbar/overlay' }},
-                '2021': {'raster': {raster: 'rasterTest/currentTimestamp', coords: testCoords}, 
-                    'overlay': {raster: 'overlayTest', coords: testCoords }}
-            },
-            2: {
-                '2020': {'raster': {raster: 'rasterTest2', coords: testCoords }, 
-                    'overlay': {raster: 'overlayTest2', coords: testCoords }}
-            }
-        }),
-        rasterBase: 'testBase/',
-        sortedTimestamps: ['2020'],
-        overlayOrder: [],
-        displayedColorbar: null,
-        organization: 'SJSU',
-        overlayList: ['overlay'],
-        baseLayerDict: {},
-        presets: {
-            rasters: null
-        }
-    }),
-    map: {
-        addTo: jest.fn(),
-        fitBounds: jest.fn(),
-        on: jest.fn()
-    },
     dragElement: jest.fn(),
     debounce: jest.fn(),
     setURL: jest.fn(),
