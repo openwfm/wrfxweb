@@ -17,6 +17,6 @@
   "scripts": {
     "prestart": "npm install",
     "start": "http-server -g -a localhost -p 8000 -c-1",
-    "test": "jest --silent"
+    "test": "jest"
   }
 }
