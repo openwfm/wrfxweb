@@ -12,6 +12,45 @@ global.L = { DomEvent: {disableClickPropagation: jest.fn(), disableScrollPropaga
                                                                _image: {}}), 
             icon: (options) => {}};
 
+const map = require('../map.js');
+jest.mock('../map.js', () => ({
+    map: {
+        addTo: jest.fn(),
+        fitBounds: jest.fn(),
+        on: jest.fn()
+    },
+}));
+
+const simVars = require('../simVars.js');
+jest.mock('../simVars.js', () => ({
+    simVars: ({
+        currentSimulation: 'test',
+        rasters: ({
+            1: {
+                '2020': {'raster': {raster: 'rasterTest', coords: testCoords, 'colorbar': 'testColorbar/raster'}, 
+                    'overlay': {raster: 'overlayTest', coords: testCoords, 'colorbar': 'testColorbar/overlay' }},
+                '2021': {'raster': {raster: 'rasterTest/currentTimestamp', coords: testCoords}, 
+                    'overlay': {raster: 'overlayTest', coords: testCoords }}
+            },
+            2: {
+                '2020': {'raster': {raster: 'rasterTest2', coords: testCoords }, 
+                    'overlay': {raster: 'overlayTest2', coords: testCoords }}
+            }
+        }),
+        rasterBase: 'testBase/',
+        sortedTimestamps: ['2020'],
+        overlayOrder: [],
+        displayedColorbar: null,
+        organization: 'SJSU',
+        overlayList: ['overlay'],
+        baseLayerDict: {},
+        presets: {
+            rasters: null
+        }
+    })
+}));
+   
+
 const controller = require('../components/Controller.js');
 jest.mock('../components/Controller.js', () => ({
     controllers: ({
@@ -47,36 +86,6 @@ const testCoords = ({0: [0,0], 1: [0, 1], 2: [1, 0], 3: [1, 1]});
 
 const util = require('../util.js');
 jest.mock('../util.js', () => ({
-    simVars: ({
-        currentSimulation: 'test',
-        rasters: ({
-            1: {
-                '2020': {'raster': {raster: 'rasterTest', coords: testCoords, 'colorbar': 'testColorbar/raster'}, 
-                    'overlay': {raster: 'overlayTest', coords: testCoords, 'colorbar': 'testColorbar/overlay' }},
-                '2021': {'raster': {raster: 'rasterTest/currentTimestamp', coords: testCoords}, 
-                    'overlay': {raster: 'overlayTest', coords: testCoords }}
-            },
-            2: {
-                '2020': {'raster': {raster: 'rasterTest2', coords: testCoords }, 
-                    'overlay': {raster: 'overlayTest2', coords: testCoords }}
-            }
-        }),
-        rasterBase: 'testBase/',
-        sortedTimestamps: ['2020'],
-        overlayOrder: [],
-        displayedColorbar: null,
-        organization: 'SJSU',
-        overlayList: ['overlay'],
-        baseLayerDict: {},
-        presets: {
-            rasters: null
-        }
-    }),
-    map: {
-        addTo: jest.fn(),
-        fitBounds: jest.fn(),
-        on: jest.fn()
-    },
     dragElement: jest.fn(),
     debounce: jest.fn(),
     setURL: jest.fn(),
@@ -95,11 +104,14 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
 
-        util.simVars.overlayOrder = []
+        simVars.simVars.overlayOrder = []
          
-        const div = document.createElement('div');
-        div.id = 'raster-colorbar';
-        await document.body.appendChild(div);
+        const rasterColorbar = document.createElement('div');
+        rasterColorbar.id = 'raster-colorbar';
+        await document.body.appendChild(rasterColorbar);
+        const copyLink = document.createElement('div');
+        copyLink.id = 'copyLink';
+        await document.body.appendChild(copyLink);
 
         layerController = await document.body.appendChild(new LayerController());
         layerController.domainSwitch();
@@ -120,7 +132,7 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         layerController.handleOverlayadd('raster');
 
         expect('testBase/rasterTest' in globalMap).toEqual(true);
-        expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
+        expect(simVars.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
 
     test('Layers should be correctly removed from the map when selected', () => {
@@ -135,17 +147,17 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
 
-        expect(util.simVars.overlayOrder.includes('raster')).toEqual(true);
+        expect(simVars.simVars.overlayOrder.includes('raster')).toEqual(true);
         expect('testBase/rasterTest2' in globalMap).toEqual(true);
         expect('testBase/rasterTest' in globalMap).toEqual(false);
     });
 
     test('Layer Controller should clear selected layers when domain is switched to new simulation', () => {
         layerController.handleOverlayadd('raster');
-        util.simVars.currentSimulation = 'new simulation';
+        simVars.simVars.currentSimulation = 'new simulation';
         layerController.domainSwitch();
 
-        expect(util.simVars.overlayOrder.length).toEqual(0);
+        expect(simVars.simVars.overlayOrder.length).toEqual(0);
         expect(globalMap).toEqual({});
     });
 
@@ -171,12 +183,15 @@ describe('Tests for adding layers with colorbars', () => {
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () => '2020';
 
-        util.simVars.overlayOrder = [];
-        util.simVars.displayedColorbar = '';
+        simVars.simVars.overlayOrder = [];
+        simVars.simVars.displayedColorbar = '';
 
-        const div = document.createElement('div');
-        div.id = 'raster-colorbar';
-        await document.body.appendChild(div);
+        const rasterColorbar = document.createElement('div');
+        rasterColorbar.id = 'raster-colorbar';
+        await document.body.appendChild(rasterColorbar);
+        const copyLink = document.createElement('div');
+        copyLink.id = 'copyLink';
+        await document.body.appendChild(copyLink);
 
         layerController = await document.body.appendChild(new LayerController());
         layerController.domainSwitch();
@@ -186,21 +201,21 @@ describe('Tests for adding layers with colorbars', () => {
     test('Layer Controller should add any colorbars', () => {
         layerController.handleOverlayadd('raster');
 
-        expect(util.simVars.displayedColorbar).toEqual('raster');
+        expect(simVars.simVars.displayedColorbar).toEqual('raster');
     });
 
     test('Layer Controller should remove colorbars when layer deselected', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayRemove('raster');
 
-        expect(util.simVars.displayedColorbar).toEqual(null);
+        expect(simVars.simVars.displayedColorbar).toEqual(null);
     });
 
     test('Layer Controller should put most recent selected colorbar on top', () => {
         layerController.handleOverlayadd('raster');
         layerController.handleOverlayadd('overlay');
 
-        expect(util.simVars.displayedColorbar).toEqual('overlay');
+        expect(simVars.simVars.displayedColorbar).toEqual('overlay');
     });
 
     test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
@@ -208,7 +223,7 @@ describe('Tests for adding layers with colorbars', () => {
         layerController.handleOverlayadd('overlay');
         layerController.handleOverlayRemove('overlay');
 
-        expect(util.simVars.displayedColorbar).toEqual('raster');
+        expect(simVars.simVars.displayedColorbar).toEqual('raster');
     });
 
     test('Layer Controller should remove colorbar when switching to a domain without one', () => {
@@ -216,7 +231,7 @@ describe('Tests for adding layers with colorbars', () => {
         controller.controllers.currentDomain.getValue = () => 2;
         layerController.domainSwitch();
 
-        expect(util.simVars.displayedColorbar).toEqual(null);
+        expect(simVars.simVars.displayedColorbar).toEqual(null);
     });
 });
 
@@ -229,9 +244,9 @@ describe('Tests for preloading', () => {
 
         controller.controllers.currentDomain.getValue = () => 1;
         controller.controllers.currentTimestamp.getValue = () =>'2020';
-        util.simVars.sortedTimestamps = ['2020', '2021'];
+        simVars.simVars.sortedTimestamps = ['2020', '2021'];
 
-        util.simVars.rasters = ({
+        simVars.simVars.rasters = ({
             1: {
                 '2020': {'layer': {raster: 'rasterTest1/2020', coords: testCoords, 'colorbar': 'colorbar1/2020'}},
                 '2021': {'layer': {raster: 'rasterTest1/2021', coords: testCoords, 'colorbar': 'colorbar1/2021'}}
@@ -243,11 +258,14 @@ describe('Tests for preloading', () => {
                 '2021.5': {'layer': {raster: 'rasterTest2/2021.5', coords: testCoords, 'colorbar': 'colorbar2/2021.5'}}
             }
         })
-        util.simVars.overlayOrder = [];
+        simVars.simVars.overlayOrder = [];
          
-        const div = document.createElement('div');
-        div.id = 'raster-colorbar';
-        await document.body.appendChild(div);
+        const rasterColorbar = document.createElement('div');
+        rasterColorbar.id = 'raster-colorbar';
+        await document.body.appendChild(rasterColorbar);
+        const copyLink = document.createElement('div');
+        copyLink.id = 'copyLink';
+        await document.body.appendChild(copyLink);
 
         layerController = await document.body.appendChild(new LayerController());
         layerController.domainSwitch();
@@ -261,11 +279,11 @@ describe('Tests for preloading', () => {
     })
 
     test('UpdateTime should load a preloaded URL', () => {
-        util.simVars.overlayOrder = ['layer'];
+        simVars.simVars.overlayOrder = ['layer'];
 
         var preloadedUrl = 'preloadedRasterTest1/2020';
-        var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
-        var currentUrl = util.simVars.rasterBase + currentRasters[controller.controllers.currentTimestamp.getValue()]['layer'].raster;
+        var currentRasters = simVars.simVars.rasters[controller.controllers.currentDomain.getValue()];
+        var currentUrl = simVars.simVars.rasterBase + currentRasters[controller.controllers.currentTimestamp.getValue()]['layer'].raster;
         layerController.preloaded[currentUrl] = preloadedUrl;
         layerController.updateTime();
 
@@ -273,20 +291,20 @@ describe('Tests for preloading', () => {
     });
 
     test('UpdateTime should load URLs not preloaded', () => {
-        util.simVars.overlayOrder = ['layer'];
+        simVars.simVars.overlayOrder = ['layer'];
         layerController.updateTime();
 
         expect(imageUrl).toEqual('testBase/rasterTest1/2020');
     });
 
     test('UpdateTime should preload future times when current time not loaded', () => {
-        util.simVars.overlayOrder = ['layer'];
+        simVars.simVars.overlayOrder = ['layer'];
 
         var futureTimeStamp = '2021';
         var preloadedFutureUrl = 'preloadedFutureUrl';
         layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
-            var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
-            var futureUrl = util.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
+            var currentRasters = simVars.simVars.rasters[controller.controllers.currentDomain.getValue()];
+            var futureUrl = simVars.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
             layerController.preloaded[futureUrl] = preloadedFutureUrl;
         }
 
@@ -298,16 +316,16 @@ describe('Tests for preloading', () => {
     });
 
     test('Switching domains with a layer added should preload times', () => {
-        util.simVars.overlayOrder = ['layer'];
-        util.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
+        simVars.simVars.overlayOrder = ['layer'];
+        simVars.simVars.sortedTimestamps = ['2020', '2020.5', '2021', '2021.5'];
         controller.controllers.currentDomain.getValue = () => '2';
         controller.controllers.endDate.getValue = () => '2021.5';
 
         var futureTimeStamp = '2021.5';
         var preloadedFutureUrl = 'preloadedFutureUrl';
         layerController.loadWithPriority = (startTime, endTime, overlayOrder) => {
-            var currentRasters = util.simVars.rasters[controller.controllers.currentDomain.getValue()];
-            var futureUrl = util.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
+            var currentRasters = simVars.simVars.rasters[controller.controllers.currentDomain.getValue()];
+            var futureUrl = simVars.simVars.rasterBase + currentRasters[endTime]['layer'].raster;
             layerController.preloaded[futureUrl] = preloadedFutureUrl;
         }
 
