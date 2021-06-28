@@ -7,6 +7,15 @@ jest.mock('../leaflet/leaflet.js');
 const {CatalogItem} = require('../components/CatalogMenu/catalogItem');
 jest.mock('../components/CatalogMenu/catalogItem');
 
+const simVars = require('../simVars.js');
+jest.mock('../simVars.js', () => ({
+    simVars: ({
+        rasters: [],
+        organization: null,
+        rasterBase: '',
+    })
+}));
+
 const utils = require('../util.js');
 jest.mock('../util.js', () => ({
     dragElement: jest.fn()
