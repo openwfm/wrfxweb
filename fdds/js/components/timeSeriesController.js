@@ -374,7 +374,6 @@ export class TimeSeriesController extends LayerController {
                 }
                 if (levelIndex == 0) {
                     y = y - (markHeight - 1);
-                // }
                 } else if (levelIndex < (levels.length - 1)) {
                     y = y - Math.floor((markHeight-1)/2);
                 }
