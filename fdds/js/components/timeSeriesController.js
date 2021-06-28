@@ -127,6 +127,41 @@ export class TimeSeriesController extends LayerController {
         this.updateMarker(marker);
     }
 
+    /** Maps location of marker to position on colorbar for current layer image and colorbar.
+     * Updates the content of the marker. */
+    updateMarker(marker) {
+        var rgb = [0, 0, 0];
+        var clrbarLocation = null;
+        if (this.imgCanvas && simVars.displayedColorbar != null) {
+            var layerImg = this.getLayer(simVars.displayedColorbar)._image;
+            rgb = this.drawMarkerOnCanvas(layerImg, marker);
+            clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
+        }
+        marker.getContent().setRGBValues(rgb, clrbarLocation);
+    }
+
+    drawMarkerOnCanvas(img, marker) {
+        var [xCoord, yCoord] = marker.imageCoords;
+        var imgX = Math.floor(xCoord * img.naturalWidth);
+        var imgY = Math.floor(yCoord * img.naturalHeight);
+
+        this.imgCanvas.getContext('2d').clearRect(0, 0, 1, 1);
+
+        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 1, 1, 0, 0, 1, 1);
+        var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
+
+        return [pixelData[0], pixelData[1], pixelData[2]];
+    }
+
+    drawMarkersOnCanvas(img, markers) {
+        var markerData = [];
+        for (var marker of markers) {
+            var rgbArray = this.drawMarkerOnCanvas(img, marker);
+            markerData.push(rgbArray);
+        }
+        return markerData;
+    }
+
     /** When removing a layer, need to find the most recent colorbar and update the timeSeries canvases
      * to that layer. */
     handleOverlayRemove(name) {
@@ -160,26 +195,7 @@ export class TimeSeriesController extends LayerController {
         clrbarImg.src = rasterColorbar.src;
     }
 
-    drawMarkersOnCanvas(img, markers) {
-        var markerData = [];
-        for (var marker of markers) {
-            var rgbArray = this.drawMarkerOnCanvas(img, marker);
-            markerData.push(rgbArray);
-        }
-        return markerData;
-    }
-
-    drawMarkerOnCanvas(img, marker) {
-        var [xCoord, yCoord] = marker.imageCoords;
-        var imgX = Math.floor(xCoord * img.naturalWidth);
-        var imgY = Math.floor(yCoord * img.naturalHeight);
-
-        this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 1, 1, 0, 0, 1, 1);
-        var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
-
-        return [pixelData[0], pixelData[1], pixelData[2]];
-    }
-
+   
     /** returns a canvas drawn with given image. */
     drawColorbarCanvas(colorbarImg) {
         this.clrbarCanvas.getContext('2d').clearRect(0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
@@ -191,19 +207,6 @@ export class TimeSeriesController extends LayerController {
         this.clrbarCanvas.getContext('2d').drawImage(colorbarImg, 0, 0, this.clrbarCanvas.width, this.clrbarCanvas.height);
     }
 
-    /** Maps location of marker to position on colorbar for current layer image and colorbar.
-     * Updates the content of the marker. */
-    updateMarker(marker) {
-        var rgb = [0, 0, 0];
-        var clrbarLocation = null;
-        if (this.imgCanvas && simVars.displayedColorbar != null) {
-            var layerImg = this.getLayer(simVars.displayedColorbar)._image;
-            rgb = this.drawMarkerOnCanvas(layerImg, marker);
-            clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
-        }
-        marker.getContent().setRGBValues(rgb, clrbarLocation);
-    }
-    
     /** Iterates over all keys in clrbarMap and finds closest one to given rgb values. Returns relative 
      * location in clrbarMap. */
     findClosestKey(rgb, clrbarMap) {
@@ -353,6 +356,19 @@ export class TimeSeriesController extends LayerController {
             }
             var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
             if (colorbarData[3] != 0) {
+                var markHeight = 0;
+                while (colorbarData[3] != 0 && y < clrbarCanvas.height) {
+                    y += 1;
+                    markHeight += 1;
+                    colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+                }
+                if (levelIndex == 0) {
+                    y = y - (markHeight - 1);
+                // }
+                } else if (levelIndex < (levels.length - 1)) {
+                    y = y - Math.floor((markHeight-1)/2);
+                }
+                
                 var location = computeLocation(y);
                 levelMap[location] = levels[levelIndex];
                 if (coord2.length == 0) {
@@ -368,7 +384,8 @@ export class TimeSeriesController extends LayerController {
         var slope = (coord2[1] - coord1[1]) / (coord2[0] - coord1[0]);
         const interpolate = (location) => {
             if (!stratified) {
-                return slope*(location - coord1[0]) + coord1[1];
+                var val = slope*(location - coord1[0]) + coord1[1];
+                return Math.round(val * 100) / 100;
             }
             // find closest key in levelMap
             var closestKey = location;
