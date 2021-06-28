@@ -1,7 +1,7 @@
 const { DomainSelector } = require('../components/domainSelector');
 
-const util = require('../util.js');
-jest.mock('../util.js', () => ({
+const simVars = require('../simVars.js');
+jest.mock('../simVars.js', () => ({
     simVars: ({
         sortedTimestamps: [],
         rasters: ({
@@ -17,6 +17,10 @@ jest.mock('../util.js', () => ({
             opacity: "0.5"
         }),
     }),
+}));
+
+const util = require('../util.js');
+jest.mock('../util.js', () => ({
     localToUTC: jest.fn()
 }));
 
@@ -58,7 +62,7 @@ describe('Domain Selector Tests', () => {
     test('Tests setUpForDomain', () => {
         domainSelector.setUpForDomain(1);
 
-        expect(util.simVars.sortedTimestamps).toEqual(['2020']);
+        expect(simVars.simVars.sortedTimestamps).toEqual(['2020']);
         expect(currentDomain).toEqual(1);
     });
 
@@ -66,7 +70,7 @@ describe('Domain Selector Tests', () => {
         domainSelector.setUpForDomain(1);
         domainSelector.setUpForDomain(2);
 
-        expect(util.simVars.sortedTimestamps).toEqual(['2020', '2021']);
+        expect(simVars.simVars.sortedTimestamps).toEqual(['2020', '2021']);
         expect(currentDomain).toEqual(2);
     });
 });
