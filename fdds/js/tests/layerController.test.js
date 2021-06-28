@@ -206,64 +206,65 @@ describe('Tests for adding layers to menu and selecting layers', () => {
     });
 });
 
-// describe('Tests for adding layers with colorbars', () => {
-//     var layerController;
+describe('Tests for adding layers with colorbars', () => {
+    var layerController;
 
-//     beforeEach(async () => {
-//         controller.controllers.currentDomain.getValue = () => 1;
-//         controller.controllers.currentTimestamp.getValue = () => '2020';
+    beforeEach(async () => {
+        controller.controllers.currentDomain.getValue = () => 1;
+        controller.controllers.currentTimestamp.getValue = () => '2020';
 
-//         simVars.simVars.overlayOrder = [];
-//         simVars.simVars.displayedColorbar = '';
+        simVars.simVars.overlayOrder = [];
+        simVars.simVars.displayedColorbar = '';
 
-        // const div = document.createElement('div');
-        // div.id = 'raster-colorbar';
-        // await document.body.appendChild(div);
-        // const div = document.createElement('div');
-        // div.id = 'copyLink';
-        // await document.body.appendChild(div);
+        const rasterColorbar = document.createElement('div');
+        rasterColorbar.id = 'raster-colorbar';
+        await document.body.appendChild(rasterColorbar);
+        const copyLink = document.createElement('div');
+        copyLink.id = 'copyLink';
+        await document.body.appendChild(copyLink);
 
-//         layerController = await document.body.appendChild(new LayerController());
-//         layerController.domainSwitch();
-//         layerController.loadWithPriority = jest.fn();
-//     });
 
-//     test('Layer Controller should add any colorbars', () => {
-//         layerController.handleOverlayadd('raster');
+        layerController = await document.body.appendChild(new LayerController());
+        layerController.domainSwitch();
+        layerController.loadWithPriority = jest.fn();
+    });
 
-//         expect(simVars.simVars.displayedColorbar).toEqual('raster');
-//     });
+    test('Layer Controller should add any colorbars', () => {
+        layerController.handleOverlayadd('raster');
 
-//     test('Layer Controller should remove colorbars when layer deselected', () => {
-//         layerController.handleOverlayadd('raster');
-//         layerController.handleOverlayRemove('raster');
+        expect(simVars.simVars.displayedColorbar).toEqual('raster');
+    });
 
-//         expect(simVars.simVars.displayedColorbar).toEqual(null);
-//     });
+    test('Layer Controller should remove colorbars when layer deselected', () => {
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayRemove('raster');
 
-//     test('Layer Controller should put most recent selected colorbar on top', () => {
-//         layerController.handleOverlayadd('raster');
-//         layerController.handleOverlayadd('overlay');
+        expect(simVars.simVars.displayedColorbar).toEqual(null);
+    });
 
-//         expect(simVars.simVars.displayedColorbar).toEqual('overlay');
-//     });
+    test('Layer Controller should put most recent selected colorbar on top', () => {
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayadd('overlay');
 
-//     test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
-//         layerController.handleOverlayadd('raster');
-//         layerController.handleOverlayadd('overlay');
-//         layerController.handleOverlayRemove('overlay');
+        expect(simVars.simVars.displayedColorbar).toEqual('overlay');
+    });
 
-//         expect(simVars.simVars.displayedColorbar).toEqual('raster');
-//     });
+    test('Layer Controller should put last selected colorbar on top when another is deselected', () => {
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayadd('overlay');
+        layerController.handleOverlayRemove('overlay');
 
-//     test('Layer Controller should remove colorbar when switching to a domain without one', () => {
-//         layerController.handleOverlayadd('raster');
-//         controller.controllers.currentDomain.getValue = () => 2;
-//         layerController.domainSwitch();
+        expect(simVars.simVars.displayedColorbar).toEqual('raster');
+    });
 
-//         expect(simVars.simVars.displayedColorbar).toEqual(null);
-//     });
-// });
+    test('Layer Controller should remove colorbar when switching to a domain without one', () => {
+        layerController.handleOverlayadd('raster');
+        controller.controllers.currentDomain.getValue = () => 2;
+        layerController.domainSwitch();
+
+        expect(simVars.simVars.displayedColorbar).toEqual(null);
+    });
+});
 
 // describe('Tests for preloading', () => {
 //     var layerController;
