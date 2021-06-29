@@ -97,7 +97,7 @@ export class DomainSelector extends HTMLElement {
         }
 
         var startDate = controllers.startDate.getValue();
-        if (!startDate) {
+        if (!startDate || this.currentSimulation != simVars.currentSimulation) {
             startDate = nextTimestamps[0];
             var presetStartDate = localToUTC(simVars.presets.startDate);
             if (nextTimestamps.includes(presetStartDate)) {
@@ -110,7 +110,7 @@ export class DomainSelector extends HTMLElement {
         controllers.startDate.setValue(startDate);
 
         var endDate = controllers.endDate.getValue();
-        if (!endDate) {
+        if (!endDate || this.currentSimulation != simVars.currentSimulation) {
             endDate = nextTimestamps[nextTimestamps.length - 1];
             var presetEndDate = localToUTC(simVars.presets.endDate);
             if (nextTimestamps.includes(presetEndDate)) {
@@ -138,6 +138,10 @@ export class DomainSelector extends HTMLElement {
             controllers.currentTimestamp.setValue(presetTimestamp);
         }
         simVars.presets.timestamp = null;
+
+        if (this.currentSimulation != simVars.currentSimulation) {
+            this.currentSimulation = simVars.currentSimulation;
+        }
     }
 }
 
