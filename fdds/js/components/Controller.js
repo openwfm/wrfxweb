@@ -50,9 +50,9 @@ export const controllers = {
     opacity: (function createOpacity() {
         var opacityController = new Controller(.5);
 
-        opacityController.subscribe(() => {
-            setURL();
-        });
+        // opacityController.subscribe(() => {
+        //     setURL();
+        // });
 
         return opacityController;
     })(),
@@ -68,7 +68,7 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
 
-            setURL();
+            // setURL();
         }
         startDateController.subscribe(subscriptionFunction);
 
@@ -85,7 +85,7 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
 
-            setURL();
+            // setURL();
         }
         endDateController.subscribe(subscriptionFunction);
 

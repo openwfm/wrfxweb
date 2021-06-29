@@ -107,7 +107,6 @@ export class LayerController extends HTMLElement {
                 rasterColorbar.src = colorbarURL;
             }
         }
-        setURL();
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
