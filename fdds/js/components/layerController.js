@@ -190,6 +190,9 @@ export class LayerController extends HTMLElement {
         this.preloaded = {};
 
         const reload = () => {
+            if (this.currentSimulation != simVars.currentSimulation) {
+                return;
+            }
             var startDate = controllers.startDate.getValue();
             var endDate = controllers.endDate.getValue();
             this.loadWithPriority(startDate, endDate, simVars.overlayOrder);

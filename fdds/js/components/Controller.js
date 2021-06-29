@@ -47,15 +47,7 @@ export const controllers = {
     domainInstance: new Controller(),
     currentDomain: new Controller(),
     loadingProgress: new Controller(0),
-    opacity: (function createOpacity() {
-        var opacityController = new Controller(.5);
-
-        // opacityController.subscribe(() => {
-        //     setURL();
-        // });
-
-        return opacityController;
-    })(),
+    opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
         var startDateController = new Controller();
@@ -67,8 +59,6 @@ export const controllers = {
             if (newStartDate > currentTimestamp) {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
-
-            // setURL();
         }
         startDateController.subscribe(subscriptionFunction);
 
@@ -84,8 +74,6 @@ export const controllers = {
             if (newEndDate < currentTimestamp) {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
-
-            // setURL();
         }
         endDateController.subscribe(subscriptionFunction);
 
