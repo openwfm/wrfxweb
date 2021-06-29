@@ -54,8 +54,8 @@ export class SimulationSlider extends Slider {
             }
             #slider-marker-info {
                 position: absolute;
-                margin: auto auto;
-                top: 30px; bottom: 0; left: 0; right: 0;
+                margin: 0 auto;
+                top: 20px; bottom: 0; left: 0; right: 0;
                 background: white;
                 width: 160px;
                 height: 20px;
