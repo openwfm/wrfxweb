@@ -256,6 +256,11 @@ export class TimeSeriesController extends LayerController {
             var syncController = new SyncController();
             syncController.subscribe(() => {
                 for (var i = 0; i < markerData.length; i++) {
+                    var dataType = markers[i].getContent().getDataType();
+                    var [r, g, b] = markerData[i];
+                    if ((r + g + b) == 0 && (dataType == 'discrete')) {
+                        continue;
+                    }
                     var dataValue = this.findClosestKey(markerData[i], clrbarMap);
                     var key = generateKey(markers[i]);
 
