@@ -1,5 +1,6 @@
 import { Slider } from './slider.js';
 import { controllers } from './Controller.js';
+import { setURL } from '../util.js';
 
 export class OpacitySlider extends Slider {
     constructor() {
@@ -18,6 +19,11 @@ export class OpacitySlider extends Slider {
         var opacity = controllers.opacity.getValue();
         opacityDisplay.innerHTML = opacity;
 
+        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        sliderHead.onpointerdown = (e) => {
+            const updateCallback = (newFrame) => this.updateHeadPosition(newFrame)
+            this.dragSliderHead(e, this.frame, updateCallback, setURL)
+        }
         controllers.opacity.subscribe(() => {
             this.updateOpacity();
         });
