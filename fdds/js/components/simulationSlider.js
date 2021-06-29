@@ -1,5 +1,5 @@
 import { Slider } from './slider.js';
-import { utcToLocal, createElement } from '../util.js';
+import { utcToLocal, createElement, setURL } from '../util.js';
 import { controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -86,10 +86,15 @@ export class SimulationSlider extends Slider {
         `;
 
         sliderHead.onpointerdown = (e) => {
-            this.dragSliderHead(e, this.frame, this.setTimestamp);
+            const finishedCallback = () => setURL();
+            this.dragSliderHead(e, this.frame, this.setTimestamp, finishedCallback);
+        }
+        const clickBarCallback = (newTimestamp) => {
+            this.setTimestamp(newTimestamp);
+            setURL();
         }
         sliderBar.onclick = (e) => {
-            this.clickBar(e, this.setTimestamp);
+            this.clickBar(e, clickBarCallback);
         }
 
         this.configureStartSetter();
@@ -177,10 +182,12 @@ export class SimulationSlider extends Slider {
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                setURL();
             }
 
             this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
+
         controllers.startDate.subscribe(() => {
             var startDate = controllers.startDate.getValue();
             var startIndex = simVars.sortedTimestamps.indexOf(startDate);
@@ -221,6 +228,7 @@ export class SimulationSlider extends Slider {
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                setURL();
             }
             
             this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);

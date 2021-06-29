@@ -1,5 +1,5 @@
 import { controllers } from './Controller.js';
-import { utcToLocal } from '../util.js';
+import { setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
@@ -73,9 +73,11 @@ export class SimulationController extends HTMLElement {
         }
         this.querySelector('#slider-prev').onpointerdown = () => {
             this.prevFrame();
+            setURL();
         }
         this.querySelector('#slider-next').onpointerdown = () => {
             this.nextFrame();
+            setURL();
         }
         const speedUp = this.querySelector('#slider-fast-forward');
         const slowDown = this.querySelector('#slider-slow-down');
@@ -128,6 +130,7 @@ export class SimulationController extends HTMLElement {
             playPauseButton.firstElementChild.src = 'icons/play_arrow-24px.svg';
             prevButton.disabled = false;
             nextButton.disabled = false;
+            setURL();
         } else {
             playPauseButton.firstElementChild.src = 'icons/pause-24px.svg';
             prevButton.disabled = true;
