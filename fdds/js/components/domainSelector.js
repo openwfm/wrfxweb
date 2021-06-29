@@ -23,11 +23,13 @@ export class DomainSelector extends HTMLElement {
         }
 
         controllers.domainInstance.subscribe(domainSubscription);
+        this.currentSimulation = '';
     }
 
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
         var domains = controllers.domainInstance.getValue();
+        controllers.loadingProgress.setValue(0);
 
         var presetDomain = domains[0];
         if (domains.includes(simVars.presets.domain)) {
