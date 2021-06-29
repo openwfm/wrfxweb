@@ -3,7 +3,7 @@ import { controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
 export class TimeSeriesButton extends HTMLElement {
-    constructor() {
+    constructor(dataType = 'continuous') {
         super();
         this.innerHTML = `
             <link rel='stylesheet' href='css/timeSeriesButton.css'/>
@@ -16,21 +16,26 @@ export class TimeSeriesButton extends HTMLElement {
                     <label class='timeseries-select-label' for='endDate'>end time: </label>
                     <select class='timeseries-select' id='endDate'></select>
                 </div>
+                <div>
+                    <label class='timeseries-select-label' for='dataType'>data type: </label>
+                    <select class='timeseries-select' id='dataType'>
+                        <option value='continuous'>continuous</option>
+                        <option value='discrete'>discrete</option>
+                    </select>
+                </div>
                 <button class='timeSeriesButton' id='timeSeriesButton'>
                     <span>generate timeseries</span>
                     <div id='progressBar'></div>
                 </button>
             </div>
         `;
+        this.querySelector('#dataType').value = dataType;
     }
 
     connectedCallback() {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
-        // const dateChange = () => {
-        //     linkSelects(startDate, endDate)
-        // }
         startDate.addEventListener('change', () => {
             var simulationStartDate = controllers.startDate.getValue();
             if (startDate.value < simulationStartDate) {
@@ -100,6 +105,10 @@ export class TimeSeriesButton extends HTMLElement {
 
     getEndDate() {
         return this.querySelector('#endDate').value;
+    }
+
+    getDataType() {
+        return this.querySelector('#dataType').value;
     }
 
     setStartDate(newStartDate) {
