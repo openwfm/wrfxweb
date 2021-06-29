@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -49,9 +49,19 @@ export class TimeSeriesChart extends HTMLElement {
         const undoZoom = this.querySelector('#undo-zoom');
         const timeSeries = this.querySelector('#timeSeriesChart');
         this.ctx = timeSeries.getContext('2d');
-        timeSeries.onpointerdown = (e) => {
+        timeSeries.addEventListener('pointerdown', (e) => {
             this.zoomBox(e);
-        }
+        });
+        timeSeries.addEventListener('pointerdown', (evt) => {
+            const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+            if (points.length) {
+                const firstPoint = points[0];
+                var label = this.chart.data.labels[firstPoint.index];
+                var timestamp = localToUTC(label);
+                controllers.currentTimestamp.setValue(timestamp);
+                setURL();
+            }
+        });
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
             this.populateChart(this.data, zoomStart.value, zoomEnd.value);
@@ -200,18 +210,6 @@ export class TimeSeriesChart extends HTMLElement {
             options: {
                 animation: {
                     duration: 0
-                },
-                onClick: (evt) => {
-                    const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                    if (points.length) {
-                        const firstPoint = points[0];
-                        var label = this.chart.data.labels[firstPoint.index];
-                        for (var timeStamp of simVars.sortedTimestamps) {
-                            if (utcToLocal(timeStamp) == label) {
-                                controllers.currentTimestamp.setValue(timeStamp);
-                            }
-                        }
-                    }
                 },
                 scales: {
                     yAxes: {

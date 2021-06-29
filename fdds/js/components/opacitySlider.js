@@ -21,8 +21,8 @@ export class OpacitySlider extends Slider {
 
         const sliderHead = this.shadowRoot.querySelector('#slider-head');
         sliderHead.onpointerdown = (e) => {
-            const updateCallback = (newFrame) => this.updateHeadPosition(newFrame)
-            this.dragSliderHead(e, this.frame, updateCallback, setURL)
+            const updateCallback = (newFrame) => this.updateHeadPosition(newFrame);
+            this.dragSliderHead(e, this.frame, updateCallback, setURL);
         }
         const sliderBar = this.shadowRoot.querySelector('#slider-bar');
         sliderBar.onclick = (e) => {
