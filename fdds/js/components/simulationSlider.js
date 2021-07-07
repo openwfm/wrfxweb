@@ -1,6 +1,6 @@
 import { Slider } from './slider.js';
 import { utcToLocal, createElement, setURL } from '../util.js';
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
 export class SimulationSlider extends Slider {
@@ -12,15 +12,19 @@ export class SimulationSlider extends Slider {
     connectedCallback() {
         super.connectedCallback();
 
-        controllers.currentDomain.subscribe(() => {
-            this.resetSlider();
-        });
-        controllers.currentTimestamp.subscribe(() => {
+        const updateSlider = () => {
             var currentTimestamp = controllers.currentTimestamp.getValue();
             var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
-
             this.updateHeadPosition(newFrame);
-        });
+        }
+        controllers.currentDomain.subscribe(() => {
+            this.nFrames = simVars.sortedTimestamps.length - 1;
+            this.updateStartLocation();
+            this.updateEndLocation();
+            updateSlider();
+        }, controllerEvents.all);
+
+        controllers.currentTimestamp.subscribe(updateSlider);
         controllers.loadingProgress.subscribe(() => {
             this.setLoadProgress();
         });
@@ -101,30 +105,30 @@ export class SimulationSlider extends Slider {
         this.configureEndSetter();
     }
 
-    resetSlider() {
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
-        var currentTimestamp = controllers.currentTimestamp.getValue();
+    // resetSlider() {
+    //     var startDate = controllers.startDate.getValue();
+    //     var endDate = controllers.endDate.getValue();
+    //     var currentTimestamp = controllers.currentTimestamp.getValue();
 
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.currentSimulation = simVars.currentSimulation;
-            currentTimestamp = startDate;
-        } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
-            var percentage = this.frame / this.nFrames;
-            var timeIndex = Math.floor((simVars.sortedTimestamps.length - 1) * percentage);
-            currentTimestamp = simVars.sortedTimestamps[timeIndex];
-        }
+        // if (this.currentSimulation != simVars.currentSimulation) {
+        //     this.currentSimulation = simVars.currentSimulation;
+        //     currentTimestamp = startDate;
+        // } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
+        //     var percentage = this.frame / this.nFrames;
+        //     var timeIndex = Math.floor((simVars.sortedTimestamps.length - 1) * percentage);
+        //     currentTimestamp = simVars.sortedTimestamps[timeIndex];
+        // }
 
-        if (currentTimestamp < startDate) {
-            currentTimestamp = startDate;
-        }
-        if (currentTimestamp > endDate) {
-            currentTimstamp = endDate;
-        }
+        // if (currentTimestamp < startDate) {
+        //     currentTimestamp = startDate;
+        // }
+        // if (currentTimestamp > endDate) {
+        //     currentTimstamp = endDate;
+        // }
 
-        this.nFrames = simVars.sortedTimestamps.length - 1;
-        controllers.currentTimestamp.setValue(currentTimestamp);
-    }
+        // this.nFrames = simVars.sortedTimestamps.length - 1;
+        // controllers.currentTimestamp.setValue(currentTimestamp);
+    // }
 
     setLoadProgress() {
         var progress = controllers.loadingProgress.getValue();
@@ -189,13 +193,16 @@ export class SimulationSlider extends Slider {
         }
 
         controllers.startDate.subscribe(() => {
-            var startDate = controllers.startDate.getValue();
-            var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-            var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
+            this.updateStartLocation();
+            // var startDate = controllers.startDate.getValue();
+            // var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+            // var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
 
-            sliderStart.style.left = left + 'px';
+            // sliderStart.style.left = left + 'px';
         });
     }
+
+    
 
     configureEndSetter() {
         const sliderEnd = this.shadowRoot.querySelector('#slider-end');
@@ -235,12 +242,33 @@ export class SimulationSlider extends Slider {
         }
 
         controllers.endDate.subscribe(() => {
-            var endDate = controllers.endDate.getValue();
-            var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
+            this.updateEndLocation();
+            // var endDate = controllers.endDate.getValue();
+            // var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
+            // let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
 
-            sliderEnd.style.left = left + 'px';
+            // sliderEnd.style.left = left + 'px';
         });
+    }
+
+    updateStartLocation() {
+        const sliderStart = this.shadowRoot.querySelector('#slider-start');
+
+        var startDate = controllers.startDate.getValue();
+        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
+        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
+
+        sliderStart.style.left = left + 'px';
+    }
+
+    updateEndLocation() {
+        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
+
+        var endDate = controllers.endDate.getValue();
+        var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
+        let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
+
+        sliderEnd.style.left = left + 'px';
     }
 
     setTimestamp(timeIndex) {

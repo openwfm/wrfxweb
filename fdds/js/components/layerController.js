@@ -55,11 +55,13 @@ export class LayerController extends HTMLElement {
         const domainSubscription = () => {
             this.resetLayers();
             this.domainSwitch();
+            this.updateTime();
         }
         const domainResetSubscription = () => {
             this.resetLayers();
             this.resetLayerController();
             this.domainSwitch();
+            this.updateTime();
         }
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
@@ -154,11 +156,11 @@ export class LayerController extends HTMLElement {
         });
         for (var timeStamp of filteredTimeStamps) {
             var raster = simVars.rasters[currentDomain][timeStamp];
-            if (!raster) { // not a great bit of code. needed because loadWithPriority called immediately after 
-                           // switching the domain when the start and endDates are set but the domain hasn't 
-                           // updated yet. need to better figure out the order of events.
-                return;
-            }
+            // if (!raster) { // not a great bit of code. needed because loadWithPriority called immediately after 
+            //                // switching the domain when the start and endDates are set but the domain hasn't 
+            //                // updated yet. need to better figure out the order of events.
+            //     return;
+            // }
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
@@ -326,6 +328,8 @@ export class LayerController extends HTMLElement {
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
+        console.log(controllers.currentDomain.getValue());
+        console.log(controllers.currentTimestamp.getValue());
         var raster_info = rasters_now[name];
         var opacity = controllers.opacity.getValue();
         layer.setUrl(simVars.rasterBase + raster_info.raster);

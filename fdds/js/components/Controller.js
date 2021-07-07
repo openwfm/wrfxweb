@@ -1,7 +1,8 @@
 export const controllerEvents = {
     quiet: 'QUIET', 
     simReset: 'SIMULATION_RESET',
-    valueSet: 'VALUE_SET'
+    valueSet: 'VALUE_SET', 
+    all: 'ALL'
 }
 
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
@@ -22,7 +23,10 @@ export class Controller {
 
     setValue(value, eventName=controllerEvents.valueSet) {
         this.value = value;
-        this.notifyListeners(this.listeners[eventName]);
+        if (eventName != controllerEvents.quiet) {
+            this.notifyListeners(this.listeners[eventName]);
+            this.notifyListeners(this.listeners[controllerEvents.all]);
+        }
     }
 
     getValue() {

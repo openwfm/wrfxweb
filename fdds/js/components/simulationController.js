@@ -1,4 +1,4 @@
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
@@ -63,7 +63,7 @@ export class SimulationController extends HTMLElement {
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
-        });
+        }, controllerEvents.all);
         controllers.currentTimestamp.subscribe(() => {
             this.updateSlider();
         });
@@ -109,6 +109,7 @@ export class SimulationController extends HTMLElement {
 
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
+        this.updateSlider();
     }
 
     /** Called to update the UI when the currentFrame has been updated. */

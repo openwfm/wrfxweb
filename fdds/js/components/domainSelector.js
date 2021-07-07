@@ -111,11 +111,13 @@ export class DomainSelector extends HTMLElement {
         }
         simVars.presets.opacity = null;
 
+        var currentTimestamp = startDate;
         var presetTimestamp = localToUTC(simVars.presets.timestamp);
-        if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
-            controllers.currentTimestamp.setValue(presetTimestamp, controllerEvents.quiet);
+        if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
+            currentTimestamp = presetTimestamp;
         }
         simVars.presets.timestamp = null;
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
     }
 
     /** Function called when a new domain is selected. */
@@ -136,53 +138,18 @@ export class DomainSelector extends HTMLElement {
         }
 
         var startDate = controllers.startDate.getValue();
-        // if (!startDate || this.currentSimulation != simVars.currentSimulation) {
-        //     startDate = nextTimestamps[0];
-        //     var presetStartDate = localToUTC(simVars.presets.startDate);
-        //     if (nextTimestamps.includes(presetStartDate)) {
-        //         startDate = presetStartDate;
-        //         simVars.presets.startDate = null;
-        //     }
-        // } else {
-        //     startDate = findNewTimestamp(startDate);
-        // }
         startDate = findNewTimestamp(startDate);
         controllers.startDate.setValue(startDate, controllerEvents.quiet);
 
         var endDate = controllers.endDate.getValue();
-        // if (!endDate || this.currentSimulation != simVars.currentSimulation) {
-        //     endDate = nextTimestamps[nextTimestamps.length - 1];
-        //     var presetEndDate = localToUTC(simVars.presets.endDate);
-        //     if (nextTimestamps.includes(presetEndDate)) {
-        //         endDate = presetEndDate;
-        //         simVars.presets.endDate = null;
-        //     }
-        // } else {
-        //     endDate = findNewTimestamp(endDate);
-        // }
         endDate = findNewTimestamp(endDate);
         controllers.endDate.setValue(endDate, controllerEvents.quiet);
 
-        // var presetOpacity = simVars.presets.opacity;
-        // if (presetOpacity && !isNaN(presetOpacity)) {
-        //     var opacity = Number(presetOpacity);
-        //     if (opacity >= 0 && opacity <= 1) {
-        //         controllers.opacity.setValue(Number(presetOpacity));
-        //     }
-        //     simVars.presets.opacity = null;
-        // }
+        var currentTimestamp = controllers.currentTimestamp.value;
+        currentTimestamp = findNewTimestamp(currentTimestamp);
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
 
         controllers.currentDomain.setValue(domId);
-
-        // var presetTimestamp = localToUTC(simVars.presets.timestamp);
-        // if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
-        //     controllers.currentTimestamp.setValue(presetTimestamp);
-        // }
-        // simVars.presets.timestamp = null;
-
-        // if (this.currentSimulation != simVars.currentSimulation) {
-        //     this.currentSimulation = simVars.currentSimulation;
-        // }
     }
 }
 
