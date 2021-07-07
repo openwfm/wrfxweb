@@ -1,5 +1,5 @@
 import { dragElement, debounce, setURL } from '../util.js';
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
 import { map } from '../map.js';
@@ -53,9 +53,17 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
         const domainSubscription = () => {
+            this.resetLayers();
+            this.domainSwitch();
+        }
+        const domainResetSubscription = () => {
+            this.resetLayers();
+            this.resetLayerController();
             this.domainSwitch();
         }
         controllers.currentDomain.subscribe(domainSubscription);
+        controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
+
         controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
         controllers.opacity.subscribe(() => {
             var newOpacity = controllers.opacity.getValue();
@@ -77,9 +85,9 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        if (this.currentSimulation != simVars.currentSimulation) {
-            return;
-        }
+        // if (this.currentSimulation != simVars.currentSimulation) {
+        //     return;
+        // }
         var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var reloading = false;
         for (var layerName of simVars.overlayOrder) {
@@ -174,6 +182,23 @@ export class LayerController extends HTMLElement {
         }
     }
 
+    resetLayers() {
+        if (this.worker) {
+            this.worker.terminate();
+        }
+        this.nImages = 0;
+        for (var layerName of simVars.overlayOrder) {
+            var layer = this.getLayer(layerName);
+            if (layer) {
+                layer.remove(map);
+            }
+        }
+        simVars.displayedColorbar = null;
+        const rasterColorbar = document.querySelector('#raster-colorbar');
+        rasterColorbar.src = '';
+        rasterColorbar.style.display = 'none';
+    }
+
     resetLayerController() {
         this.currentSimulation = simVars.currentSimulation;
 
@@ -207,24 +232,24 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // remove all layers of previous domain and reset the colorbar
-        if (this.worker) {
-            this.worker.terminate();
-        }
-        this.nImages = 0;
-        for (var layerName of simVars.overlayOrder) {
-            var layer = this.getLayer(layerName);
-            if (layer) {
-                layer.remove(map);
-            }
-        }
-        simVars.displayedColorbar = null;
-        const rasterColorbar = document.querySelector('#raster-colorbar');
-        rasterColorbar.src = '';
-        rasterColorbar.style.display = 'none';
-        // if on a new simulation entirely, reset selected layers
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.resetLayerController();
-        }
+        // if (this.worker) {
+        //     this.worker.terminate();
+        // }
+        // this.nImages = 0;
+        // for (var layerName of simVars.overlayOrder) {
+        //     var layer = this.getLayer(layerName);
+        //     if (layer) {
+        //         layer.remove(map);
+        //     }
+        // }
+        // simVars.displayedColorbar = null;
+        // const rasterColorbar = document.querySelector('#raster-colorbar');
+        // rasterColorbar.src = '';
+        // rasterColorbar.style.display = 'none';
+        // // if on a new simulation entirely, reset selected layers
+        // if (this.currentSimulation != simVars.currentSimulation) {
+        //     this.resetLayerController();
+        // }
         // build the layer groups of the current domain
         var first_rasters = simVars.rasters[controllers.currentDomain.getValue()][simVars.sortedTimestamps[0]];
         var vars = Object.keys(first_rasters);
@@ -319,10 +344,10 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             simVars.displayedColorbar = name;
         }
-        var startDate = controllers.currentTimestamp.getValue();
-        // var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-        var endDate = controllers.endDate.getValue();
-        this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+        // var startDate = controllers.currentTimestamp.getValue();
+        // // var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        // var endDate = controllers.endDate.getValue();
+        // this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         setURL();
     }
 
@@ -467,7 +492,10 @@ export class LayerController extends HTMLElement {
         input.checked = simVars.overlayOrder.includes(name);
         input.onclick = () => {
             if (input.checked) {
+                var startDate = controllers.currentTimestamp.getValue();
+                var endDate = controllers.endDate.getValue();
                 this.handleOverlayadd(name);
+                this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
             } else {
                 this.handleOverlayRemove(name);
             }
