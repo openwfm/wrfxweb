@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -40,6 +40,7 @@ export class TimeSeriesChart extends HTMLElement {
 
     connectedCallback() {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        dragElement(timeSeriesChart, '');
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         const zoomStart = this.querySelector('#zoom-start');
