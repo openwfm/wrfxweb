@@ -35,7 +35,6 @@ export class LayerController extends HTMLElement {
             </div>
         `;
         this.mapType = 'OSM';
-        this.currentSimulation = '';
         this.overlayDict = {};
         this.rasterDict = {};
         this.preloaded = {};
@@ -74,7 +73,15 @@ export class LayerController extends HTMLElement {
                 var topLayer = this.getLayer(topLayerName);
                 topLayer.setOpacity(newOpacity);
             }
-        })
+        });
+
+        const reload = () => {
+            var startDate = controllers.startDate.getValue();
+            var endDate = controllers.endDate.getValue();
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+        }
+        controllers.startDate.subscribe(reload);
+        controllers.endDate.subscribe(reload);
 
         const opacitySlider = new OpacitySlider();
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
@@ -87,9 +94,6 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        // if (this.currentSimulation != simVars.currentSimulation) {
-        //     return;
-        // }
         var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var reloading = false;
         for (var layerName of simVars.overlayOrder) {
@@ -156,11 +160,6 @@ export class LayerController extends HTMLElement {
         });
         for (var timeStamp of filteredTimeStamps) {
             var raster = simVars.rasters[currentDomain][timeStamp];
-            // if (!raster) { // not a great bit of code. needed because loadWithPriority called immediately after 
-            //                // switching the domain when the start and endDates are set but the domain hasn't 
-            //                // updated yet. need to better figure out the order of events.
-            //     return;
-            // }
             for (var layerName of layerNames) {
                 var rasterInfo = raster[layerName];
                 var imageURL = simVars.rasterBase + rasterInfo.raster;
@@ -202,8 +201,6 @@ export class LayerController extends HTMLElement {
     }
 
     resetLayerController() {
-        this.currentSimulation = simVars.currentSimulation;
-
         simVars.overlayOrder = [];
         var presetRasters = simVars.presets.rasters;
         if (presetRasters) {
@@ -216,16 +213,7 @@ export class LayerController extends HTMLElement {
         }
         this.preloaded = {};
 
-        const reload = () => {
-            if (this.currentSimulation != simVars.currentSimulation) {
-                return;
-            }
-            var startDate = controllers.startDate.getValue();
-            var endDate = controllers.endDate.getValue();
-            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-        }
-        controllers.startDate.subscribe(reload);
-        controllers.endDate.subscribe(reload);
+       
 
         this.querySelector('#layer-controller-container').style.display = 'block';
         document.querySelector('#copyLink').style.display = 'block';
@@ -233,25 +221,6 @@ export class LayerController extends HTMLElement {
 
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
-        // remove all layers of previous domain and reset the colorbar
-        // if (this.worker) {
-        //     this.worker.terminate();
-        // }
-        // this.nImages = 0;
-        // for (var layerName of simVars.overlayOrder) {
-        //     var layer = this.getLayer(layerName);
-        //     if (layer) {
-        //         layer.remove(map);
-        //     }
-        // }
-        // simVars.displayedColorbar = null;
-        // const rasterColorbar = document.querySelector('#raster-colorbar');
-        // rasterColorbar.src = '';
-        // rasterColorbar.style.display = 'none';
-        // // if on a new simulation entirely, reset selected layers
-        // if (this.currentSimulation != simVars.currentSimulation) {
-        //     this.resetLayerController();
-        // }
         // build the layer groups of the current domain
         var first_rasters = simVars.rasters[controllers.currentDomain.getValue()][simVars.sortedTimestamps[0]];
         var vars = Object.keys(first_rasters);
@@ -328,8 +297,6 @@ export class LayerController extends HTMLElement {
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        console.log(controllers.currentDomain.getValue());
-        console.log(controllers.currentTimestamp.getValue());
         var raster_info = rasters_now[name];
         var opacity = controllers.opacity.getValue();
         layer.setUrl(simVars.rasterBase + raster_info.raster);
@@ -348,10 +315,6 @@ export class LayerController extends HTMLElement {
             rasterColorbar.style.display = 'block';
             simVars.displayedColorbar = name;
         }
-        // var startDate = controllers.currentTimestamp.getValue();
-        // // var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-        // var endDate = controllers.endDate.getValue();
-        // this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         setURL();
     }
 

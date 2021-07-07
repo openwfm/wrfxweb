@@ -1,5 +1,5 @@
 import { Slider } from './slider.js';
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { setURL } from '../util.js';
 
 export class OpacitySlider extends Slider {
@@ -37,7 +37,9 @@ export class OpacitySlider extends Slider {
             this.updateOpacity();
         });
 
-        this.updateOpacity();
+        controllers.currentDomain.subscribe(() => {
+            this.updateOpacity();
+        }, controllerEvents.all);
     }
 
     updateHeadPosition(newFrame) {

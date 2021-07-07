@@ -105,31 +105,6 @@ export class SimulationSlider extends Slider {
         this.configureEndSetter();
     }
 
-    // resetSlider() {
-    //     var startDate = controllers.startDate.getValue();
-    //     var endDate = controllers.endDate.getValue();
-    //     var currentTimestamp = controllers.currentTimestamp.getValue();
-
-        // if (this.currentSimulation != simVars.currentSimulation) {
-        //     this.currentSimulation = simVars.currentSimulation;
-        //     currentTimestamp = startDate;
-        // } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
-        //     var percentage = this.frame / this.nFrames;
-        //     var timeIndex = Math.floor((simVars.sortedTimestamps.length - 1) * percentage);
-        //     currentTimestamp = simVars.sortedTimestamps[timeIndex];
-        // }
-
-        // if (currentTimestamp < startDate) {
-        //     currentTimestamp = startDate;
-        // }
-        // if (currentTimestamp > endDate) {
-        //     currentTimstamp = endDate;
-        // }
-
-        // this.nFrames = simVars.sortedTimestamps.length - 1;
-        // controllers.currentTimestamp.setValue(currentTimestamp);
-    // }
-
     setLoadProgress() {
         var progress = controllers.loadingProgress.getValue();
         var progressWidth = progress*this.sliderWidth;
@@ -194,15 +169,8 @@ export class SimulationSlider extends Slider {
 
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
-            // var startDate = controllers.startDate.getValue();
-            // var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-            // var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
-
-            // sliderStart.style.left = left + 'px';
         });
     }
-
-    
 
     configureEndSetter() {
         const sliderEnd = this.shadowRoot.querySelector('#slider-end');
@@ -243,11 +211,6 @@ export class SimulationSlider extends Slider {
 
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
-            // var endDate = controllers.endDate.getValue();
-            // var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            // let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
-
-            // sliderEnd.style.left = left + 'px';
         });
     }
 
