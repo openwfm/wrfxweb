@@ -1,4 +1,4 @@
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { localToUTC } from '../util.js';
 import { simVars } from '../simVars.js';
 
@@ -23,7 +23,7 @@ export class DomainSelector extends HTMLElement {
         }
 
         controllers.domainInstance.subscribe(domainSubscription);
-        this.currentSimulation = '';
+        // this.currentSimulation = '';
     }
 
     /** Builds the list of domain elements that can be chosen. */
@@ -34,8 +34,10 @@ export class DomainSelector extends HTMLElement {
         var presetDomain = domains[0];
         if (domains.includes(simVars.presets.domain)) {
             presetDomain = simVars.presets.domain;
-            simVars.presets.domain = null;
         }
+        simVars.presets.domain = null;
+
+        this.setPresets(presetDomain);
 
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
@@ -49,7 +51,8 @@ export class DomainSelector extends HTMLElement {
         document.querySelector('#domain-button').style.display = 'inline-block';
         document.querySelector('#layers-button').style.display = 'inline-block';
 
-        this.setUpForDomain(presetDomain);
+        // this.setUpForDomain(presetDomain);
+        controllers.currentDomain.setValue(presetDomain, controllerEvents.simReset);
     }
 
     /** Create a div element for each domain checkbox. When clicked an element is clicked, 
@@ -79,6 +82,44 @@ export class DomainSelector extends HTMLElement {
         return div;
     }
 
+    setPresets(domId) {
+        var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
+        simVars.sortedTimestamps = nextTimestamps;
+
+        startDate = nextTimestamps[0];
+        var presetStartDate = localToUTC(simVars.presets.startDate);
+        if (nextTimestamps.includes(presetStartDate)) {
+            startDate = presetStartDate;
+        }
+        simVars.presets.startDate = null;
+        controllers.startDate.setValue(startDate, controllerEvents.quiet);
+
+        endDate = nextTimestamps[nextTimestamps.length - 1];
+        var presetEndDate = localToUTC(simVars.presets.endDate);
+        if (nextTimestamps.includes(presetEndDate)) {
+            endDate = presetEndDate;
+        }
+        simVars.presets.endDate = null;
+        controllers.endDate.setValue(endDate, controllerEvents.quiet);
+
+        var presetOpacity = simVars.presets.opacity;
+        if (presetOpacity && !isNaN(presetOpacity)) {
+            var opacity = Number(presetOpacity);
+            if (opacity >= 0 && opacity <= 1) {
+                controllers.opacity.setValue(Number(presetOpacity), controllerEvents.quiet);
+            }
+        }
+        simVars.presets.opacity = null;
+
+        var currentTimestamp = startDate;
+        var presetTimestamp = localToUTC(simVars.presets.timestamp);
+        if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
+            currentTimestamp = presetTimestamp;
+        }
+        simVars.presets.timestamp = null;
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
+    }
+
     /** Function called when a new domain is selected. */
     setUpForDomain(domId) {
         // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
@@ -97,51 +138,18 @@ export class DomainSelector extends HTMLElement {
         }
 
         var startDate = controllers.startDate.getValue();
-        if (!startDate || this.currentSimulation != simVars.currentSimulation) {
-            startDate = nextTimestamps[0];
-            var presetStartDate = localToUTC(simVars.presets.startDate);
-            if (nextTimestamps.includes(presetStartDate)) {
-                startDate = presetStartDate;
-                simVars.presets.startDate = null;
-            }
-        } else {
-            startDate = findNewTimestamp(startDate);
-        }
-        controllers.startDate.setValue(startDate);
+        startDate = findNewTimestamp(startDate);
+        controllers.startDate.setValue(startDate, controllerEvents.quiet);
 
         var endDate = controllers.endDate.getValue();
-        if (!endDate || this.currentSimulation != simVars.currentSimulation) {
-            endDate = nextTimestamps[nextTimestamps.length - 1];
-            var presetEndDate = localToUTC(simVars.presets.endDate);
-            if (nextTimestamps.includes(presetEndDate)) {
-                endDate = presetEndDate;
-                simVars.presets.endDate = null;
-            }
-        } else {
-            endDate = findNewTimestamp(endDate);
-        }
-        controllers.endDate.setValue(endDate);
+        endDate = findNewTimestamp(endDate);
+        controllers.endDate.setValue(endDate, controllerEvents.quiet);
 
-        var presetOpacity = simVars.presets.opacity;
-        if (presetOpacity && !isNaN(presetOpacity)) {
-            var opacity = Number(presetOpacity);
-            if (opacity >= 0 && opacity <= 1) {
-                controllers.opacity.setValue(Number(presetOpacity));
-            }
-            simVars.presets.opacity = null;
-        }
+        var currentTimestamp = controllers.currentTimestamp.value;
+        currentTimestamp = findNewTimestamp(currentTimestamp);
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
 
         controllers.currentDomain.setValue(domId);
-
-        var presetTimestamp = localToUTC(simVars.presets.timestamp);
-        if (simVars.sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
-            controllers.currentTimestamp.setValue(presetTimestamp);
-        }
-        simVars.presets.timestamp = null;
-
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.currentSimulation = simVars.currentSimulation;
-        }
     }
 }
 

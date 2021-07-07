@@ -54,15 +54,17 @@ export class TimeSeriesController extends LayerController {
         }
     }
 
+    resetLayerController() {
+        super.resetLayerController();
+        this.timeSeriesDatasets = {};
+    }
+
     /** When domain is switched, remove all timeSeries markers. */
     domainSwitch() {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
         while (this.markers.length > 0) {
             this.markers[0].removeFrom(map);
-        }
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.timeSeriesDatasets = {};
         }
 
         var startDate = controllers.startDate.getValue();

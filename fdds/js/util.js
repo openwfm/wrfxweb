@@ -144,6 +144,7 @@ export function dragElement(elmnt, subID) {
   })
 
   function dragMouseDown(e) {
+    document.body.classList.add('grabbing');
     e = e || window.event;
     e.preventDefault();
     e.stopPropagation();
@@ -181,6 +182,7 @@ export function dragElement(elmnt, subID) {
 
   function closeDragElement() {
     // stop moving when mouse button is released:
+    document.body.classList.remove('grabbing');
     document.onpointerup = null;
     document.onpointermove = null;
   }

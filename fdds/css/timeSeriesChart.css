@@ -23,13 +23,13 @@
   top: 0;
   bottom: 0;
   z-index: 9000;
-  margin: auto;
+  /* margin: auto; */
   height: 550px;
   width: 560px;
   background: white;
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
-  cursor: pointer;
+  cursor: grab;
 }
 
 #zoomBox {
@@ -62,6 +62,7 @@
 #timeSeriesChart {
   display: block;
   margin-left:10px;
+  cursor: pointer;
 }
 
 @media (max-width: 769px) {

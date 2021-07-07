@@ -1,28 +1,43 @@
-import { setURL } from "../util.js";
+export const controllerEvents = {
+    quiet: 'QUIET', 
+    simReset: 'SIMULATION_RESET',
+    valueSet: 'VALUE_SET', 
+    all: 'ALL'
+}
 
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
  * then be called whenever the value in the controller is updated. */
 export class Controller {
     constructor(value=null) {
-        this.listeners = [];
+        this.listeners = {};
         this.value = value;
     }
 
-    subscribe(callback) {
-        this.listeners.push(callback);
+    subscribe(callback, eventName=controllerEvents.valueSet) {
+        // this.listeners.push(callback);
+        if (!(eventName in this.listeners)) {
+            this.listeners[eventName] = [];
+        }
+        this.listeners[eventName].push(callback);
     }
 
-    setValue(value) {
+    setValue(value, eventName=controllerEvents.valueSet) {
         this.value = value;
-        this.notifyListeners();
+        if (eventName != controllerEvents.quiet) {
+            this.notifyListeners(this.listeners[eventName]);
+            this.notifyListeners(this.listeners[controllerEvents.all]);
+        }
     }
 
     getValue() {
         return this.value;
     }
 
-    notifyListeners() {
-        this.listeners.map(listener => listener());
+    notifyListeners(listeners) {
+        if (listeners == null) {
+            return;
+        }
+        listeners.map(listener => listener());
     }
 }
 
