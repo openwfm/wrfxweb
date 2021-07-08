@@ -229,21 +229,11 @@ export class SimulationSlider extends Slider {
         var startLeft = this.getStartLeft();
         var endLeft = this.getEndLeft();
         var totalWidth = endLeft - (startLeft + 4);
-        // var startLeft = this.getLeftOfDate(controllers.startDate.getValue());
-        // const startBar = this.shadowRoot.querySelector('#slider-start');
-        // const endBar = this.shadowRoot.querySelector('#slider-end');
-        // var startRect = startBar.getBoundingClientRect();
-        // var endRect = endBar.getBoundingClientRect();
-        // var totalWidth = endRect.left - (startRect.left + startRect.width);
         this.progressWidth = totalWidth;
     }
 
     updateStartLocation() {
         const sliderStart = this.shadowRoot.querySelector('#slider-start');
-
-        // var startDate = controllers.startDate.getValue();
-        // var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        // var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
         var left = this.getStartLeft();
 
         sliderStart.style.left = left + 'px';
@@ -251,9 +241,7 @@ export class SimulationSlider extends Slider {
 
     getStartLeft() {
         var startDate = controllers.startDate.getValue();
-        // var startIndex = simVars.sortedTimestamps.indexOf(startDate);
         var left = this.getLeftOfDate(startDate);
-        // var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
         return left - 2;
     }
 
@@ -265,10 +253,6 @@ export class SimulationSlider extends Slider {
 
     updateEndLocation() {
         const sliderEnd = this.shadowRoot.querySelector('#slider-end');
-
-        // var endDate = controllers.endDate.getValue();
-        // var endIndex = simVars.sortedTimestamps.indexOf(endDate);
-        // let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 14);
         var left = this.getEndLeft();
 
         sliderEnd.style.left = left + 'px';
