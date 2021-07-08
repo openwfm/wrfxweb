@@ -39,8 +39,13 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     connectedCallback() {
+        // set the position of the timeSeriesChart
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
-        dragElement(timeSeriesChart, '');
+        var clientWidth = document.body.clientWidth;
+        if (clientWidth > 769) {
+            timeSeriesChart.style.left = 300 + 'px';
+            dragElement(timeSeriesChart, '');
+        }
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         const zoomStart = this.querySelector('#zoom-start');
