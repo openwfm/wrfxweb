@@ -6,7 +6,6 @@ import { simVars } from '../simVars.js';
 export class SimulationSlider extends Slider {
     constructor() {
         super(340, simVars.sortedTimestamps.length - 1);
-        this.currentSimulation = '';
     }
 
     connectedCallback() {
@@ -17,6 +16,7 @@ export class SimulationSlider extends Slider {
             var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
             this.updateHeadPosition(newFrame);
         }
+        // assumes that all necessary controllers are set and all I need to do is update my UI.
         controllers.currentDomain.subscribe(() => {
             this.nFrames = simVars.sortedTimestamps.length - 1;
             this.updateStartLocation();
@@ -228,8 +228,8 @@ export class SimulationSlider extends Slider {
         const sliderEnd = this.shadowRoot.querySelector('#slider-end');
 
         var endDate = controllers.endDate.getValue();
-        var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-        let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
+        var endIndex = simVars.sortedTimestamps.indexOf(endDate);
+        let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 14);
 
         sliderEnd.style.left = left + 'px';
     }
