@@ -92,13 +92,14 @@ export class CatalogMenu extends HTMLElement {
         }
         // Sets up search functionality
         menuSearch.oninput = () => {
-            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value);
+            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
         sortBy.onchange = () => {
             this.sortBy(sortBy.value, reverseOrder.checked);
         }
         reverseOrder.onclick = () => {
-            this.sortBy(sortBy.value, reverseOrder.checked);
+            // this.sortBy(sortBy.value, reverseOrder.checked);
+            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
         menuSelect.onchange = () => {
             this.selectCategory(menuSelect.value);
@@ -135,7 +136,7 @@ export class CatalogMenu extends HTMLElement {
     }
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
-    searchCatalog(searchText, sortBy) {
+    searchCatalog(searchText, sortBy, reverseOrder) {
         const filterFunction = (catalogEntry) => {
             if (sortBy == 'original-order' || sortBy == 'description') {
                 return catalogEntry.description.toLowerCase().includes(searchText);
@@ -148,7 +149,11 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         const createList = (list) => {
-            return list.filter(filterFunction);
+            var filteredList = list.filter(filterFunction);
+            if (reverseOrder) {
+                filteredList.reverse();
+            }
+            return filteredList;
         }
         this.filterColumns(createList);
     }
