@@ -18,12 +18,9 @@ export class DomainSelector extends HTMLElement {
     }
 
     connectedCallback() {
-        const domainSubscription = () => {
+        controllers.domainInstance.subscribe(() => {
             this.buildDomains();
-        }
-
-        controllers.domainInstance.subscribe(domainSubscription);
-        // this.currentSimulation = '';
+        });
     }
 
     /** Builds the list of domain elements that can be chosen. */
@@ -102,14 +99,16 @@ export class DomainSelector extends HTMLElement {
         simVars.presets.endDate = null;
         controllers.endDate.setValue(endDate, controllerEvents.quiet);
 
+        var opacity = 0.5;
         var presetOpacity = simVars.presets.opacity;
         if (presetOpacity && !isNaN(presetOpacity)) {
-            var opacity = Number(presetOpacity);
-            if (opacity >= 0 && opacity <= 1) {
-                controllers.opacity.setValue(Number(presetOpacity), controllerEvents.quiet);
+            presetOpacity = Number(presetOpacity);
+            if (presetOpacity >= 0 && presetOpacity <= 1) {
+                opacity = presetOpacity;
             }
         }
         simVars.presets.opacity = null;
+        controllers.opacity.setValue(opacity, controllerEvents.quiet);
 
         var currentTimestamp = startDate;
         var presetTimestamp = localToUTC(simVars.presets.timestamp);
