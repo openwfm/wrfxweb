@@ -44,9 +44,8 @@ export class TimeSeriesChart extends HTMLElement {
         var clientWidth = document.body.clientWidth;
         if (clientWidth > 769) {
             timeSeriesChart.style.left = 300 + 'px';
+            dragElement(timeSeriesChart, '');
         }
-
-        dragElement(timeSeriesChart, '');
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
         const zoomStart = this.querySelector('#zoom-start');
