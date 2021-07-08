@@ -318,9 +318,7 @@ export class LayerController extends HTMLElement {
             var lastLayer = this.getLayer(lastLayerName);
             lastLayer.setOpacity(.5);
         }
-        // this.nImages += simVars.sortedTimestamps.length;
         if('colorbar' in raster_info) {
-            // this.nImages += simVars.sortedTimestamps.length;
             var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
@@ -382,13 +380,6 @@ export class LayerController extends HTMLElement {
             }
         }
         
-        // this.nImages = 0;
-        // for (var overlay of simVars.overlayOrder) {
-        //     // this.nImages += simVars.sortedTimestamps.length;
-        //     if ('colorbar' in rasters_now[overlay]) {
-        //         // this.nImages += simVars.sortedTimestamps.length;
-        //     }
-        // }
         simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
