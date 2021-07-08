@@ -129,9 +129,26 @@ export class LayerController extends HTMLElement {
         var loadLater = [];
         this.progressSet = 0;
 
+        // don't load if there's nothing to load.
         if (layerNames.length == 0) {
             controllers.loadingProgress.setValue(0);
             return;
+        }
+
+        var filteredTimeStamps = simVars.sortedTimestamps.filter((timestamp) => {
+            var lowestTime = controllers.startDate.getValue();
+            var greatestTime = controllers.endDate.getValue();
+            return (timestamp >= lowestTime && timestamp <= greatestTime);
+        });
+
+        this.nImages = 0;
+        for (var name of layerNames) {
+            var rasters = simVars.rasters[currentDomain][startTime];
+            var rasterInfo = rasters[name];
+            this.nImages += filteredTimeStamps.length;
+            if('colorbar' in rasterInfo) {
+                this.nImages += filteredTimeStamps.length;
+            }
         }
 
         const nowOrLater = (timeStamp, imageURL, layerName) => {
@@ -153,11 +170,6 @@ export class LayerController extends HTMLElement {
             }
         }
 
-        var filteredTimeStamps = simVars.sortedTimestamps.filter((timestamp) => {
-            var lowestTime = controllers.startDate.getValue();
-            var greatestTime = controllers.endDate.getValue();
-            return (timestamp >= lowestTime && timestamp <= greatestTime);
-        });
         for (var timeStamp of filteredTimeStamps) {
             var raster = simVars.rasters[currentDomain][timeStamp];
             for (var layerName of layerNames) {
@@ -306,9 +318,7 @@ export class LayerController extends HTMLElement {
             var lastLayer = this.getLayer(lastLayerName);
             lastLayer.setOpacity(.5);
         }
-        this.nImages += simVars.sortedTimestamps.length;
         if('colorbar' in raster_info) {
-            this.nImages += simVars.sortedTimestamps.length;
             var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
             rasterColorbar.src = cb_url;
@@ -370,13 +380,6 @@ export class LayerController extends HTMLElement {
             }
         }
         
-        this.nImages = 0;
-        for (var overlay of simVars.overlayOrder) {
-            this.nImages += simVars.sortedTimestamps.length;
-            if ('colorbar' in rasters_now[overlay]) {
-                this.nImages += simVars.sortedTimestamps.length;
-            }
-        }
         simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;

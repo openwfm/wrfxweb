@@ -6,7 +6,7 @@ import { simVars } from '../simVars.js';
 export class SimulationSlider extends Slider {
     constructor() {
         super(340, simVars.sortedTimestamps.length - 1);
-        this.currentSimulation = '';
+        this.progressWidth = 0;
     }
 
     connectedCallback() {
@@ -17,16 +17,19 @@ export class SimulationSlider extends Slider {
             var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
             this.updateHeadPosition(newFrame);
         }
+        // assumes that all necessary controllers are set and all I need to do is update my UI.
         controllers.currentDomain.subscribe(() => {
             this.nFrames = simVars.sortedTimestamps.length - 1;
             this.updateStartLocation();
             this.updateEndLocation();
             updateSlider();
+            this.updateProgressWidth();
         }, controllerEvents.all);
 
         controllers.currentTimestamp.subscribe(updateSlider);
         controllers.loadingProgress.subscribe(() => {
-            this.setLoadProgress();
+            var progress = controllers.loadingProgress.value;
+            this.setLoadProgress(progress);
         });
 
         const slider = this.shadowRoot.querySelector('#slider');
@@ -105,9 +108,8 @@ export class SimulationSlider extends Slider {
         this.configureEndSetter();
     }
 
-    setLoadProgress() {
-        var progress = controllers.loadingProgress.getValue();
-        var progressWidth = progress*this.sliderWidth;
+    setLoadProgress(progress) {
+        var progressWidth = progress*this.progressWidth + 2;
 
         const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
@@ -122,6 +124,13 @@ export class SimulationSlider extends Slider {
         var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
 
         progressBar.style.left = left + 'px';
+    }
+
+    getLeftOfDate(date) {
+        var index = simVars.sortedTimestamps.indexOf(date);
+        var left = Math.floor((index / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
+
+        return left;
     }
 
     setSliderMarkerInfo(timeStamp) {
@@ -169,6 +178,7 @@ export class SimulationSlider extends Slider {
 
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
+            this.updateProgressWidth();
         });
     }
 
@@ -211,25 +221,39 @@ export class SimulationSlider extends Slider {
 
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
+            this.updateProgressWidth();
         });
+    }
+
+    updateProgressWidth() {
+        var startLeft = this.getStartLeft();
+        var endLeft = this.getEndLeft();
+        var totalWidth = endLeft - (startLeft + 4);
+        this.progressWidth = totalWidth;
     }
 
     updateStartLocation() {
         const sliderStart = this.shadowRoot.querySelector('#slider-start');
-
-        var startDate = controllers.startDate.getValue();
-        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
+        var left = this.getStartLeft();
 
         sliderStart.style.left = left + 'px';
     }
 
+    getStartLeft() {
+        var startDate = controllers.startDate.getValue();
+        var left = this.getLeftOfDate(startDate);
+        return left - 2;
+    }
+
+    getEndLeft() {
+        var endDate = controllers.endDate.value;
+        var left = this.getLeftOfDate(endDate);
+        return left + 14;
+    }
+
     updateEndLocation() {
         const sliderEnd = this.shadowRoot.querySelector('#slider-end');
-
-        var endDate = controllers.endDate.getValue();
-        var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-        let left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * (this.sliderWidth*.95) + 7);
+        var left = this.getEndLeft();
 
         sliderEnd.style.left = left + 'px';
     }
