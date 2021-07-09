@@ -181,6 +181,7 @@ export class TimeSeriesChart extends HTMLElement {
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
+                    spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
                         var index = context.dataIndex;
