@@ -165,11 +165,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.startDate.setValue(newTimestamp);
+                controllers.startDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.startDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
 
@@ -179,7 +180,7 @@ export class SimulationSlider extends Slider {
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
             this.updateProgressWidth();
-        });
+        }, controllerEvents.all);
     }
 
     configureEndSetter() {
@@ -208,11 +209,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.endDate.setValue(newTimestamp);
+                controllers.endDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.endDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
             
@@ -222,7 +224,7 @@ export class SimulationSlider extends Slider {
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
             this.updateProgressWidth();
-        });
+        }, controllerEvents.all);
     }
 
     updateProgressWidth() {
