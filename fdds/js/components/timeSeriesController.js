@@ -249,7 +249,7 @@ export class TimeSeriesController extends LayerController {
      * to an rgb value and find its corresponding place in the colormap. Puts the colorbar location into the 
      * given timeSeriesData dictionary under timeStamp key. Should not return until both the image and 
      * colorbar have been loaded and the timeSeriesData has been populated. */
-    async loadImageAndColorbar(timeSeriesData, timeStamp, markers) {
+    async loadImageAndColorbar(timeSeriesData, timeStamp, markers, dataType) {
         var rasterDomains = simVars.rasters[controllers.currentDomain.getValue()];
         var img = new Image();
         var clrbarImg = new Image();
@@ -268,7 +268,6 @@ export class TimeSeriesController extends LayerController {
             var syncController = new SyncController();
             syncController.subscribe(() => {
                 for (var i = 0; i < markerData.length; i++) {
-                    var dataType = markers[i].getContent().getDataType();
                     var [r, g, b] = markerData[i];
                     if ((r + g + b) == 0 && (dataType == 'discrete')) {
                         continue;
@@ -328,6 +327,7 @@ export class TimeSeriesController extends LayerController {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        var dataType = progressMarker.getDataType();
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
@@ -335,7 +335,7 @@ export class TimeSeriesController extends LayerController {
             timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, rgb: timeSeriesMarker.getRGB(), dataset: {}});
         }
         for (var timeStamp of filteredTimeStamps) {
-            await this.loadImageAndColorbar(timeSeriesData, timeStamp, markers);
+            await this.loadImageAndColorbar(timeSeriesData, timeStamp, markers, dataType);
             progress += 1;
             progressMarker.setProgress(progress/filteredTimeStamps.length);
         }
