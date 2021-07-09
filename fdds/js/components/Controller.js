@@ -2,6 +2,7 @@ export const controllerEvents = {
     quiet: 'QUIET', 
     simReset: 'SIMULATION_RESET',
     valueSet: 'VALUE_SET', 
+    slidingValue: 'SLIDING_VALUE',
     all: 'ALL'
 }
 
@@ -25,7 +26,9 @@ export class Controller {
         this.value = value;
         if (eventName != controllerEvents.quiet) {
             this.notifyListeners(this.listeners[eventName]);
-            this.notifyListeners(this.listeners[controllerEvents.all]);
+            if (eventName != controllerEvents.all) {
+                this.notifyListeners(this.listeners[controllerEvents.all]);
+            }
         }
     }
 
@@ -38,6 +41,10 @@ export class Controller {
             return;
         }
         listeners.map(listener => listener());
+    }
+
+    broadcastEvent(event) {
+        this.notifyListeners(this.listeners[event]);
     }
 }
 
@@ -75,7 +82,7 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
         }
-        startDateController.subscribe(subscriptionFunction);
+        startDateController.subscribe(subscriptionFunction, controllerEvents.all);
 
         return startDateController;
     })(),
@@ -90,7 +97,7 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
         }
-        endDateController.subscribe(subscriptionFunction);
+        endDateController.subscribe(subscriptionFunction, controllerEvents.all);
 
         return endDateController;
     })(),

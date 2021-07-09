@@ -225,8 +225,6 @@ export class LayerController extends HTMLElement {
         }
         this.preloaded = {};
 
-       
-
         this.querySelector('#layer-controller-container').style.display = 'block';
         document.querySelector('#copyLink').style.display = 'block';
     }

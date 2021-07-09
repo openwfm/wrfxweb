@@ -156,6 +156,7 @@ export class SimulationSlider extends Slider {
             var startDate = controllers.startDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
             this.setSliderMarkerInfo(startDate);
+            this.setLoadProgress(0);
 
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
@@ -165,11 +166,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.startDate.setValue(newTimestamp);
+                controllers.startDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.startDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
 
@@ -179,7 +181,7 @@ export class SimulationSlider extends Slider {
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
             this.updateProgressWidth();
-        });
+        }, controllerEvents.all);
     }
 
     configureEndSetter() {
@@ -199,6 +201,7 @@ export class SimulationSlider extends Slider {
             var endDate = controllers.endDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
             this.setSliderMarkerInfo(endDate);
+            this.setLoadProgress(0);
             
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
@@ -208,11 +211,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.endDate.setValue(newTimestamp);
+                controllers.endDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.endDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
             
@@ -222,7 +226,7 @@ export class SimulationSlider extends Slider {
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
             this.updateProgressWidth();
-        });
+        }, controllerEvents.all);
     }
 
     updateProgressWidth() {
