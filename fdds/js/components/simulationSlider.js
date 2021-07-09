@@ -5,7 +5,12 @@ import { simVars } from '../simVars.js';
 
 export class SimulationSlider extends Slider {
     constructor() {
-        super(340, simVars.sortedTimestamps.length - 1);
+        var clientWidth = document.body.clientWidth;
+        var width = 340;
+        if (clientWidth < 770) {
+            width = 300;
+        }
+        super(width, simVars.sortedTimestamps.length - 1);
         this.progressWidth = 0;
     }
 
@@ -42,6 +47,9 @@ export class SimulationSlider extends Slider {
 
         slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
 
+        if (document.body.clientWidth < 770) {
+            slider.style.left = '10px';
+        }
         sliderBar.style.background = '#d6d6d6';
         const style = this.shadowRoot.querySelector('style');
         style.innerText += `
