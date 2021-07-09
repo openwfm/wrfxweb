@@ -269,10 +269,11 @@ export class TimeSeriesController extends LayerController {
             syncController.subscribe(() => {
                 for (var i = 0; i < markerData.length; i++) {
                     var [r, g, b] = markerData[i];
-                    if ((r + g + b) == 0 && (dataType == 'discrete')) {
-                        continue;
-                    }
                     var dataValue = this.findClosestKey(markerData[i], clrbarMap);
+                    if ((r + g + b) == 0 && (dataType == 'discrete')) {
+                        dataValue = null;
+                        // continue;
+                    }
                     var key = generateKey(markers[i]);
 
                     this.timeSeriesDatasets[key] = dataValue;
