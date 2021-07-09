@@ -55,6 +55,9 @@ export class LayerController extends HTMLElement {
             this.resetLayers();
             this.domainSwitch();
             this.updateTime();
+            var startDate = controllers.startDate.value;
+            var endDate = controllers.endDate.value;
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         }
         const domainResetSubscription = () => {
             this.resetLayers();
@@ -94,7 +97,9 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
+        var currentDomain = controllers.currentDomain.value;
+        var currentTimestamp = controllers.currentTimestamp.value;
+        var rastersNow = simVars.rasters[currentDomain][currentTimestamp];
         var reloading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(layerName);
