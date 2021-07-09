@@ -156,6 +156,7 @@ export class SimulationSlider extends Slider {
             var startDate = controllers.startDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
             this.setSliderMarkerInfo(startDate);
+            this.setLoadProgress(0);
 
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
@@ -200,6 +201,7 @@ export class SimulationSlider extends Slider {
             var endDate = controllers.endDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
             this.setSliderMarkerInfo(endDate);
+            this.setLoadProgress(0);
             
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];

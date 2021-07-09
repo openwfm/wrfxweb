@@ -124,7 +124,6 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
-        console.log('here');
         var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
         var loadLater = [];
