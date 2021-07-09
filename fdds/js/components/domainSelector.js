@@ -83,7 +83,7 @@ export class DomainSelector extends HTMLElement {
         var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
         simVars.sortedTimestamps = nextTimestamps;
 
-        startDate = nextTimestamps[0];
+        var startDate = nextTimestamps[0];
         var presetStartDate = localToUTC(simVars.presets.startDate);
         if (nextTimestamps.includes(presetStartDate)) {
             startDate = presetStartDate;
@@ -91,7 +91,7 @@ export class DomainSelector extends HTMLElement {
         simVars.presets.startDate = null;
         controllers.startDate.setValue(startDate, controllerEvents.quiet);
 
-        endDate = nextTimestamps[nextTimestamps.length - 1];
+        var endDate = nextTimestamps[nextTimestamps.length - 1];
         var presetEndDate = localToUTC(simVars.presets.endDate);
         if (nextTimestamps.includes(presetEndDate)) {
             endDate = presetEndDate;
