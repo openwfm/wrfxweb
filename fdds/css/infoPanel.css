@@ -29,7 +29,9 @@
     top: 0;
     bottom: 0;
     right: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
+    border-radius: .4rem;
+    border: 1px solid #5d5d5d;
 }
 
 #infoPanel.hovered {
@@ -47,8 +49,20 @@
     right: 15px;
     height: 10px;
     width: 10px;
+    font-size: 1rem;
 }
 
 #closeInfoPanel:hover {
     cursor: pointer;
+}
+
+@media (max-width: 769px) {
+    #infoPanel {
+        width: 300px;
+        height: 600px;
+    }
+
+    #infoPanelContainer {
+        left: 230px;
+    }
 }

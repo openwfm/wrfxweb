@@ -34,7 +34,7 @@ class InfoPanel extends HTMLElement {
             infoPanel.classList.remove('hovered');
         }
         closePanel.onclick = () => {
-            infoPanel.style.display = 'none';
+            infoPanel.classList.remove('clicked');
         }
     }
 }
