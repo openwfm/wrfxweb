@@ -1,3 +1,5 @@
+import { InfoSection } from './infoSection.js';
+
 class InfoPanel extends HTMLElement {
     constructor() {
         super();
@@ -112,6 +114,46 @@ class InfoPanel extends HTMLElement {
         closePanel.onclick = () => {
             infoPanel.classList.remove('clicked');
         }
+
+        this.addSubsections(infoPanel);
+    }
+
+    addSubsections(infoPanel) {
+        this.addCatalogMenuSection(infoPanel);
+        this.addLayerControllerSection(infoPanel);
+        // this.addSimulationControllerSection();
+    }
+
+    addCatalogMenuSection(infoPanel) {
+        var header = 'Catalog Menu';
+        var subsections = ['Searching and Ordering Catalog'];
+        var catalogMenuSection = new InfoSection(header, subsections);
+
+        var generalDescription = `The Catalog Menu shows all available simulations that can 
+                                  be shown on the current account.
+                                  <br>
+                                  To access the menu click the Catalog button in the 
+                                  top left of the screen`;
+        catalogMenuSection.updateDescription(header, generalDescription);
+                                  
+        infoPanel.appendChild(layerControllerSection);
+    }
+
+    addLayerControllerSection(infoPanel) {
+        var header = 'Layer Controller';
+        var subsections = ['Layer Selection', 'Switching Domains', 'Top Layer Opacity'];
+        var layerControllerSection = new InfoSection(header, subsections);
+
+        var generalDescription = `The Layer Controler is found on the right hand side of the screen after a simulation has
+                                  been selected from the Catalog Menu. It shows the different layers that can be shown in the 
+                                  current simulation and domain.`;
+
+        layerControllerSection.updateDescription(header, generalDescription);
+
+
+
+
+        infoPanel.appendChild(layerControllerSection);
     }
 }
 
