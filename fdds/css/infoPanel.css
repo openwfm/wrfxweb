@@ -18,7 +18,7 @@
 }
 
 #infoPanel {
-    display: none;
+    /* display: none; */
     padding: 5px 20px 15px 20px;
     position: absolute;
     margin: auto;
