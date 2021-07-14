@@ -3,18 +3,22 @@ export class InfoSection extends HTMLElement {
         super();
         this.innerHTML = `
             <div id='infoSectionContainer'>
-                <h3>${header}</h3>
-                <div id=${this.formatHeader(header)}></div>
+                <div id=${this.formatHeader(header)}>
+                    <h3>${header}</h3>
+                </div>
                 <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
             </div>
         `;
         // this.subheaders = subheaders.map(subheader => this.formatHeader(subheader));
+        this.header = header;
         this.subheaders = subheaders;
+        this.sectionDivs = {};
     }
 
     connectedCallback() {
         const infoSection = this.querySelector('#infoSectionContainer');
         const sectionBreak = this.querySelector('#break');
+        this.sectionDivs[this.header] = this.querySelector('#' + this.formatHeader(this.header));
         for (var subheader of this.subheaders) {
             var div = document.createElement('div');
             div.id = this.formatHeader(subheader);
@@ -22,7 +26,9 @@ export class InfoSection extends HTMLElement {
             h4.innerHTML = subheader;
             div.appendChild(h4);
             infoSection.insertBefore(div, sectionBreak);
+            this.sectionDivs[subheader] = div;
         }
+        console.log(this.sectionDivs);
     }
 
     formatHeader(header) {
@@ -30,12 +36,14 @@ export class InfoSection extends HTMLElement {
     }
 
     updateDescription(subheader, description) {
-        var formattedSubheader = this.formatHeader(subheader);
-        const subSection = this.querySelector('#' + formattedSubheader);
+        // const subSection = this.querySelector('#' + formattedSubheader);
+        const subSection = this.sectionDivs[subheader];
         if (subSection == null) {
+            // console.log(formattedSubheader);
+            console.log(subheader);
             return;
         }
-        var p = document.createElement('div');
+        var p = document.createElement('p');
         p.innerHTML = description;
         subSection.appendChild(p);
     }
