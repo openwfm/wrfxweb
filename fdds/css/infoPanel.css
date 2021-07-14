@@ -59,6 +59,25 @@
     font-size: 1rem;
 }
 
+#infoSectionContainer {
+    position: relative;
+}
+
+.expand-collapse {
+    position: absolute;
+    opacity: 50%;
+    top: 0px; right: 10px;
+}
+
+.expand-collapse:hover {
+    opacity: 100%;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
 #closeInfoPanel:hover {
     cursor: pointer;
 }
