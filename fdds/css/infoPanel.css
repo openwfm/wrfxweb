@@ -11,10 +11,12 @@
     height: 40px;
     background: transparent;
     border: none;
+    opacity: 50%;
 }
 
 #infoButton:hover {
     cursor: pointer;
+    opacity: 100%;
 }
 
 #infoPanel {
@@ -34,7 +36,6 @@
     font-size: 1rem;
     border-radius: .4rem;
     border: 1px solid #5d5d5d;
-    cursor: pointer;
 }
 
 #infoPanel h2 {
@@ -71,6 +72,9 @@
 
 .expand-collapse:hover {
     opacity: 100%;
+}
+
+.infoSectionHeader:hover {
     cursor: pointer;
 }
 

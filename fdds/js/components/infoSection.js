@@ -3,12 +3,16 @@ export class InfoSection extends HTMLElement {
         super();
         this.innerHTML = `
             <div id='infoSectionContainer' class='infoSectionContainer'>
-                <div id=${this.formatHeader(header)}>
-                    <h3>${header}</h3>
+                <div id=${this.formatHeader(header)} class='infoSectionHeader'>
+                    <h3 id='header'>
+                    ${header}
                     <div id='expand-collapse' class='expand-collapse'>
-                        <span id='expand'>[+]</span>
-                        <span id='collapse' class='hidden'>[-]</span>
+                        [+]
                     </div>
+                    </h3>
+                </div>
+                <div id='subheaders' class='hidden'>
+                    <div id='generalDescription'></div>
                 </div>
                 <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
             </div>
@@ -16,25 +20,43 @@ export class InfoSection extends HTMLElement {
         this.header = header;
         this.subheaders = subheaders;
         this.sectionDivs = {};
+        this.expanded = false;
     }
 
     connectedCallback() {
-        const infoSection = this.querySelector('#infoSectionContainer');
-        const sectionBreak = this.querySelector('#break');
-        const expand = this.querySelector('#expand');
-        const collapse = this.querySelector('#collapse');
+        const header = this.querySelector('#header');
+        const subsections = this.querySelector('#subheaders');
+        const expandCollapse = this.querySelector('#expand-collapse');
 
-        this.sectionDivs[this.header] = this.querySelector('#' + this.formatHeader(this.header));
+        const expandSection = () => {
+            subsections.classList.remove('hidden');
+            expandCollapse.innerHTML = '[-]';
+            this.expanded = true;
+        }
+        const contractSection = () => {
+            subsections.classList.add('hidden');
+            expandCollapse.innerHTML = '[+]';
+            this.expanded = false;
+        }
+
+        header.onclick = () => {
+            if (this.expanded) {
+                contractSection();
+            } else {
+                expandSection();
+            }
+        }
+
+        this.sectionDivs[this.header] = this.querySelector('#generalDescription');
         for (var subheader of this.subheaders) {
             var div = document.createElement('div');
             div.id = this.formatHeader(subheader);
             var h4 = document.createElement('h4');
             h4.innerHTML = subheader;
             div.appendChild(h4);
-            infoSection.insertBefore(div, sectionBreak);
+            subsections.appendChild(div);
             this.sectionDivs[subheader] = div;
         }
-
     }
 
     formatHeader(header) {
