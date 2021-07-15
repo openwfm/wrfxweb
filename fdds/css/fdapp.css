@@ -10,6 +10,37 @@ html {
   font-family: helvetica;
 }
 
+.splash {
+  position: fixed;
+  line-height: 90vh;
+  font-size: 1rem;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: white;
+  z-index: 9999;
+  color: black;
+  text-align: center;
+  font-family: Helvetica;
+}
+
+.hidden {
+  display: none;
+  z-index: -10;
+}
+
+@keyframes fadeIn {
+  to{
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+}
+
 #map-fd {
   position: absolute;
   left: 0;
