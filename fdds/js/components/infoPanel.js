@@ -187,7 +187,7 @@ class InfoPanel extends HTMLElement {
 
     async addSimulationControllerSection(infoPanel) {
         var header = 'Simulation Controller';
-        var subsections = ['Basic Navigation', 'Simulation Start and Stop Times', 'Loading Progress'];
+        var subsections = ['Basic Navigation', 'Simulation Start and Stop Times', 'Loading Progress', 'Domain Switching'];
         var simulationControllerSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(simulationControllerSection);
 
@@ -208,6 +208,35 @@ class InfoPanel extends HTMLElement {
                        location in the simulation. Alternatively the seeker showing the relative location in 
                        the simulation can be clicked and dragged to a new location.`;
         simulationControllerSection.updateDescription(subsections[0], navDesc);
+
+        var startStopDesc = `On the left and right ends of the navigation bar are two black bars that represent
+                            start and stop times of the simulation. Selecting a layer from the <i>Layer Controller</i>
+                            will load the layer over all timestamps included within the start and stop times specifid
+                            with these two bars. Hovering over the bars will bring up a label specifying their exact 
+                            times and clicking and dragging the bars will reset them to a new time. The start time is 
+                            not permitted to exceed the end time and the current timestamp is not permitted to fall 
+                            outside the range of the start and end times. If while moving either the start or end times,
+                            the range is updated such that the current timestamp is outside of it, the current timestamp
+                            will update with whichever of the start or end times are updating.`;
+        simulationControllerSection.updateDescription(subsections[1], startStopDesc);
+
+        var loadProgDesc = `After a layer from the <i>Layer Controller</i> is selected, all timestamps within the start and 
+                            stop times will be loaded. The progress of loading will be shown on the navigation bar as a loading
+                            bar starting at the start time and extending towards the end time. Once the loading bar has reached
+                            the end time, all timestamps to play the simulation smoothly have been loaded. The simulation can still
+                            be played while timestamps are still loading, but it may not be as smooth. The loading bar also only shows
+                            the progress of the total times that need to be loaded and the location of the loading bar does not give 
+                            information about which times have been loaded. When loading begins, it starts at the current timestamp and
+                            loads the times between the current timestamp and the end time chromatically first before chromatically loading the times 
+                            between the start time and the current timestamp. Layers that are loaded are cached so they do not need to 
+                            be reloaded if they are removed and then re-added.`;
+        simulationControllerSection.updateDescription(subsections[2], loadProgDesc);
+
+        var domainDesc = `When switching domains, if the new domain has not been loaded before, loading will begin on the selected 
+                          layers. The current timestamp, start time, and end time of the simulation are preserved when switching
+                          domains UNLESS they do not exist in the new domain. If so than they will be updated to the nearest corresponding
+                          timestamps in the new domain.`;
+        simulationControllerSection.updateDescription(subsections[3], domainDesc);
     }
 
     async addDomainSelectorSection(infoPanel) {
