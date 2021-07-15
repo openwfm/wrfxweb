@@ -164,7 +164,8 @@ class InfoPanel extends HTMLElement {
                          relocate the chart on the screen and the chart can be closed by clicking the <b>x</b> in the top-right corner. The color of the plotted line of values is determined by the color
                          of corresponding point on the layer at the time of generation. Clicking and dragging from top-left to bottom-right create a box that can be used 
                          to zoom into specific locations on the chart. A zoom range can also be specified using the <b>zoom in start</b> and <b>zoom in end</b> dropdown
-                         menus. After zooming, the chart can be returned to its original range by clicking the back arrow at the top-left corner of the chart. Using the 
+                         menus. After zooming, the chart can be returned to its original range by clicking the back arrow at the top-left corner of the chart. Clicking on a
+                         specific point in the plot will move the current timestamp of the simulation to the timestamp corresponding to the clicked data point. Using the 
                          <b>y-axis threshold</b> input box, a number value can be entered to draw a horizontal line on the chart at the value specified. All points above
                          this line will be highlighted, and all points below will be colored grey. This line can be given a label with the <b>threshold label</b> input.`;
         timeSeriesSection.updateDescription(subsections[1], chartDesc);
