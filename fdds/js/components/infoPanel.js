@@ -138,15 +138,56 @@ class InfoPanel extends HTMLElement {
 
     async addTimeSeriesSection(infoPanel) {
         var header = 'Time Series Generation';
-        var subsections = ['TimeSeries Markers', 'TimeSeries Chart'];
+        var subsections = ['TimeSeries Markers', 'TimeSeries Chart', 'Data Type', 'Changing Domains'];
         var timeSeriesSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(timeSeriesSection);
 
+        var generalDescription = `If any added layers from the <i>Layer Controller</i> have an associated colorbar, a timeseries can be created to show
+                                  the values of any point in the layer as defined by the colorbar. The timeseries will always be associated with the top
+                                  most layer that has a colorbar.`;
+        timeSeriesSection.updateDescription(header, generalDescription);
+
+        var markerDesc = `Double clicking on a point in the top most layer with a colorbar will create a marker that shows some information about that point
+                          including the latitude and longitude of the point on the map, the RGB values of the color at that point coded in that color, the 
+                          location in the colorbar of the point, and some options to create a timeSeries over a range of time at this point. Changing the value 
+                          of the current timestamp in the location using the <i>Simulation Controller</i> will also update the values in the marker accordingly 
+                          to match the update to the layer. Clicking the <b>generate timeseries</b> button will load all timestamps between the specified range 
+                          and retrieve the values in the colorbar at each time at the specified marker location and show a chart plotting these points. Selecting
+                          <b>generate timeseries</b> from the marker will plot only the values at that marker's location. Multiple markers can be added to the layer
+                          by double clicking at multiple locations and the timeseries associated with each marker can all be plotted with on the same chart by clicking
+                          the <b>generate timeseries</b> button from the <b>Timeseries over all Markers</b> section of the <i>Layer Controller</i>.`;
+        timeSeriesSection.updateDescription(subsections[0], markerDesc);
+
+        var chartDesc = `After <b>generate timeseries</b> has been clicked, a chart will show in the center of the screen after all timestamps in the selected range
+                         have been loaded and the values at the specified locations determined. When a timeseries is generated, the values at the corresponding locations
+                         are cached for each timestamp so time spent reloading in the future is minimized. The generated chart can be clicked and dragged from its edges to
+                         relocate the chart on the screen and the chart can be closed by clicking the <b>x</b> in the top-right corner. The color of the plotted line of values is determined by the color
+                         of corresponding point on the layer at the time of generation. Clicking and dragging from top-left to bottom-right create a box that can be used 
+                         to zoom into specific locations on the chart. A zoom range can also be specified using the <b>zoom in start</b> and <b>zoom in end</b> dropdown
+                         menus. After zooming, the chart can be returned to its original range by clicking the back arrow at the top-left corner of the chart. Using the 
+                         <b>y-axis threshold</b> input box, a number value can be entered to draw a horizontal line on the chart at the value specified. All points above
+                         this line will be highlighted, and all points below will be colored grey. This line can be given a label with the <b>threshold label</b> input.`;
+        timeSeriesSection.updateDescription(subsections[1], chartDesc);
+
+        var dataTypeDesc = `Changing the <b>data type</b> from the options used to create the timeseries Chart changes how the chart handles timestamps 
+                            that do not have any data associated with them in the layer a timeseries is being generated for.
+                            <br>
+                            </br>
+                            Selecting <b>continuous</b> from the dropdown will ensure that every timestamp in the specified range has a value associated with it
+                            in the generated timeseries. If the layer has no value at a specified location and timestamp, then zero will be filled at that timestamp.
+                            <br>
+                            <br>
+                            Selecting <b>discrete</b> from the dropdown will not enforce every timestamp in the specified range having a value associated with it. The
+                            generated timeseries will instead directly connect only timestamps that have values at the specified location in the layer.`;
+        timeSeriesSection.updateDescription(subsections[2], dataTypeDesc);
+
+        var domainDesc = `Changing domains will clear all timeSeries Markers. Returning to a domain will not return the cleared timeSeries Markers.`;
+        timeSeriesSection.updateDescription(subsections[3], domainDesc);
     }
 
     async addSimulationControllerSection(infoPanel) {
         var header = 'Simulation Controller';
-        var subsections = ['Basic Navigation', 'Simulation Start and Stop Times', 'Loading Progress'];
+        var subsections = ['Basic Navigation', 'Simulation Start and Stop Times', 'Loading Progress', 'Domain Switching'];
         var simulationControllerSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(simulationControllerSection);
 
@@ -167,6 +208,35 @@ class InfoPanel extends HTMLElement {
                        location in the simulation. Alternatively the seeker showing the relative location in 
                        the simulation can be clicked and dragged to a new location.`;
         simulationControllerSection.updateDescription(subsections[0], navDesc);
+
+        var startStopDesc = `On the left and right ends of the navigation bar are two black bars that represent
+                            start and stop times of the simulation. Selecting a layer from the <i>Layer Controller</i>
+                            will load the layer over all timestamps included within the start and stop times specifid
+                            with these two bars. Hovering over the bars will bring up a label specifying their exact 
+                            times and clicking and dragging the bars will reset them to a new time. The start time is 
+                            not permitted to exceed the end time and the current timestamp is not permitted to fall 
+                            outside the range of the start and end times. If while moving either the start or end times,
+                            the range is updated such that the current timestamp is outside of it, the current timestamp
+                            will update with whichever of the start or end times are updating.`;
+        simulationControllerSection.updateDescription(subsections[1], startStopDesc);
+
+        var loadProgDesc = `After a layer from the <i>Layer Controller</i> is selected, all timestamps within the start and 
+                            stop times will be loaded. The progress of loading will be shown on the navigation bar as a loading
+                            bar starting at the start time and extending towards the end time. Once the loading bar has reached
+                            the end time, all timestamps to play the simulation smoothly have been loaded. The simulation can still
+                            be played while timestamps are still loading, but it may not be as smooth. The loading bar also only shows
+                            the progress of the total times that need to be loaded and the location of the loading bar does not give 
+                            information about which times have been loaded. When loading begins, it starts at the current timestamp and
+                            loads the times between the current timestamp and the end time chromatically first before chromatically loading the times 
+                            between the start time and the current timestamp. Layers that are loaded are cached so they do not need to 
+                            be reloaded if they are removed and then re-added.`;
+        simulationControllerSection.updateDescription(subsections[2], loadProgDesc);
+
+        var domainDesc = `When switching domains, if the new domain has not been loaded before, loading will begin on the selected 
+                          layers. The current timestamp, start time, and end time of the simulation are preserved when switching
+                          domains UNLESS they do not exist in the new domain. If so than they will be updated to the nearest corresponding
+                          timestamps in the new domain.`;
+        simulationControllerSection.updateDescription(subsections[3], domainDesc);
     }
 
     async addDomainSelectorSection(infoPanel) {
@@ -184,7 +254,7 @@ class InfoPanel extends HTMLElement {
 
         var generalDescription = `As various settings such as timestamp, added layers, domain, etc are
                                   updated in the simulation they are saved as parameters in the URL.
-                                  Clicking 'Copy Link to Clipboard' copies this URL that can be used 
+                                  Clicking <b>Copy Link to Clipboard</b> copies this URL that can be used 
                                   to navigate to the simulation preset to the state it was in when the URL
                                   was copied. The URL can also be directly copied.`;
         URLSection.updateDescription(header, generalDescription);
