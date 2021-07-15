@@ -47,9 +47,9 @@ class InfoPanel extends HTMLElement {
     addSubsections(infoPanel) {
         this.addCatalogMenuSection(infoPanel);
         this.addLayerControllerSection(infoPanel);
-        this.addTimeSeriesSection(infoPanel);
-        this.addSimulationControllerSection(infoPanel);
         this.addDomainSelectorSection(infoPanel);
+        this.addSimulationControllerSection(infoPanel);
+        this.addTimeSeriesSection(infoPanel);
         this.addURLSection(infoPanel);
     }
 
@@ -244,6 +244,13 @@ class InfoPanel extends HTMLElement {
         var subsections = [];
         var domainSelectorSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(domainSelectorSection);
+
+        var generalDescription = `The <i>Domain Selector</i> can be found underneath the <b>Catalog</b> button on desktop and by clicking
+                                  the <b>domains</b> button at the top of the screen on mobile. Switching between domains can change the size
+                                  and center of layers on the map as well as the granularity of the timestamps in the simulation (for example 
+                                  going from hour increments in <i>domain 1</i> to 30 min increments in <i>domain 2</i>). Switching domains may
+                                  also change which layers are available to add to the map from the <i>Layer Controller</i>.`;
+        domainSelectorSection.updateDescription(header, generalDescription);
     }
 
     async addURLSection(infoPanel) {
