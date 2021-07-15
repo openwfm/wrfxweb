@@ -138,10 +138,46 @@ class InfoPanel extends HTMLElement {
 
     async addTimeSeriesSection(infoPanel) {
         var header = 'Time Series Generation';
-        var subsections = ['TimeSeries Markers', 'TimeSeries Chart'];
+        var subsections = ['TimeSeries Markers', 'TimeSeries Chart', 'Data Type', 'Changing Domains'];
         var timeSeriesSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(timeSeriesSection);
 
+        var generalDescription = `If any added layers from the <i>Layer Controller</i> have an associated colorbar, a timeseries can be created to show
+                                  the values of any point in the layer as defined by the colorbar. The timeseries will always be associated with the top
+                                  most layer that has a colorbar.`;
+        timeSeriesSection.updateDescription(header, generalDescription);
+
+        var markerDesc = `Double clicking on a point in the top most layer with a colorbar will create a marker that shows some information about that point
+                          including the latitude and longitude of the point on the map, the RGB values of the color at that point coded in that color, the 
+                          location in the colorbar of the point, and some options to create a timeSeries over a range of time at this point. Changing the value 
+                          of the current timestamp in the location using the <i>Simulation Controller</i> will also update the values in the marker accordingly 
+                          to match the update to the layer. Clicking the <b>generate timeseries</b> button will load all timestamps between the specified range 
+                          and retrieve the values in the colorbar at each time at the specified marker location and show a chart plotting these points. Selecting
+                          <b>generate timeseries</b> from the marker will plot only the values at that marker's location. Multiple markers can be added to the layer
+                          by double clicking at multiple locations and the timeseries associated with each marker can all be plotted with on the same chart by clicking
+                          the <b>generate timeseries</b> button from the <b>Timeseries over all Markers</b> section of the <i>Layer Controller</i>.`;
+        timeSeriesSection.updateDescription(subsections[0], markerDesc);
+
+        var chartDesc = `After <b>generate timeseries</b> has been clicked, a chart will show in the center of the screen after all timestamps in the selected range
+                         have been loaded and the values at the specified locations determined. The color of the plotted line of values is determined by the color of
+                         corresponding point on the layer at the time of generation.
+                         color ,caching, zooming, threshold`;
+        timeSeriesSection.updateDescription(subsections[1], chartDesc);
+
+        var dataTypeDesc = `Changing the <b>data type</b> from the options used to create the timeseries Chart changes how the chart handles timestamps 
+                            that do not have any data associated with them in the layer a timeseries is being generated for.
+                            <br>
+                            </br>
+                            Selecting <b>continuous</b> from the dropdown will ensure that every timestamp in the specified range has a value associated with it
+                            in the generated timeseries. If the layer has no value at a specified location and timestamp, then zero will be filled at that timestamp.
+                            <br>
+                            <br>
+                            Selecting <b>discrete</b> from the dropdown will not enforce every timestamp in the specified range having a value associated with it. The
+                            generated timeseries will instead directly connect only timestamps that have values at the specified location in the layer.`;
+        timeSeriesSection.updateDescription(subsections[2], dataTypeDesc);
+
+        var domainDesc = `Changing domains will clear all timeSeries Markers. Returning to a domain will not return the cleared timeSeries Markers.`;
+        timeSeriesSection.updateDescription(subsections[3], domainDesc);
     }
 
     async addSimulationControllerSection(infoPanel) {
@@ -184,7 +220,7 @@ class InfoPanel extends HTMLElement {
 
         var generalDescription = `As various settings such as timestamp, added layers, domain, etc are
                                   updated in the simulation they are saved as parameters in the URL.
-                                  Clicking 'Copy Link to Clipboard' copies this URL that can be used 
+                                  Clicking <b>Copy Link to Clipboard</b> copies this URL that can be used 
                                   to navigate to the simulation preset to the state it was in when the URL
                                   was copied. The URL can also be directly copied.`;
         URLSection.updateDescription(header, generalDescription);
