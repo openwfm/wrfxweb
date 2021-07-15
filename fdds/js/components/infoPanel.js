@@ -66,25 +66,32 @@ class InfoPanel extends HTMLElement {
                                   top left of the screen`;
         catalogMenuSection.updateDescription(header, generalDescription);
 
-        var sortingDescription = `The Catalog Menu can be sorted by the following categories using the 'sort by' dropdown menu: 
+        var sortingDescription = `The Catalog Menu can be sorted by the following categories using the <i>sort by</i> dropdown menu: 
             <br>
             <br>
             <b>orignal order</b>: order simulations were added to the server EXCEPT FOR simulations in the Fuel moisture column, which in
-            'original order' sorting are sorted by description.
+            <i>original order</i> sorting are sorted by description.
             <br>
             <br>
             <b>description</b>: sorted by alphabetical order of the simulation description (the text in bold of each simulation in the menu)
             <br>
             <br>
-            <b>start date</b>: sorted by earliest start date (labeled 'from') to latest
+            <b>start date</b>: sorted by earliest start date (labeled <i>from</i>) to latest
             <br>
             <br>
-            <b>end date</b>: sorted by earliest end date (labeled 'to') to latest
+            <b>end date</b>: sorted by earliest end date (labeled <i>to</i>) to latest
             <br>
             <br>
-            Order of any sorting can also be reversed using the 'Reverse Order' checkbox
+            Order of any sorting can also be reversed using the <i>Reverse Order</i> checkbox
         `;
         catalogMenuSection.updateDescription(subsections[0], sortingDescription);
+
+        var searchingDescription = `The Catalog Menu can be searched by the categories it is sorted by. For example, when <i>original order</i> 
+                                    is selected, typing text in the search box will filter the results of every column based on if the description
+                                    of each simulation matches the text in the search box. Typing text in the search box when <i>start date</i> is
+                                    selected will filter based on whether start date matches the text. Search results can also be reversed. Search
+                                    results are cleared when the sorting category is changed.`;
+        catalogMenuSection.updateDescription(subsections[1], searchingDescription);
                                   
     }
 
