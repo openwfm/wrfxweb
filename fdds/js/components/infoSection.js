@@ -46,6 +46,12 @@ export class InfoSection extends HTMLElement {
                 expandSection();
             }
         }
+        header.onmouseover = () => {
+            expandCollapse.classList.add('hover');
+        }
+        header.onmouseout = () => {
+            expandCollapse.classList.remove('hover');
+        }
 
         this.sectionDivs[this.header] = this.querySelector('#generalDescription');
         for (var subheader of this.subheaders) {
