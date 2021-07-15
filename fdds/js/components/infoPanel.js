@@ -55,7 +55,7 @@ class InfoPanel extends HTMLElement {
 
     async addCatalogMenuSection(infoPanel) {
         var header = 'Catalog Menu';
-        var subsections = ['Searching and Ordering Catalog'];
+        var subsections = ['Sorting Catalog', 'Searching Catalog'];
         var catalogMenuSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(catalogMenuSection);
 
@@ -65,6 +65,26 @@ class InfoPanel extends HTMLElement {
                                   To access the menu click the Catalog button in the 
                                   top left of the screen`;
         catalogMenuSection.updateDescription(header, generalDescription);
+
+        var sortingDescription = `The Catalog Menu can be sorted by the following categories using the 'sort by' dropdown menu: 
+            <br>
+            <br>
+            <b>orignal order</b>: order simulations were added to the server EXCEPT FOR simulations in the Fuel moisture column, which in
+            'original order' sorting are sorted by description.
+            <br>
+            <br>
+            <b>description</b>: sorted by alphabetical order of the simulation description (the text in bold of each simulation in the menu)
+            <br>
+            <br>
+            <b>start date</b>: sorted by earliest start date (labeled 'from') to latest
+            <br>
+            <br>
+            <b>end date</b>: sorted by earliest end date (labeled 'to') to latest
+            <br>
+            <br>
+            Order of any sorting can also be reversed using the 'Reverse Order' checkbox
+        `;
+        catalogMenuSection.updateDescription(subsections[0], sortingDescription);
                                   
     }
 
@@ -75,7 +95,8 @@ class InfoPanel extends HTMLElement {
         infoPanel.appendChild(layerControllerSection);
 
         var generalDescription = `The Layer Controler is found on the right hand side of the screen after a simulation has
-                                  been selected from the Catalog Menu. It shows the different layers that can be shown in the 
+                                  been selected from the Catalog Menu or can be accessed by clicking the 'layer' button 
+                                  at the top of the screen in mobile. It shows the different layers that can be shown in the 
                                   current simulation and domain.`;
         layerControllerSection.updateDescription(header, generalDescription);
 
@@ -140,6 +161,13 @@ class InfoPanel extends HTMLElement {
         var subsections = [];
         var URLSection = await new InfoSection(header, subsections);
         infoPanel.appendChild(URLSection);
+
+        var generalDescription = `As various settings such as timestamp, added layers, domain, etc are
+                                  updated in the simulation they are saved as parameters in the URL.
+                                  Clicking 'Copy Link to Clipboard' copies this URL that can be used 
+                                  to navigate to the simulation preset to the state it was in when the URL
+                                  was copied. The URL can also be directly copied.`;
+        URLSection.updateDescription(header, generalDescription);
     }
 }
 
