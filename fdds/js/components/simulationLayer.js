@@ -6,7 +6,8 @@ import { map } from '../map.js';
 export class SimulationLayer {
     constructor(layerName, cs, url, domain) {
         this.layerName = layerName;
-        this.preloaded = {};
+        this.preloadedRasters = {};
+        this.preloadedColorbars = {};
         this.layer = L.imageOverlay(url,
                                     [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                     {
@@ -57,6 +58,10 @@ export class SimulationLayer {
             rasterColorbar.style.display = 'block';
             simVars.displayedColorbar = this.layerName;
         }
+    }
+
+    clearCache() {
+        for (var )
     }
 
     setImage(timestamp, imgURL) {
