@@ -6,6 +6,7 @@ self.addEventListener('message', async event => {
     var timeStamp = urlData.timeStamp;
     var layerName = urlData.layerName;
     var layerDomain = urlData.layerDomain;
+    var colorbar = urlData.colorbar;
 
     const response = await fetch(imageURL);
     const blob = await response.blob();
@@ -15,5 +16,6 @@ self.addEventListener('message', async event => {
         timeStamp: timeStamp,
         layerName: layerName,
         layerDomain: layerDomain,
+        colorbar: colorbar
     });
 });

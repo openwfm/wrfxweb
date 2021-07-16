@@ -68,7 +68,25 @@ export const controllers = {
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
-    loadingProgress: new Controller(0),
+    loadingProgress: (function createLoadProg() {
+        const loadingProgress = new Controller(0);
+        loadingProgress.nFrames = 0;
+        loadingProgress.loadedFrames = 0;
+
+        loadingProgress.setFrames = (nFrames) => {
+            loadingProgress.nFrames = nFrames;
+            loadingProgress.loadedFrames = 0;
+            loadingProgress.setValue(0);
+        }
+
+        loadingProgress.frameLoaded = () => {
+            loadingProgress.loadedFrames += 1;
+            var progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
+            loadingProgress.setValue(progress);
+        }
+
+        return loadingProgress;
+    })(),
     opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
