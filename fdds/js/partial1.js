@@ -17,5 +17,4 @@ window.onload = () => {
   setTimeout(() => {
     splash.classList.add('hidden');
   }, 1000);
-
 }

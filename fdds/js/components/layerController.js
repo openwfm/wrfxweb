@@ -133,12 +133,12 @@ export class LayerController extends HTMLElement {
         var worker = this.createWorker();
         var loadLater = [];
         this.progressSet = 0;
-
+        controllers.loadingProgress.setValue(0);
         // don't load if there's nothing to load.
-        if (layerNames.length == 0) {
-            controllers.loadingProgress.setValue(0);
-            return;
-        }
+        // if (layerNames.length == 0) {
+        //     controllers.loadingProgress.setValue(0);
+        //     return;
+        // }
 
         var filteredTimeStamps = simVars.sortedTimestamps.filter((timestamp) => {
             var lowestTime = controllers.startDate.getValue();
@@ -146,53 +146,59 @@ export class LayerController extends HTMLElement {
             return (timestamp >= lowestTime && timestamp <= greatestTime);
         });
 
-        this.nImages = 0;
-        for (var name of layerNames) {
-            var rasters = simVars.rasters[currentDomain][startTime];
-            var rasterInfo = rasters[name];
-            this.nImages += filteredTimeStamps.length;
-            if('colorbar' in rasterInfo) {
-                this.nImages += filteredTimeStamps.length;
-            }
-        }
+        // this.nImages = 0;
+        // for (var name of layerNames) {
+        //     var rasters = simVars.rasters[currentDomain][startTime];
+        //     var rasterInfo = rasters[name];
+        //     this.nImages += filteredTimeStamps.length;
+        //     if('colorbar' in rasterInfo) {
+        //         this.nImages += filteredTimeStamps.length;
+        //     }
+        // }
 
-        const nowOrLater = (timeStamp, imageURL, layerName) => {
-            if (timeStamp < startTime || timeStamp > endTime) {
-                loadLater.push({
-                                    imageURL: imageURL, 
-                                    timeStamp: timeStamp,
-                                    layerName: layerName,
-                                    layerDomain: currentDomain,
-                                });
-            }    
-            else {
-                worker.postMessage({
-                                    imageURL: imageURL, 
-                                    timeStamp: timeStamp,
-                                    layerName: layerName,
-                                    layerDomain: currentDomain,
-                                });
-            }
-        }
+        // const nowOrLater = (timeStamp, imageURL, layerName) => {
+        //     if (timeStamp < startTime || timeStamp > endTime) {
+        //         loadLater.push({
+        //                             imageURL: imageURL, 
+        //                             timeStamp: timeStamp,
+        //                             layerName: layerName,
+        //                             layerDomain: currentDomain,
+        //                         });
+        //     }    
+        //     else {
+        //         worker.postMessage({
+        //                             imageURL: imageURL, 
+        //                             timeStamp: timeStamp,
+        //                             layerName: layerName,
+        //                             layerDomain: currentDomain,
+        //                         });
+        //     }
+        // }
 
-        for (var timeStamp of filteredTimeStamps) {
-            var raster = simVars.rasters[currentDomain][timeStamp];
+        for (var timestamp of filteredTimeStamps) {
+            // var raster = simVars.rasters[currentDomain][timeStamp];
             for (var layerName of layerNames) {
-                var rasterInfo = raster[layerName];
-                var imageURL = simVars.rasterBase + rasterInfo.raster;
-                if (!(imageURL in this.preloaded)) {
-                    nowOrLater(timeStamp, imageURL, layerName);
-                    if ('colorbar' in rasterInfo) {
-                        var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-                        nowOrLater(timeStamp, colorbarURL, layerName);
-                    }
-                } else if (simVars.overlayOrder.includes(layerName)) {
-                    this.progressSet += 1;
-                    if ('colorbar' in rasterInfo) {
-                        this.progressSet += 1;
-                    }
-                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                var layer = this.getLayer(currentDomain, layerName);
+                if (timestamp < startTime || timestamp > endTime) {
+                    loadLater.push(layer);
+                } else {
+                    layer.loadTimestamp(timestamp, worker);
                 }
+                // var rasterInfo = raster[layerName];
+                // var imageURL = simVars.rasterBase + rasterInfo.raster;
+                // if (!(imageURL in this.preloaded)) {
+                //     nowOrLater(timeStamp, imageURL, layerName);
+                //     if ('colorbar' in rasterInfo) {
+                //         var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
+                //         nowOrLater(timeStamp, colorbarURL, layerName);
+                //     }
+                // } else if (simVars.overlayOrder.includes(layerName)) {
+                //     this.progressSet += 1;
+                //     if ('colorbar' in rasterInfo) {
+                //         this.progressSet += 1;
+                //     }
+                //     controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                // }
             }
         }
         for (var urlData of loadLater) {
@@ -225,6 +231,7 @@ export class LayerController extends HTMLElement {
             simVars.presets.rasters = null;
         }
 
+        // clear cache
         for (var imgURL in this.preloaded) {
             URL.revokeObjectURL(this.preloaded[imgURL]);
         }
@@ -237,13 +244,18 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // build the layer groups of the current domain
-        var first_rasters = simVars.rasters[controllers.currentDomain.getValue()][simVars.sortedTimestamps[0]];
+        var currentDomain = controllers.currentDomain.value;
+        var timestamp = simVars.sortedTimestamps[0];
+        var first_rasters = simVars.rasters[currentDomain][timestamp];
         var vars = Object.keys(first_rasters);
 
         var cs = first_rasters[vars[0]].coords;
 
-        this.rasterDict = {};
-        this.overlayDict = {};    
+        if (this.rasterDict[currentDomain] == null) {
+            this.rasterDict[currentDomain] = {};
+        }
+        // this.rasterDict = {};
+        // this.overlayDict = {};    
 
         for (var r in first_rasters) {
             var raster_info = first_rasters[r];
@@ -298,12 +310,14 @@ export class LayerController extends HTMLElement {
     handleOverlayadd(name) {
         // register in currently displayed layers and bring to front if it's an overlay
         var layer = this.getLayer(name);
-        console.log('name ' + name + ' layer ' + layer);
-        layer.addTo(map);
-        if (!(simVars.overlayOrder.includes(name))) {
-            simVars.overlayOrder.push(name);
-        }
-        layer.bringToFront();
+        console.log('name ' + name + ' layer ' + layer.getLayer());
+        // layer.addTo(map);
+        // if (!(simVars.overlayOrder.includes(name))) {
+        //     simVars.overlayOrder.push(name);
+        // }
+        // layer.bringToFront();
+        layer.addLayerToMap();
+        // Make sure overlays are still on top
         for (var overlay of simVars.overlayOrder) {
             if (simVars.overlayList.includes(overlay)) {
                 var overlayLayer = this.getLayer(overlay);
@@ -311,23 +325,23 @@ export class LayerController extends HTMLElement {
             }
         }
         // if the overlay being added now has a colorbar and there is none displayed, show it
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        var raster_info = rasters_now[name];
-        var opacity = controllers.opacity.getValue();
-        layer.setUrl(simVars.rasterBase + raster_info.raster);
-        layer.setOpacity(opacity);
+        // var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
+        // var raster_info = rasters_now[name];
+        // var opacity = controllers.opacity.getValue();
+        // layer.setUrl(simVars.rasterBase + raster_info.raster);
+        // layer.setOpacity(opacity);
         if (simVars.overlayOrder.length > 1) {
             var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
             var lastLayer = this.getLayer(lastLayerName);
             lastLayer.setOpacity(.5);
         }
-        if('colorbar' in raster_info) {
-            var cb_url = simVars.rasterBase + raster_info.colorbar;
-            const rasterColorbar = document.querySelector('#raster-colorbar');
-            rasterColorbar.src = cb_url;
-            rasterColorbar.style.display = 'block';
-            simVars.displayedColorbar = name;
-        }
+        // if('colorbar' in raster_info) {
+        //     var cb_url = simVars.rasterBase + raster_info.colorbar;
+        //     const rasterColorbar = document.querySelector('#raster-colorbar');
+        //     rasterColorbar.src = cb_url;
+        //     rasterColorbar.style.display = 'block';
+        //     simVars.displayedColorbar = name;
+        // }
         setURL();
     }
 
@@ -345,16 +359,19 @@ export class LayerController extends HTMLElement {
             const layerDomain = imageData.layerDomain;
 
             const objectURL = URL.createObjectURL(imageData.blob);
-            const img = new Image();
-            img.onload = () => {
-                var currentDomain = controllers.currentDomain.getValue();
-                this.preloaded[imageURL] = objectURL;
-                if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
-                    this.progressSet += 1;
-                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
-                }
-            }
-            img.src = objectURL;
+            var layer = this.getLayer(layerDomain, layerName);
+            layer.setImage(timeStamp, objectURL);
+
+            // const img = new Image();
+            // img.onload = () => {
+            //     var currentDomain = controllers.currentDomain.getValue();
+            //     this.preloaded[imageURL] = objectURL;
+            //     if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
+            //         this.progressSet += 1;
+            //         controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+            //     }
+            // }
+            // img.src = objectURL;
         });
         return worker;
     }
@@ -394,6 +411,7 @@ export class LayerController extends HTMLElement {
 
     /** Returns the layer associated with a given name */
     getLayer(name) {
+
         if (simVars.overlayList.includes(name)) {
             return this.overlayDict[name];
         }
