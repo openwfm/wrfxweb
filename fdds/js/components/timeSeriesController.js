@@ -145,7 +145,7 @@ export class TimeSeriesController extends LayerController {
 
     /** Maps location of marker to position on colorbar for current layer image and colorbar.
      * Updates the content of the marker. */
-    updateMarker(marker) {
+    async updateMarker(marker) {
         var rgb = [0, 0, 0];
         var clrbarLocation = null;
         if (this.imgCanvas && simVars.displayedColorbar != null) {
@@ -154,6 +154,10 @@ export class TimeSeriesController extends LayerController {
             rgb = this.drawMarkerOnCanvas(layerImg, marker);
             clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
         }
+        var currentTimestamp = controllers.currentTimestamp.value;
+        var layer = this.getLayer(currentDomain, simVars.displayedColorbar);
+        var otherRGB = await layer.getPixelValueAtLocation(currentTimestamp, marker.imageCoords);
+        console.log(otherRGB);
         marker.getContent().setRGBValues(rgb, clrbarLocation);
     }
 

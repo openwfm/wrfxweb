@@ -1,5 +1,5 @@
 import { simVars } from '../simVars.js';
-import { controllers } from './Controller.js';
+import { controllers, SyncController } from './Controller.js';
 import { map } from '../map.js';
 
 /** Layer for a specific domain. */
@@ -23,6 +23,10 @@ export class SimulationLayer {
                                     });
         this.preloadedRasters = {};
         this.preloadedColorbars = {};
+        this.colorbarMaps = {};
+
+        this.imgCanvas = document.createElement('canvas');
+        this.clrbarCanvas = document.createElement('canvas');
     }
 
     getLayer() {
@@ -72,21 +76,38 @@ export class SimulationLayer {
         }
     }
 
-    setTimestamp(timestamp) {
+    getTimestampURL(timestamp) {
         var rastersNow = simVars.rasters[this.domain][timestamp];
         var rasterInfo = rastersNow[this.layerName];
         var imageURL = simVars.rasterBase + rasterInfo.raster;
         if (timestamp in this.preloadedRasters) {
             imageURL = this.preloadedRasters[timestamp];
         }
+        return imageURL;
+    }
+
+    getTimestampColorbarURL(timestamp) {
+        if (!this.hasColorbar) {
+            return;
+        }
+
+        var rastersNow = simVars.rasters[this.domain][timestamp];
+        var rasterInfo = rastersNow[this.layerName];
+        var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
+        if (timestamp in this.preloadedColorbars) {
+            colorbarURL = this.preloadedColorbars[timestamp];
+        }
+        return colorbarURL;
+    }
+
+    setTimestamp(timestamp) {
+        var imageURL = this.getTimestampURL(timestamp);
         this.layer.setUrl(imageURL);
         if (this.layerName == simVars.displayedColorbar) {
-            // const rasterColorbar = document.querySelector('#raster-colorbar');
-            var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-            if (timestamp in this.preloadedColorbars) {
-                colorbarURL = this.preloadedColorbars[timestamp];
+            var colorbarURL = this.getTimestampColorbarURL(timestamp);
+            if (colorbarURL != null) {
+                this.rasterColorbar.src = colorbarURL;
             }
-            this.rasterColorbar.src = colorbarURL;
         }
     }
 
@@ -121,6 +142,38 @@ export class SimulationLayer {
             }
         }
         img.src = imgURL;
+    }
+
+    async getColorbarValueAtLocation(timestamp, coords) {
+
+    }
+
+    async getColorbarValueOfPixelValue(timestamp, value) {
+        return new Promise(resolve => {
+            resolve('test');
+        });
+    }
+
+    async getPixelValueAtLocation(timestamp, coords) {
+        return new Promise(resolve => {
+            var imgURL = this.getTimestampURL(timestamp);
+            var [xCoord, yCoord] = coords;
+            var img = new Image();
+
+            img.onload = () => {
+                var imgX = Math.floor(xCoord * img.naturalWidth);
+                var imgY = Math.floor(yCoord * img.naturalHeight);
+
+                this.imgCanvas.getContext('2d').clearRect(0, 0, 1, 1);
+
+                this.imgCanvas.getContext('2d').drawImage(img, imgX, imgY, 1, 1, 0, 0, 1, 1);
+                var pixelData = this.imgCanvas.getContext('2d').getImageData(0, 0, 1, 1).data; 
+
+                resolve([pixelData[0], pixelData[1], pixelData[2]])
+            }
+            
+            img.src = imgURL;
+        });
     }
 
     loadTimestamp(timestamp, worker) {
