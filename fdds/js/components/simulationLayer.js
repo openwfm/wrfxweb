@@ -125,6 +125,8 @@ export class SimulationLayer {
 
     loadTimestamp(timestamp, worker) {
         if (this.isPreloaded(timestamp)) {
+            var frames = this.hasColorbar ? 2 : 1;
+            controllers.loadingProgress.frameLoaded(frames);
             return;
         }
         var raster = simVars.rasters[this.domain][timestamp];

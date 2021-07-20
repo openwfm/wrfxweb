@@ -79,8 +79,8 @@ export const controllers = {
             loadingProgress.setValue(0);
         }
 
-        loadingProgress.frameLoaded = () => {
-            loadingProgress.loadedFrames += 1;
+        loadingProgress.frameLoaded = (frames = 1) => {
+            loadingProgress.loadedFrames += frames;
             var progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
             loadingProgress.setValue(progress);
         }
