@@ -263,13 +263,13 @@ export class LayerController extends HTMLElement {
         // Make sure overlays are still on top
         for (var overlay of simVars.overlayOrder) {
             if (simVars.overlayList.includes(overlay)) {
-                var overlayLayer = this.getLayer(overlay);
+                var overlayLayer = this.getLayer(currentDomain, overlay);
                 overlayLayer.bringToFront();
             }
         }
         if (simVars.overlayOrder.length > 1) {
             var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
-            var lastLayer = this.getLayer(lastLayerName);
+            var lastLayer = this.getLayer(currentDomain, lastLayerName);
             lastLayer.setOpacity(.5);
         }
         setURL();

@@ -42,7 +42,9 @@ export class TimeSeriesController extends LayerController {
         // When both a layer and its colorbar have loaded, update the timeSeries canvases
         this.imgCanvas.width = 1;
         this.imgCanvas.height = 1;
-        controllers.syncImageLoad.subscribe(() => this.updateCanvases());
+        controllers.syncImageLoad.subscribe(() => {
+            this.updateCanvases()
+        });
         this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
@@ -87,13 +89,15 @@ export class TimeSeriesController extends LayerController {
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
      * Update the current canvases and markers to point to the new layer and create a callback to 
      * build a new marker when the new layer is double clicked. */
-    handleOverlayadd(name) {
-        super.handleOverlayadd(name);
-        var rastersNow = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
-        var layer = this.getLayer(name);
-        var img = layer._image;
+    handleOverlayadd(layerName) {
+        super.handleOverlayadd(layerName);
+        var currentDomain = controllers.currentDomain.value;
+        var currentTimestamp = controllers.currentTimestamp.value;
+        var rastersNow = simVars.rasters[currentDomain][currentTimestamp];
+        var layer = this.getLayer(currentDomain, layerName);
+        var img = layer.getLayer()._image;
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        if ('colorbar' in rastersNow[name]) {
+        if ('colorbar' in rastersNow[layerName]) {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
@@ -145,7 +149,8 @@ export class TimeSeriesController extends LayerController {
         var rgb = [0, 0, 0];
         var clrbarLocation = null;
         if (this.imgCanvas && simVars.displayedColorbar != null) {
-            var layerImg = this.getLayer(simVars.displayedColorbar)._image;
+            var currentDomain = controllers.currentDomain.value;
+            var layerImg = this.getLayer(currentDomain, simVars.displayedColorbar).layer._image;
             rgb = this.drawMarkerOnCanvas(layerImg, marker);
             clrbarLocation = this.findClosestKey(rgb, this.clrbarMap);
         }
@@ -176,8 +181,8 @@ export class TimeSeriesController extends LayerController {
 
     /** When removing a layer, need to find the most recent colorbar and update the timeSeries canvases
      * to that layer. */
-    handleOverlayRemove(name) {
-        super.handleOverlayRemove(name);
+    handleOverlayRemove(layerName) {
+        super.handleOverlayRemove(layerName);
         if (!simVars.displayedColorbar) {
             this.timeSeriesButton.getButton().disabled = true;
         }
