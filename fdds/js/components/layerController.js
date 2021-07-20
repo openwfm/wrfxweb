@@ -71,8 +71,9 @@ export class LayerController extends HTMLElement {
         controllers.opacity.subscribe(() => {
             var newOpacity = controllers.opacity.getValue();
             if (simVars.overlayOrder.length > 0) {
+                var currentDomain = controllers.currentDomain.value;
                 var topLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
-                var topLayer = this.getLayer(topLayerName);
+                var topLayer = this.getLayer(currentDomain, topLayerName);
                 topLayer.setOpacity(newOpacity);
             }
         });
