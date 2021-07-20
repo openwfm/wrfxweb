@@ -1,5 +1,5 @@
 import { simVars } from '../simVars.js';
-import { controllers, SyncController } from './Controller.js';
+import { controllers } from './Controller.js';
 import { map } from '../map.js';
 
 /** Layer for a specific domain. */
