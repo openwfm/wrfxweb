@@ -38,10 +38,8 @@ export class LayerController extends HTMLElement {
         this.mapType = 'OSM';
         this.overlayDict = {};
         this.rasterDict = {};
-        this.preloaded = {};
-        this.progressSet = 0;
+        this.activeLayers = {};
         this.worker; 
-        this.nImages = 0;
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -100,36 +98,35 @@ export class LayerController extends HTMLElement {
     updateTime() {
         var currentDomain = controllers.currentDomain.value;
         var currentTimestamp = controllers.currentTimestamp.value;
-        var reloading = false;
+        var loading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(currentDomain, layerName);
-            if (!layer.preloadCheck(currentTimestamp)) {
-                if (!reloading) {
-                    var startTime = controllers.currentTimestamp.getValue();
+            if (!layer.isPreloaded(currentTimestamp)) {
+                if (!loading) {
                     var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-                    this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
+                    this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
                 }
-                reloading = true;
+                loading = true;
             }
             layer.setTimestamp(currentTimestamp);
         }
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
-        var currentDomain = controllers.currentDomain.getValue();
+        var currentDomain = controllers.currentDomain.value;
         var worker = this.createWorker();
         var loadLater = [];
         controllers.loadingProgress.setValue(0);
-        var filteredTimeStamps = simVars.sortedTimestamps.filter((timestamp) => {
-            var lowestTime = controllers.startDate.getValue();
-            var greatestTime = controllers.endDate.getValue();
+        var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
+            var lowestTime = controllers.startDate.value;
+            var greatestTime = controllers.endDate.value;
             return (timestamp >= lowestTime && timestamp <= greatestTime);
         });
         var nFrames = 0;
         for (var layerName of layerNames) {
             var layer = this.getLayer(currentDomain, layerName);
-            var layerFrames = layer.colorbar ? 2 : 1;
-            nFrames += layerFrames * filteredTimeStamps.length;
+            var layerFrames = layer.hasColorbar ? 2 : 1;
+            nFrames += layerFrames * timestampsToLoad.length;
         }
         controllers.loadingProgress.setFrames(nFrames);
 
@@ -139,12 +136,11 @@ export class LayerController extends HTMLElement {
                 layer.loadTimestamp(timestamp, worker);
             }
         }
-
-        for (var timestamp of filteredTimeStamps) {
-            if (timestamp < startTime || timestamp > endTime) {
-                loadLater.push(timestamp);
-            } else {
+        for (var timestamp of timestampsToLoad) {
+            if (timestamp >= startTime && timestamp <= endTime) {
                 loadTimestamp(timestamp);
+            } else {
+                loadLater.push(timestamp);
             }
         }
         for (var timestamp of loadLater) {
@@ -156,12 +152,12 @@ export class LayerController extends HTMLElement {
         if (this.worker) {
             this.worker.terminate();
         }
-        this.nImages = 0;
         for (var layerName of simVars.overlayOrder) {
-            var layer = this.getLayer(layerName);
-            if (layer) {
-                layer.remove(map);
+            var layer = this.activeLayers[layerName];
+            if (layer != null) {
+                layer.getLayer().remove(map);
             }
+            delete this.activeLayers[layerName];
         }
         simVars.displayedColorbar = null;
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -263,6 +259,7 @@ export class LayerController extends HTMLElement {
         var layer = this.getLayer(currentDomain, layerName);
         console.log('name ' + layerName + ' layer ' + layer.getLayer());
         layer.addLayerToMap();
+        this.activeLayers[layerName] = layer;
         // Make sure overlays are still on top
         for (var overlay of simVars.overlayOrder) {
             if (simVars.overlayList.includes(overlay)) {
@@ -294,16 +291,17 @@ export class LayerController extends HTMLElement {
 
             const objectURL = URL.createObjectURL(imageData.blob);
             var layer = this.getLayer(layerDomain, layerName);
-            layer.setImage(timeStamp, objectURL, colorbar);
+            layer.setImageLoaded(timeStamp, objectURL, colorbar);
         });
         return worker;
     }
 
     /** Called when a layer is de-selected. */
-    handleOverlayRemove(name) {
+    handleOverlayRemove(layerName) {
         var currentDomain = controllers.currentDomain.value;
-        var removedLayer = this.getLayer(currentDomain, name);
+        var removedLayer = this.getLayer(currentDomain, layerName);
         removedLayer.removeLayer();
+        delete this.activeLayers[layerName];
 
         if (simVars.overlayOrder.length > 0) {
             var topOpacity = controllers.opacity.value;
@@ -378,7 +376,7 @@ export class LayerController extends HTMLElement {
 
         var currentDomain = controllers.currentDomain.value;
         var rasterDict = this.rasterDict[currentDomain];
-        var overlayDict = this.rasterDict[currentDomain];
+        var overlayDict = this.overlayDict[currentDomain];
         for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {
             for (var layerName in layerDict) {
                 layerDiv.appendChild(this.buildLayerBox(layerName));
