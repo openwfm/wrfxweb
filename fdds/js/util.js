@@ -28,7 +28,7 @@ export function setURL() {
   addData('startDate', startDate);
   var endDate = utcToLocal(controllers.endDate.getValue());
   addData('endDate', endDate);
-  var rasterURL = simVars.overlayOrder.join('-');
+  var rasterURL = simVars.overlayOrder.join(',');
   addData('rasters', rasterURL);
   var opacity = controllers.opacity.getValue();
   addData('opacity', opacity);
