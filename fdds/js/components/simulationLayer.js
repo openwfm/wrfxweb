@@ -24,8 +24,12 @@ export class SimulationLayer {
         this.preloadedRasters = {};
         this.preloadedColorbars = {};
         this.colorbarMaps = {};
+        this.colorbarValueCache = {};
 
         this.imgCanvas = document.createElement('canvas');
+        this.imgCanvas.width = 1;
+        this.imgCanvas.height = 1;
+
         this.clrbarCanvas = document.createElement('canvas');
     }
 
@@ -145,8 +149,14 @@ export class SimulationLayer {
     }
 
     async colorValueAtLocation(timestamp, coords) {
+        var key = timestamp + coords.join(',');
+        var colorValue = this.colorbarValueCache[key];
+        if (colorValue != null) {
+            return colorValue;
+        }
         var rgbValue = await this.rgbValueAtLocation(timestamp, coords);
-        var colorValue = await this.rgbValueToColorValue(timestamp, rgbValue);
+        colorValue = await this.rgbValueToColorValue(timestamp, rgbValue);
+        this.colorbarValueCache[key] = colorValue;
         return colorValue;
     }
 
