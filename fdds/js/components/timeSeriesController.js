@@ -170,7 +170,7 @@ export class TimeSeriesController extends LayerController {
         document.body.classList.add('waiting');
         progressMarker.setProgress(0);
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        // var dataType = progressMarker.getDataType();
+        var dataType = progressMarker.getDataType();
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
@@ -183,6 +183,9 @@ export class TimeSeriesController extends LayerController {
             for (var i = 0; i < markers.length; i++) {
                 var coords = markers[i].imageCoords;
                 var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
+                if (colorbarValue == null && dataType == 'continuous') {
+                    colorbarValue = 0;
+                }
                 timeSeriesData[i].dataset[timeStamp] = colorbarValue;
             }
             progress += 1;
