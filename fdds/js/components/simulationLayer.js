@@ -150,12 +150,14 @@ export class SimulationLayer {
 
     async colorValueAtLocation(timestamp, coords) {
         var key = timestamp + coords.join(',');
-        var colorValue = this.colorbarValueCache[key];
-        if (colorValue != null) {
-            return colorValue;
+        if (key in this.colorbarValueCache) {
+            return this.colorbarValueCache[key];
         }
-        var rgbValue = await this.rgbValueAtLocation(timestamp, coords);
-        colorValue = await this.rgbValueToColorValue(timestamp, rgbValue);
+        var [r, g, b] = await this.rgbValueAtLocation(timestamp, coords);
+        var colorValue = null;
+        if ((r + g + b) != 0) {
+            colorValue = await this.rgbValueToColorValue(timestamp, [r, g, b]);
+        }
         this.colorbarValueCache[key] = colorValue;
         return colorValue;
     }
