@@ -156,7 +156,7 @@ export class LayerController extends HTMLElement {
         for (var layerName of simVars.overlayOrder) {
             var layer = this.activeLayers[layerName];
             if (layer != null) {
-                layer.getLayer().remove(map);
+                layer.imageOverlay.remove(map);
             }
             delete this.activeLayers[layerName];
         }
@@ -258,7 +258,7 @@ export class LayerController extends HTMLElement {
         // register in currently displayed layers and bring to front if it's an overlay
         var currentDomain = controllers.currentDomain.value;
         var layer = this.getLayer(currentDomain, layerName);
-        console.log('name ' + layerName + ' layer ' + layer.getLayer());
+        console.log('name ' + layerName + ' layer ' + layer.imageOverlay);
         layer.addLayerToMap();
         this.activeLayers[layerName] = layer;
         // Make sure overlays are still on top
