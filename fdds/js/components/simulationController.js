@@ -45,6 +45,7 @@ export class SimulationController extends HTMLElement {
         this.slowRate = 500;
         this.normalRate = 330;
         this.frameRate = this.normalRate;
+        this.simulationSlider;
     }
 
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
@@ -52,6 +53,7 @@ export class SimulationController extends HTMLElement {
         const container = this.querySelector('.slider-container');
         const slider = new SimulationSlider();
         container.appendChild(slider);
+        this.simulationSlider = slider;
 
         if (document.body.clientWidth < 769) {
             const timeStamp = this.querySelector('#slider-timestamp');
@@ -66,6 +68,16 @@ export class SimulationController extends HTMLElement {
         }, controllerEvents.all);
         controllers.currentTimestamp.subscribe(() => {
             this.updateSlider();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            e = e || window.event;
+            if (e.key == 'ArrowRight') {
+                this.nextFrame();
+            }
+            if (e.key == 'ArrowLeft') {
+                this.prevFrame();
+            }
         });
 
         this.querySelector('#slider-play-pause').onpointerdown = () => {
@@ -114,7 +126,6 @@ export class SimulationController extends HTMLElement {
 
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
-        // set current time
         var currentTimestamp = controllers.currentTimestamp.getValue();
         document.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
     }
@@ -155,8 +166,7 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the right. */
     nextFrame() {
-        const simulationSlider = this.querySelector('simulation-slider');
-        var nextTimestamp = simulationSlider.nextTimestamp();
+        var nextTimestamp = this.simulationSlider.nextTimestamp();
 
         controllers.currentTimestamp.setValue(nextTimestamp);
         return nextTimestamp;
@@ -164,8 +174,7 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the left. */
     prevFrame() {
-        const simulationSlider = this.querySelector('simulation-slider');
-        var prevTimestamp = simulationSlider.prevTimestamp();
+        var prevTimestamp = this.simulationSlider.prevTimestamp();
 
         controllers.currentTimestamp.setValue(prevTimestamp);
         return prevTimestamp;
