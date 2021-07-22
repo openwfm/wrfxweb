@@ -17,6 +17,7 @@ export const map = (function buildMap() {
     zoom = presetZoom;
   }
   var leafletMap = L.map('map-fd', {
+    keyboard: false,
     layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,
     minZoom: 3,
