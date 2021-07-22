@@ -127,7 +127,12 @@ export function dragElement(elmnt, subID) {
   if (clientWidth < 769) {
     return;
   }
-  document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+  var draggableElement = document.getElementById(elmnt.id);
+  if (subID != '') {
+    draggableElement = document.getElementById(subID);
+  }
+  // document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+  draggableElement.onpointerdown = dragMouseDown;
   window.addEventListener('resize', () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {

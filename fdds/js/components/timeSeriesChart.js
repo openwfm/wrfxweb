@@ -9,9 +9,12 @@ export class TimeSeriesChart extends HTMLElement {
             <link rel='stylesheet' href='css/timeSeriesChart.css'/>
             <div id='timeSeriesChartContainer'>
                 <div id='zoomBox'></div>
-                <span id='closeTimeSeriesChart'>x</span>
-                <button id='undo-zoom' style='display:none'>
-                    <img height=10 width=10 src='icons/undo_black_24dp.svg'></img>
+                <span class='interactive-button' id='closeTimeSeriesChart'>x</span>
+                <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
+                    <img height=15 width=15 src='icons/open_with_black_24dp.svg'></img>
+                </button>
+                <button id='undo-zoom' class='interactive-button' style='display:none'>
+                    <img height=15 width=15 src='icons/undo_black_24dp.svg'></img>
                 </button>
                 <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
                 <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
@@ -44,7 +47,9 @@ export class TimeSeriesChart extends HTMLElement {
         var clientWidth = document.body.clientWidth;
         if (clientWidth > 769) {
             timeSeriesChart.style.left = 300 + 'px';
-            dragElement(timeSeriesChart, '');
+            const dragButton = this.querySelector('#drag-container');
+            dragButton.style.display = 'inline-block';
+            dragElement(timeSeriesChart, 'drag-container');
         }
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
@@ -109,7 +114,7 @@ export class TimeSeriesChart extends HTMLElement {
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
         var yAxisCheck = isNaN(yMin);
-        var undoZoomDisplay = 'block';
+        var undoZoomDisplay = 'inline-block';
         if (startCheck && endCheck && yAxisCheck) {
             undoZoomDisplay = 'none';
         }

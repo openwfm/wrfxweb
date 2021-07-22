@@ -30,6 +30,15 @@ html {
   z-index: -10;
 }
 
+.interactive-button {
+  opacity: 50%;
+  cursor: pointer;
+}
+
+.interactive-button:hover {
+  opacity: 100%;
+}
+
 @keyframes fadeIn {
   to{
     opacity: 1;
