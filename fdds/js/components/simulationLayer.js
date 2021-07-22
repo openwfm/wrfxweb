@@ -14,7 +14,7 @@ export class SimulationLayer {
         this.domain = domain;
         this.hasColorbar = hasColorbar;
         this.rasterColorbar = rasterColorbar;
-        this.layer = L.imageOverlay(layerURL,
+        this.imageOverlay = L.imageOverlay(layerURL,
                                     [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                     {
                                         attribution: simVars.organization,
@@ -43,14 +43,14 @@ export class SimulationLayer {
     }
 
     bringToFront() {
-        if (this.layer != null) {
-            this.layer.bringToFront();
+        if (this.imageOverlay != null) {
+            this.imageOverlay.bringToFront();
         }
     }
 
     setOpacity(opacity) {
-        if (this.layer != null) {
-            this.layer.setOpacity(opacity);
+        if (this.imageOverlay != null) {
+            this.imageOverlay.setOpacity(opacity);
         }
     }
 
@@ -60,13 +60,13 @@ export class SimulationLayer {
         var rasterInfo = rastersNow[this.layerName];
         var opacity = controllers.opacity.value;
 
-        this.layer.addTo(map);
+        this.imageOverlay.addTo(map);
         if (!(simVars.overlayOrder.includes(this.layerName))) {
             simVars.overlayOrder.push(this.layerName);
         }
-        this.layer.bringToFront();
-        this.layer.setUrl(simVars.rasterBase + rasterInfo.raster);
-        this.layer.setOpacity(opacity);
+        this.imageOverlay.bringToFront();
+        this.imageOverlay.setUrl(simVars.rasterBase + rasterInfo.raster);
+        this.imageOverlay.setOpacity(opacity);
         if (this.hasColorbar) {
             var cbURL = simVars.rasterBase + rasterInfo.colorbar;
             // const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -102,7 +102,7 @@ export class SimulationLayer {
 
     setTimestamp(timestamp) {
         var imageURL = this.getTimestampURL(timestamp);
-        this.layer.setUrl(imageURL);
+        this.imageOverlay.setUrl(imageURL);
         if (this.layerName == simVars.displayedColorbar) {
             var colorbarURL = this.getTimestampColorbarURL(timestamp);
             if (colorbarURL != null) {
@@ -112,7 +112,7 @@ export class SimulationLayer {
     }
 
     removeLayer() {
-        this.layer.remove(map);
+        this.imageOverlay.remove(map);
         simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(this.layerName), 1);
     }
 
