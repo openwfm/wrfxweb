@@ -33,10 +33,6 @@ export class SimulationLayer {
         this.clrbarCanvas = document.createElement('canvas');
     }
 
-    getLayer() {
-        return this.layer;
-    }
-
     isPreloaded(timestamp) {
         var rasterCheck = this.preloadedRasters[timestamp] != null;
         var colorbarCheck = true;

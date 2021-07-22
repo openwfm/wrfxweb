@@ -81,7 +81,7 @@ export class TimeSeriesController extends LayerController {
         super.handleOverlayadd(layerName);
         var currentDomain = controllers.currentDomain.value;
         var layer = this.getLayer(currentDomain, layerName);
-        var img = layer.getLayer()._image;
+        var img = layer.layer._image;
         if (layer.hasColorbar) {
             img.ondblclick = (e) => {
                 var latLon = map.mouseEventToLatLng(e);

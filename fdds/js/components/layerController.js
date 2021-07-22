@@ -258,7 +258,7 @@ export class LayerController extends HTMLElement {
         // register in currently displayed layers and bring to front if it's an overlay
         var currentDomain = controllers.currentDomain.value;
         var layer = this.getLayer(currentDomain, layerName);
-        console.log('name ' + layerName + ' layer ' + layer.getLayer());
+        console.log('name ' + layerName + ' layer ' + layer.layer);
         layer.addLayerToMap();
         this.activeLayers[layerName] = layer;
         // Make sure overlays are still on top
