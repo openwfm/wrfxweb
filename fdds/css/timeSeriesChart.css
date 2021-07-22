@@ -30,7 +30,16 @@
 }
 
 #drag-container {
+  position: absolute;
+  top: 8px;
+  left: 15px;
   cursor: grab;
+}
+
+#undo-zoom {
+  position: absolute;
+  top: 8px;
+  left: 40px;
 }
 
 #zoomBox {
