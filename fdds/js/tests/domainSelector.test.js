@@ -11,7 +11,14 @@ jest.mock('../simVars.js', () => ({
             2: {
                 '2020': {'raster': {}},
                 '2021': {'raster': {}}
-            } 
+            },
+            3: {
+                '2020': {'raster': {}},
+                '2020.5': {'raster':{}},
+                '2021': {'raster': {}},
+                '2021.5': {'raster': {}},
+                '2022' : {'raster': {}}
+            }
         }),
         presets: ({ 
             opacity: "0.5"
@@ -61,9 +68,11 @@ jest.mock('../components/Controller.js', () => ({
 describe('Domain Selector Tests', () => {
     var domainSelector;
     var currentDomain;
+    var currentTimestamp;
 
     beforeEach(async () => {
         controller.controllers.currentDomain.setValue = (newDomain) => currentDomain = newDomain;
+        controller.controllers.currentTimestamp.setValue = (newTimestamp) => currentTimestamp = newTimestamp;
         domainSelector = await document.body.appendChild(new DomainSelector());
     });
 
@@ -80,5 +89,17 @@ describe('Domain Selector Tests', () => {
 
         expect(simVars.simVars.sortedTimestamps).toEqual(['2020', '2021']);
         expect(currentDomain).toEqual(2);
+    });
+
+    test('Changing domain should preserve currentTimestamp', () => {
+        domainSelector.setUpForDomain(2);
+        controller.controllers.currentTimestamp.getValue = () => '2021';
+
+        domainSelector.setUpForDomain(3);
+        expect(currentTimestamp).toEqual('2021');
+
+        controller.controllers.currentTimestamp.getValue = () => '2021.5';
+        domainSelector.setUpForDomain(2);
+        expect(currentTimestamp).toEqual('2021');
     });
 });
