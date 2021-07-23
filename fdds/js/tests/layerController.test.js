@@ -141,12 +141,12 @@ describe('Tests for adding layers to menu and selecting layers', () => {
         expect(simVars.simVars.overlayOrder.includes('raster')).toEqual(true);
     });
 
-    // test('Layers should be correctly removed from the map when selected', () => {
-    //     layerController.handleOverlayadd('raster');
-    //     layerController.handleOverlayRemove('raster');
+    test('Layers should be correctly removed from the map when selected', () => {
+        layerController.handleOverlayadd('raster');
+        layerController.handleOverlayRemove('raster');
 
-    //     expect('testBase/rasterTest' in globalMap).toEqual(false);
-    // });
+        expect('testBase/rasterTest' in globalMap).toEqual(false);
+    });
 
     // test('Layer Controller should preserve previous selected layers when domain is switched on the same simulation', () => {
     //     layerController.handleOverlayadd('raster');
