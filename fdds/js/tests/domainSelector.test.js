@@ -31,6 +31,10 @@ jest.mock('../components/Controller.js', () => ({
             subscribe: jest.fn(),
             getValue: () => [1, 2]
         }),
+        currentTimestamp: ({
+            getValue: () => '2020',
+            setValue: jest.fn()
+        }),
         currentDomain: ({
             getValue: jest.fn(),
             setValue: jest.fn()
@@ -47,7 +51,11 @@ jest.mock('../components/Controller.js', () => ({
             getValue: () => 0.5,
             setValue: jest.fn()
         })
+    }),
+    controllerEvents: ({
+        quiet: 'quiet',
     })
+
 }));
 
 describe('Domain Selector Tests', () => {
