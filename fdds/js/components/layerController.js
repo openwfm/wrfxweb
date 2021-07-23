@@ -98,7 +98,7 @@ export class LayerController extends HTMLElement {
      */
     updateTime() {
         var currentDomain = controllers.currentDomain.value;
-        var currentTimestamp = controllers.currentTimestamp.value;
+        var currentTimestamp = controllers.currentTimestamp.getValue();
         var loading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(currentDomain, layerName);
@@ -196,7 +196,7 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // build the layer groups of the current domain
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var timestamp = simVars.sortedTimestamps[0];
         if (this.rasterDict[currentDomain] == null) {
             this.rasterDict[currentDomain] = {};
@@ -256,7 +256,7 @@ export class LayerController extends HTMLElement {
     /** Called when a layer is selected. */
     handleOverlayadd(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var layer = this.getLayer(currentDomain, layerName);
         console.log('name ' + layerName + ' layer ' + layer.imageOverlay);
         layer.addLayerToMap();
