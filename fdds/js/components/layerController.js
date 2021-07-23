@@ -71,7 +71,7 @@ export class LayerController extends HTMLElement {
         controllers.opacity.subscribe(() => {
             var newOpacity = controllers.opacity.getValue();
             if (simVars.overlayOrder.length > 0) {
-                var currentDomain = controllers.currentDomain.value;
+                var currentDomain = controllers.currentDomain.getValue();
                 var topLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
                 var topLayer = this.getLayer(currentDomain, topLayerName);
                 topLayer.setOpacity(newOpacity);
@@ -97,8 +97,8 @@ export class LayerController extends HTMLElement {
      * Need to update the colorbar on top to the current time as well.
      */
     updateTime() {
-        var currentDomain = controllers.currentDomain.value;
-        var currentTimestamp = controllers.currentTimestamp.value;
+        var currentDomain = controllers.currentDomain.getValue();
+        var currentTimestamp = controllers.currentTimestamp.getValue();
         var loading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(currentDomain, layerName);
@@ -114,7 +114,7 @@ export class LayerController extends HTMLElement {
     }
 
     loadWithPriority(startTime, endTime, layerNames) {
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
         var loadLater = [];
         controllers.loadingProgress.setValue(0);
@@ -196,7 +196,7 @@ export class LayerController extends HTMLElement {
     /** Called when a new domain is selected or a new simulation is selected. */
     domainSwitch() {
         // build the layer groups of the current domain
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var timestamp = simVars.sortedTimestamps[0];
         if (this.rasterDict[currentDomain] == null) {
             this.rasterDict[currentDomain] = {};
@@ -256,7 +256,7 @@ export class LayerController extends HTMLElement {
     /** Called when a layer is selected. */
     handleOverlayadd(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var layer = this.getLayer(currentDomain, layerName);
         console.log('name ' + layerName + ' layer ' + layer.imageOverlay);
         layer.addLayerToMap();
@@ -299,7 +299,8 @@ export class LayerController extends HTMLElement {
 
     /** Called when a layer is de-selected. */
     handleOverlayRemove(layerName) {
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
+        var currentTimestamp = controllers.currentTimestamp.getValue();
         var removedLayer = this.getLayer(currentDomain, layerName);
         removedLayer.removeLayer();
         delete this.activeLayers[layerName];
@@ -311,7 +312,7 @@ export class LayerController extends HTMLElement {
             lastLayer.setOpacity(topOpacity);
         }
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
+        var rasters_now = simVars.rasters[currentDomain][currentTimestamp];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
         var colorbarDisplay = 'none';
@@ -375,7 +376,7 @@ export class LayerController extends HTMLElement {
         const overlayDiv = this.querySelector('#overlay-checkboxes');
         overlayDiv.innerHTML = '';
 
-        var currentDomain = controllers.currentDomain.value;
+        var currentDomain = controllers.currentDomain.getValue();
         var rasterDict = this.rasterDict[currentDomain];
         var overlayDict = this.overlayDict[currentDomain];
         for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {

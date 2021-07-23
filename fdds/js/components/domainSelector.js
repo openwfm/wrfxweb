@@ -144,7 +144,7 @@ export class DomainSelector extends HTMLElement {
         endDate = findNewTimestamp(endDate);
         controllers.endDate.setValue(endDate, controllerEvents.quiet);
 
-        var currentTimestamp = controllers.currentTimestamp.value;
+        var currentTimestamp = controllers.currentTimestamp.getValue();
         currentTimestamp = findNewTimestamp(currentTimestamp);
         controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
 

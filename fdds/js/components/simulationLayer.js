@@ -55,10 +55,10 @@ export class SimulationLayer {
     }
 
     addLayerToMap() {
-        var currentTimestamp = controllers.currentTimestamp.value;
+        var currentTimestamp = controllers.currentTimestamp.getValue();
         var rastersNow = simVars.rasters[this.domain][currentTimestamp];
         var rasterInfo = rastersNow[this.layerName];
-        var opacity = controllers.opacity.value;
+        var opacity = controllers.opacity.getValue();
 
         this.imageOverlay.addTo(map);
         if (!(simVars.overlayOrder.includes(this.layerName))) {
