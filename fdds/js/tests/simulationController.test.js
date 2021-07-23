@@ -43,6 +43,9 @@ jest.mock('../components/Controller.js', () => ({
             subscribe: jest.fn()
         })
     }),
+    controllerEvents: ({
+        all: 'all'
+    })
 }));
 
 describe('Simulation Controller Tests', () => {
@@ -119,21 +122,5 @@ describe('Simulation Controller Tests', () => {
         }
 
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');
-    });
-
-    test('Switching to a new simulation should reset the slider', () => {
-        for (var fun of currentDomainSubscriptions) {
-            fun();
-        }
-        simulationController.nextFrame();
-        for (var fun of currentDomainSubscriptions) {
-            fun();
-        }
-        simVars.simVars.currentSimulation = 'new Simulation';
-        for (var fun of currentDomainSubscriptions) {
-            fun();
-        }
-
-        expect(controller.controllers.currentTimestamp.getValue()).toEqual('2020');
     });
 });
