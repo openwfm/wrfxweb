@@ -91,7 +91,7 @@ describe('Domain Selector Tests', () => {
         expect(currentDomain).toEqual(2);
     });
 
-    test('Changing domain should preserve currentTimestamp', () => {
+    test('Changing domain should change currentTimestamp when it doesn\'t exist in new domain', () => {
         domainSelector.setUpForDomain(2);
         controller.controllers.currentTimestamp.getValue = () => '2021';
 
@@ -99,7 +99,20 @@ describe('Domain Selector Tests', () => {
         expect(currentTimestamp).toEqual('2021');
 
         controller.controllers.currentTimestamp.getValue = () => '2021.5';
+        currentTimestamp = '2021.5';
         domainSelector.setUpForDomain(2);
         expect(currentTimestamp).toEqual('2021');
+    });
+
+    test('Changing domain should preserve currentTimestamp', () => {
+        domainSelector.setUpForDomain(2);
+        controller.controllers.currentTimestamp.getValue = () => '2021';
+
+        domainSelector.setUpForDomain(3);
+        expect(currentTimestamp).toEqual('2021');
+
+        controller.controllers.currentTimestamp.getValue = () => '2020';
+        domainSelector.setUpForDomain(2);
+        expect(currentTimestamp).toEqual('2020');
     });
 });
