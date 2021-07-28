@@ -106,14 +106,19 @@ export class TimeSeriesController extends LayerController {
     }
 
     createNewMarker(latLon, xCoord, yCoord) {
-        var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
+        var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false, closeButton: false}).setLatLng(latLon).addTo(map);
         const timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
         popup.setContent(timeSeriesMarker);
+        popup.getElement().style.display = 'none';
+        timeSeriesMarker.bindToButton(() => popup.removeFrom(map));
         var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
         var mapMarker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         popup.on('remove', () => {
             this.markers.splice(this.markers.indexOf(marker), 1);
             mapMarker.removeFrom(map);
+            if (this.markers.length == 0) {
+                this.timeSeriesButton.getButton().disabled = true;
+            }
         });
         mapMarker.on('click', () => {
             var popupElem = popup.getElement();

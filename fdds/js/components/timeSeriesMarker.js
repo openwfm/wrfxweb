@@ -18,6 +18,7 @@ export class TimeSeriesMarker extends HTMLElement {
                     <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
                 </div>
                 <p id='colorbar-location' style='margin: 0'></p>
+                <button id='removeMarker'>Remove Marker</button>
             </div>
         `;
         
@@ -57,6 +58,11 @@ export class TimeSeriesMarker extends HTMLElement {
             rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
             // button.disabled = false;
         }
+    }
+
+    bindToButton(fun) {
+        const removeMarkerButton = this.querySelector('#removeMarker');
+        removeMarkerButton.onclick = fun;
     }
 }
 
