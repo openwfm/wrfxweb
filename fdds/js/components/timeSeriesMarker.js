@@ -1,12 +1,7 @@
-import { TimeSeriesButton } from './timeSeriesButton.js';
-
-// export class TimeSeriesMarker extends TimeSeriesButton {
 export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
-        // const timeSeriesButton = this.querySelector('#timeseries-button');
-        // var labelDetails = `
         this.innerHTML = `
             <div id='timeSeriesMarker'>
                 <div>
@@ -21,17 +16,9 @@ export class TimeSeriesMarker extends HTMLElement {
                 <button id='removeMarker'>Remove Marker</button>
             </div>
         `;
-        
-        // timeSeriesButton.innerHTML = labelDetails + timeSeriesButton.innerHTML;
-
         this.rgb = null;
         this.clrbarLocation = null;
     }
-
-    // connectedCallback() {
-    //     // super.connectedCallback();
-    //     // this.updateTimestamps();
-    // }
 
     getRGB() {
         return this.rgb;
@@ -46,17 +33,14 @@ export class TimeSeriesMarker extends HTMLElement {
         this.clrbarLocation = clrbarLocation;
         const clrbarP = this.querySelector('#colorbar-location');
         const rgbP = this.querySelector('#rgb-value');
-        // const button = this.getButton();
         clrbarP.style.display = 'none';
         rgbP.innerHTML = 'No layer with colorbar to show values of';
         rgbP.style.color = 'black';
-        // button.disabled = true;
         if (clrbarLocation != null) {
             clrbarP.style.display = 'block';
             clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
             rgbP.style.color = `rgb(${this.rgb[0]},${this.rgb[1]},${this.rgb[2]})`;
             rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
-            // button.disabled = false;
         }
     }
 

@@ -42,7 +42,7 @@ export class TimeSeriesController extends LayerController {
             document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(this.timeSeriesButton, startDate, endDate, this.markers);
+            var timeSeriesData = await this.generateTimeSeriesData(startDate, endDate, this.markers);
             document.body.classList.remove('waiting');
             const timeSeriesChart = document.querySelector('timeseries-chart');
             timeSeriesChart.populateChart(timeSeriesData);
@@ -176,14 +176,14 @@ export class TimeSeriesController extends LayerController {
     /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
      * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
      * the corresponding timestamp. */
-    async generateTimeSeriesData(progressMarker, startDate, endDate, markers) {
+    async generateTimeSeriesData(startDate, endDate, markers) {
         if (simVars.displayedColorbar == null) {
             return;
         }
         document.body.classList.add('waiting');
-        progressMarker.setProgress(0);
+        this.timeSeriesButton.setProgress(0);
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        var dataType = progressMarker.getDataType();
+        var dataType = this.timeSeriesButton.getDataType();
         var progress = 0;
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
@@ -202,7 +202,7 @@ export class TimeSeriesController extends LayerController {
                 timeSeriesData[i].dataset[timeStamp] = colorbarValue;
             }
             progress += 1;
-            progressMarker.setProgress(progress/filteredTimeStamps.length);
+            this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
         }
         document.body.classList.remove('waiting');
         return timeSeriesData;
