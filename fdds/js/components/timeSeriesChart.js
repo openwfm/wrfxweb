@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -165,22 +165,8 @@ export class TimeSeriesChart extends HTMLElement {
         }
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
-        const complementColor = (rgb) => {
-            var complement = [];
-            for (var colorValue of rgb) {
-                var upper = (colorValue + 255) / 2;
-                var lower = colorValue / 2;
-                if ((upper - colorValue) > (colorValue - lower)) {
-                    complement.push(upper);
-                } else {
-                    complement.push(lower);
-                }
-            }
-            return `rgb(${complement[0]}, ${complement[1]}, ${complement[2]})`;
-        };
         for (var timeSeriesDataset of data) {
-            let rgb = timeSeriesDataset.rgb; // use let here to create block scope
-            let color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;  
+            let color = timeSeriesDataset.color; // use let here to create block scope
             var timeSeriesData = {
                     label: timeSeriesDataset.label + ' values at lat: ' + roundLatLon(timeSeriesDataset.latLon.lat) + ' lon: ' + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
@@ -194,7 +180,7 @@ export class TimeSeriesChart extends HTMLElement {
                         if (this.val === '' || isNaN(this.val) || value > this.val) {
                             return color;
                         }
-                        return complementColor(rgb);
+                        return darkenHex(color);
                     },
                     lineTension: 0,
                     borderWidth: 1,

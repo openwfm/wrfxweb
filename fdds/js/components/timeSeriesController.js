@@ -106,11 +106,15 @@ export class TimeSeriesController extends LayerController {
     }
 
     createNewMarker(latLon, xCoord, yCoord) {
-        var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false, closeButton: false}).setLatLng(latLon).addTo(map);
+        var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
         const timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
+        timeSeriesMarker.bindHide(() => {
+            var popupElem = popup.getElement();
+            popupElem.classList.remove('clicked');
+            popupElem.style.display = 'none';
+        })
         popup.setContent(timeSeriesMarker);
         popup.getElement().style.display = 'none';
-        timeSeriesMarker.bindToButton(() => popup.removeFrom(map));
         var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
         var mapMarker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         popup.on('remove', () => {
@@ -188,7 +192,7 @@ export class TimeSeriesController extends LayerController {
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
             var timeSeriesMarker = markers[i].getContent();
-            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, rgb: timeSeriesMarker.getRGB(), dataset: {}});
+            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}});
         }
         var currentDomain = controllers.currentDomain.value;
         var colorbarLayer = this.getLayer(currentDomain, simVars.displayedColorbar);
