@@ -119,6 +119,45 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
+export function rgbToHex(r, g, b) {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+export function darkenHex(hex) {
+  var darkenedHex = '#';
+  for (var decimal of hex.substr(1)) {
+      switch (decimal) {
+          case 'f': 
+              darkenedHex += 'd';
+              break;
+          case 'e': 
+              darkenedHex += 'c';
+              break;
+          case 'd':
+              darkenedHex += 'b';
+              break;
+          case 'c':
+              darkenedHex += 'a';
+              break;
+          case 'b':
+              darkenedHex += '0';
+              break;
+          case 'a': 
+              darkenedHex += '8';
+              break;
+          case '0': 
+              darkenedHex += 'e';
+              break;
+          case '1': 
+              darkenedHex += 'f';
+              break;
+          default:
+              darkenedHex += Number(decimal) - 2;
+      }
+  }
+  return darkenedHex;
+}
+
 /** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
