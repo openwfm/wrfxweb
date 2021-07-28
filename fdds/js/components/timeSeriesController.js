@@ -106,25 +106,33 @@ export class TimeSeriesController extends LayerController {
     }
 
     createNewMarker(latLon, xCoord, yCoord) {
-        var marker = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng([latLon.lat, latLon.lng]).openOn(map);
-        marker.imageCoords = [xCoord, yCoord];
-        this.markers.push(marker);
-        marker.on('remove', () => {
+        var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
+        const timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
+        popup.setContent(timeSeriesMarker);
+        var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
+        var mapMarker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
+        popup.on('remove', () => {
             this.markers.splice(this.markers.indexOf(marker), 1);
-            if (this.markers.length == 0) {
-                this.timeSeriesButton.getButton().disabled = true;
+            mapMarker.removeFrom(map);
+        });
+        mapMarker.on('click', () => {
+            var popupElem = popup.getElement();
+            if (popupElem.classList.contains('clicked')) {
+                popupElem.classList.remove('clicked');
+                popupElem.style.display = 'none';
+            } else {
+                popupElem.classList.add('clicked');
+                popupElem.style.display = 'block';
             }
         });
-        const timeSeriesChart = document.querySelector('timeseries-chart');
-        const timeSeriesMarker = new TimeSeriesMarker(latLon);
-        const timeSeriesButton = timeSeriesMarker.getButton();
-        marker.setContent(timeSeriesMarker);
-        timeSeriesButton.onclick = async () => {
-            var startDate = timeSeriesMarker.getStartDate();
-            var endDate = timeSeriesMarker.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(timeSeriesMarker, startDate, endDate, [marker]);
-            timeSeriesChart.populateChart(timeSeriesData);
-        }
+
+        var marker = {
+                        getContent: () => timeSeriesMarker,
+                        marker: mapMarker,
+                        imageCoords: [xCoord, yCoord],
+                        _latlng: latLon
+                     }
+        this.markers.push(marker);
         this.updateMarker(marker);
     }
 
