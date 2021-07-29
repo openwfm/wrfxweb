@@ -10,6 +10,8 @@ export class TimeSeriesChart extends HTMLElement {
             <div id='timeSeriesChartContainer'>
                 <div class='hidden' id='legendOptions'>
                     <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
+                    <label class='legendLabel' for'openMarker'>Open Marker Info</label>
+                    <input class='legendInput' type='checkbox' id='openMarker'/>
                     <label class='legendLabel' for='hideData'>Hide Data: </label>
                     <input class='legendInput' type='checkbox' id='hideData'/>
                     <label class='legendLabel' for='timeseriesColorCode'>Change Color: </label>
@@ -263,9 +265,8 @@ export class TimeSeriesChart extends HTMLElement {
                             hideData.checked = dataPoint.hidden;
                             hideData.oninput = () => {
                                 var hidden = hideData.checked;
-                                console.log(hidden);
                                 dataPoint.hidden = hidden;
-                                timeSeriesMarker.hidden = hidden;
+                                timeSeriesMarker.hideOnChart = hidden;
                                 this.data[index] = dataPoint;
                                 this.populateChart(this.data, startDate, endDate);
                             }
@@ -277,6 +278,18 @@ export class TimeSeriesChart extends HTMLElement {
                                 this.data[index] = dataPoint;
                                 timeSeriesMarker.setChartColor(colorInput.value);
                                 this.populateChart(this.data, startDate, endDate);
+                            }
+
+                            const openMarker = this.querySelector('#openMarker');
+                            openMarker.checked = timeSeriesMarker.infoOpen;
+                            openMarker.oninput = () => {
+                                var open = openMarker.checked;
+                                if (open) {
+                                    simVars.markers[index].showMarkerInfo();
+                                } else {
+                                    simVars.markers[index].hideMarkerInfo();
+                                }
+                                
                             }
 
                             const addChangeName = this.querySelector('#addChangeName');

@@ -108,11 +108,18 @@ export class TimeSeriesController extends LayerController {
     createNewMarker(latLon, xCoord, yCoord) {
         var popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
         const timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
-        timeSeriesMarker.bindHide(() => {
+        const hideInfo = () => {
             var popupElem = popup.getElement();
-            popupElem.classList.remove('clicked');
             popupElem.style.display = 'none';
-        })
+            timeSeriesMarker.infoOpen = false;
+        }
+        const showInfo = () => {
+            var popupElem = popup.getElement();
+            popupElem.style.display = 'block';
+            timeSeriesMarker.infoOpen = true;
+        }
+
+        timeSeriesMarker.bindHide(hideInfo);
         popup.setContent(timeSeriesMarker);
         popup.getElement().style.display = 'none';
         var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
@@ -125,13 +132,10 @@ export class TimeSeriesController extends LayerController {
             }
         });
         mapMarker.on('click', () => {
-            var popupElem = popup.getElement();
-            if (popupElem.classList.contains('clicked')) {
-                popupElem.classList.remove('clicked');
-                popupElem.style.display = 'none';
+            if (timeSeriesMarker.infoOpen) {
+                hideInfo();
             } else {
-                popupElem.classList.add('clicked');
-                popupElem.style.display = 'block';
+                showInfo();
             }
         });
 
@@ -139,7 +143,9 @@ export class TimeSeriesController extends LayerController {
                         getContent: () => timeSeriesMarker,
                         marker: mapMarker,
                         imageCoords: [xCoord, yCoord],
-                        _latlng: latLon
+                        _latlng: latLon,
+                        hideMarkerInfo: hideInfo,
+                        showMarkerInfo: showInfo, 
                      }
         simVars.markers.push(marker);
         this.updateMarker(marker);
@@ -195,7 +201,7 @@ export class TimeSeriesController extends LayerController {
             // var timeSeriesMarker = simVars.markers[i].getContent();
             var timeSeriesMarker = marker.getContent();
             // timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: simVars.markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: false});
-            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hidden});
+            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hideOnChart});
         }
         var currentDomain = controllers.currentDomain.value;
         var colorbarLayer = this.getLayer(currentDomain, simVars.displayedColorbar);

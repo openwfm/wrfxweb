@@ -29,7 +29,8 @@ export class TimeSeriesMarker extends HTMLElement {
         this.chartColor = null;
         this.colorInputted = false;
         this.clrbarLocation = null;
-        this.hidden = false;
+        this.hideOnChart = false;
+        this.infoOpen = false;
     }
 
     getChartColor() {
