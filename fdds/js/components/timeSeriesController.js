@@ -53,9 +53,10 @@ export class TimeSeriesController extends LayerController {
     domainSwitch() {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
-        while (simVars.markers.length > 0) {
-            simVars.markers[0].removeFrom(map);
+        for (var marker of simVars.markers) {
+            marker.marker.removeFrom(map);
         }
+        simVars.markers = [];
 
         var startDate = controllers.startDate.getValue();
         this.timeSeriesButton.setStartDate(startDate);
