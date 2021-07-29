@@ -119,6 +119,7 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
+// pulled from https://www.w3docs.com/snippets/javascript/how-to-convert-rgb-to-hex-and-vice-versa.html
 export function rgbToHex(r, g, b) {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }

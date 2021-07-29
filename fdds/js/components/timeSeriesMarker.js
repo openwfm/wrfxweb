@@ -24,25 +24,26 @@ export class TimeSeriesMarker extends HTMLElement {
                     <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
                 </div>
                 <p id='colorbar-location' style='margin: 0'></p>
-                <div style='display: inline-block'>
-                    <label style='display: inline-block; width: 100px' for='timeseriesColorCode'>Color on Chart: </label>
-                    <input type='color' id='timeseriesColorCode'></input>
-                </div>
             </div>
         `;
         this.chartColor = null;
-        this.clrbarLocation = null;
         this.colorInputted = false;
-
-        const colorInput = this.querySelector('#timeseriesColorCode');
-        colorInput.oninput = () => {
-            this.colorInputted = true;
-            this.chartColor = colorInput.value;
-        }
+        this.clrbarLocation = null;
+        this.hideOnChart = false;
+        this.infoOpen = false;
     }
 
     getChartColor() {
         return this.chartColor;
+    }
+
+    setChartColor(chartColor) {
+        this.chartColor = chartColor;
+        this.colorInputted = true;
+    }
+
+    setName(name) {
+        this.querySelector('#timeseries-custom-name').value = name;
     }
 
     getName() {
@@ -62,8 +63,6 @@ export class TimeSeriesMarker extends HTMLElement {
         if (!this.colorInputted) {
             var hexValue = rgbToHex(r, g, b);
             this.chartColor = hexValue;
-            const colorInput = this.querySelector('#timeseriesColorCode');
-            colorInput.value = hexValue;
         }
         this.clrbarLocation = clrbarLocation;
         const clrbarP = this.querySelector('#colorbar-location');
@@ -75,7 +74,7 @@ export class TimeSeriesMarker extends HTMLElement {
             clrbarP.style.display = 'block';
             clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
             rgbP.style.color = `rgb(${r},${g},${b})`;
-            rgbP.innerHTML = `pixel value: R ${r} G ${g} B ${b}`;
+            rgbP.innerHTML = `pixel value: R${r} G${g} B${b}`;
         }
     }
 }

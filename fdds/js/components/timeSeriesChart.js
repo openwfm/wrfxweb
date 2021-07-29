@@ -8,8 +8,19 @@ export class TimeSeriesChart extends HTMLElement {
         this.innerHTML = `
             <link rel='stylesheet' href='css/timeSeriesChart.css'/>
             <div id='timeSeriesChartContainer'>
+                <div class='hidden' id='legendOptions'>
+                    <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
+                    <label class='legendLabel' for'openMarker'>Open Marker Info</label>
+                    <input class='legendInput' type='checkbox' id='openMarker'/>
+                    <label class='legendLabel' for='hideData'>Hide Data: </label>
+                    <input class='legendInput' type='checkbox' id='hideData'/>
+                    <label class='legendLabel' for='timeseriesColorCode'>Change Color: </label>
+                    <input class='legendInput' type='color' id='timeseriesColorCode'></input>
+                    <label class='legendLabel' for='addChangeName'>Add Name:</label>
+                    <input class='legendInput' id='addChangeName'></input>
+                </div>
                 <div id='zoomBox'></div>
-                <span class='interactive-button' id='closeTimeSeriesChart'>x</span>
+                <span class='interactive-button close-button' id='closeTimeSeriesChart'>x</span>
                 <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
                     <img height=15 width=15 src='icons/open_with_black_24dp.svg'></img>
                 </button>
@@ -73,6 +84,13 @@ export class TimeSeriesChart extends HTMLElement {
                 setURL();
             }
         });
+        
+        const legendOptions = this.querySelector('#legendOptions');
+        const closeLegendOptions = this.querySelector('#closeLegendOptions');
+        closeLegendOptions.onclick = () => {
+            legendOptions.classList.add('hidden');
+        }
+
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
             this.populateChart(this.data, zoomStart.value, zoomEnd.value);
@@ -172,6 +190,7 @@ export class TimeSeriesChart extends HTMLElement {
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
+                    hidden: timeSeriesDataset.hidden,
                     spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
@@ -234,7 +253,59 @@ export class TimeSeriesChart extends HTMLElement {
                                 xAdjust: this.xAdjust - 2*this.label.length
                             }
                         }]
-                      }
+                    },
+                    legend: {
+                        display: true,
+                        onClick: (e, legendItem, legend) => {
+                            var index = legendItem.datasetIndex;
+                            var dataPoint = this.data[index];
+                            var timeSeriesMarker = simVars.markers[index].getContent();
+
+                            const hideData = this.querySelector('#hideData');
+                            hideData.checked = dataPoint.hidden;
+                            hideData.oninput = () => {
+                                var hidden = hideData.checked;
+                                dataPoint.hidden = hidden;
+                                timeSeriesMarker.hideOnChart = hidden;
+                                this.data[index] = dataPoint;
+                                this.populateChart(this.data, startDate, endDate);
+                            }
+
+                            const colorInput = this.querySelector('#timeseriesColorCode');
+                            colorInput.value = this.data[index].color;
+                            colorInput.oninput = () => {
+                                dataPoint.color = colorInput.value;
+                                this.data[index] = dataPoint;
+                                timeSeriesMarker.setChartColor(colorInput.value);
+                                this.populateChart(this.data, startDate, endDate);
+                            }
+
+                            const openMarker = this.querySelector('#openMarker');
+                            openMarker.checked = timeSeriesMarker.infoOpen;
+                            openMarker.oninput = () => {
+                                var open = openMarker.checked;
+                                if (open) {
+                                    simVars.markers[index].showMarkerInfo();
+                                } else {
+                                    simVars.markers[index].hideMarkerInfo();
+                                }
+                                
+                            }
+
+                            const addChangeName = this.querySelector('#addChangeName');
+                            addChangeName.value = timeSeriesMarker.getName();
+                            addChangeName.oninput = () => {
+                                timeSeriesMarker.setName(addChangeName.value);
+                                dataPoint.label = addChangeName.value;
+                                
+                                this.data[index] = dataPoint;
+                                this.populateChart(this.data, startDate, endDate);
+                            }
+
+                            const legendOptions = this.querySelector('#legendOptions');
+                            legendOptions.classList.remove('hidden');
+                        }
+                    }
                 },
             }
         });
