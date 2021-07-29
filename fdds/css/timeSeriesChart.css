@@ -53,6 +53,18 @@
   border: 1px solid #b6e2f0;
 }
 
+#colorSelector {
+  position: absolute;
+  display: none;
+  padding: 10px;
+  top: 80px;
+  left: 200px;
+  background: #e8e8e8;
+  border-radius: .2rem;
+  border: 1px solid darkgray;
+
+}
+
 #timeSeriesChartContainer button {
   background-color: transparent;
   border: none;

@@ -192,7 +192,7 @@ export class TimeSeriesController extends LayerController {
         var timeSeriesData = [];
         for (var i = 0; i < markers.length; i++) {
             var timeSeriesMarker = markers[i].getContent();
-            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}});
+            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: false});
         }
         var currentDomain = controllers.currentDomain.value;
         var colorbarLayer = this.getLayer(currentDomain, simVars.displayedColorbar);

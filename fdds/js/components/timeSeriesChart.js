@@ -8,6 +8,11 @@ export class TimeSeriesChart extends HTMLElement {
         this.innerHTML = `
             <link rel='stylesheet' href='css/timeSeriesChart.css'/>
             <div id='timeSeriesChartContainer'>
+                <div id='colorSelector'>
+                    <label style='display: inline-block; width: 100px' for='timeseriesColorCode'>Color on Chart: </label>
+                    <input type='color' id='timeseriesColorCode'></input>
+                    <button id='test'>test</button>
+                </div>
                 <div id='zoomBox'></div>
                 <span class='interactive-button' id='closeTimeSeriesChart'>x</span>
                 <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
@@ -234,7 +239,48 @@ export class TimeSeriesChart extends HTMLElement {
                                 xAdjust: this.xAdjust - 2*this.label.length
                             }
                         }]
-                      }
+                    },
+                    legend: {
+                        display: true,
+                        onClick: (e, legendItem, legend) => {
+                            var defaultLegendClickHandler = Chart.defaults.plugins.legend.onClick;
+                            var index = legendItem.datasetIndex;
+                            console.log(this.data[index]);
+                            var dataPoint = this.data[index];
+                            if (dataPoint.hidden) {
+                                dataPoint.hidden = false;
+                                defaultLegendClickHandler(e, legendItem, legend);
+                                return;
+                            }
+                            const testButton = this.querySelector('#test');
+                            testButton.onclick = () => {
+                                if (dataPoint.hidden) {
+                                    dataPoint.hidden = false;
+                                } else {
+                                    dataPoint.hidden = true;
+                                }
+                                defaultLegendClickHandler(e, legendItem, legend);
+                            }
+                            const colorInput = this.querySelector('#timeseriesColorCode');
+                            colorInput.value = this.data[index].color;
+                            const colorSelector = this.querySelector('#colorSelector');
+                            colorSelector.style.display = 'block';
+                            // colorInput.dispatchEvent(new Event('click'));
+                            // var type = legend.chart.config.type;
+                            // let ci = legend.chart;
+                            // [
+                            //     ci.getDatasetMeta(0),
+                            //     ci.getDatasetMeta(1)
+                            // ].forEach(function(meta) {
+                            //     // meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                            //     console.log(meta);
+                            //     meta.
+                            // });
+
+                            // this.chart.update(this.data);
+                            // this.populateChart(this.data, startDate, endDate);
+                        }
+                    }
                 },
             }
         });
