@@ -30,7 +30,7 @@ export class TimeSeriesController extends LayerController {
         timeSeriesDiv.appendChild(this.timeSeriesButton);
         container.appendChild(timeSeriesDiv);
 
-        this.markers = [];
+        simVars.markers = [];
     }
 
     connectedCallback() {
@@ -42,7 +42,7 @@ export class TimeSeriesController extends LayerController {
             document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(startDate, endDate, this.markers);
+            var timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
             document.body.classList.remove('waiting');
             const timeSeriesChart = document.querySelector('timeseries-chart');
             timeSeriesChart.populateChart(timeSeriesData);
@@ -53,8 +53,8 @@ export class TimeSeriesController extends LayerController {
     domainSwitch() {
         this.timeSeriesButton.updateTimestamps();
         super.domainSwitch();
-        while (this.markers.length > 0) {
-            this.markers[0].removeFrom(map);
+        while (simVars.markers.length > 0) {
+            simVars.markers[0].removeFrom(map);
         }
 
         var startDate = controllers.startDate.getValue();
@@ -91,7 +91,7 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
-            if (this.markers.length > 0) {
+            if (simVars.markers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
                 this.updateMarkers();
             }
@@ -118,9 +118,9 @@ export class TimeSeriesController extends LayerController {
         var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
         var mapMarker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         popup.on('remove', () => {
-            this.markers.splice(this.markers.indexOf(marker), 1);
+            simVars.markers.splice(simVars.markers.indexOf(marker), 1);
             mapMarker.removeFrom(map);
-            if (this.markers.length == 0) {
+            if (simVars.markers.length == 0) {
                 this.timeSeriesButton.getButton().disabled = true;
             }
         });
@@ -141,7 +141,7 @@ export class TimeSeriesController extends LayerController {
                         imageCoords: [xCoord, yCoord],
                         _latlng: latLon
                      }
-        this.markers.push(marker);
+        simVars.markers.push(marker);
         this.updateMarker(marker);
     }
 
@@ -162,7 +162,7 @@ export class TimeSeriesController extends LayerController {
     }
 
     updateMarkers() {
-        for (var marker of this.markers) {
+        for (var marker of simVars.markers) {
             this.updateMarker(marker);
         }
     }
@@ -180,7 +180,7 @@ export class TimeSeriesController extends LayerController {
     /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
      * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
      * the corresponding timestamp. */
-    async generateTimeSeriesData(startDate, endDate, markers) {
+    async generateTimeSeriesData(startDate, endDate) {
         if (simVars.displayedColorbar == null) {
             return;
         }
@@ -190,15 +190,18 @@ export class TimeSeriesController extends LayerController {
         var dataType = this.timeSeriesButton.getDataType();
         var progress = 0;
         var timeSeriesData = [];
-        for (var i = 0; i < markers.length; i++) {
-            var timeSeriesMarker = markers[i].getContent();
-            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: false});
+        for (var marker of simVars.markers) {
+        // for (var i = 0; i < simVars.markers.length; i++) {
+            // var timeSeriesMarker = simVars.markers[i].getContent();
+            var timeSeriesMarker = marker.getContent();
+            // timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: simVars.markers[i]._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: false});
+            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hidden});
         }
         var currentDomain = controllers.currentDomain.value;
         var colorbarLayer = this.getLayer(currentDomain, simVars.displayedColorbar);
         for (var timeStamp of filteredTimeStamps) {
-            for (var i = 0; i < markers.length; i++) {
-                var coords = markers[i].imageCoords;
+            for (var i = 0; i < simVars.markers.length; i++) {
+                var coords = simVars.markers[i].imageCoords;
                 var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
                 if (colorbarValue == null && dataType == 'continuous') {
                     colorbarValue = 0;

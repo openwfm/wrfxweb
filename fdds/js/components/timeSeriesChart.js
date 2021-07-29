@@ -177,6 +177,7 @@ export class TimeSeriesChart extends HTMLElement {
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
                     borderColor: color, 
+                    hidden: timeSeriesDataset.hidden,
                     spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
@@ -243,40 +244,36 @@ export class TimeSeriesChart extends HTMLElement {
                     legend: {
                         display: true,
                         onClick: (e, legendItem, legend) => {
-                            var defaultLegendClickHandler = Chart.defaults.plugins.legend.onClick;
+                            // var defaultLegendClickHandler = Chart.defaults.plugins.legend.onClick;
                             var index = legendItem.datasetIndex;
-                            console.log(this.data[index]);
                             var dataPoint = this.data[index];
                             if (dataPoint.hidden) {
                                 dataPoint.hidden = false;
-                                defaultLegendClickHandler(e, legendItem, legend);
+                                simVars.markers[index].getContent().hidden = false;
+                                this.populateChart(this.data, startDate, endDate);
                                 return;
                             }
                             const testButton = this.querySelector('#test');
                             testButton.onclick = () => {
+                                var hidden = true;
                                 if (dataPoint.hidden) {
-                                    dataPoint.hidden = false;
-                                } else {
-                                    dataPoint.hidden = true;
+                                    hidden = false;
                                 }
-                                defaultLegendClickHandler(e, legendItem, legend);
+                                dataPoint.hidden = hidden;
+                                simVars.markers[index].getContent().hidden = hidden;
+                                this.data[index] = dataPoint;
+                                this.populateChart(this.data, startDate, endDate);
                             }
                             const colorInput = this.querySelector('#timeseriesColorCode');
                             colorInput.value = this.data[index].color;
+                            colorInput.oninput = () => {
+                                dataPoint.color = colorInput.value;
+                                this.data[index] = dataPoint;
+                                simVars.markers[index].getContent().setChartColor(colorInput.value);
+                                this.populateChart(this.data, startDate, endDate);
+                            }
                             const colorSelector = this.querySelector('#colorSelector');
                             colorSelector.style.display = 'block';
-                            // colorInput.dispatchEvent(new Event('click'));
-                            // var type = legend.chart.config.type;
-                            // let ci = legend.chart;
-                            // [
-                            //     ci.getDatasetMeta(0),
-                            //     ci.getDatasetMeta(1)
-                            // ].forEach(function(meta) {
-                            //     // meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
-                            //     console.log(meta);
-                            //     meta.
-                            // });
-
                             // this.chart.update(this.data);
                             // this.populateChart(this.data, startDate, endDate);
                         }
