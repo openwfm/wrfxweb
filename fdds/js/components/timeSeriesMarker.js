@@ -1,4 +1,6 @@
 import { rgbToHex } from '../util.js';
+import { simVars } from '../simVars.js';
+import { map } from '../map.js';
 
 export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
@@ -76,6 +78,63 @@ export class TimeSeriesMarker extends HTMLElement {
             rgbP.style.color = `rgb(${r},${g},${b})`;
             rgbP.innerHTML = `pixel value: R${r} G${g} B${b}`;
         }
+    }
+}
+
+export class Marker {
+    constructor(latLon, timeSeriesButton, xCoord, yCoord) {
+        this._latlng = latLon;
+        this.imageCoords = [xCoord, yCoord];
+
+        this.popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
+        this.timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
+        this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
+        this.popup.setContent(this.timeSeriesMarker);
+        this.popup.getElement().style.display = 'none';
+
+        var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
+        this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
+        this.popup.on('remove', () => {
+            simVars.markers.splice(simVars.markers.indexOf(this.marker), 1);
+            this.marker.removeFrom(map);
+            if (simVars.markers.length == 0) {
+                timeSeriesButton.getButton().disabled = true;
+            }
+        });
+        this.marker.on('click', () => {
+            if (this.timeSeriesMarker.infoOpen) {
+                this.hideMarkerInfo();
+            } else {
+                this.showMarkerInfo();
+            }
+        });
+
+        // var marker = {
+        //                 getContent: () => timeSeriesMarker,
+        //                 marker: mapMarker,
+        //                 imageCoords: [xCoord, yCoord],
+        //                 _latlng: latLon,
+        //                 hideMarkerInfo: hideInfo,
+        //                 showMarkerInfo: showInfo, 
+        //              }
+        // simVars.markers.push(marker);
+        // this.updateMarker(marker);
+    }
+
+    hideMarkerInfo() {
+        var popupElem = this.popup.getElement();
+        popupElem.style.display = 'none';
+        this.timeSeriesMarker.infoOpen = false;
+    }
+
+    showMarkerInfo() {
+        var popupElem = this.popup.getElement();
+        popupElem.style.display = 'block';
+        this.timeSeriesMarker.infoOpen = true;
+    }
+
+    getContent() {
+        return this.timeSeriesMarker;
     }
 }
 
