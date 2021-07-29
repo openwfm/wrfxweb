@@ -41,6 +41,10 @@ export class TimeSeriesMarker extends HTMLElement {
         this.colorInputted = true;
     }
 
+    setName(name) {
+        this.querySelector('#timeseries-custom-name').value = name;
+    }
+
     getName() {
         return this.querySelector('#timeseries-custom-name').value;
     }
