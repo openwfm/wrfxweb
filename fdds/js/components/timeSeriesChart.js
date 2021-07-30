@@ -100,7 +100,6 @@ export class TimeSeriesChart extends HTMLElement {
             this.label = labelSetter.value;
             this.populateChart(this.data, zoomStart.value, zoomEnd.value);
         }
-
     }
 
     setZoomOptions(timeSeries) {

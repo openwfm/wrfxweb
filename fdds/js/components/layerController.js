@@ -67,7 +67,7 @@ export class LayerController extends HTMLElement {
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
 
-        controllers.currentTimestamp.subscribe(debounce(() => this.updateTime(), 100));
+        controllers.currentTimestamp.subscribe(() => this.updateTime());
         controllers.opacity.subscribe(() => {
             var newOpacity = controllers.opacity.getValue();
             if (simVars.overlayOrder.length > 0) {
