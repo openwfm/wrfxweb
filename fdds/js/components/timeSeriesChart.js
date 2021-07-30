@@ -172,15 +172,30 @@ export class TimeSeriesChart extends HTMLElement {
         if (data.length == 0) {
             return;
         }
+
         this.data = data;
         var labels = Object.keys(data[0].dataset).map(timeStamp => {
             return utcToLocal(timeStamp);
         });
         this.labels = labels;
         this.populateZoomSelectors(labels, startDate, endDate);
+
         if (this.chart) {
             this.chart.destroy();
         }
+        var dataset = this.createChartDataset(data);
+        this.chart = new Chart(this.ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: dataset
+            },
+            options: this.getOptions(startDate, endDate)
+        });
+        this.querySelector('#timeSeriesChartContainer').style.display = 'block';
+    }
+
+    createChartDataset(data) {
         const roundLatLon = (num) => Math.round(num*100) / 100;
         var dataset = [];
         for (var timeSeriesDataset of data) {
@@ -206,6 +221,10 @@ export class TimeSeriesChart extends HTMLElement {
             }
             dataset.push(timeSeriesData);
         }
+        return dataset;
+    }
+
+    getOptions(startDate, endDate) {
         var xAxisOptions = {
             title: {
                 display: true,
@@ -218,98 +237,115 @@ export class TimeSeriesChart extends HTMLElement {
         if (endDate) {
             xAxisOptions.max = endDate;
         }
-        this.chart = new Chart(this.ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: dataset
-            },
-            options: {
-                animation: {
-                    duration: 0
-                },
-                scales: {
-                    yAxes: {
-                        title: {
-                            display: true,
-                            text: simVars.displayedColorbar
-                        }
+ 
+        return ({
+                    animation: {
+                        duration: 0
                     },
-                    xAxes: xAxisOptions
-                },
-                plugins: {
-                    annotation: {
-                        annotations: [{
-                            display: this.val !== '' && !isNaN(this.val),
-                            type: 'line',
-                            mode: 'horizontal',
-                            scaleID: 'yAxes',
-                            value: this.val,
-                            borderColor: 'rgb(255, 99, 132)',
-                            borderWidth: 2,
-                            label: {
-                                enabled: this.label != '',
-                                content: this.label,
-                                xAdjust: this.xAdjust - 2*this.label.length
+                    scales: {
+                        yAxes: {
+                            title: {
+                                display: true,
+                                text: simVars.displayedColorbar
                             }
-                        }]
+                        },
+                        xAxes: xAxisOptions
                     },
-                    legend: {
-                        display: true,
-                        onClick: (e, legendItem, legend) => {
-                            var index = legendItem.datasetIndex;
-                            var dataPoint = this.data[index];
-                            var timeSeriesMarker = simVars.markers[index].getContent();
-
-                            const hideData = this.querySelector('#hideData');
-                            hideData.checked = dataPoint.hidden;
-                            hideData.oninput = () => {
-                                var hidden = hideData.checked;
-                                dataPoint.hidden = hidden;
-                                timeSeriesMarker.hideOnChart = hidden;
-                                this.data[index] = dataPoint;
-                                this.populateChart(this.data, startDate, endDate);
-                            }
-
-                            const colorInput = this.querySelector('#timeseriesColorCode');
-                            colorInput.value = this.data[index].color;
-                            colorInput.oninput = () => {
-                                dataPoint.color = colorInput.value;
-                                this.data[index] = dataPoint;
-                                timeSeriesMarker.setChartColor(colorInput.value);
-                                this.populateChart(this.data, startDate, endDate);
-                            }
-
-                            const openMarker = this.querySelector('#openMarker');
-                            openMarker.checked = timeSeriesMarker.infoOpen;
-                            openMarker.oninput = () => {
-                                var open = openMarker.checked;
-                                if (open) {
-                                    simVars.markers[index].showMarkerInfo();
-                                } else {
-                                    simVars.markers[index].hideMarkerInfo();
+                    plugins: {
+                        annotation: {
+                            annotations: [{
+                                display: this.val !== '' && !isNaN(this.val),
+                                type: 'line',
+                                mode: 'horizontal',
+                                scaleID: 'yAxes',
+                                value: this.val,
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 2,
+                                label: {
+                                    enabled: this.label != '',
+                                    content: this.label,
+                                    xAdjust: this.xAdjust - 2*this.label.length
                                 }
-                                
+                            }]
+                        },
+                        legend: {
+                            display: true,
+                            onClick: (e, legendItem, legend) => {
+                                this.legendClick(legendItem);
                             }
-
-                            const addChangeName = this.querySelector('#addChangeName');
-                            addChangeName.value = timeSeriesMarker.getName();
-                            addChangeName.oninput = () => {
-                                timeSeriesMarker.setName(addChangeName.value);
-                                dataPoint.label = addChangeName.value;
-                                
-                                this.data[index] = dataPoint;
-                                this.populateChart(this.data, startDate, endDate);
-                            }
-
-                            const legendOptions = this.querySelector('#legendOptions');
-                            legendOptions.classList.remove('hidden');
                         }
-                    }
-                },
+                    },
+                });
+    }
+
+    legendClick(legendItem) {
+        var index = legendItem.datasetIndex;
+        var dataPoint = this.data[index];
+        var timeSeriesMarker = simVars.markers[index].getContent();
+
+        const hideData = this.querySelector('#hideData');
+        hideData.checked = dataPoint.hidden;
+        hideData.oninput = () => {
+            var hidden = hideData.checked;
+            dataPoint.hidden = hidden;
+            timeSeriesMarker.hideOnChart = hidden;
+            this.data[index] = dataPoint;
+            this.populateChart(this.data, startDate, endDate);
+        }
+
+        const colorInput = this.querySelector('#timeseriesColorCode');
+        colorInput.value = this.data[index].color;
+        colorInput.oninput = () => {
+            dataPoint.color = colorInput.value;
+            this.data[index] = dataPoint;
+            timeSeriesMarker.setChartColor(colorInput.value);
+            this.populateChart(this.data, startDate, endDate);
+        }
+
+        const openMarker = this.querySelector('#openMarker');
+        openMarker.checked = timeSeriesMarker.infoOpen;
+        openMarker.oninput = () => {
+            var open = openMarker.checked;
+            if (open) {
+                simVars.markers[index].showMarkerInfo();
+            } else {
+                simVars.markers[index].hideMarkerInfo();
             }
-        });
-        this.querySelector('#timeSeriesChartContainer').style.display = 'block';
+            
+        }
+
+        const addChangeName = this.querySelector('#addChangeName');
+        addChangeName.value = timeSeriesMarker.getName();
+        addChangeName.oninput = () => {
+            timeSeriesMarker.setName(addChangeName.value);
+            dataPoint.label = addChangeName.value;
+            
+            this.data[index] = dataPoint;
+            this.populateChart(this.data, startDate, endDate);
+        }
+
+        const legendOptions = this.querySelector('#legendOptions');
+        legendOptions.classList.remove('hidden');
+    }
+
+    populateZoomSelectors(timeStamps, startDate, endDate) {
+        if (startDate == '') {
+            startDate = timeStamps[0]
+        }
+        if (endDate == '') {
+            endDate = timeStamps[timeStamps.length - 1];
+        }
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        zoomStart.innerHTML = '';
+        zoomEnd.innerHTML = '';
+        for (var timeStamp of timeStamps) {
+            zoomStart.appendChild(createOption(timeStamp, false));
+            zoomEnd.appendChild(createOption(timeStamp, false));
+        }
+        zoomStart.value = startDate;
+        zoomEnd.value = endDate;
+        linkSelects(zoomStart, zoomEnd);
     }
 
     zoomBox(e) {
@@ -379,6 +415,36 @@ export class TimeSeriesChart extends HTMLElement {
             zoomBoxArea.style.width = xDiff + 'px';
             zoomBoxArea.style.height = yDiff + 'px';
         }
+    }
+    
+    zoomDate(startDate = '', endDate = '', yMin = NaN, yMax = NaN) {
+        const zoomStart = this.querySelector('#zoom-start');
+        const zoomEnd = this.querySelector('#zoom-end');
+        const undoZoom = this.querySelector('#undo-zoom');
+        if (startDate) {
+            zoomStart.value = startDate;
+        }
+        if (endDate) {
+            zoomEnd.value = endDate;
+        }
+        linkSelects(zoomStart, zoomEnd);
+        var startCheck = zoomStart.value == this.labels[0];
+        var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
+        var yAxisCheck = isNaN(yMin);
+        var undoZoomDisplay = 'inline-block';
+        if (startCheck && endCheck && yAxisCheck) {
+            undoZoomDisplay = 'none';
+        }
+        undoZoom.style.display = undoZoomDisplay;
+        this.chart.options.scales.xAxes.min = zoomStart.value;
+        this.chart.options.scales.xAxes.max = zoomEnd.value;
+        delete this.chart.options.scales.yAxes.min;
+        delete this.chart.options.scales.yAxes.max;
+        if (!isNaN(yMin)) {
+            this.chart.options.scales.yAxes.min = yMin;
+            this.chart.options.scales.yAxes.max = yMax;
+        }
+        this.chart.update(this.data);
     }
 }
 
