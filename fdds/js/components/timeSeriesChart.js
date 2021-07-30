@@ -50,6 +50,8 @@ export class TimeSeriesChart extends HTMLElement {
         this.label = '';
         this.labels = '';
         this.xAdjust = null;
+        this.startDate = '';
+        this.endDate = '';
     }
 
     connectedCallback() {
@@ -139,6 +141,8 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChartCallback([data, startDate='', endDate='']) {
+        this.startDate = startDate;
+        this.endDate = endDate;
         if (data.length == 0) {
             return;
         }
@@ -287,7 +291,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.hidden = hidden;
             timeSeriesMarker.hideOnChart = hidden;
             this.data[index] = dataPoint;
-            this.populateChart(this.data, startDate, endDate);
+            this.populateChart(this.data, this.startDate, this.endDate);
         }
     }
 
@@ -298,7 +302,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.color = colorInput.value;
             this.data[index] = dataPoint;
             timeSeriesMarker.setChartColor(colorInput.value);
-            this.populateChart(this.data, startDate, endDate);
+            this.populateChart(this.data, this.startDate, this.endDate);
         }
     }
 
