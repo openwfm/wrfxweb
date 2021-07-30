@@ -1,3 +1,5 @@
+import { debounce } from '../util.js';
+
 export const controllerEvents = {
     quiet: 'QUIET', 
     simReset: 'SIMULATION_RESET',
@@ -12,6 +14,9 @@ export class Controller {
     constructor(value=null) {
         this.listeners = {};
         this.value = value;
+        this.debouncedSetValue = debounce((setArgs) => {
+            this.setValueCallback(setArgs);
+        }, 100);
     }
 
     subscribe(callback, eventName=controllerEvents.valueSet) {
@@ -23,6 +28,10 @@ export class Controller {
     }
 
     setValue(value, eventName=controllerEvents.valueSet) {
+        this.setValueCallback([value, eventName]);
+    }
+
+    setValueCallback([value, eventName=controllerEvents.valueSet]) {
         this.value = value;
         if (eventName != controllerEvents.quiet) {
             this.notifyListeners(this.listeners[eventName]);
@@ -65,7 +74,13 @@ export class SyncController extends Controller {
 
 // global controllers
 export const controllers = {
-    currentTimestamp: new Controller(),
+    currentTimestamp: (function createCurrentTimestamp() {
+        var currentTimestamp = new Controller();
+        currentTimestamp.setValue = (value, eventName=controllerEvents.valueSet) => {
+            currentTimestamp.debouncedSetValue([value, eventName]);
+        }
+        return currentTimestamp;
+    })(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
     loadingProgress: (function createLoadProg() {
