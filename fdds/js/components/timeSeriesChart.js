@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -71,6 +71,9 @@ export class TimeSeriesChart extends HTMLElement {
         this.setThresholdOptions();
         this.setZoomOptions(timeSeries);
         this.setDataClicking(timeSeries);
+        this.debouncedPopulateChart = debounce((chartArgs) => {
+            this.populateChartCallback(chartArgs);
+        }, 100);
 
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             this.val = '';
@@ -133,6 +136,10 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChart(data, startDate='', endDate='') {
+        this.debouncedPopulateChart([data, startDate, endDate]);
+    }
+
+    populateChartCallback([data, startDate='', endDate='']) {
         if (data.length == 0) {
             return;
         }

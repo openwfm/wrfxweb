@@ -49,13 +49,13 @@ map.on('moveend', function() {
 
 export function debounce(callback, delay) {
   let timeout; 
-  return function() {
+  return function(args=null) {
     if (timeout) {
       return;
     }
+    callback(args);
     const callbackInIntervals = () => {
       timeout = null;
-      callback();
     };
     timeout = setTimeout(callbackInIntervals, delay);
   }
