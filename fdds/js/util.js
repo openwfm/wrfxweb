@@ -47,7 +47,8 @@ map.on('moveend', function() {
   setURL();
 });
 
-export function debounce(callback, delay) {
+/** Executes function with a maximum rate of delay. */
+export function debounceInIntervals(callback, delay) {
   let timeout; 
   return function(args=null) {
     if (timeout) {
@@ -58,6 +59,17 @@ export function debounce(callback, delay) {
       timeout = null;
     };
     timeout = setTimeout(callbackInIntervals, delay);
+  }
+}
+
+/** Executes a function once at the end of an update cycle lasting delay. */
+export function debounce(callback, delay) {
+  let timeout;
+  return function(args=null) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => callback(args), delay);
   }
 }
 

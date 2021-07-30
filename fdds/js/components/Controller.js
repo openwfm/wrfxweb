@@ -1,4 +1,4 @@
-import { debounce } from '../util.js';
+import { debounceInIntervals } from '../util.js';
 
 export const controllerEvents = {
     quiet: 'QUIET', 
@@ -14,7 +14,7 @@ export class Controller {
     constructor(value=null) {
         this.listeners = {};
         this.value = value;
-        this.debouncedSetValue = debounce((setArgs) => {
+        this.debouncedSetValue = debounceInIntervals((setArgs) => {
             this.setValueCallback(setArgs);
         }, 100);
     }
