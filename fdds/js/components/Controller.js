@@ -14,6 +14,9 @@ export class Controller {
     constructor(value=null) {
         this.listeners = {};
         this.value = value;
+        this.debouncedSetValue = debounce((setArgs) => {
+            this.setValueCallback(setArgs);
+        }, 100);
     }
 
     subscribe(callback, eventName=controllerEvents.valueSet) {
@@ -25,6 +28,10 @@ export class Controller {
     }
 
     setValue(value, eventName=controllerEvents.valueSet) {
+        this.setValueCallback([value, eventName]);
+    }
+
+    setValueCallback([value, eventName=controllerEvents.valueSet]) {
         this.value = value;
         if (eventName != controllerEvents.quiet) {
             this.notifyListeners(this.listeners[eventName]);
@@ -69,22 +76,8 @@ export class SyncController extends Controller {
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
         var currentTimestamp = new Controller();
-
-        currentTimestamp.debouncedSetValue = debounce((setArgs) => {
-            currentTimestamp.setValueCallback(setArgs);
-        }, 100);
-
         currentTimestamp.setValue = (value, eventName=controllerEvents.valueSet) => {
             currentTimestamp.debouncedSetValue([value, eventName]);
-        }
-        currentTimestamp.setValueCallback = ([value, eventName=controllerEvents.valueSet]) => {
-            currentTimestamp.value = value;
-            if (eventName != controllerEvents.quiet) {
-                currentTimestamp.notifyListeners(currentTimestamp.listeners[eventName]);
-                if (eventName != controllerEvents.all) {
-                    currentTimestamp.notifyListeners(currentTimestamp.listeners[controllerEvents.all]);
-                }
-            }
         }
         return currentTimestamp;
     })(),
