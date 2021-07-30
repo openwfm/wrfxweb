@@ -283,25 +283,16 @@ export class TimeSeriesChart extends HTMLElement {
         var dataPoint = this.data[index];
         var timeSeriesMarker = simVars.markers[index].getContent();
 
-        const hideData = this.querySelector('#hideData');
-        hideData.checked = dataPoint.hidden;
-        hideData.oninput = () => {
-            var hidden = hideData.checked;
-            dataPoint.hidden = hidden;
-            timeSeriesMarker.hideOnChart = hidden;
-            this.data[index] = dataPoint;
-            this.populateChart(this.data, startDate, endDate);
-        }
+        this.setOpeningMarker(index, timeSeriesMarker);
+        this.setHidingDataOnChart(index, dataPoint, timeSeriesMarker);
+        this.setDataColor(index, dataPoint, timeSeriesMarker);
+        this.setAddingName(index, dataPoint, timeSeriesMarker);
 
-        const colorInput = this.querySelector('#timeseriesColorCode');
-        colorInput.value = this.data[index].color;
-        colorInput.oninput = () => {
-            dataPoint.color = colorInput.value;
-            this.data[index] = dataPoint;
-            timeSeriesMarker.setChartColor(colorInput.value);
-            this.populateChart(this.data, startDate, endDate);
-        }
+        const legendOptions = this.querySelector('#legendOptions');
+        legendOptions.classList.remove('hidden');
+    }
 
+    setOpeningMarker(index, timeSeriesMarker) {
         const openMarker = this.querySelector('#openMarker');
         openMarker.checked = timeSeriesMarker.infoOpen;
         openMarker.oninput = () => {
@@ -311,9 +302,33 @@ export class TimeSeriesChart extends HTMLElement {
             } else {
                 simVars.markers[index].hideMarkerInfo();
             }
-            
         }
+    }
 
+    setHidingDataOnChart(index, dataPoint, timeSeriesMarker) {
+        const hideData = this.querySelector('#hideData');
+        hideData.checked = dataPoint.hidden;
+        hideData.oninput = () => {
+            var hidden = hideData.checked;
+            dataPoint.hidden = hidden;
+            timeSeriesMarker.hideOnChart = hidden;
+            this.data[index] = dataPoint;
+            this.populateChart(this.data, startDate, endDate);
+        }
+    }
+
+    setDataColor(index, dataPoint, timeSeriesMarker) {
+        const colorInput = this.querySelector('#timeseriesColorCode');
+        colorInput.value = this.data[index].color;
+        colorInput.oninput = () => {
+            dataPoint.color = colorInput.value;
+            this.data[index] = dataPoint;
+            timeSeriesMarker.setChartColor(colorInput.value);
+            this.populateChart(this.data, startDate, endDate);
+        }
+    }
+
+    setAddingName(index, dataPoint, timeSeriesMarker) {
         const addChangeName = this.querySelector('#addChangeName');
         addChangeName.value = timeSeriesMarker.getName();
         addChangeName.oninput = () => {
@@ -323,9 +338,6 @@ export class TimeSeriesChart extends HTMLElement {
             this.data[index] = dataPoint;
             this.populateChart(this.data, startDate, endDate);
         }
-
-        const legendOptions = this.querySelector('#legendOptions');
-        legendOptions.classList.remove('hidden');
     }
 
     populateZoomSelectors(timeStamps, startDate, endDate) {
