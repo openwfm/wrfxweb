@@ -1,6 +1,6 @@
 import { rgbToHex } from '../util.js';
-import { simVars } from '../simVars.js';
 import { map } from '../map.js';
+import { controllers } from './Controller.js';
 
 export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
@@ -82,12 +82,12 @@ export class TimeSeriesMarker extends HTMLElement {
 }
 
 export class Marker {
-    constructor(latLon, timeSeriesButton, xCoord, yCoord) {
+    constructor(latLon, coords) {
         this._latlng = latLon;
-        this.imageCoords = [xCoord, yCoord];
+        this.imageCoords = coords;
 
         this.popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
-        this.timeSeriesMarker = new TimeSeriesMarker(latLon, [xCoord, yCoord]);
+        this.timeSeriesMarker = new TimeSeriesMarker(latLon, coords);
         this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
         this.popup.setContent(this.timeSeriesMarker);
         this.popup.getElement().style.display = 'none';
@@ -95,11 +95,8 @@ export class Marker {
         var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
         this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         this.popup.on('remove', () => {
-            simVars.markers.splice(simVars.markers.indexOf(this.marker), 1);
+            controllers.timeSeriesMarkers.remove(this);
             this.marker.removeFrom(map);
-            if (simVars.markers.length == 0) {
-                timeSeriesButton.getButton().disabled = true;
-            }
         });
         this.marker.on('click', () => {
             if (this.timeSeriesMarker.infoOpen) {
@@ -108,17 +105,6 @@ export class Marker {
                 this.showMarkerInfo();
             }
         });
-
-        // var marker = {
-        //                 getContent: () => timeSeriesMarker,
-        //                 marker: mapMarker,
-        //                 imageCoords: [xCoord, yCoord],
-        //                 _latlng: latLon,
-        //                 hideMarkerInfo: hideInfo,
-        //                 showMarkerInfo: showInfo, 
-        //              }
-        // simVars.markers.push(marker);
-        // this.updateMarker(marker);
     }
 
     hideMarkerInfo() {
