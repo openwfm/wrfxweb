@@ -340,7 +340,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.label = addChangeName.value;
             
             this.data[index] = dataPoint;
-            this.populateChart(this.data, startDate, endDate);
+            this.populateChart(this.data, this.startDate, this.endDate);
         }
     }
 
