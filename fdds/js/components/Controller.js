@@ -45,15 +45,15 @@ export class Controller {
         return this.value;
     }
 
-    notifyListeners(listeners) {
+    notifyListeners(listeners, args=null) {
         if (listeners == null) {
             return;
         }
-        listeners.map(listener => listener());
+        listeners.map(listener => listener(args));
     }
 
-    broadcastEvent(event) {
-        this.notifyListeners(this.listeners[event]);
+    broadcastEvent(event, args=null) {
+        this.notifyListeners(this.listeners[event], args);
     }
 }
 
@@ -101,6 +101,19 @@ export const controllers = {
         }
 
         return loadingProgress;
+    })(),
+    timeSeriesMarkers: (function createTimeSeriesMarkers() {
+        var timeSeriesMarkers = new Controller([]);
+        timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
+        timeSeriesMarkers.add = (newMarker) => {
+            timeSeriesMarkers.value.push(newMarker);
+        }
+        timeSeriesMarkers.remove = (removeMarker) => {
+            var index = timeSeriesMarkers.value.indexOf(removeMarker);
+            timeSeriesMarkers.value.splice(index, 1);
+            timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
+        }
+        return timeSeriesMarkers;
     })(),
     opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),

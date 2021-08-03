@@ -10,7 +10,7 @@
 }
 
 #timeSeriesChartContainer {
-  display: none;
+  display: block;
   position: absolute;
   padding-right: 20px;
   padding-top: 10px;
@@ -28,6 +28,10 @@
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
+}
+
+#timeSeriesChartContainer.hidden {
+  display: none;
 }
 
 #drag-container {
