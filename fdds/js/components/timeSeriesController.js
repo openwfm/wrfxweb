@@ -62,7 +62,7 @@ export class TimeSeriesController extends LayerController {
             marker.marker.removeFrom(map);
         }
         controllers.timeSeriesMarkers.value = [];
-        this.timeSeriesButton.getButton().disabled = false;
+        this.timeSeriesButton.getButton().disabled = true;
 
         var startDate = controllers.startDate.getValue();
         this.timeSeriesButton.setStartDate(startDate);
