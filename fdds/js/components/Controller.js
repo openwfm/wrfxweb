@@ -53,7 +53,7 @@ export class Controller {
     }
 
     broadcastEvent(event, args=null) {
-        this.notifyListeners(this.listeners[event]);
+        this.notifyListeners(this.listeners[event], args);
     }
 }
 
