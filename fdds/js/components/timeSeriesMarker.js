@@ -98,7 +98,7 @@ export class Marker {
             controllers.timeSeriesMarkers.remove(this);
             this.marker.removeFrom(map);
         });
-        this.marker.on('click', () => {
+        this.marker.on('mousedown', () => {
             if (this.timeSeriesMarker.infoOpen) {
                 this.hideMarkerInfo();
             } else {
