@@ -7,8 +7,8 @@ export class TimeSeriesChart extends HTMLElement {
         super();
         this.innerHTML = `
             <link rel='stylesheet' href='css/timeSeriesChart.css'/>
-            <div id='timeSeriesChartContainer' class='hidden'>
-                <div class='hidden' id='legendOptions'>
+            <div id='timeSeriesChartContainer'>
+                <div id='legendOptions'>
                     <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
                     <label class='legendLabel' for'openMarker'>Open Marker Info</label>
                     <input class='legendInput' type='checkbox' id='openMarker'/>
@@ -81,7 +81,8 @@ export class TimeSeriesChart extends HTMLElement {
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             this.val = '';
             this.label = '';
-            timeSeriesChart.classList.add('hidden');
+            timeSeriesChart.style.display = 'none';
+            timeSeriesChart.classList.remove('displayed');
         }
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
@@ -91,10 +92,10 @@ export class TimeSeriesChart extends HTMLElement {
         const legendOptions = this.querySelector('#legendOptions');
         const chart = this.querySelector('#timeSeriesChartContainer');
         const updateData = (index) => {
-            if (chart.classList.contains('hidden')) {
+            if (!chart.classList.contains('displayed')) {
                 return;
             }
-            legendOptions.classList.add('hidden');
+            legendOptions.style.display = 'none';
             this.data.splice(index, 1);
             this.populateChart(this.data, this.startDate, this.endDate);
         }
@@ -157,9 +158,13 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChartCallback([data, startDate='', endDate='']) {
+        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+
         this.startDate = startDate;
         this.endDate = endDate;
         if (data.length == 0) {
+            timeSeriesChart.classList.remove('displayed');
+            timeSeriesChart.style.display = 'none';
             return;
         }
 
@@ -182,7 +187,8 @@ export class TimeSeriesChart extends HTMLElement {
             },
             options: this.getOptions(startDate, endDate)
         });
-        this.querySelector('#timeSeriesChartContainer').classList.remove('hidden');
+        timeSeriesChart.classList.add('displayed');
+        timeSeriesChart.style.display = 'block';
     }
 
     createChartDataset(data) {
@@ -282,9 +288,11 @@ export class TimeSeriesChart extends HTMLElement {
         const legendOptions = this.querySelector('#legendOptions');
         const closeLegendOptions = this.querySelector('#closeLegendOptions');
         closeLegendOptions.onclick = () => {
-            legendOptions.classList.add('hidden');
+            legendOptions.classList.remove('displayed');
+            legendOptions.style.display = 'none';
         }
-        legendOptions.classList.remove('hidden');
+        legendOptions.style.display = 'block';
+        legendOptions.classList.add('displayed');
     }
 
     setOpeningMarker(index, timeSeriesMarker) {
@@ -361,6 +369,9 @@ export class TimeSeriesChart extends HTMLElement {
         e = e || window.event;
         e.stopPropagation();
         e.preventDefault();
+        if (e.layerY < this.chart.legend.bottom) {
+            return;
+        }
         var [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
         // position the drawn box
         const zoomBoxArea = this.querySelector('#zoomBox');
