@@ -177,7 +177,6 @@ export class TimeSeriesController extends LayerController {
         }
         var currentDomain = controllers.currentDomain.value;
         for (layerName of simVars.overlayOrder) {
-            console.log(layerName);
             var colorbarLayer = this.getLayer(currentDomain, layerName);
             var timeSeriesData = layerData[layerName];
             for (var timeStamp of filteredTimeStamps) {

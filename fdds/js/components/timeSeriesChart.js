@@ -29,6 +29,10 @@ export class TimeSeriesChart extends HTMLElement {
                 </button>
                 <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
                 <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
+                <div id='layerSelection' style='margin-top: 10px; margin-left: 120px'>
+                    <label for='select-layer' style='display: inline-block; width: 150px'>Select Layer to Show</label>
+                    <select id='select-layer' style='width: 150px'></select>
+                </div>
                 <div id='add-threshold' style='margin-top: 10px'>
                     <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
                     <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
@@ -74,6 +78,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.setThresholdOptions();
         this.setZoomOptions(timeSeries);
         this.setDataClicking(timeSeries);
+        this.setLayerSelection();
         this.debouncedPopulateChart = debounce((chartArgs) => {
             this.populateChartCallback(chartArgs);
         }, 100);
@@ -86,6 +91,14 @@ export class TimeSeriesChart extends HTMLElement {
         }
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
+    }
+
+    setLayerSelection() {
+        const layerSelection = this.querySelector('#select-layer');
+        layerSelection.onchange = () => {
+            this.activeLayer = layerSelection.value;
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
+        }
     }
 
     updateDataOnRemove() {
@@ -157,9 +170,24 @@ export class TimeSeriesChart extends HTMLElement {
         this.debouncedPopulateChart([data, startDate, endDate, activeLayer]);
     }
 
+    populateLayers(activeLayer) {
+        const layerSelection = this.querySelector('#select-layer');
+        layerSelection.innerHTML = '';
+        for (var layerName of simVars.overlayOrder) {
+            var option = document.createElement('option');
+            option.value = layerName;
+            option.innerText = layerName;
+            layerSelection.appendChild(option);
+        }
+        layerSelection.value = activeLayer;
+    }
+
     populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        console.log(allData);
+        console.log(activeLayer);
 
+        this.populateLayers(activeLayer);
         this.startDate = startDate;
         this.endDate = endDate;
         this.activeLayer = activeLayer;

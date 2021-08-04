@@ -28,6 +28,7 @@
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
+  overflow-y: auto;
 }
 
 #drag-container {
