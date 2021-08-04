@@ -97,7 +97,7 @@ export class TimeSeriesChart extends HTMLElement {
             }
             legendOptions.style.display = 'none';
             this.data.splice(index, 1);
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate);
         }
         var markerController = controllers.timeSeriesMarkers;
         markerController.subscribe(updateData, markerController.removeEvent);
@@ -113,11 +113,11 @@ export class TimeSeriesChart extends HTMLElement {
         labelSetter.value = '';
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
-            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
+            this.populateChart(this.allData, zoomStart.value, zoomEnd.value);
         }
         labelSetter.oninput = () => {
             this.label = labelSetter.value;
-            this.populateChart(this.data, zoomStart.value, zoomEnd.value);
+            this.populateChart(this.allData, zoomStart.value, zoomEnd.value);
         }
     }
 
@@ -136,7 +136,7 @@ export class TimeSeriesChart extends HTMLElement {
         zoomEnd.onchange = zoomChange;
         undoZoom.onclick = () => {
             undoZoom.style.display = 'none';
-            this.populateChart(this.data);
+            this.populateChart(this.allData);
         }
     }
 
@@ -153,15 +153,18 @@ export class TimeSeriesChart extends HTMLElement {
         });
     }
 
-    populateChart(data, startDate='', endDate='') {
-        this.debouncedPopulateChart([data, startDate, endDate]);
+    populateChart(data, startDate='', endDate='', activeLayer=simVars.displayedColorbar) {
+        this.debouncedPopulateChart([data, startDate, endDate, activeLayer]);
     }
 
-    populateChartCallback([data, startDate='', endDate='']) {
+    populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
 
         this.startDate = startDate;
         this.endDate = endDate;
+        this.activeLayer = activeLayer;
+        this.allData = allData;
+        var data = allData[activeLayer];
         if (data.length == 0) {
             timeSeriesChart.classList.remove('displayed');
             timeSeriesChart.style.display = 'none';
@@ -317,7 +320,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.hidden = hidden;
             timeSeriesMarker.hideOnChart = hidden;
             this.data[index] = dataPoint;
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate);
         }
     }
 
@@ -328,7 +331,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.color = colorInput.value;
             this.data[index] = dataPoint;
             timeSeriesMarker.setChartColor(colorInput.value);
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate);
         }
     }
 
@@ -340,7 +343,7 @@ export class TimeSeriesChart extends HTMLElement {
             dataPoint.label = addChangeName.value;
             
             this.data[index] = dataPoint;
-            this.populateChart(this.data, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate);
         }
     }
 

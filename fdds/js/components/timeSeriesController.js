@@ -164,28 +164,38 @@ export class TimeSeriesController extends LayerController {
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var dataType = this.timeSeriesButton.getDataType();
         var progress = 0;
-        var timeSeriesData = [];
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        for (var marker of timeSeriesMarkers) {
-            var timeSeriesMarker = marker.getContent();
-            timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hideOnChart});
+
+        var layerData = {};
+        for (var layerName of simVars.overlayOrder) {
+            var timeSeriesData = [];
+            for (var marker of timeSeriesMarkers) {
+                var timeSeriesMarker = marker.getContent();
+                timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hideOnChart});
+            }
+            layerData[layerName] = timeSeriesData;
         }
         var currentDomain = controllers.currentDomain.value;
-        var colorbarLayer = this.getLayer(currentDomain, simVars.displayedColorbar);
-        for (var timeStamp of filteredTimeStamps) {
-            for (var i = 0; i < timeSeriesMarkers.length; i++) {
-                var coords = timeSeriesMarkers[i].imageCoords;
-                var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
-                if (colorbarValue == null && dataType == 'continuous') {
-                    colorbarValue = 0;
+        for (layerName of simVars.overlayOrder) {
+            console.log(layerName);
+            var colorbarLayer = this.getLayer(currentDomain, layerName);
+            var timeSeriesData = layerData[layerName];
+            for (var timeStamp of filteredTimeStamps) {
+                for (var i = 0; i < timeSeriesMarkers.length; i++) {
+                    var coords = timeSeriesMarkers[i].imageCoords;
+                    var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
+                    if (colorbarValue == null && dataType == 'continuous') {
+                        colorbarValue = 0;
+                    }
+                    timeSeriesData[i].dataset[timeStamp] = colorbarValue;
                 }
-                timeSeriesData[i].dataset[timeStamp] = colorbarValue;
+                progress += 1;
+                this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
             }
-            progress += 1;
-            this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
         }
         document.body.classList.remove('waiting');
-        return timeSeriesData;
+
+        return layerData;
     }
 }
 
