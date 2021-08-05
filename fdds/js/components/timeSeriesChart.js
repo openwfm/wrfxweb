@@ -49,7 +49,6 @@ export class TimeSeriesChart extends HTMLElement {
         `;
         this.ctx = null;
         this.chart = null;
-        this.data = null;
         this.val = '';
         this.label = '';
         this.labels = '';
@@ -109,8 +108,11 @@ export class TimeSeriesChart extends HTMLElement {
                 return;
             }
             legendOptions.style.display = 'none';
-            this.data.splice(index, 1);
-            this.populateChart(this.allData, this.startDate, this.endDate);
+            for (var layerName in this.allData) {
+                var data = this.allData[layerName];
+                data.splice(index, 1);
+            }
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
         var markerController = controllers.timeSeriesMarkers;
         markerController.subscribe(updateData, markerController.removeEvent);
@@ -126,11 +128,11 @@ export class TimeSeriesChart extends HTMLElement {
         labelSetter.value = '';
         thresholdSetter.oninput = () => {
             this.val = thresholdSetter.value;
-            this.populateChart(this.allData, zoomStart.value, zoomEnd.value);
+            this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
         }
         labelSetter.oninput = () => {
             this.label = labelSetter.value;
-            this.populateChart(this.allData, zoomStart.value, zoomEnd.value);
+            this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
         }
     }
 
@@ -149,7 +151,7 @@ export class TimeSeriesChart extends HTMLElement {
         zoomEnd.onchange = zoomChange;
         undoZoom.onclick = () => {
             undoZoom.style.display = 'none';
-            this.populateChart(this.allData);
+            this.populateChart(this.allData, '', '', this.activeLayer);
         }
     }
 
@@ -184,8 +186,6 @@ export class TimeSeriesChart extends HTMLElement {
 
     populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
-        console.log(allData);
-        console.log(activeLayer);
 
         this.populateLayers(activeLayer);
         this.startDate = startDate;
@@ -199,7 +199,6 @@ export class TimeSeriesChart extends HTMLElement {
             return;
         }
 
-        this.data = data;
         var labels = Object.keys(data[0].dataset).map(timeStamp => {
             return utcToLocal(timeStamp);
         });
@@ -273,7 +272,7 @@ export class TimeSeriesChart extends HTMLElement {
                         yAxes: {
                             title: {
                                 display: true,
-                                text: simVars.displayedColorbar
+                                text: this.activeLayer
                             }
                         },
                         xAxes: xAxisOptions
@@ -307,14 +306,13 @@ export class TimeSeriesChart extends HTMLElement {
 
     legendClick(legendItem) {
         var index = legendItem.datasetIndex;
-        var dataPoint = this.data[index];
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
         var timeSeriesMarker = timeSeriesMarkers[index].getContent();
 
         this.setOpeningMarker(index, timeSeriesMarker);
-        this.setHidingDataOnChart(index, dataPoint, timeSeriesMarker);
-        this.setDataColor(index, dataPoint, timeSeriesMarker);
-        this.setAddingName(index, dataPoint, timeSeriesMarker);
+        this.setHidingDataOnChart(index, timeSeriesMarker);
+        this.setDataColor(index, timeSeriesMarker);
+        this.setAddingName(index, timeSeriesMarker);
 
         const legendOptions = this.querySelector('#legendOptions');
         const closeLegendOptions = this.querySelector('#closeLegendOptions');
@@ -340,38 +338,46 @@ export class TimeSeriesChart extends HTMLElement {
         }
     }
 
-    setHidingDataOnChart(index, dataPoint, timeSeriesMarker) {
+    setHidingDataOnChart(index, timeSeriesMarker) {
         const hideData = this.querySelector('#hideData');
+        var dataPoint = this.allData[this.activeLayer][index];
         hideData.checked = dataPoint.hidden;
         hideData.oninput = () => {
             var hidden = hideData.checked;
-            dataPoint.hidden = hidden;
+            for (var layerName in this.allData) {
+                var data = this.allData[layerName];
+                data[index].hidden = hidden;
+            }
             timeSeriesMarker.hideOnChart = hidden;
-            this.data[index] = dataPoint;
-            this.populateChart(this.allData, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
     }
 
-    setDataColor(index, dataPoint, timeSeriesMarker) {
+    setDataColor(index, timeSeriesMarker) {
         const colorInput = this.querySelector('#timeseriesColorCode');
-        colorInput.value = this.data[index].color;
+        colorInput.value = this.allData[this.activeLayer][index].color;
+
         colorInput.oninput = () => {
-            dataPoint.color = colorInput.value;
-            this.data[index] = dataPoint;
+            for (var layerName in this.allData) {
+                var data = this.allData[layerName];
+                data[index].color = colorInput.value;
+            }
             timeSeriesMarker.setChartColor(colorInput.value);
-            this.populateChart(this.allData, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
     }
 
-    setAddingName(index, dataPoint, timeSeriesMarker) {
+    setAddingName(index, timeSeriesMarker) {
         const addChangeName = this.querySelector('#addChangeName');
         addChangeName.value = timeSeriesMarker.getName();
         addChangeName.oninput = () => {
             timeSeriesMarker.setName(addChangeName.value);
-            dataPoint.label = addChangeName.value;
+            for (var layerName in this.allData) {
+                var data = this.allData[layerName];
+                data[index].label = addChangeName.value;
+            }
             
-            this.data[index] = dataPoint;
-            this.populateChart(this.allData, this.startDate, this.endDate);
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
     }
 
@@ -416,7 +422,8 @@ export class TimeSeriesChart extends HTMLElement {
         var boundingRect = canvas.getBoundingClientRect();
         // get the data of each point on the chart
         var dataset = [];
-        for (var i = 0; i < this.data.length; i++) {
+        var dataLength = this.allData[this.activeLayer].length;
+        for (var i = 0; i < dataLength; i++) {
             dataset.push(this.chart.getDatasetMeta(i).data);
         }
 
@@ -446,7 +453,7 @@ export class TimeSeriesChart extends HTMLElement {
                 yMin = yMin - .01*yMin;
                 yMax = yMax + .01*yMax;
                 this.zoomDate(this.labels[minIndex], this.labels[maxIndex], yMin, yMax);
-                this.chart.update(this.data);
+                this.chart.update(this.allData[this.activeLayer]);
             }
         };
         // call a function whenever the cursor moves: draws a zoombox
@@ -494,7 +501,7 @@ export class TimeSeriesChart extends HTMLElement {
             this.chart.options.scales.yAxes.min = yMin;
             this.chart.options.scales.yAxes.max = yMax;
         }
-        this.chart.update(this.data);
+        this.chart.update(this.allData[this.activeLayer]);
     }
 }
 
