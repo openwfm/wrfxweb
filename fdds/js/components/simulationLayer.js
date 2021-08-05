@@ -326,7 +326,7 @@ export class SimulationLayer {
             return;
         }
         var rastersAtTime = simVars.rasters[currentDomain][timeStamp];
-        var rasterInfo = rastersAtTime[simVars.displayedColorbar];
+        var rasterInfo = rastersAtTime[this.layerName];
         var levels = rasterInfo.levels;
         var x = clrbarMap.left - 5;
         if (!levels) {
