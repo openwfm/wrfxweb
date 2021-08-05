@@ -125,8 +125,6 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     setThresholdOptions() {
-        const zoomStart = this.querySelector('#zoom-start');
-        const zoomEnd = this.querySelector('#zoom-end');
         const thresholdSetter = this.querySelector('#threshold-setter');
         const labelSetter = this.querySelector('#threshold-label');
 
@@ -134,11 +132,11 @@ export class TimeSeriesChart extends HTMLElement {
         labelSetter.value = '';
         thresholdSetter.oninput = () => {
             this.thresholdValues[this.activeLayer] = thresholdSetter.value;
-            this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
         labelSetter.oninput = () => {
             this.thresholdLabels[this.activeLayer] = labelSetter.value;
-            this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
     }
 
@@ -496,6 +494,8 @@ export class TimeSeriesChart extends HTMLElement {
         if (endDate) {
             zoomEnd.value = endDate;
         }
+        this.startDate = startDate;
+        this.endDate = endDate;
         linkSelects(zoomStart, zoomEnd);
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
