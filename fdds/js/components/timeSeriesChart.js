@@ -49,8 +49,8 @@ export class TimeSeriesChart extends HTMLElement {
         `;
         this.ctx = null;
         this.chart = null;
-        this.val = '';
-        this.label = '';
+        this.thresholdValues = {};
+        this.thresholdLabels = {};
         this.labels = '';
         this.xAdjust = null;
         this.startDate = '';
@@ -83,8 +83,8 @@ export class TimeSeriesChart extends HTMLElement {
         }, 100);
 
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
-            this.val = '';
-            this.label = '';
+            this.thresholdLabels = {};
+            this.thresholdValues = {};
             timeSeriesChart.style.display = 'none';
             timeSeriesChart.classList.remove('displayed');
         }
@@ -94,9 +94,15 @@ export class TimeSeriesChart extends HTMLElement {
 
     setLayerSelection() {
         const layerSelection = this.querySelector('#select-layer');
+        const thresholdSetter = this.querySelector('#threshold-setter');
+        const labelSetter = this.querySelector('#threshold-label');
         layerSelection.onchange = () => {
             this.activeLayer = layerSelection.value;
             this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
+            var thresholdLabel = this.thresholdLabels[this.activeLayer];
+            var thresholdValue = this.thresholdValues[this.activeLayer];
+            labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
+            thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
         }
     }
 
@@ -127,11 +133,11 @@ export class TimeSeriesChart extends HTMLElement {
         thresholdSetter.value = '';
         labelSetter.value = '';
         thresholdSetter.oninput = () => {
-            this.val = thresholdSetter.value;
+            this.thresholdValues[this.activeLayer] = thresholdSetter.value;
             this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
         }
         labelSetter.oninput = () => {
-            this.label = labelSetter.value;
+            this.thresholdLabels[this.activeLayer] = labelSetter.value;
             this.populateChart(this.allData, zoomStart.value, zoomEnd.value, this.activeLayer);
         }
     }
@@ -251,6 +257,11 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     getOptions(startDate, endDate) {
+        var thresholdLabel = this.thresholdLabels[this.activeLayer];
+        if (thresholdLabel == null) {
+            thresholdLabel = '';
+        }
+        var thresholdValue = this.thresholdValues[this.activeLayer];
         var xAxisOptions = {
             title: {
                 display: true,
@@ -280,17 +291,17 @@ export class TimeSeriesChart extends HTMLElement {
                     plugins: {
                         annotation: {
                             annotations: [{
-                                display: this.val !== '' && !isNaN(this.val),
+                                display: thresholdValue !== null && !isNaN(thresholdValue),
                                 type: 'line',
                                 mode: 'horizontal',
                                 scaleID: 'yAxes',
-                                value: this.val,
+                                value: thresholdValue,
                                 borderColor: 'rgb(255, 99, 132)',
                                 borderWidth: 2,
                                 label: {
-                                    enabled: this.label != '',
-                                    content: this.label,
-                                    xAdjust: this.xAdjust - 2*this.label.length
+                                    enabled: thresholdLabel != '',
+                                    content: thresholdLabel,
+                                    xAdjust: this.xAdjust - 2*thresholdLabel.length
                                 }
                             }]
                         },

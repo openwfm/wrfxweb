@@ -171,7 +171,8 @@ export class TimeSeriesController extends LayerController {
             var timeSeriesData = [];
             for (var marker of timeSeriesMarkers) {
                 var timeSeriesMarker = marker.getContent();
-                timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), dataset: {}, hidden: timeSeriesMarker.hideOnChart});
+                timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
+                                     dataset: {}, hidden: timeSeriesMarker.hideOnChart});
             }
             layerData[layerName] = timeSeriesData;
         }
