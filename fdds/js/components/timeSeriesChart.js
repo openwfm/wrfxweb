@@ -241,9 +241,10 @@ export class TimeSeriesChart extends HTMLElement {
                     spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
+                        var thresholdValue = this.thresholdValues[this.activeLayer];
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];
-                        if (this.val === '' || isNaN(this.val) || value > this.val) {
+                        if (thresholdValue === '' || isNaN(thresholdValue) || value > thresholdValue) {
                             return color;
                         }
                         return darkenHex(color);
