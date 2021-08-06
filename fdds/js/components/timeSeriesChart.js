@@ -101,7 +101,7 @@ export class TimeSeriesChart extends HTMLElement {
     setLayerSelection() {
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
-        addLayers.onclick = () => {
+        addLayers.onpointerdown = () => {
             if (layersToAdd.classList.contains('displayed')) {
                 layersToAdd.style.display = 'none';
                 layersToAdd.classList.remove('displayed');
