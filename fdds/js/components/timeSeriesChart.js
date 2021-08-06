@@ -116,7 +116,7 @@ export class TimeSeriesChart extends HTMLElement {
 
     updateDataOnRemove() {
         const legendOptions = this.querySelector('#legendOptions');
-        const chart = this.querySelector('#timeSeriesChartContainer');
+        const chart = this.querySelector('#fullContainer');
         const updateData = (index) => {
             if (!chart.classList.contains('displayed')) {
                 return;
