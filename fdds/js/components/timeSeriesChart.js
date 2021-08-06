@@ -7,43 +7,52 @@ export class TimeSeriesChart extends HTMLElement {
         super();
         this.innerHTML = `
             <link rel='stylesheet' href='css/timeSeriesChart.css'/>
-            <div id='timeSeriesChartContainer'>
-                <div id='legendOptions'>
-                    <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
-                    <label class='legendLabel' for'openMarker'>Open Marker Info</label>
-                    <input class='legendInput' type='checkbox' id='openMarker'/>
-                    <label class='legendLabel' for='hideData'>Hide Data: </label>
-                    <input class='legendInput' type='checkbox' id='hideData'/>
-                    <label class='legendLabel' for='timeseriesColorCode'>Change Color: </label>
-                    <input class='legendInput' type='color' id='timeseriesColorCode'></input>
-                    <label class='legendLabel' for='addChangeName'>Add Name:</label>
-                    <input class='legendInput' id='addChangeName'></input>
+            <div id='fullContainer'>
+                <div>
+                    <div id='addLayers'>
+                        <span class='interactive-button'>Added Layers</span>
+                    </div>
+                    <div id='layers-to-add'></div>
                 </div>
-                <div id='zoomBox'></div>
-                <span class='interactive-button close-button' id='closeTimeSeriesChart'>x</span>
-                <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
-                    <img height=15 width=15 src='icons/open_with_black_24dp.svg'></img>
-                </button>
-                <button id='undo-zoom' class='interactive-button' style='display:none'>
-                    <img height=15 width=15 src='icons/undo_black_24dp.svg'></img>
-                </button>
-                <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
-                <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
-                <div id='layerSelection' style='margin-top: 10px; margin-left: 120px'>
-                    <label for='select-layer' style='display: inline-block; width: 150px'>Select Layer to Show</label>
-                    <select id='select-layer' style='width: 150px'></select>
-                </div>
-                <div id='add-threshold' style='margin-top: 10px'>
-                    <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
-                    <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
-                    <label style='display: inline-block; width: 100px' for='threshold-label'>threshold label: </label>
-                    <input id='threshold-label' style='width: 150px'></input>
-                </div>
-                <div id='zoomIn' style='display: inline-block; margin-top: 10px'>
-                    <label style='display: inline-block; width: 100px' for='zoom-start'>zoom in start: </label>
-                    <select id='zoom-start' style='width: 160px; margin-right:10px'></select>
-                    <label style='display: inline-block; width: 100px' for='zoom-end'>zoom in end: </label>
-                    <select id='zoom-end' style='width: 160px'></select>
+                <div id='timeSeriesChartContainer'>
+                    <div id='legendOptions'>
+                        <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
+                        <label class='legendLabel' for'openMarker'>Open Marker Info</label>
+                        <input class='legendInput' type='checkbox' id='openMarker'/>
+                        <label class='legendLabel' for='hideData'>Hide Data: </label>
+                        <input class='legendInput' type='checkbox' id='hideData'/>
+                        <label class='legendLabel' for='timeseriesColorCode'>Change Color: </label>
+                        <input class='legendInput' type='color' id='timeseriesColorCode'></input>
+                        <label class='legendLabel' for='addChangeName'>Add Name:</label>
+                        <input class='legendInput' id='addChangeName'></input>
+                    </div>
+                    <div id='zoomBox'></div>
+                    <span class='interactive-button close-button' id='closeTimeSeriesChart'>x</span>
+                    <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
+                        <img height=15 width=15 src='icons/open_with_black_24dp.svg'></img>
+                    </button>
+                    <button id='undo-zoom' class='interactive-button' style='display:none'>
+                        <img height=15 width=15 src='icons/undo_black_24dp.svg'></img>
+                    </button>
+                    <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
+                    <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
+                    <div id='layerSelection' style='margin-top: 10px; margin-left: 120px'>
+                        <label for='select-layer' style='display: inline-block; width: 150px'>Select Layer to Show</label>
+                        <select id='select-layer' style='width: 150px'></select>
+                        <button id='add-layers' class='interactive-button'>Add layers to this Chart</button>
+                    </div>
+                    <div id='add-threshold' style='margin-top: 10px'>
+                        <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
+                        <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
+                        <label style='display: inline-block; width: 100px' for='threshold-label'>threshold label: </label>
+                        <input id='threshold-label' style='width: 150px'></input>
+                    </div>
+                    <div id='zoomIn' style='display: inline-block; margin-top: 10px'>
+                        <label style='display: inline-block; width: 100px' for='zoom-start'>zoom in start: </label>
+                        <select id='zoom-start' style='width: 160px; margin-right:10px'></select>
+                        <label style='display: inline-block; width: 100px' for='zoom-end'>zoom in end: </label>
+                        <select id='zoom-end' style='width: 160px'></select>
+                    </div>
                 </div>
             </div>
         `;
@@ -60,12 +69,14 @@ export class TimeSeriesChart extends HTMLElement {
     connectedCallback() {
         // set the position of the timeSeriesChart
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        const fullContainer = this.querySelector('#fullContainer');
         var clientWidth = document.body.clientWidth;
         if (clientWidth > 769) {
-            timeSeriesChart.style.left = 300 + 'px';
+            // timeSeriesChart.style.left = 300 + 'px';
+            fullContainer.style.left = 330 + 'px';
             const dragButton = this.querySelector('#drag-container');
             dragButton.style.display = 'inline-block';
-            dragElement(timeSeriesChart, 'drag-container');
+            dragElement(fullContainer, 'drag-container');
         }
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
@@ -85,8 +96,8 @@ export class TimeSeriesChart extends HTMLElement {
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             this.thresholdLabels = {};
             this.thresholdValues = {};
-            timeSeriesChart.style.display = 'none';
-            timeSeriesChart.classList.remove('displayed');
+            fullContainer.style.display = 'none';
+            fullContainer.classList.remove('displayed');
         }
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
@@ -103,6 +114,20 @@ export class TimeSeriesChart extends HTMLElement {
             var thresholdValue = this.thresholdValues[this.activeLayer];
             labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
             thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
+        }
+
+        const addLayers = this.querySelector('#addLayers');
+        const layersToAdd = this.querySelector('#layers-to-add');
+        addLayers.onclick = () => {
+            if (layersToAdd.classList.contains('displayed')) {
+                layersToAdd.style.display = 'none';
+                layersToAdd.classList.remove('displayed');
+                addLayers.style.left = '-80px';
+            } else {
+                layersToAdd.style.display = 'block';
+                layersToAdd.classList.add('displayed');
+                addLayers.style.left = '-330px';
+            }
         }
     }
 
@@ -189,7 +214,7 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
-        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        const timeSeriesChart = this.querySelector('#fullContainer');
 
         this.populateLayers(activeLayer);
         this.startDate = startDate;
