@@ -1,4 +1,4 @@
-import { dragElement, debounce, setURL } from '../util.js';
+import { dragElement, debounce, setURL, buildCheckBox } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
@@ -352,8 +352,19 @@ export class LayerController extends HTMLElement {
      * the map has been initialized. */
     buildMapBase() {
         const baseMapDiv = this.querySelector('#map-checkboxes');
-        for (const [name, layer] of Object.entries(simVars.baseLayerDict)) {
-            let mapCheckBox = this.buildMapCheckBox(name, layer);
+        const mapCheckCallback = ([layerName, layer]) => {
+            if (layerName != this.mapType) {
+                layer.addTo(map);
+                this.mapType = layerName; 
+                layer.bringToFront();
+            } else {
+                layer.remove(map);
+            }
+        }
+        for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
+            var checked = layerName == this.mapType;
+            let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
+                                             checked, mapCheckCallback, [layerName, layer]);
             baseMapDiv.appendChild(mapCheckBox);
         }
     }
@@ -379,66 +390,27 @@ export class LayerController extends HTMLElement {
         var currentDomain = controllers.currentDomain.getValue();
         var rasterDict = this.rasterDict[currentDomain];
         var overlayDict = this.overlayDict[currentDomain];
+        const layerClick = (layerName) => {
+            if (!simVars.overlayOrder.includes(layerName)) {
+                var startDate = controllers.currentTimestamp.getValue();
+                var endDate = controllers.endDate.getValue();
+                this.handleOverlayadd(layerName);
+                this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+            } else {
+                this.handleOverlayRemove(layerName);
+            }
+        };
         for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {
             for (var layerName in layerDict) {
-                layerDiv.appendChild(this.buildLayerBox(layerName));
+                var checked = simVars.overlayOrder.includes(layerName);
+                var layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
+                                              checked, layerClick, layerName);
+                layerDiv.appendChild(layerBox);
             }
         }
         for (var layerName of simVars.overlayOrder) {
             this.handleOverlayadd(layerName);
         }
-    }
-
-    /** Builds a radio box for each map base that can be chosen */
-    buildMapCheckBox(name, layer) {
-        let [div, input] = this.buildCheckBox(name);
-        input.type = 'radio';
-        input.name = 'base';
-        input.checked = name == this.mapType;
-        input.onclick = () => {
-            if (input.checked) {
-                layer.addTo(map);
-                this.mapType = name; 
-                layer.bringToFront();
-            } else {
-                layer.remove(map);
-            }
-        }
-        return div;
-    }
-
-    /** Creates the checkbox for a layer. Displays name and when clicked adds layer to the map. base is
-     * a boolean that indicates whether creating a checkbox for a map type or a layer.*/
-    buildLayerBox(name) {
-        let [div, input] = this.buildCheckBox(name);
-        input.type = 'checkbox';
-        input.name = 'layers';
-        input.checked = simVars.overlayOrder.includes(name);
-        input.onclick = () => {
-            if (input.checked) {
-                var startDate = controllers.currentTimestamp.getValue();
-                var endDate = controllers.endDate.getValue();
-                this.handleOverlayadd(name);
-                this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-            } else {
-                this.handleOverlayRemove(name);
-            }
-        }
-        return div;
-    }
-
-    /** Creates the htmlElement for each checkbox in the LayerController. */
-    buildCheckBox(name) {
-        var div = document.createElement('div');
-        div.className = 'layer-checkbox';
-        const input = document.createElement('input');
-        input.id = name;
-        var label = document.createElement('label');
-        label.for = name;
-        label.innerText = name;
-        div.appendChild(input);
-        div.appendChild(label);
-        return [div, input];
     }
 }
 
