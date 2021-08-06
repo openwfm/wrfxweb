@@ -116,6 +116,28 @@ export function createElement(id=null, className=null) {
     return div;
 }
 
+/** Creates the htmlElement for each checkbox in the LayerController. */
+export function buildCheckBox(id, type, name, checked, callback, args=null) {
+  var div = document.createElement('div');
+  div.className = 'layer-checkbox';
+
+  const input = document.createElement('input');
+  input.id = id;
+  input.name = name;
+  input.type = type;
+  input.checked = checked;
+  input.onclick = () => {
+    callback(args);
+  }
+
+  var label = document.createElement('label');
+  label.for = id;
+  label.innerText = id;
+  div.appendChild(input);
+  div.appendChild(label);
+  return div;
+}
+
 export function linkSelects(selectStart, selectEnd) {
   selectStart.childNodes.forEach(startOption => {
     startOption.disabled = false;

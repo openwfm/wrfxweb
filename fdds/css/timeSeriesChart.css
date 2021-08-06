@@ -9,9 +9,21 @@
   font-size: 1rem;
 }
 
-#timeSeriesChartContainer {
+#fullContainer {
   display: none;
+  z-index: 9000;
   position: absolute;
+  width: 580px;
+  height: 560px;
+  left: 0;
+  right: 0;
+  top: 5px;
+  bottom: 0;
+}
+
+#timeSeriesChartContainer {
+  position: absolute;
+  display: block;
   padding-right: 20px;
   padding-top: 10px;
   padding-left: 10px;
@@ -20,15 +32,12 @@
   right: 0;
   top: 5px;
   bottom: 0;
-  z-index: 9000;
-  /* margin: auto; */
   height: 550px;
   width: 560px;
   background: white;
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
-  overflow-y: auto;
 }
 
 #drag-container {
@@ -42,6 +51,45 @@
   position: absolute;
   top: 8px;
   left: 40px;
+}
+
+.layerCheckbox {
+  margin-left: 15px;
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+#addLayers{
+  padding: 10px;
+  position: absolute;
+  display: block;
+  z-index: 9001;
+  width: 100px;
+  top:130px;
+  left: -80px;
+  border-top: 1px solid #5d5d5d;order: 1px solid #5d5d5d;
+  border-left: 1px solid #5d5d5d;order: 1px solid #5d5d5d;
+  border-right: 1px solid #5d5d5d;order: 1px solid #5d5d5d;
+  background: #e8e8e8;
+  text-align: center;
+  border-radius: .4rem .4rem 0 0;
+  font-weight: bold;
+  transform: rotate(-90deg);
+}
+
+#layers-to-add {
+  display: none;
+  position: absolute;
+  z-index: 9000;
+  width: 250px;
+  left: -251px;
+  height: 400px;
+  top: 39px;
+  background: #e8e8e8;
+  border-top: 1px solid #5d5d5d;
+  border-left: 1px solid #5d5d5d;
+  border-bottom: 1px solid #5d5d5d;
+  border-radius: .4rem 0 0 .4rem;
 }
 
 #zoomBox {
