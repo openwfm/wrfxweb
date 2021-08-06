@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -36,11 +36,6 @@ export class TimeSeriesChart extends HTMLElement {
                     </button>
                     <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
                     <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
-                    <div id='layerSelection' style='margin-top: 10px; margin-left: 120px'>
-                        <label for='select-layer' style='display: inline-block; width: 150px'>Select Layer to Show</label>
-                        <select id='select-layer' style='width: 150px'></select>
-                        <button id='add-layers' class='interactive-button'>Add layers to this Chart</button>
-                    </div>
                     <div id='add-threshold' style='margin-top: 10px'>
                         <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
                         <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
@@ -104,18 +99,6 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     setLayerSelection() {
-        const layerSelection = this.querySelector('#select-layer');
-        const thresholdSetter = this.querySelector('#threshold-setter');
-        const labelSetter = this.querySelector('#threshold-label');
-        layerSelection.onchange = () => {
-            this.activeLayer = layerSelection.value;
-            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
-            var thresholdLabel = this.thresholdLabels[this.activeLayer];
-            var thresholdValue = this.thresholdValues[this.activeLayer];
-            labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
-            thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
-        }
-
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
         addLayers.onclick = () => {
@@ -201,30 +184,45 @@ export class TimeSeriesChart extends HTMLElement {
         this.debouncedPopulateChart([data, startDate, endDate, activeLayer]);
     }
 
-    populateLayers(activeLayer) {
-        const layerSelection = this.querySelector('#select-layer');
-        layerSelection.innerHTML = '';
-        for (var layerName of simVars.overlayOrder) {
-            var option = document.createElement('option');
-            option.value = layerName;
-            option.innerText = layerName;
-            layerSelection.appendChild(option);
+    setThresholdValues() {
+        const thresholdSetter = this.querySelector('#threshold-setter');
+        const labelSetter = this.querySelector('#threshold-label');
+
+        var thresholdLabel = this.thresholdLabels[this.activeLayer];
+        var thresholdValue = this.thresholdValues[this.activeLayer];
+        labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
+        thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
+    }
+
+    populateLayers() {
+        const selectLayers = this.querySelector('#layers-to-add');
+        selectLayers.innerHTML = '';
+        const selectCallback = (layerName) => {
+            this.activeLayer = layerName;
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
-        layerSelection.value = activeLayer;
+        for (var layerName in this.allData) {
+            var checked = layerName == this.activeLayer;
+            var checkbox = buildCheckBox(layerName, 'checkbox', 'chartLayer',
+                                         checked, selectCallback, layerName);
+            selectLayers.appendChild(checkbox);
+        }
     }
 
     populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
-        const timeSeriesChart = this.querySelector('#fullContainer');
+        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        const fullContainer = this.querySelector('#fullContainer');
 
-        this.populateLayers(activeLayer);
+        this.activeLayer = activeLayer;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.activeLayer = activeLayer;
         this.allData = allData;
+        this.populateLayers();
+        this.setThresholdValues();
         var data = allData[activeLayer];
         if (data.length == 0) {
-            timeSeriesChart.classList.remove('displayed');
-            timeSeriesChart.style.display = 'none';
+            fullContainer.classList.remove('displayed');
+            fullContainer.style.display = 'none';
             return;
         }
 
@@ -246,7 +244,8 @@ export class TimeSeriesChart extends HTMLElement {
             },
             options: this.getOptions(startDate, endDate)
         });
-        timeSeriesChart.classList.add('displayed');
+        fullContainer.classList.add('displayed');
+        fullContainer.style.display = 'block';
         timeSeriesChart.style.display = 'block';
     }
 

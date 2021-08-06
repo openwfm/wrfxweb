@@ -38,7 +38,6 @@
   border-radius: .4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
-  overflow-y: auto;
 }
 
 #drag-container {
@@ -71,13 +70,6 @@
   border-radius: .4rem .4rem 0 0;
   font-weight: bold;
   transform: rotate(-90deg);
-}
-
-#add-layers {
-  width: 150px;
-  border: 1px solid #5d5d5d;
-  border-radius: .4rem;
-  background: #e8e8e8;
 }
 
 #layers-to-add {

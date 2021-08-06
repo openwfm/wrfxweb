@@ -170,31 +170,30 @@ export class TimeSeriesController extends LayerController {
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
 
         var layerData = {};
+        var currentDomain = controllers.currentDomain.value;
         for (var layerName of simVars.overlayOrder) {
+            var colorbarLayer = this.getLayer(currentDomain, layerName);
+            if (!colorbarLayer.hasColorbar) {
+                continue;
+            }
             var timeSeriesData = [];
             for (var marker of timeSeriesMarkers) {
                 var timeSeriesMarker = marker.getContent();
-                timeSeriesData.push({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
+                var dataEntry = ({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
                                      dataset: {}, hidden: timeSeriesMarker.hideOnChart});
-            }
-            layerData[layerName] = timeSeriesData;
-        }
-        var currentDomain = controllers.currentDomain.value;
-        for (layerName of simVars.overlayOrder) {
-            var colorbarLayer = this.getLayer(currentDomain, layerName);
-            var timeSeriesData = layerData[layerName];
-            for (var timeStamp of filteredTimeStamps) {
-                for (var i = 0; i < timeSeriesMarkers.length; i++) {
-                    var coords = timeSeriesMarkers[i].imageCoords;
+                for (var timeStamp of filteredTimeStamps) {
+                    var coords = marker.imageCoords;
                     var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
                     if (colorbarValue == null && dataType == 'continuous') {
                         colorbarValue = 0;
                     }
-                    timeSeriesData[i].dataset[timeStamp] = colorbarValue;
+                    dataEntry.dataset[timeStamp] = colorbarValue;
+                    progress += 1;
+                    this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
                 }
-                progress += 1;
-                this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
+                timeSeriesData.push(dataEntry);
             }
+            layerData[layerName] = timeSeriesData;
         }
         document.body.classList.remove('waiting');
 
