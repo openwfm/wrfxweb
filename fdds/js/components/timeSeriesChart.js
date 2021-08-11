@@ -29,10 +29,14 @@ export class TimeSeriesChart extends HTMLElement {
                     <div id='zoomBox'></div>
                     <span class='interactive-button close-button' id='closeTimeSeriesChart'>x</span>
                     <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
-                        <img height=15 width=15 src='icons/open_with_black_24dp.svg'></img>
+                        <svg class='interactive-button' height=15 width=15>
+                            <use href='#open_with_black_24dp'></use>
+                        </svg>
                     </button>
                     <button id='undo-zoom' class='interactive-button' style='display:none'>
-                        <img height=15 width=15 src='icons/undo_black_24dp.svg'></img>
+                        <svg class='interactive-button' height=15 width=15>
+                            <use href='#undo_black_24dp'></use>
+                        </svg>
                     </button>
                     <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
                     <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>

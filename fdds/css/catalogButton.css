@@ -30,12 +30,6 @@
     width: 40px;
 }
 
-#menu-button-icon-container img {
-    position: relative;
-    opacity: .5;
-    top: 7px;
-}
-
 #menu-label {
     display: inline-block;
     position: relative;

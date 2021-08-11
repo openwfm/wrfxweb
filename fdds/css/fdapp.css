@@ -10,6 +10,13 @@ html {
   font-family: helvetica;
 }
 
+.svgIcon {
+    margin: 0;
+    padding: 0;
+    height: 24px;
+    width: 24px;
+}
+
 .splash {
   position: fixed;
   line-height: 90vh;

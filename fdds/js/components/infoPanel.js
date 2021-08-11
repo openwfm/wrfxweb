@@ -7,7 +7,9 @@ class InfoPanel extends HTMLElement {
             <link rel='stylesheet' href='css/infoPanel.css'/>
             <div id='infoPanelContainer'>
                 <button id='infoButton'>
-                    <img src='icons/info_black_24dp.svg'></img>
+                    <svg class='svgIcon interactive-button'>
+                        <use href="#info_black_24dp"></use>
+                    </svg>
                 </button></div>
                 <div id='infoPanel'>
                     <span id='closeInfoPanel'>x</span>

@@ -8,12 +8,15 @@ class CatalogButton extends HTMLElement {
             <link rel='stylesheet' href='css/catalogButton.css'/>
             <div id='catalog-button'>
                 <div id='menu-button-icon-container'>
-                    <img src='icons/menu-24px.svg'></img>
+                    <svg class='interactive-button svgIcon' style='position: relative; top:6px'>
+                        <use href='#menu-24px'></use>
+                    </svg>
                 </div>
                 <span id='menu-label'>Catalog</span>
             </div>
         `;
     }
+
 
     connectedCallback() {
         const catalogButton = this.querySelector('#catalog-button');
