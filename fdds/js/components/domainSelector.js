@@ -7,7 +7,6 @@ export class DomainSelector extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/domainSelector.css'/>
             <div id='domain-mobile-wrapper'>
                 <div id='domain-selector'>
                     <span id='domain-selector-label'>Active domain</span>

@@ -13,7 +13,6 @@ export class LayerController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/layerController.css'/>
             <div id='layer-controller-container'>
                 <div id='base-maps' class='layer-group' style='border-bottom: 2px'>
                     <span>Base Maps</span>

@@ -4,7 +4,6 @@ class InfoPanel extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/infoPanel.css'/>
             <div id='infoPanelContainer'>
                 <button id='infoButton'>
                     <svg class='svgIcon interactive-button'>

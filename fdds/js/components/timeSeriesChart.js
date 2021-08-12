@@ -6,7 +6,6 @@ export class TimeSeriesChart extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/timeSeriesChart.css'/>
             <div id='fullContainer'>
                 <div>
                     <div id='addLayers'>

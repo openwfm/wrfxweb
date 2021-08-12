@@ -10,6 +10,12 @@ html {
   font-family: helvetica;
 }
 
+#hideMenu {
+    position: absolute;
+    top: 3px;
+    left: 5px;
+}
+
 .svgIcon {
     margin: 0;
     padding: 0;

@@ -7,13 +7,6 @@ export class TimeSeriesMarker extends HTMLElement {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
         this.innerHTML = `
-            <style>
-                #hideMenu {
-                    position: absolute;
-                    top: 3px;
-                    left: 5px;
-                }
-            </style>
             <div id='timeSeriesMarker'>
                 <span id='hideMenu' class='interactive-button'>hide</span>
                 <div>

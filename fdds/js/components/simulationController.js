@@ -13,7 +13,6 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/simulationController.css'/>
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
