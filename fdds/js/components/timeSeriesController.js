@@ -149,20 +149,25 @@ export class TimeSeriesController extends LayerController {
         if (simVars.displayedColorbar == null) {
             return;
         }
+        var currentDomain = controllers.currentDomain.value;
         document.body.classList.add('waiting');
         this.timeSeriesButton.setProgress(0);
+
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var dataType = this.timeSeriesButton.getDataType();
-        var progress = 0;
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
+        var colorbarLayers = simVars.overlayOrder.map(layerName => {
+            return this.getLayer(currentDomain, layerName)
+        }).filter(layer => {
+            return layer.hasColorbar;
+        });
+
+        var progress = 0;
+        var totalFramesToLoad = filteredTimeStamps.length * timeSeriesMarkers.length * colorbarLayers.length;
 
         var layerData = {};
-        var currentDomain = controllers.currentDomain.value;
-        for (var layerName of simVars.overlayOrder) {
-            var colorbarLayer = this.getLayer(currentDomain, layerName);
-            if (!colorbarLayer.hasColorbar) {
-                continue;
-            }
+        for (var colorbarLayer of colorbarLayers) {
+            var layerName = colorbarLayer.layerName;
             var timeSeriesData = [];
             for (var marker of timeSeriesMarkers) {
                 var timeSeriesMarker = marker.getContent();
@@ -176,7 +181,7 @@ export class TimeSeriesController extends LayerController {
                     }
                     dataEntry.dataset[timeStamp] = colorbarValue;
                     progress += 1;
-                    this.timeSeriesButton.setProgress(progress/filteredTimeStamps.length);
+                    this.timeSeriesButton.setProgress(progress/totalFramesToLoad);
                 }
                 timeSeriesData.push(dataEntry);
             }
