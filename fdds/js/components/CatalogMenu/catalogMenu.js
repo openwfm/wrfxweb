@@ -25,12 +25,10 @@ export class CatalogMenu extends HTMLElement {
                     </div>
                     <div id='menu-label'>Catalog</div>
                 </div>
-                <div class='catalog-menu'>
-                    <div id='menu-title' class='menu-title'>
-                        <h3>Select Simulation...</h3>
-                        <div> 
-                            <span id='menu-close'>x</span>
-                        </div>
+                <div class='catalog-menu round-border'>
+                    <div id='menu-title' class='menu-title round-border'>
+                        <div>Select Simulation...</div>
+                        <div id='menu-close' class='round-border'>x</div>
                     </div>
                     <div class='search-header'>
                         <div class='search-header-block'>
@@ -78,37 +76,27 @@ export class CatalogMenu extends HTMLElement {
      * presentation details based on whether on mobile. */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
-        const catalogButton = this.querySelector('#catalog-button');
-        L.DomEvent.disableClickPropagation(catalogButton);
-        catalogButton.onpointerdown = () => {
-            const catalogMenu = document.querySelector('.catalog-menu');
-            var visible = catalogMenu.style.display == 'none';
-            catalogMenu.style.display = visible ? 'block' : 'none';
-        };
+        L.DomEvent.disableClickPropagation(catalogMenu);
 
-        const clientWidth = document.body.clientWidth;
+        dragElement(catalogMenu, 'menu-title');
+        this.hideShowMenu();
+        this.responsiveUI();
+        window.addEventListener('resize', () => { 
+            this.responsiveUI();
+        });
+        this.setMenuSearching();
+        this.buildMenu();
+    }
+
+    setMenuSearching() {
         const sortBy = this.querySelector('#sort-by');
         const reverseOrder = this.querySelector('#reverse-order');
-        const reverseLabel = this.querySelector('#reverse-label');
         const menuSearch = this.querySelector('#search-for');
         const menuSelect = this.querySelector('#mobile-selector');
-        // change labels, sizes and positions based on screen size
-        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
-        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
-        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
-        // Makes sure that map events like zooming and panning are disabled from within menu div
-        L.DomEvent.disableClickPropagation(catalogMenu);
-        // Closes the menu when the x is clicked
-        this.querySelector('#menu-close').onclick = () => {
-            catalogMenu.style.display = 'none';
-        }
-        // Implements repositioning menu
-        dragElement(catalogMenu, 'menu-title');
-        menuSearch.placeholder = searchDescription;
+
         menuSearch.onpointerdown = (e) => {
             e.stopPropagation();
         }
-        // Sets up search functionality
         menuSearch.oninput = () => {
             this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
@@ -116,13 +104,40 @@ export class CatalogMenu extends HTMLElement {
             this.sortBy(sortBy.value, reverseOrder.checked);
         }
         reverseOrder.onclick = () => {
-            // this.sortBy(sortBy.value, reverseOrder.checked);
             this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
         menuSelect.onchange = () => {
             this.selectCategory(menuSelect.value);
         }
-        this.buildMenu();
+    }
+
+    responsiveUI() {
+        const clientWidth = document.body.clientWidth;
+        const catalogMenu = this.querySelector('.catalog-menu');
+        const reverseLabel = this.querySelector('#reverse-label');
+        const menuSearch = this.querySelector('#search-for');
+
+        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
+        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
+        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
+        menuSearch.placeholder = searchDescription;
+        
+    }
+
+    hideShowMenu() {
+        const catalogMenu = this.querySelector('.catalog-menu');
+        const catalogButton = this.querySelector('#catalog-button');
+        L.DomEvent.disableClickPropagation(catalogButton);
+        catalogButton.onpointerdown = () => {
+            if (catalogMenu.classList.contains('hidden')) {
+                catalogMenu.classList.remove('hidden');
+            } else {
+                catalogMenu.classList.add('hidden');
+            }
+        };
+        this.querySelector('#menu-close').onclick = () => {
+            catalogMenu.classList.add('hidden');
+        }
     }
 
     /** Function that retrieves catalog Entries from services.js and builds a CatalogItem for each and adds it to the 

@@ -80,10 +80,6 @@
     cursor: pointer;
 }
 
-.hidden {
-    display: none;
-}
-
 #closeInfoPanel:hover {
     cursor: pointer;
 }

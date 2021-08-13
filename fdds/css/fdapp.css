@@ -57,6 +57,10 @@ html {
   z-index: -10;
 }
 
+.round-border {
+  border-radius: 4px;
+}
+
 .clicked {
   display: block;
 }

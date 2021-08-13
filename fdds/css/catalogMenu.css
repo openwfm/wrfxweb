@@ -32,55 +32,33 @@
     height: 440px;
     top: 15%;
     background:#f2f2f2;
-    border-radius: 4px;
     line-height: normal;
-    cursor: auto;
 }
 
 .menu-title {
     display: flex;
     padding: 8px;
-    border-radius: 4px;
-    flex-direction: row;
-    align-items:center;
     background:#f7af39;
-    justify-content: space-between;
-    line-height: 20px;
-    cursor: move;
-}
-
-.menu-title h3 {
-    margin: 0px;
     color: #ffffff;
     font-size: 1rem;
+    font-weight: bold;
+    cursor: grab;
 }
 
-.menu-title input {
-    display: inline-block;
-    border-radius: 4px;
-    border: none;
-    height: 20px;
-}
-
-.menu-title span {
-    display: inline-block;
+#menu-close {
+    position: absolute;
+    right: 15px;
     color: #f7af39;
     background: #f2f2f2;
     width: 20px;
     height: 20px;
-    border-radius: 4px;
     text-align: center;
-    align-items: center;
-    font-weight: bold;
+    cursor: pointer;
 }
 
 .menu-search {
     font-size: 1rem;
     width: 100%;
-}
-
-#menu-close:hover {
-    cursor: pointer;
 }
 
 .menu-columns {
