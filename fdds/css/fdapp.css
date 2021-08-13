@@ -16,6 +16,13 @@ html {
     left: 5px;
 }
 
+.feature-controller {
+    background:#e8e8e8;
+    border: none;
+    border-radius: .4rem;
+    z-index: 8000;
+}
+
 .svgIcon {
     margin: 0;
     padding: 0;

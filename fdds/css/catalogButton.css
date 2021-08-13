@@ -1,50 +1,39 @@
-#catalog-button {
-    position: fixed;
-    display: inline-block;
+.catalog-button {
     height: 40px;
+    position: fixed;
     left: 20px;
     top: 20px;
-    z-index: 8000;
-    background:#e8e8e8;
-    padding: 0;
-    border: none;
-    border-radius: .4rem;
+    display: grid;
+    grid-template-columns: 40px 90px;
+    place-items: center;
     font-size: 1.15rem;
-    text-align: center;
-}
-
-#catalog-button:hover { 
-    background: #ececec;
-    cursor: pointer;
-}
-
-#catalog-button:hover #menu-button-icon-container {
-    background: #dadada;
-}
-
-#menu-button-icon-container {
-    display: inline-block;
-    background:#d6d6d6;
-    border-radius: .4rem 0 0 .4rem;
-    height: 40px;
-    width: 40px;
-}
-
-#menu-label {
-    display: inline-block;
-    position: relative;
-    margin: auto 15px;
     font-weight: bold;
     color: #5d5d5d;
-    top: 2px;
+}
+
+#catalog-menu-icon-container {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    width: 100%;
+    background:#d6d6d6;
+    border-radius: .4rem 0 0 .4rem;
+}
+
+.catalog-button:hover #catalog-menu-icon {
+    opacity: 100%;
 }
 
 @media (max-width: 769px) {
-    #menu-label {
-        display: none;
+    .catalog-button > div:nth-child(2) {
+        visibility: hidden;
     }
 
-    #menu-button-icon-container {
+    .catalog-button {
+        width: 40px;
+    }
+
+    #catalog-menu-icon-container {
         border-radius: .4rem;
         background:#e8e8e8;
     }

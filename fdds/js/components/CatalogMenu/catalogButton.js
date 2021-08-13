@@ -5,13 +5,13 @@ class CatalogButton extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id='catalog-button'>
-                <div id='menu-button-icon-container'>
-                    <svg class='interactive-button svgIcon' style='position: relative; top:6px'>
+            <div class='feature-controller catalog-button'>
+                <div id='catalog-menu-icon-container'>
+                    <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
                         <use href='#menu-24px'></use>
                     </svg>
                 </div>
-                <span id='menu-label'>Catalog</span>
+                <div id='menu-label'>Catalog</div>
             </div>
         `;
     }
