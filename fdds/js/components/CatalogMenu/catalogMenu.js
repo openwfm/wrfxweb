@@ -16,48 +16,58 @@ export class CatalogMenu extends HTMLElement {
         this.satelliteList = [];
         this.addOrder = [];
         this.innerHTML = `
-            <div class='catalog-menu'>
-                <div id='menu-title' class='menu-title'>
-                    <h3>Select Simulation...</h3>
-                    <div> 
-                        <span id='menu-close'>x</span>
+            <div>
+                <div id='catalog-button' class='feature-controller catalog-button'>
+                    <div id='catalog-menu-icon-container'>
+                        <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
+                            <use href='#menu-24px'></use>
+                        </svg>
                     </div>
+                    <div id='menu-label'>Catalog</div>
                 </div>
-                <div class='search-header'>
-                    <div class='search-header-block'>
-                        <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
-                        <select id='sort-by' class='selector'>
-                            <option value='original-order'>original order</option>
-                            <option value='description'>description</option>
-                            <option value='start-date'>start date</option>
-                            <option value='end-date'>end date</option>
+                <div class='catalog-menu'>
+                    <div id='menu-title' class='menu-title'>
+                        <h3>Select Simulation...</h3>
+                        <div> 
+                            <span id='menu-close'>x</span>
+                        </div>
+                    </div>
+                    <div class='search-header'>
+                        <div class='search-header-block'>
+                            <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
+                            <select id='sort-by' class='selector'>
+                                <option value='original-order'>original order</option>
+                                <option value='description'>description</option>
+                                <option value='start-date'>start date</option>
+                                <option value='end-date'>end date</option>
+                            </select>
+                        </div>
+                        <div class='search-header-block'>
+                            <label id='reverse-label' for='reverse-order'>Reverse Order</label>
+                            <input type='checkbox' id='reverse-order' style='display:inline-block'></input>
+                        </div>
+                        <div class='search-header-block'>
+                            <input id='search-for' class='menu-search' type='text'></input>
+                        </div>
+                    </div>
+                    <div class='menu-columns'>
+                        <select id='mobile-selector'>
+                            <option value='Fires'>Fires</option>
+                            <option value='Fuel Moisture'>Fuel Moisture</option>
+                            <option value='Satellite Data'>Satellite Data</option>
                         </select>
-                    </div>
-                    <div class='search-header-block'>
-                        <label id='reverse-label' for='reverse-order'>Reverse Order</label>
-                        <input type='checkbox' id='reverse-order' style='display:inline-block'></input>
-                    </div>
-                    <div class='search-header-block'>
-                        <input id='search-for' class='menu-search' type='text'></input>
-                    </div>
-                </div>
-                <div class='menu-columns'>
-                    <select id='mobile-selector'>
-                        <option value='Fires'>Fires</option>
-                        <option value='Fuel Moisture'>Fuel Moisture</option>
-                        <option value='Satellite Data'>Satellite Data</option>
-                    </select>
-                    <div id='fires-column' class='column'>
-                        <h3 class='column-header'>Fires</h3>
-                        <ul id='catalog-fires' class='catalog-list'> </ul>
-                    </div>
-                    <div id='fuel-moisture-column' class='column'>
-                        <h3 class='column-header'>Fuel moisture</h3>
-                        <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
-                    </div>
-                    <div id='satellite-column' class='column'>
-                        <h3 class='column-header'>Satellite Data</h3>
-                        <ul id='catalog-satellite-data' class='catalog-list'> </ul>
+                        <div id='fires-column' class='column'>
+                            <h3 class='column-header'>Fires</h3>
+                            <ul id='catalog-fires' class='catalog-list'> </ul>
+                        </div>
+                        <div id='fuel-moisture-column' class='column'>
+                            <h3 class='column-header'>Fuel moisture</h3>
+                            <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
+                        </div>
+                        <div id='satellite-column' class='column'>
+                            <h3 class='column-header'>Satellite Data</h3>
+                            <ul id='catalog-satellite-data' class='catalog-list'> </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,6 +78,14 @@ export class CatalogMenu extends HTMLElement {
      * presentation details based on whether on mobile. */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
+        const catalogButton = this.querySelector('#catalog-button');
+        L.DomEvent.disableClickPropagation(catalogButton);
+        catalogButton.onpointerdown = () => {
+            const catalogMenu = document.querySelector('.catalog-menu');
+            var visible = catalogMenu.style.display == 'none';
+            catalogMenu.style.display = visible ? 'block' : 'none';
+        };
+
         const clientWidth = document.body.clientWidth;
         const sortBy = this.querySelector('#sort-by');
         const reverseOrder = this.querySelector('#reverse-order');
