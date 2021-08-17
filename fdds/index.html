@@ -78,10 +78,12 @@
   <!-- WRF Fire Display Server; Copyright 2016, University of Colorado Denver,
        Department of Mathematical and Statistical Sciences -->
 
-  <div class="splash" id="splash-screen" style="line-height: 90vh;">
+  <div class="splash" id="splash-screen">
     <h1 class="fade-in">WIRC</h1>
   </div>
-	<div id="simulation-flags" style="position: fixed; top:15px; display:none; z-index:1000;"><span id="current-sim-label" class="displayTest"></span></div>
+	<div id="simulation-flags" class='hidden'>
+    <span id="current-sim-label" class="displayTest"></span>
+  </div>
   <timeseries-chart></timeseries-chart>
 	<catalog-menu></catalog-menu>
   <simulation-controller></simulation-controller>
@@ -90,7 +92,7 @@
   <info-panel></info-panel>
 
 	<img id="raster-colorbar"/>
-  <div id="copyLink">Copy Link to Clipboard</div>
+  <div id="copyLink" class="feature-controller hidden">Copy Link to Clipboard</div>
 
 	<script src="js/components/CatalogMenu/catalogMenu.js" type="module"></script>
 	<script src="js/components/simulationController.js" type="module"></script>

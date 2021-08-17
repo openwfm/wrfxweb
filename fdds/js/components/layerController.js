@@ -23,12 +23,12 @@ export class LayerController extends HTMLElement {
                         <div id='map-checkboxes' class='layer-list'>
                         </div>
                     </div>
-                    <div id='raster-layers'>
+                    <div id='raster-layers' class='hidden'>
                         <h4>Rasters</h4>
                         <div id='raster-checkboxes' class='layer-list'>
                         </div>
                     </div>
-                    <div id='overlay-layers'>
+                    <div id='overlay-layers' class='hidden'>
                         <h4>Overlays</h4>
                         <div id='overlay-checkboxes' class='layer-list'>
                         </div>
@@ -200,8 +200,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = this.clearCache(this.overlayDict);
 
         this.querySelector('#layer-controller-container').classList.remove('hidden');
-        // this.querySelector('#layer-controller-container').style.display = 'block';
-        document.querySelector('#copyLink').style.display = 'block';
+        document.querySelector('#copyLink').classList.remove('hidden');
     }
 
     clearCache(domainDict) {
@@ -394,14 +393,14 @@ export class LayerController extends HTMLElement {
     /** Builds a checkbox for each raster layer and overlay layer */
     buildLayerBoxes() {
         const rasterRegion = this.querySelector('#raster-layers');
-        rasterRegion.style.display = 'block';
+        rasterRegion.classList.remove('hidden');
         if (Object.keys(this.rasterDict).length == 0) {
-            rasterRegion.style.display = 'none';
+            rasterRegion.classList.add('hidden');
         }
         const overlayRegion = this.querySelector('#overlay-layers');
-        overlayRegion.style.display = 'block';
+        overlayRegion.classList.remove('hidden');
         if (Object.keys(this.overlayDict).length == 0) {
-            overlayRegion.style.display = 'none';
+            overlayRegion.classList.add('hidden');
         }
 
         const rasterDiv = this.querySelector('#raster-checkboxes');

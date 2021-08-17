@@ -158,21 +158,22 @@ html, body {
 
 #copyLink {
   position: fixed;
-  z-index: 2000;
-  background:#e8e8e8;
-  color: #555555;
   padding: 10px;
   top: 155px;
   left: 20px;
   font-size: 1rem;
   font-weight: bold;
-  border-radius: 4px;
-  display: none;
 }
 
 #copyLink:hover {
   background: #ececec;
   cursor: pointer;
+}
+
+#simulation-flags {
+  position: fixed; 
+  top:15px; 
+  z-index:1000;
 }
 
 .displayTest {
@@ -184,9 +185,7 @@ html, body {
   left: 250px;
   padding-right: 10px;
   padding-left: 10px;
-  z-index: 1000;
   background-color: #fdfd96;
-  font-family: helvetica;
   font-size: 125%;
   font-weight: bold;
   border-radius: 5px;

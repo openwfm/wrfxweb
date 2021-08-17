@@ -106,7 +106,7 @@ export class CatalogItem extends HTMLElement {
         // setURL();
         // history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
 
-        document.querySelector('#simulation-flags').style.display = 'block';
+        document.querySelector('#simulation-flags').classList.remove('hidden');
         getSimulation(path);
     }
 }
