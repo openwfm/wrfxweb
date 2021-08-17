@@ -31,22 +31,20 @@ export class CatalogMenu extends HTMLElement {
                         <div id='menu-close' class='round-border'>x</div>
                     </div>
                     <div class='search-header'>
-                        <div class='search-header-block'>
+                        <div>
                             <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
-                            <select id='sort-by' class='selector'>
+                            <select id='sort-by'>
                                 <option value='original-order'>original order</option>
                                 <option value='description'>description</option>
                                 <option value='start-date'>start date</option>
                                 <option value='end-date'>end date</option>
                             </select>
                         </div>
-                        <div class='search-header-block'>
+                        <div class='sorting-column'>
                             <label id='reverse-label' for='reverse-order'>Reverse Order</label>
-                            <input type='checkbox' id='reverse-order' style='display:inline-block'></input>
+                            <input type='checkbox' id='reverse-order'></input>
                         </div>
-                        <div class='search-header-block'>
-                            <input id='search-for' class='menu-search' type='text'></input>
-                        </div>
+                        <input id='search-for' type='text'></input>
                     </div>
                     <div class='menu-columns'>
                         <select id='mobile-selector'>
@@ -55,15 +53,15 @@ export class CatalogMenu extends HTMLElement {
                             <option value='Satellite Data'>Satellite Data</option>
                         </select>
                         <div id='fires-column' class='column'>
-                            <h3 class='column-header'>Fires</h3>
+                            <div class='column-header'>Fires</div>
                             <ul id='catalog-fires' class='catalog-list'> </ul>
                         </div>
                         <div id='fuel-moisture-column' class='column'>
-                            <h3 class='column-header'>Fuel moisture</h3>
+                            <div class='column-header'>Fuel moisture</div>
                             <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
                         </div>
                         <div id='satellite-column' class='column'>
-                            <h3 class='column-header'>Satellite Data</h3>
+                            <div class='column-header'>Satellite Data</div>
                             <ul id='catalog-satellite-data' class='catalog-list'> </ul>
                         </div>
                     </div>
@@ -113,6 +111,7 @@ export class CatalogMenu extends HTMLElement {
 
     responsiveUI() {
         const clientWidth = document.body.clientWidth;
+
         const catalogMenu = this.querySelector('.catalog-menu');
         const reverseLabel = this.querySelector('#reverse-label');
         const menuSearch = this.querySelector('#search-for');
@@ -121,6 +120,16 @@ export class CatalogMenu extends HTMLElement {
         catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
         var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
         menuSearch.placeholder = searchDescription;
+        if (clientWidth < 769) {
+            this.selectCategory('Fires');
+        } else {
+            const firesListDOM = this.querySelector('#fires-column');
+            const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
+            const satelliteListDOM = this.querySelector('#satellite-column');
+            firesListDOM.classList.remove('hidden');
+            fuelMoistureListDOM.classList.remove('hidden');
+            satelliteListDOM.classList.remove('hidden');
+        }
         
     }
 
@@ -255,17 +264,26 @@ export class CatalogMenu extends HTMLElement {
      * Hides all columns and then shows the selected column. */
     selectCategory(selection) {
         const firesListDOM = this.querySelector('#fires-column');
-        firesListDOM.style.display = 'none';
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-        fuelMoistureListDOM.style.display = 'none';
         const satelliteListDOM = this.querySelector('#satellite-column');
-        satelliteListDOM.style.display = 'none';
+        // firesListDOM.style.display = 'none';
+        firesListDOM.classList.add('hidden');
+        // fuelMoistureListDOM.style.display = 'none';
+        fuelMoistureListDOM.classList.add('hidden');
+        // satelliteListDOM.style.display = 'none';
+        satelliteListDOM.classList.add('hidden');
         if (selection == 'Fires') {
-            firesListDOM.style.display = 'block';
+            console.log('fires');
+            // firesListDOM.style.display = 'block';
+            firesListDOM.classList.remove('hidden');
         } else if (selection == 'Fuel Moisture') {
-            fuelMoistureListDOM.style.display = 'block';
+            console.log('fuel moisture');
+            // fuelMoistureListDOM.style.display = 'block';
+            fuelMoistureListDOM.classList.remove('hidden');
         } else {
-            satelliteListDOM.style.display = 'block';
+            console.log('satellite');
+            // satelliteListDOM.style.display = 'block';
+            satelliteListDOM.classList.remove('hidden');
         }
     }
 }
