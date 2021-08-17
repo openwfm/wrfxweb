@@ -138,9 +138,12 @@ export class CatalogMenu extends HTMLElement {
         const catalogButton = this.querySelector('#catalog-button');
         L.DomEvent.disableClickPropagation(catalogButton);
         catalogButton.onpointerdown = () => {
+            console.log('here');
             if (catalogMenu.classList.contains('hidden')) {
+                console.log('show');
                 catalogMenu.classList.remove('hidden');
             } else {
+                console.log('hide');
                 catalogMenu.classList.add('hidden');
             }
         };
@@ -266,23 +269,14 @@ export class CatalogMenu extends HTMLElement {
         const firesListDOM = this.querySelector('#fires-column');
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
         const satelliteListDOM = this.querySelector('#satellite-column');
-        // firesListDOM.style.display = 'none';
         firesListDOM.classList.add('hidden');
-        // fuelMoistureListDOM.style.display = 'none';
         fuelMoistureListDOM.classList.add('hidden');
-        // satelliteListDOM.style.display = 'none';
         satelliteListDOM.classList.add('hidden');
         if (selection == 'Fires') {
-            console.log('fires');
-            // firesListDOM.style.display = 'block';
             firesListDOM.classList.remove('hidden');
         } else if (selection == 'Fuel Moisture') {
-            console.log('fuel moisture');
-            // fuelMoistureListDOM.style.display = 'block';
             fuelMoistureListDOM.classList.remove('hidden');
         } else {
-            console.log('satellite');
-            // satelliteListDOM.style.display = 'block';
             satelliteListDOM.classList.remove('hidden');
         }
     }

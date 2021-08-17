@@ -18,9 +18,23 @@ html {
 
 .feature-controller {
     background:#e8e8e8;
+    color: #5d5d5d;
     border: none;
     border-radius: .4rem;
     z-index: 8000;
+}
+
+.mobile-button {
+  display: none;
+  position: fixed;
+  padding: 0 5px 0 5px;
+  line-height: 40px;
+  font-size: 1.15rem;
+  text-align: center;
+  color: #5d5d5d;
+  height: 40px;
+  left: 140px;
+  top: 20px;
 }
 
 .svgIcon {
@@ -311,6 +325,10 @@ html, body {
     width: 80px;
     bottom: 120px;
     left: 40px;
+  }
+
+  .mobile-button {
+    display: block;
   }
 
   /* catalogMenu style */

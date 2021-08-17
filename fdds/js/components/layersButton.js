@@ -6,7 +6,7 @@ class LayersButton extends HTMLElement {
         super();
         this.innerHTML = `
             <link rel='stylesheet' href='css/layersButton.css'/>
-            <div id='layers-button-wrapper'>
+            <div id='layers-button-wrapper' class='mobile-button feature-controller hidden'>
                 <div id='layers-button'>
                     <span id='layers-button-label'>layers</span>
                 </div>
@@ -24,8 +24,8 @@ class LayersButton extends HTMLElement {
             let visible = layersSelector.style.display == 'block';
             var display = 'none';
             if (!visible) {
-                document.querySelector('.catalog-menu').style.display = 'none';
-                document.querySelector('#domain-mobile-wrapper').style.display = 'none';
+                document.querySelector('.catalog-menu').classList.add('hidden');
+                document.querySelector('#domain-selector').classList.add('hidden');
                 display = 'block';
             }
             layersSelector.style.display = display;

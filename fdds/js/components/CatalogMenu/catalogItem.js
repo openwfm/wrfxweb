@@ -102,7 +102,7 @@ export class CatalogItem extends HTMLElement {
         // simVars.currentSimulation = description;
         simVars.currentSimulation = entryID;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').style.display = 'none';
+        document.querySelector('.catalog-menu').classList.add('hidden');
         // setURL();
         // history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
 

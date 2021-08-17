@@ -2,12 +2,7 @@
   position: fixed;
   left: 20px;
   top: 70px;
-  z-index: 3000;
-  display: none;
-  color: #5d5d5d;
-  background: #e8e8e8;
   padding: 7px;
-  border-radius: .4rem;
   font-weight: bold;
   line-height: 12px;
   font-size: 1rem;
@@ -39,10 +34,4 @@
 .domain-checkbox label {
     margin-left: 10px;
     margin-right: 20px;
-}
-
-@media (max-width: 769px) {
-    #domain-mobile-wrapper {
-        display: none;
-    }
 }

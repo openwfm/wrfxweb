@@ -8,7 +8,10 @@ export class DomainSelector extends HTMLElement {
         super();
         this.innerHTML = `
             <div id='domain-mobile-wrapper'>
-                <div id='domain-selector'>
+                <div id='domain-selector-button' class='mobile-button feature-controller hidden'>
+                    domains
+                </div>
+                <div id='domain-selector' class='feature-controller hidden'>
                     <span id='domain-selector-label'>Active domain</span>
                     <div id='domain-checkboxes'></div>
                 </div>
@@ -20,6 +23,20 @@ export class DomainSelector extends HTMLElement {
         controllers.domainInstance.subscribe(() => {
             this.buildDomains();
         });
+        const domainButton = this.querySelector('#domain-selector-button');
+        L.DomEvent.disableClickPropagation(domainButton);
+        domainButton.onpointerdown = () => {
+            const domainSelector = this.querySelector('#domain-selector');
+            const catalogMenu = document.querySelector('.catalog-menu');
+            const layerController = document.querySelector('#layer-controller-container');
+            if (domainSelector.classList.contains('hidden')) {
+                domainSelector.classList.remove('hidden');
+                catalogMenu.classList.add('hidden');
+                layerController.classList.add('hidden');
+            } else {
+                domainSelector.classList.add('hidden');
+            }
+        }
     }
 
     /** Builds the list of domain elements that can be chosen. */
@@ -43,9 +60,10 @@ export class DomainSelector extends HTMLElement {
             domainCheckboxes.appendChild(domainCheckbox);
         }
 
-        this.querySelector('#domain-selector').style.display = 'block';
-        document.querySelector('#domain-button').style.display = 'inline-block';
-        document.querySelector('#layers-button').style.display = 'inline-block';
+        this.querySelector('#domain-selector').classList.remove('hidden');
+        this.querySelector('#domain-selector-button').classList.remove('hidden');
+        // document.querySelector('#layers-button-wrapper').classList.remove('hidden');
+        // document.querySelector('#layers-button').style.display = 'inline-block';
 
         // this.setUpForDomain(presetDomain);
         controllers.currentDomain.setValue(presetDomain, controllerEvents.simReset);
