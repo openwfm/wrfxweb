@@ -6,6 +6,10 @@ html {
   overflow-y: hidden;
 }
 
+h4 {
+  margin: 0;
+}
+
 .body {
   font-family: helvetica;
 }
@@ -335,6 +339,27 @@ html, body {
     margin-right: 20px;
 }
 
+/* LayerController */
+#layer-controller-container {
+    position: absolute;
+    right: 20px;
+    top: 5%;
+    width: 300px;
+    max-height: 85%;
+    background: white;
+    font-size: 1.15rem;
+    padding: 8px;
+    overflow-y: auto;
+}
+
+#layers-button {
+    left: 70px;
+}
+
+.layer-list {
+    margin-left: 50px;
+}
+
 @media (max-width: 769px) {
   .displayTest {
     left: 20px;
@@ -406,5 +431,13 @@ html, body {
 
   .column {
       width: 250px;
+  }
+
+  /* LayerController */
+  #layer-controller-container {
+    width: 300px;
+    height: 440px;
+    top: 85px;
+    right: 30px;
   }
 }

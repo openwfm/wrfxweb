@@ -24,9 +24,9 @@ export class TimeSeriesController extends LayerController {
         const timeSeriesDiv = document.createElement('div');
         timeSeriesDiv.className = 'layer-group';
         timeSeriesDiv.id = 'timeseries-layer-group';
-        const span = document.createElement('span');
-        span.innerText = 'Timeseries over all Markers';
-        timeSeriesDiv.appendChild(span);
+        const h4 = document.createElement('h4');
+        h4.innerText = 'Timeseries over all Markers';
+        timeSeriesDiv.appendChild(h4);
         timeSeriesDiv.appendChild(this.timeSeriesButton);
         container.appendChild(timeSeriesDiv);
     }

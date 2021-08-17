@@ -17,24 +17,24 @@ export class LayerController extends HTMLElement {
                 <div id='layers-button' class='mobile-button feature-controller hidden'>
                     layers
                 </div>
-                <div id='layer-controller-container' class='hidden'>
-                    <div id='base-maps' class='layer-group' style='border-bottom: 2px'>
-                        <span>Base Maps</span>
+                <div id='layer-controller-container' class='feature-controller hidden'>
+                    <div id='base-maps'>
+                        <h4>Base Maps</h4>
                         <div id='map-checkboxes' class='layer-list'>
                         </div>
                     </div>
-                    <div id='raster-layers' class='layer-group'>
-                        <span>Rasters</span>
+                    <div id='raster-layers'>
+                        <h4>Rasters</h4>
                         <div id='raster-checkboxes' class='layer-list'>
                         </div>
                     </div>
-                    <div id='overlay-layers' class='layer-group'>
-                        <span>Overlays</span>
+                    <div id='overlay-layers'>
+                        <h4>Overlays</h4>
                         <div id='overlay-checkboxes' class='layer-list'>
                         </div>
                     </div>
-                    <div id='opacity-slider-container' class='layer-group'>
-                        <span>Top Layer Opacity</span>
+                    <div id='opacity-slider-container'>
+                        <h4>Top Layer Opacity</h4>
                     </div>
                 </div>
             </div>
