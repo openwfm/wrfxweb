@@ -301,6 +301,40 @@ html, body {
   cursor: pointer;
 }
 
+/* DomainSelector */
+#domain-selector {
+  position: fixed;
+  left: 20px;
+  top: 70px;
+  padding: 7px;
+  font-weight: bold;
+  line-height: 12px;
+  font-size: 1rem;
+}
+
+#domain-selector-label {
+    padding: 10px 0px;
+    text-align: center;
+}
+
+#domain-checkboxes {
+    height: 20px;
+    padding: 0px 5px;
+}
+
+.domain-checkbox {
+    display: inline-block;
+}
+
+.domain-checkbox input {
+    cursor: pointer;
+}
+
+.domain-checkbox label {
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
 @media (max-width: 769px) {
   .displayTest {
     left: 20px;

@@ -12,7 +12,7 @@ export class DomainSelector extends HTMLElement {
                     domains
                 </div>
                 <div id='domain-selector' class='feature-controller hidden'>
-                    <span id='domain-selector-label'>Active domain</span>
+                    <div id='domain-selector-label'>Active domain</div>
                     <div id='domain-checkboxes'></div>
                 </div>
             </div>
