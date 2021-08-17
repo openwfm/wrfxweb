@@ -13,24 +13,29 @@ export class LayerController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id='layer-controller-container'>
-                <div id='base-maps' class='layer-group' style='border-bottom: 2px'>
-                    <span>Base Maps</span>
-                    <div id='map-checkboxes' class='layer-list'>
-                    </div>
+            <div id='layer-controller-mobile-wrapper'>
+                <div id='layers-button' class='mobile-button feature-controller hidden'>
+                    layers
                 </div>
-                <div id='raster-layers' class='layer-group'>
-                    <span>Rasters</span>
-                    <div id='raster-checkboxes' class='layer-list'>
+                <div id='layer-controller-container' class='hidden'>
+                    <div id='base-maps' class='layer-group' style='border-bottom: 2px'>
+                        <span>Base Maps</span>
+                        <div id='map-checkboxes' class='layer-list'>
+                        </div>
                     </div>
-                </div>
-                <div id='overlay-layers' class='layer-group'>
-                    <span>Overlays</span>
-                    <div id='overlay-checkboxes' class='layer-list'>
+                    <div id='raster-layers' class='layer-group'>
+                        <span>Rasters</span>
+                        <div id='raster-checkboxes' class='layer-list'>
+                        </div>
                     </div>
-                </div>
-                <div id='opacity-slider-container' class='layer-group'>
-                    <span>Top Layer Opacity</span>
+                    <div id='overlay-layers' class='layer-group'>
+                        <span>Overlays</span>
+                        <div id='overlay-checkboxes' class='layer-list'>
+                        </div>
+                    </div>
+                    <div id='opacity-slider-container' class='layer-group'>
+                        <span>Top Layer Opacity</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -49,6 +54,7 @@ export class LayerController extends HTMLElement {
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
+        this.setLayerButton();
         const domainSubscription = () => {
             this.resetLayers();
             this.domainSwitch();
@@ -89,6 +95,22 @@ export class LayerController extends HTMLElement {
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
         opacitySliderContainer.appendChild(opacitySlider);
         this.buildMapBase();
+    }
+
+    setLayerButton() {
+        const layersButton = this.querySelector('#layers-button');
+
+        L.DomEvent.disableClickPropagation(layersButton);
+        layersButton.onpointerdown = (e) => {
+            const layersSelector = document.querySelector('#layer-controller-container');
+            if (layersSelector.classList.contains('hidden')) {
+                document.querySelector('.catalog-menu').classList.add('hidden');
+                document.querySelector('#domain-selector').classList.add('hidden');
+                layersSelector.classList.remove('hidden');
+            } else {
+                layersSelector.classList.add('hidden');
+            }
+        }
     }
 
     /** Triggered whenever currentTimestamp is changed. For every layer currently selected 
@@ -177,7 +199,8 @@ export class LayerController extends HTMLElement {
         this.rasterDict = this.clearCache(this.rasterDict);
         this.overlayDict = this.clearCache(this.overlayDict);
 
-        this.querySelector('#layer-controller-container').style.display = 'block';
+        this.querySelector('#layer-controller-container').classList.remove('hidden');
+        // this.querySelector('#layer-controller-container').style.display = 'block';
         document.querySelector('#copyLink').style.display = 'block';
     }
 

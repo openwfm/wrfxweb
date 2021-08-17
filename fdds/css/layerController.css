@@ -1,6 +1,6 @@
 #layer-controller-container {
     position: absolute;
-    display: none;
+    /* display: none; */
     right: 20px;
     top: 5%;
     z-index: 5000;
@@ -16,6 +16,9 @@
     overflow-y: auto;
 }
 
+#layers-button {
+    left: 70px;
+}
 
 .layer-group {
     display: block;

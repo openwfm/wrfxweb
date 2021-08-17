@@ -27,12 +27,10 @@ export class DomainSelector extends HTMLElement {
         L.DomEvent.disableClickPropagation(domainButton);
         domainButton.onpointerdown = () => {
             const domainSelector = this.querySelector('#domain-selector');
-            const catalogMenu = document.querySelector('.catalog-menu');
-            const layerController = document.querySelector('#layer-controller-container');
             if (domainSelector.classList.contains('hidden')) {
                 domainSelector.classList.remove('hidden');
-                catalogMenu.classList.add('hidden');
-                layerController.classList.add('hidden');
+                document.querySelector('.catalog-menu').classList.add('hidden');
+                document.querySelector('#layer-controller-container').classList.add('hidden');
             } else {
                 domainSelector.classList.add('hidden');
             }
@@ -60,12 +58,13 @@ export class DomainSelector extends HTMLElement {
             domainCheckboxes.appendChild(domainCheckbox);
         }
 
-        this.querySelector('#domain-selector').classList.remove('hidden');
+        var clientWidth = document.body.clientWidth;
+        if (clientWidth >= 769) {
+            this.querySelector('#domain-selector').classList.remove('hidden');
+        }
         this.querySelector('#domain-selector-button').classList.remove('hidden');
-        // document.querySelector('#layers-button-wrapper').classList.remove('hidden');
-        // document.querySelector('#layers-button').style.display = 'inline-block';
+        document.querySelector('#layers-button').classList.remove('hidden');
 
-        // this.setUpForDomain(presetDomain);
         controllers.currentDomain.setValue(presetDomain, controllerEvents.simReset);
     }
 
