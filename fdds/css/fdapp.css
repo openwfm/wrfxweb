@@ -623,6 +623,43 @@ button[disabled] {
   left: 340px;
 }
 
+.timeSeriesButton {
+    border-radius: .2rem;
+    padding: 5px;
+    margin-bottom: 5px;
+    background: #b6e2f0;
+    text-align: center;
+    color: #6a6a6a;
+    font-weight: bold;
+    width: 100%;
+    border: none;
+}
+
+#progressBar {
+    border-radius: .2rem;
+    margin-top: 5px;
+    background: black;
+    height: 10px;
+    width: 100%;
+    border: none;
+}
+
+.timeSeriesButton:hover:not([disabled]) {
+    cursor: pointer;
+    background: #e5e5e5;
+}
+
+.timeseries-select {
+    display: inline-block;
+    width: 55%;
+    margin-bottom: 2px;
+}
+
+.timeseries-select-label {
+    display: inline-block;
+    width: 40%;
+}
+
 @media (max-width: 769px) {
   .displayTest {
     left: 20px;
