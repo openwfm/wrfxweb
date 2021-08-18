@@ -13,24 +13,33 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/simulationController.css'/>
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
                         <button id='slider-slow-down'>
-                            <img src='icons/fast_rewind_black_24dp.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#fast_rewind_black_24dp"></use>
+                            </svg>
                         </button>
                         <button id='slider-prev'>
-                            <img src='icons/arrow_left-24px.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#arrow_left-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-play-pause'>
-                            <img src='icons/play_arrow-24px.svg'></img>
+                             <svg class='svgIcon interactive-button'>
+                                <use href="#play_arrow-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-next'>
-                            <img src='icons/arrow_right-24px.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#arrow_right-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-fast-forward'>
-                            <img src='icons/fast_forward_black_24dp.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#fast_forward_black_24dp"></use>
+                            </svg>
                         </button>
                     </div>
                     <div id='slider-timestamp'>

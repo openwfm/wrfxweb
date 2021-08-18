@@ -2,7 +2,7 @@ export class InfoSection extends HTMLElement {
     constructor(header, subheaders) {
         super();
         this.innerHTML = `
-            <div id='infoSectionContainer' class='infoSectionContainer'>
+            <div id='infoSectionContainer'> 
                 <div id=${this.formatHeader(header)} class='infoSectionHeader'>
                     <h3 id='header'>
                     ${header}
@@ -14,7 +14,7 @@ export class InfoSection extends HTMLElement {
                 <div id='subheaders' class='hidden'>
                     <div id='generalDescription'></div>
                 </div>
-                <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
+                <div class='section-break'></div>
             </div>
         `;
         this.header = header;

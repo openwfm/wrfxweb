@@ -7,13 +7,6 @@ export class TimeSeriesMarker extends HTMLElement {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
         this.innerHTML = `
-            <style>
-                #hideMenu {
-                    position: absolute;
-                    top: 3px;
-                    left: 5px;
-                }
-            </style>
             <div id='timeSeriesMarker'>
                 <span id='hideMenu' class='interactive-button'>hide</span>
                 <div>
@@ -92,7 +85,13 @@ export class Marker {
         this.popup.setContent(this.timeSeriesMarker);
         this.popup.getElement().style.display = 'none';
 
-        var markerIcon = L.icon({iconUrl: 'icons/arrow_drop_down_black_24dp.svg', iconAnchor: [13, 16]});
+        let svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path d="M7 10l5 5 5-5H7z"></path>
+                              </svg>`;
+        let myIconUrl = encodeURI("data:image/svg+xml," + svgString).replace('#','%23');
+        var markerIcon = L.icon({iconUrl: myIconUrl, iconAnchor: [13, 16]});
+
         this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         this.popup.on('remove', () => {
             controllers.timeSeriesMarkers.remove(this);

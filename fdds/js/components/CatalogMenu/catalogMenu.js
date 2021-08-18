@@ -16,48 +16,54 @@ export class CatalogMenu extends HTMLElement {
         this.satelliteList = [];
         this.addOrder = [];
         this.innerHTML = `
-            <div class='catalog-menu'>
-                <div id='menu-title' class='menu-title'>
-                    <h3>Select Simulation...</h3>
-                    <div> 
-                        <span id='menu-close'>x</span>
+            <div>
+                <div id='catalog-button' class='feature-controller catalog-button'>
+                    <div id='catalog-menu-icon-container'>
+                        <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
+                            <use href='#menu-24px'></use>
+                        </svg>
                     </div>
+                    <div id='menu-label'>Catalog</div>
                 </div>
-                <div class='search-header'>
-                    <div class='search-header-block'>
-                        <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
-                        <select id='sort-by' class='selector'>
-                            <option value='original-order'>original order</option>
-                            <option value='description'>description</option>
-                            <option value='start-date'>start date</option>
-                            <option value='end-date'>end date</option>
+                <div class='catalog-menu round-border'>
+                    <div id='menu-title' class='menu-title round-border'>
+                        <div>Select Simulation...</div>
+                        <div id='menu-close' class='round-border'>x</div>
+                    </div>
+                    <div class='search-header'>
+                        <div>
+                            <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
+                            <select id='sort-by'>
+                                <option value='original-order'>original order</option>
+                                <option value='description'>description</option>
+                                <option value='start-date'>start date</option>
+                                <option value='end-date'>end date</option>
+                            </select>
+                        </div>
+                        <div class='sorting-column'>
+                            <label id='reverse-label' for='reverse-order'>Reverse Order</label>
+                            <input type='checkbox' id='reverse-order'></input>
+                        </div>
+                        <input id='search-for' type='text'></input>
+                    </div>
+                    <div class='menu-columns'>
+                        <select id='mobile-selector'>
+                            <option value='Fires'>Fires</option>
+                            <option value='Fuel Moisture'>Fuel Moisture</option>
+                            <option value='Satellite Data'>Satellite Data</option>
                         </select>
-                    </div>
-                    <div class='search-header-block'>
-                        <label id='reverse-label' for='reverse-order'>Reverse Order</label>
-                        <input type='checkbox' id='reverse-order' style='display:inline-block'></input>
-                    </div>
-                    <div class='search-header-block'>
-                        <input id='search-for' class='menu-search' type='text'></input>
-                    </div>
-                </div>
-                <div class='menu-columns'>
-                    <select id='mobile-selector'>
-                        <option value='Fires'>Fires</option>
-                        <option value='Fuel Moisture'>Fuel Moisture</option>
-                        <option value='Satellite Data'>Satellite Data</option>
-                    </select>
-                    <div id='fires-column' class='column'>
-                        <h3 class='column-header'>Fires</h3>
-                        <ul id='catalog-fires' class='catalog-list'> </ul>
-                    </div>
-                    <div id='fuel-moisture-column' class='column'>
-                        <h3 class='column-header'>Fuel moisture</h3>
-                        <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
-                    </div>
-                    <div id='satellite-column' class='column'>
-                        <h3 class='column-header'>Satellite Data</h3>
-                        <ul id='catalog-satellite-data' class='catalog-list'> </ul>
+                        <div id='fires-column' class='column'>
+                            <div class='column-header'>Fires</div>
+                            <ul id='catalog-fires' class='catalog-list'> </ul>
+                        </div>
+                        <div id='fuel-moisture-column' class='column'>
+                            <div class='column-header'>Fuel moisture</div>
+                            <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
+                        </div>
+                        <div id='satellite-column' class='column'>
+                            <div class='column-header'>Satellite Data</div>
+                            <ul id='catalog-satellite-data' class='catalog-list'> </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,29 +74,27 @@ export class CatalogMenu extends HTMLElement {
      * presentation details based on whether on mobile. */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
-        const clientWidth = document.body.clientWidth;
+        L.DomEvent.disableClickPropagation(catalogMenu);
+
+        dragElement(catalogMenu, 'menu-title');
+        this.hideShowMenu();
+        this.responsiveUI();
+        window.addEventListener('resize', () => { 
+            this.responsiveUI();
+        });
+        this.setMenuSearching();
+        this.buildMenu();
+    }
+
+    setMenuSearching() {
         const sortBy = this.querySelector('#sort-by');
         const reverseOrder = this.querySelector('#reverse-order');
-        const reverseLabel = this.querySelector('#reverse-label');
         const menuSearch = this.querySelector('#search-for');
         const menuSelect = this.querySelector('#mobile-selector');
-        // change labels, sizes and positions based on screen size
-        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
-        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
-        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
-        // Makes sure that map events like zooming and panning are disabled from within menu div
-        L.DomEvent.disableClickPropagation(catalogMenu);
-        // Closes the menu when the x is clicked
-        this.querySelector('#menu-close').onclick = () => {
-            catalogMenu.style.display = 'none';
-        }
-        // Implements repositioning menu
-        dragElement(catalogMenu, 'menu-title');
-        menuSearch.placeholder = searchDescription;
+
         menuSearch.onpointerdown = (e) => {
             e.stopPropagation();
         }
-        // Sets up search functionality
         menuSearch.oninput = () => {
             this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
@@ -98,13 +102,54 @@ export class CatalogMenu extends HTMLElement {
             this.sortBy(sortBy.value, reverseOrder.checked);
         }
         reverseOrder.onclick = () => {
-            // this.sortBy(sortBy.value, reverseOrder.checked);
             this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
         }
         menuSelect.onchange = () => {
             this.selectCategory(menuSelect.value);
         }
-        this.buildMenu();
+    }
+
+    responsiveUI() {
+        const clientWidth = document.body.clientWidth;
+
+        const catalogMenu = this.querySelector('.catalog-menu');
+        const reverseLabel = this.querySelector('#reverse-label');
+        const menuSearch = this.querySelector('#search-for');
+
+        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
+        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
+        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
+        menuSearch.placeholder = searchDescription;
+        if (clientWidth < 769) {
+            this.selectCategory('Fires');
+        } else {
+            const firesListDOM = this.querySelector('#fires-column');
+            const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
+            const satelliteListDOM = this.querySelector('#satellite-column');
+            firesListDOM.classList.remove('hidden');
+            fuelMoistureListDOM.classList.remove('hidden');
+            satelliteListDOM.classList.remove('hidden');
+        }
+        
+    }
+
+    hideShowMenu() {
+        const catalogMenu = this.querySelector('.catalog-menu');
+        const catalogButton = this.querySelector('#catalog-button');
+        L.DomEvent.disableClickPropagation(catalogButton);
+        catalogButton.onpointerdown = () => {
+            console.log('here');
+            if (catalogMenu.classList.contains('hidden')) {
+                console.log('show');
+                catalogMenu.classList.remove('hidden');
+            } else {
+                console.log('hide');
+                catalogMenu.classList.add('hidden');
+            }
+        };
+        this.querySelector('#menu-close').onclick = () => {
+            catalogMenu.classList.add('hidden');
+        }
     }
 
     /** Function that retrieves catalog Entries from services.js and builds a CatalogItem for each and adds it to the 
@@ -222,17 +267,17 @@ export class CatalogMenu extends HTMLElement {
      * Hides all columns and then shows the selected column. */
     selectCategory(selection) {
         const firesListDOM = this.querySelector('#fires-column');
-        firesListDOM.style.display = 'none';
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-        fuelMoistureListDOM.style.display = 'none';
         const satelliteListDOM = this.querySelector('#satellite-column');
-        satelliteListDOM.style.display = 'none';
+        firesListDOM.classList.add('hidden');
+        fuelMoistureListDOM.classList.add('hidden');
+        satelliteListDOM.classList.add('hidden');
         if (selection == 'Fires') {
-            firesListDOM.style.display = 'block';
+            firesListDOM.classList.remove('hidden');
         } else if (selection == 'Fuel Moisture') {
-            fuelMoistureListDOM.style.display = 'block';
+            fuelMoistureListDOM.classList.remove('hidden');
         } else {
-            satelliteListDOM.style.display = 'block';
+            satelliteListDOM.classList.remove('hidden');
         }
     }
 }

@@ -4,13 +4,14 @@ class InfoPanel extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/infoPanel.css'/>
             <div id='infoPanelContainer'>
-                <button id='infoButton'>
-                    <img src='icons/info_black_24dp.svg'></img>
+                <button id='infoButton' class='feature-controller'>
+                    <svg class='svgIcon interactive-button'>
+                        <use href="#info_black_24dp"></use>
+                    </svg>
                 </button></div>
-                <div id='infoPanel'>
-                    <span id='closeInfoPanel'>x</span>
+                <div id='infoPanel' class='feature-controller'>
+                    <div id='closeInfoPanel' class='interactive-button close-panel'>x</div>
                     <h2>Feature List and Components</h2>
                 </div>
             </div>

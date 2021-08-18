@@ -2,46 +2,6 @@ import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
 
-const template = document.createElement('template');
-template.innerHTML = `
-    <style>
-        li.catalog-entry {
-            list-style-type: none;
-            padding: 0px;
-        }
-
-        li.catalog-entry:hover {
-            background-color: #fdfd96;
-        }
-        h3 { 
-            padding: 0px;
-            margin: 0px;
-            font-size: 1rem;
-        }
-        p {
-            margin: 0px;
-        }
-        a {
-            color: black;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
-    <li class='catalog-entry'>
-        <div id='entry'>
-            <h3></h3>
-            <p id='from'>from:  </p>
-            <p id='to'>to: </p>
-            <p id='jobID'>job id:  </p>
-        </div>
-        <div id='links'>
-            <a id='kml' download></a>
-            <a id='zip' download></a>
-        </div>
-    </li>
-`;
 /** Creates an Element for each Item of the CatalogMenu. Necessary for each element to have
  * its own component because of how much information is stored within each and how much has to
  * happen after one is clicked. 
@@ -49,14 +9,25 @@ template.innerHTML = `
 export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
         super();
-        this.attachShadow({mode :'open'});
+        this.innerHTML = `
+            <li class='catalog-entry'>
+                <div id='entry'>
+                    <h3></h3>
+                    <div id='from'>from:  </div>
+                    <div id='to'>to: </div>
+                    <div id='jobID'>job id:  </div>
+                </div>
+                <div id='links'>
+                    <a id='kml' download></a>
+                    <a id='zip' download></a>
+                </div>
+            </li>
+        `;
         this.catEntry = catEntry;
         this.navJobId = navJobId;
     }
 
     connectedCallback() {
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
-
         let description = this.catEntry.description;
         let jobId = this.catEntry.job_id;
         let to = this.catEntry.to_utc;
@@ -67,24 +38,24 @@ export class CatalogItem extends HTMLElement {
         let zipSize = this.catEntry.zip_size;
         let manifestPath = this.catEntry.manifest_path;
 
-        this.shadowRoot.querySelector('h3').innerText = description;
-        this.shadowRoot.querySelector('#jobID').innerText += ' ' + jobId;
-        this.shadowRoot.querySelector('#from').innerText += ' ' + utcToLocal(from);
-        this.shadowRoot.querySelector('#to').innerText += ' ' + utcToLocal(to);
+        this.querySelector('h3').innerText = description;
+        this.querySelector('#jobID').innerText += ' ' + jobId;
+        this.querySelector('#from').innerText += ' ' + utcToLocal(from);
+        this.querySelector('#to').innerText += ' ' + utcToLocal(to);
         if(kmlURL) {
             let mb = Math.round(10*kmlSize/1048576.0)/10;
-            const kmlLink = this.shadowRoot.querySelector('#kml');
+            const kmlLink = this.querySelector('#kml');
             kmlLink.href = kmlURL;
             kmlLink.innerText = 'Download KMZ ' + mb.toString() + ' MB';
         }
         if(zipURL) {
             let mb = Math.round(10*zipSize/1048576.0)/10;
-            const zipLink = this.shadowRoot.querySelector('#zip');
+            const zipLink = this.querySelector('#zip');
             zipLink.href = zipURL;
             zipLink.innerText = 'Download ZIP ' + mb.toString() + ' MB';
         }
 
-        this.shadowRoot.querySelector('#entry').onclick = () => {
+        this.querySelector('#entry').onclick = () => {
             const timeSeriesChart = document.querySelector('#timeSeriesChartContainer');
             timeSeriesChart.style.display = 'none';
             this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
@@ -98,15 +69,11 @@ export class CatalogItem extends HTMLElement {
      * with a run, 
      */
     handle_catalog_click(entryID, path, description) {
-        // close selection dialog
-        // simVars.currentSimulation = description;
         simVars.currentSimulation = entryID;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').style.display = 'none';
-        // setURL();
-        // history.pushState({id: entryID}, 'Data', '?job_id=' + entryID);
+        document.querySelector('.catalog-menu').classList.add('hidden');
 
-        document.querySelector('#simulation-flags').style.display = 'block';
+        document.querySelector('#simulation-flags').classList.remove('hidden');
         getSimulation(path);
     }
 }

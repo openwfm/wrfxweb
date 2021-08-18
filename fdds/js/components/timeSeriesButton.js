@@ -6,7 +6,6 @@ export class TimeSeriesButton extends HTMLElement {
     constructor(dataType = 'continuous') {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/timeSeriesButton.css'/>
             <div id='timeseries-button'>
                 <div>
                     <label class='timeseries-select-label' for='startDate'>start time:</label>

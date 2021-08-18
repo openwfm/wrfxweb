@@ -37,68 +37,19 @@ export class SimulationSlider extends Slider {
             this.setLoadProgress(progress);
         });
 
-        const slider = this.shadowRoot.querySelector('#slider');
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const slider = this.querySelector('#slider');
+        slider.classList.add('simulation-slider');
+
+        const sliderHead = this.querySelector('#slider-head');
         const sliderStart = createElement('slider-start', 'slider-marker');
         const sliderEnd = createElement('slider-end', 'slider-marker');
-        const sliderProgress = createElement('slider-progress');
+        const sliderProgress = createElement('slider-progress', 'slider-bar hidden');
         const sliderMarkerInfo = createElement('slider-marker-info');
-        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+        const sliderBar = this.querySelector('#slider-bar');
 
         slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
 
-        if (document.body.clientWidth < 770) {
-            slider.style.left = '10px';
-        }
-        sliderBar.style.background = '#d6d6d6';
-        const style = this.shadowRoot.querySelector('style');
-        style.innerText += `
-            #slider-progress {
-                position:absolute;
-                display: none;
-                margin: auto 0;
-                top: 0; bottom: 0; left: 0; right: 0;
-                width: 1%;
-                height: 11px;
-                background: #f8f8f8;
-                border-style: solid;
-                border-radius: 4px;
-                border-width: .5px;
-                border-color: #cccccc;
-                pointer-events: none;
-            }
-            #slider-marker-info {
-                position: absolute;
-                margin: 0 auto;
-                top: 20px; bottom: 0; left: 0; right: 0;
-                background: white;
-                width: 160px;
-                height: 20px;
-                border-radius: .4rem;
-                display: none;
-                font-weight: bold;
-                font-size: 1rem; 
-                padding: 5px 5px 8px 10px;
-            }
-            #slider-marker-info.hovered { 
-                display: block;
-            }
-            #slider-marker-info.clicked {
-                display: block;
-            }
-            .slider-marker {
-                position: absolute;
-                margin: auto 0;
-                top: 0; bottom: 0; left: 0; right: 0;
-                background: #5d5d5d;
-                width: 4px;
-                height: 11px;
-                border-radius: 4px;
-            }
-            #slider-end {
-                left: 340px;
-            }
-        `;
+        sliderBar.classList.add('simulation-slider');
 
         sliderHead.onpointerdown = (e) => {
             const finishedCallback = () => setURL();
@@ -119,11 +70,11 @@ export class SimulationSlider extends Slider {
     setLoadProgress(progress) {
         var progressWidth = progress*this.progressWidth + 2;
 
-        const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
-        progressBar.style.display = 'block';
+        const progressBar = this.querySelector('#slider-progress'); 
+        progressBar.classList.remove('hidden');
         progressBar.style.width = progressWidth + 'px';
         if (progress == 0) {
-            progressBar.style.display = 'none';
+            progressBar.classList.add('hidden');
             return;
         }
 
@@ -142,14 +93,14 @@ export class SimulationSlider extends Slider {
     }
 
     setSliderMarkerInfo(timeStamp) {
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
         var localTime = utcToLocal(timeStamp);
         sliderMarkerInfo.innerHTML = localTime;
     }
 
     configureStartSetter() {
-        const sliderStart = this.shadowRoot.querySelector('#slider-start');
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderStart = this.querySelector('#slider-start');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
 
         sliderStart.onmouseover = () => {
             var startDate = controllers.startDate.getValue();
@@ -193,8 +144,8 @@ export class SimulationSlider extends Slider {
     }
 
     configureEndSetter() {
-        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderEnd = this.querySelector('#slider-end');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
 
         sliderEnd.onmouseover = () => {
             var endDate = controllers.endDate.getValue();
@@ -245,7 +196,7 @@ export class SimulationSlider extends Slider {
     }
 
     updateStartLocation() {
-        const sliderStart = this.shadowRoot.querySelector('#slider-start');
+        const sliderStart = this.querySelector('#slider-start');
         var left = this.getStartLeft();
 
         sliderStart.style.left = left + 'px';
@@ -264,7 +215,7 @@ export class SimulationSlider extends Slider {
     }
 
     updateEndLocation() {
-        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
+        const sliderEnd = this.querySelector('#slider-end');
         var left = this.getEndLeft();
 
         sliderEnd.style.left = left + 'px';
