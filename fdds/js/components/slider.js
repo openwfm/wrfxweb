@@ -1,46 +1,3 @@
-const template = document.createElement('template');
-template.innerHTML = `
-    <style>
-        #slider {
-            position: relative;
-            padding-top: 5px;
-            padding-bottom: 5px;
-        }
-
-        #slider-bar {
-            height: 11px;
-            background: #e8e8e8;
-            border-style: solid;
-            border-radius: 4px;
-            border-width: .5px;
-            border-color: #cccccc;
-            cursor: pointer;
-        }
-
-        #slider-head {
-            position: absolute;
-            bottom: 3px; left: 0; right: 0;
-            height: 15px;
-            width: 15px;
-            background: #f6f6f6;
-            border-style: solid; 
-            border-radius: 4px;
-            border-width: .5px;
-            border-color: #dddddd;
-            cursor: grab;
-            z-index: 3000;
-        }
-
-        #slider-head:hover {
-            border-color: black;
-        }
-    </style>
-    <div id='slider'>
-        <div id='slider-bar'></div>
-        <div id='slider-head'></div>
-    </div>
-`;
-
 export class Slider extends HTMLElement {
     constructor(sliderWidth, nFrames) {
         super();
@@ -56,10 +13,6 @@ export class Slider extends HTMLElement {
     }
 
     connectedCallback() {
-
-        const slider = this.querySelector('#slider');
-        slider.style.width = this.sliderWidth + 'px';
-        
         const sliderHead = this.querySelector('#slider-head');
         sliderHead.onpointerdown = (e) => {
             this.dragSliderHead(e);
@@ -76,8 +29,10 @@ export class Slider extends HTMLElement {
 
         const sliderHead = this.querySelector('#slider-head');
         var percentage = newFrame / this.nFrames;
-        var left = Math.floor(percentage * this.sliderWidth *.95);
-        sliderHead.style.left = left + 'px';
+        // var left = Math.floor(percentage * this.sliderWidth *.95);
+        var left = Math.floor(percentage *.95 * 100);
+        // sliderHead.style.left = left + 'px';
+        sliderHead.style.left = left + '%';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates

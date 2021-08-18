@@ -467,6 +467,14 @@ html, body {
   padding-bottom: 5px;
 }
 
+.slider.simulation-slider {
+  width: 340px;
+}
+
+.slider.opacity-slider {
+  width: 284px;
+}
+
 .slider-bar {
   height: 11px;
   background: #e8e8e8;
@@ -630,7 +638,6 @@ html, body {
 
   /* LayerController */
   #layer-controller-container {
-    width: 300px;
     height: 440px;
     top: 85px;
     right: 30px;
@@ -649,5 +656,6 @@ html, body {
   /* Slider */
   .slider.simulation-slider {
     left: 10px;
+    width: 300px;
   }
 }

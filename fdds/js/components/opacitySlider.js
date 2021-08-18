@@ -15,6 +15,7 @@ export class OpacitySlider extends Slider {
 
         const slider = this.querySelector('#slider');
         slider.insertBefore(opacityDisplay, slider.firstChild);
+        slider.classList.add('opacity-slider');
 
         var opacity = controllers.opacity.getValue();
         opacityDisplay.innerHTML = opacity;

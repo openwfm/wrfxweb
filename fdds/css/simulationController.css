@@ -64,11 +64,6 @@ button[disabled] {
         width: 320px;
     }
 
-    #slider-bar {
-        left:10px;
-        width: 300px;
-    }
-
     #slider-timestamp {
         display: flex;
         justify-content: space-around;
