@@ -1,4 +1,4 @@
-import { dragElement, debounce, setURL, buildCheckBox } from '../util.js';
+import { dragElement, setURL, buildCheckBox } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';

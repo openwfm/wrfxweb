@@ -304,6 +304,30 @@ html, body {
   cursor: pointer;
 }
 
+/* CatalogItems */
+.catalog-entry {
+  list-style-type: none;
+  margin-bottom: 10px;
+}
+
+.catalog-entry:hover {
+  background-color: #fdfd96;
+}
+
+.catalog-entry h3 {
+  margin: 0px;
+  font-size: 1rem;
+}
+
+.catalog-entry a {
+  color: black !important;
+  text-decoration: none;
+}
+
+.catalog-entry a:hover {
+  text-decoration: underline;
+}
+
 /* DomainSelector */
 #domain-selector {
   position: fixed;
