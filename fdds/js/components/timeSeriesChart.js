@@ -6,28 +6,28 @@ export class TimeSeriesChart extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id='fullContainer'>
+            <div id='fullContainer' class='hidden'>
                 <div>
-                    <div id='addLayers'>
+                    <div id='addLayers' class='popout-layer-box'>
                         <span class='interactive-button'>Added Layers</span>
                     </div>
-                    <div id='layers-to-add'></div>
+                    <div id='layers-to-add' class='popout-layer-box hidden'></div>
                 </div>
                 <div id='timeSeriesChartContainer'>
-                    <div id='legendOptions'>
-                        <span class='interactive-button close-button' id='closeLegendOptions'>x</span>
-                        <label class='legendLabel' for'openMarker'>Open Marker Info</label>
-                        <input class='legendInput' type='checkbox' id='openMarker'/>
-                        <label class='legendLabel' for='hideData'>Hide Data: </label>
-                        <input class='legendInput' type='checkbox' id='hideData'/>
-                        <label class='legendLabel' for='timeseriesColorCode'>Change Color: </label>
-                        <input class='legendInput' type='color' id='timeseriesColorCode'></input>
-                        <label class='legendLabel' for='addChangeName'>Add Name:</label>
-                        <input class='legendInput' id='addChangeName'></input>
+                    <div id='legendOptions' class='hidden'>
+                        <div class='interactive-button close-panel' id='closeLegendOptions'>x</div>
+                        <label class='legendItem' for'openMarker'>Open Marker Info</label>
+                        <input class='legendItem' type='checkbox' id='openMarker'/>
+                        <label class='legendItem' for='hideData'>Hide Data: </label>
+                        <input class='legendItem' type='checkbox' id='hideData'/>
+                        <label class='legendItem' for='timeseriesColorCode'>Change Color: </label>
+                        <input class='legendItem' type='color' id='timeseriesColorCode'></input>
+                        <label class='legendItem' for='addChangeName'>Add Name:</label>
+                        <input class='legendItem' id='addChangeName'></input>
                     </div>
                     <div id='zoomBox'></div>
-                    <span class='interactive-button close-button' id='closeTimeSeriesChart'>x</span>
-                    <button id='drag-container' class='interactive-button' style='display: none; margin-right: 5px'>
+                    <div class='interactive-button close-panel' id='closeTimeSeriesChart'>x</div>
+                    <button id='drag-container' class='interactive-button'>
                         <svg class='interactive-button' height=15 width=15>
                             <use href='#open_with_black_24dp'></use>
                         </svg>
@@ -94,8 +94,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             this.thresholdLabels = {};
             this.thresholdValues = {};
-            fullContainer.style.display = 'none';
-            fullContainer.classList.remove('displayed');
+            fullContainer.classList.add('hidden');
         }
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
@@ -105,14 +104,12 @@ export class TimeSeriesChart extends HTMLElement {
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
         addLayers.onpointerdown = () => {
-            if (layersToAdd.classList.contains('displayed')) {
-                layersToAdd.style.display = 'none';
-                layersToAdd.classList.remove('displayed');
-                addLayers.style.left = '-80px';
-            } else {
-                layersToAdd.style.display = 'block';
-                layersToAdd.classList.add('displayed');
+            if (layersToAdd.classList.contains('hidden')) {
+                layersToAdd.classList.remove('hidden');
                 addLayers.style.left = '-330px';
+            } else {
+                layersToAdd.classList.add('hidden');
+                addLayers.style.left = '-80px';
             }
         }
     }
@@ -121,10 +118,10 @@ export class TimeSeriesChart extends HTMLElement {
         const legendOptions = this.querySelector('#legendOptions');
         const chart = this.querySelector('#fullContainer');
         const updateData = (index) => {
-            if (!chart.classList.contains('displayed')) {
+            if (chart.classList.contains('hidden')) {
                 return;
             }
-            legendOptions.style.display = 'none';
+            legendOptions.classList.add('hidden');
             for (var layerName in this.allData) {
                 var data = this.allData[layerName];
                 data.splice(index, 1);
@@ -225,8 +222,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.setThresholdValues();
         var data = allData[activeLayer];
         if (data.length == 0) {
-            fullContainer.classList.remove('displayed');
-            fullContainer.style.display = 'none';
+            fullContainer.classList.add('hidden');
             return;
         }
 
@@ -248,9 +244,7 @@ export class TimeSeriesChart extends HTMLElement {
             },
             options: this.getOptions(startDate, endDate)
         });
-        fullContainer.classList.add('displayed');
-        fullContainer.style.display = 'block';
-        timeSeriesChart.style.display = 'block';
+        fullContainer.classList.remove('hidden');
     }
 
     createChartDataset(data) {
@@ -355,11 +349,9 @@ export class TimeSeriesChart extends HTMLElement {
         const legendOptions = this.querySelector('#legendOptions');
         const closeLegendOptions = this.querySelector('#closeLegendOptions');
         closeLegendOptions.onclick = () => {
-            legendOptions.classList.remove('displayed');
-            legendOptions.style.display = 'none';
+            legendOptions.classList.add('hidden');
         }
-        legendOptions.style.display = 'block';
-        legendOptions.classList.add('displayed');
+        legendOptions.classList.remove('hidden');
     }
 
     setOpeningMarker(index, timeSeriesMarker) {
