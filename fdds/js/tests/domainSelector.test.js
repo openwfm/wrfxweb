@@ -1,5 +1,6 @@
 const { DomainSelector } = require('../components/domainSelector');
 
+global.L = { DomEvent: {disableClickPropagation: jest.fn()}};
 const simVars = require('../simVars.js');
 jest.mock('../simVars.js', () => ({
     simVars: ({
