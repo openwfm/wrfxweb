@@ -4,6 +4,7 @@ node_modules/
 bower_components/
 fdds/simulations/
 package-lock.json
+*.gz
 tmp
 .DS_Store
 .idea
