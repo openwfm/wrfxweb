@@ -18,7 +18,8 @@ jest.mock('../simVars.js', () => ({
 
 const utils = require('../util.js');
 jest.mock('../util.js', () => ({
-    dragElement: jest.fn()
+    dragElement: jest.fn(),
+    debounceInIntervals: (fn, interval) => fn
 }));
 
 const catalogItemConstructor = (catEntry) => {
