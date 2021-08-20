@@ -102,7 +102,11 @@ jest.mock('../util.js', () => ({
     dragElement: jest.fn(),
     debounce: jest.fn(),
     setURL: jest.fn(),
+    buildCheckBox: jest.fn()
 }));
+
+const div = document.createElement('div');
+util.buildCheckBox = () => div;
 
 HTMLCanvasElement.prototype.getContext = () => { 
     return {drawImage: jest.fn()}
