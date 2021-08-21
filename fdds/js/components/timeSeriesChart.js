@@ -89,6 +89,9 @@ export class TimeSeriesChart extends HTMLElement {
             this.thresholdValues = {};
             fullContainer.classList.add('hidden');
         }
+        controllers.currentDomain.subscribe(() => {
+            fullContainer.classList.add('hidden');
+        }, controllerEvents.simReset); 
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
     }

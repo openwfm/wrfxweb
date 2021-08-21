@@ -56,8 +56,6 @@ export class CatalogItem extends HTMLElement {
         }
 
         this.querySelector('#entry').onclick = () => {
-            const timeSeriesChart = document.querySelector('#timeSeriesChartContainer');
-            timeSeriesChart.style.display = 'none';
             this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
         }
         if (this.navJobId == jobId) {
