@@ -129,6 +129,9 @@ export const controllers = {
             }
         }
         startDateController.subscribe(subscriptionFunction, controllerEvents.all);
+        startDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+            startDateController.debouncedSetValue([value, eventName]);
+        }
 
         return startDateController;
     })(),
@@ -144,6 +147,9 @@ export const controllers = {
             }
         }
         endDateController.subscribe(subscriptionFunction, controllerEvents.all);
+        endDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+            endDateController.debouncedSetValue([value, eventName]);
+        }
 
         return endDateController;
     })(),
