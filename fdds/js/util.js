@@ -24,10 +24,17 @@ export function setURL() {
   addData('domain', currentDomain);
   var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
   addData('timestamp', timestamp);
-  var startDate = utcToLocal(controllers.startDate.getValue());
-  addData('startDate', startDate);
-  var endDate = utcToLocal(controllers.endDate.getValue());
-  addData('endDate', endDate);
+  var startDate = controllers.startDate.getValue();
+  if (startDate != simVars.sortedTimestamps[0]) {
+    console.log('setting start date');
+    addData('startDate', utcToLocal(startDate));
+  }
+  var endDate = controllers.endDate.getValue();
+  var nTimestamps = simVars.sortedTimestamps.length;
+  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
+    console.log('setting end date');
+    addData('endDate', utcToLocal(endDate));
+  }
   var rasterURL = simVars.overlayOrder.join(',');
   addData('rasters', rasterURL);
   var opacity = controllers.opacity.getValue();
