@@ -21,24 +21,29 @@ export function setURL() {
   var currentSimulation = simVars.currentSimulation;
   addData('job_id', currentSimulation);
   var currentDomain = controllers.currentDomain.getValue();
-  addData('domain', currentDomain);
-  var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
-  addData('timestamp', timestamp);
+  var domainInstances = controllers.domainInstance.getValue();
+  if (currentDomain != domainInstances[0]) {
+    addData('domain', currentDomain);
+  }
   var startDate = controllers.startDate.getValue();
   if (startDate != simVars.sortedTimestamps[0]) {
-    console.log('setting start date');
     addData('startDate', utcToLocal(startDate));
   }
   var endDate = controllers.endDate.getValue();
   var nTimestamps = simVars.sortedTimestamps.length;
   if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
-    console.log('setting end date');
     addData('endDate', utcToLocal(endDate));
+  }
+  var timestamp = controllers.currentTimestamp.getValue();
+  if (timestamp != startDate) {
+    addData('timestamp', utcToLocal(timestamp));
   }
   var rasterURL = simVars.overlayOrder.join(',');
   addData('rasters', rasterURL);
   var opacity = controllers.opacity.getValue();
-  addData('opacity', opacity);
+  if (opacity != 0.5) {
+    addData('opacity', opacity);
+  }
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
