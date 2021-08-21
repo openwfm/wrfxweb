@@ -38,18 +38,18 @@ export class TimeSeriesChart extends HTMLElement {
                         </svg>
                     </button>
                     <canvas id='timeSeriesChart' width='400px' height='400px'></canvas>
-                    <div id='break' style='width: 100%; height: 1px; background: #5d5d5d'></div>
-                    <div id='add-threshold' style='margin-top: 10px'>
-                        <label style='display: inline-block; width: 100px' for='threshold-setter'>y-axis threshold: </label>
-                        <input id='threshold-setter' style='margin-right:10px; width: 150px'></input>
-                        <label style='display: inline-block; width: 100px' for='threshold-label'>threshold label: </label>
-                        <input id='threshold-label' style='width: 150px'></input>
+                    <div id='break' class='section-break'></div>
+                    <div id='add-threshold'>
+                        <label class='legendItem' for='threshold-setter'>y-axis threshold: </label>
+                        <input class='legendInput' id='threshold-setter'></input>
+                        <label class='legendItem' for='threshold-label'>threshold label: </label>
+                        <input class='legendInput' id='threshold-label'></input>
                     </div>
                     <div id='zoomIn' style='display: inline-block; margin-top: 10px'>
-                        <label style='display: inline-block; width: 100px' for='zoom-start'>zoom in start: </label>
-                        <select id='zoom-start' style='width: 160px; margin-right:10px'></select>
-                        <label style='display: inline-block; width: 100px' for='zoom-end'>zoom in end: </label>
-                        <select id='zoom-end' style='width: 160px'></select>
+                        <label class='legendItem' for='zoom-start'>zoom in start: </label>
+                        <select class='legendSelect' id='zoom-start'></select>
+                        <label class='legendItem' for='zoom-end'>zoom in end: </label>
+                        <select class='legendSelect' id='zoom-end'></select>
                     </div>
                 </div>
             </div>
@@ -68,14 +68,7 @@ export class TimeSeriesChart extends HTMLElement {
         // set the position of the timeSeriesChart
         const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
         const fullContainer = this.querySelector('#fullContainer');
-        var clientWidth = document.body.clientWidth;
-        if (clientWidth > 769) {
-            // timeSeriesChart.style.left = 300 + 'px';
-            fullContainer.style.left = 330 + 'px';
-            const dragButton = this.querySelector('#drag-container');
-            dragButton.style.display = 'inline-block';
-            dragElement(fullContainer, 'drag-container');
-        }
+        dragElement(fullContainer, 'drag-container');
         L.DomEvent.disableScrollPropagation(timeSeriesChart);
         L.DomEvent.disableClickPropagation(timeSeriesChart);
 
