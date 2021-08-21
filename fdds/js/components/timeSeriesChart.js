@@ -32,7 +32,7 @@ export class TimeSeriesChart extends HTMLElement {
                             <use href='#open_with_black_24dp'></use>
                         </svg>
                     </button>
-                    <button id='undo-zoom' class='interactive-button' style='display:none'>
+                    <button id='undo-zoom' class='interactive-button hidden'>
                         <svg class='interactive-button' height=15 width=15>
                             <use href='#undo_black_24dp'></use>
                         </svg>
@@ -162,7 +162,7 @@ export class TimeSeriesChart extends HTMLElement {
         zoomStart.onchange = zoomChange;
         zoomEnd.onchange = zoomChange;
         undoZoom.onclick = () => {
-            undoZoom.style.display = 'none';
+            undoZoom.classList.add('none');
             this.populateChart(this.allData, '', '', this.activeLayer);
         }
     }
@@ -520,11 +520,12 @@ export class TimeSeriesChart extends HTMLElement {
         var startCheck = zoomStart.value == this.labels[0];
         var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
         var yAxisCheck = isNaN(yMin);
-        var undoZoomDisplay = 'inline-block';
         if (startCheck && endCheck && yAxisCheck) {
+            undoZoomD.classList.add('hidden');
             undoZoomDisplay = 'none';
+        } else { 
+            undoZoom.classList.remove('hidden');
         }
-        undoZoom.style.display = undoZoomDisplay;
         this.chart.options.scales.xAxes.min = zoomStart.value;
         this.chart.options.scales.xAxes.max = zoomEnd.value;
         delete this.chart.options.scales.yAxes.min;
