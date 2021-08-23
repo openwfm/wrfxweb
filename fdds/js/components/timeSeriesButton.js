@@ -22,6 +22,13 @@ export class TimeSeriesButton extends HTMLElement {
                         <option value='discrete'>discrete</option>
                     </select>
                 </div>
+                <div>
+                    <label class='timeseries-select-label' for='layer-specification'>for layers: </label>
+                    <select class='timeseries-select' id='layer-specification'>
+                        <option value='all-added-layers'>all added layers</option>
+                        <option value='top-layer'>top layer</option>
+                    </select>
+                </div>
                 <button class='timeSeriesButton' id='timeSeriesButton'>
                     <span>generate timeseries</span>
                     <div id='progressBar' class='hidden'></div>
@@ -108,6 +115,10 @@ export class TimeSeriesButton extends HTMLElement {
 
     getDataType() {
         return this.querySelector('#dataType').value;
+    }
+
+    getLayerSpecification() {
+        return this.querySelector('#layer-specification').value;
     }
 
     setStartDate(newStartDate) {

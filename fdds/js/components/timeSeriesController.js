@@ -168,10 +168,14 @@ export class TimeSeriesController extends LayerController {
 
         var filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         var dataType = this.timeSeriesButton.getDataType();
+        var layerSpecification = this.timeSeriesButton.getLayerSpecification();
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
         var colorbarLayers = simVars.overlayOrder.map(layerName => {
             return this.getLayer(currentDomain, layerName)
         }).filter(layer => {
+            if (layerSpecification == 'top-layer') {
+                return layer.layerName == simVars.displayedColorbar;
+            }
             return layer.hasColorbar;
         });
 
