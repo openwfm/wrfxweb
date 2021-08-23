@@ -29,10 +29,10 @@ export class Slider extends HTMLElement {
 
         const sliderHead = this.querySelector('#slider-head');
         var percentage = newFrame / this.nFrames;
-        // var left = Math.floor(percentage * this.sliderWidth *.95);
-        var left = Math.floor(percentage *.95 * 100);
-        // sliderHead.style.left = left + 'px';
-        sliderHead.style.left = left + '%';
+        var left = Math.floor(percentage * this.sliderWidth *.95);
+        // var left = Math.floor(percentage *.95 * 100);
+        sliderHead.style.left = left + 'px';
+        // sliderHead.style.left = left + '%';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates

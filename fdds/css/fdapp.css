@@ -240,7 +240,7 @@ html, body {
 .catalog-menu {
   position:absolute;
   padding: 5px;
-  z-index:9000;
+  z-index: 9999;
   width: 600px;
   height: 440px;
   top: 15%;
@@ -666,7 +666,7 @@ button[disabled] {
   position: absolute;
   width: 580px;
   height: 560px;
-  left: 0;
+  left: 330px;
   right: 0;
   top: 5px;
   bottom: 0;
@@ -680,7 +680,7 @@ button[disabled] {
   padding-left: 10px;
   padding-bottom: 85px;
   left: 0;
-  right: 0;
+  /* right: 0; */
   top: 5px;
   bottom: 0;
   height: 550px;
@@ -692,10 +692,12 @@ button[disabled] {
 }
 
 #drag-container {
+  display: inline-block;
   position: absolute;
   top: 8px;
   left: 15px;
   cursor: grab;
+  margin-right: 5px;
 }
 
 #undo-zoom {
@@ -728,10 +730,6 @@ button[disabled] {
   text-align: center;
   font-weight: bold;
   transform: rotate(-90deg);
-}
-
-#drag-container {
-  margin-right: 5px;
 }
 
 #layers-to-add {
@@ -772,6 +770,16 @@ button[disabled] {
   width: 100px;
 }
 
+.legendInput {
+  width: 150px;
+  margin-right: 10px;
+}
+
+.legendSelect {
+  width: 160px;
+  margin-right: 10px;
+}
+
 #timeSeriesChartContainer button {
   background-color: transparent;
   border: none;
@@ -780,6 +788,10 @@ button[disabled] {
 #timeSeriesChart {
   margin-left:10px;
   cursor: pointer;
+}
+
+#add-threshold {
+  margin-top: 10px;
 }
 
 @media (max-width: 769px) {
@@ -911,6 +923,28 @@ button[disabled] {
     height: 430px;
     overflow-y: auto;
     margin: auto;
+  }
+
+  #fullContainer {
+    left: 5px;
+  }
+
+  #addLayers{
+    left: 10px;
+    top: 8px;
+    transform: rotate(0deg);
+  }
+
+  #layers-to-add {
+    border-right: 1px solid #5d5d5d;
+    border-radius: .4rem;
+    width: 250px;
+    left: 0px;
+    top: 46px;
+  }
+
+  #drag-container {
+    display: none;
   }
 
   #timeSeriesChart {
