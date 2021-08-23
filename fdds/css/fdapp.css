@@ -240,7 +240,7 @@ html, body {
 .catalog-menu {
   position:absolute;
   padding: 5px;
-  z-index:9000;
+  z-index: 9999;
   width: 600px;
   height: 440px;
   top: 15%;
@@ -680,7 +680,7 @@ button[disabled] {
   padding-left: 10px;
   padding-bottom: 85px;
   left: 0;
-  right: 0;
+  /* right: 0; */
   top: 5px;
   bottom: 0;
   height: 550px;
@@ -731,7 +731,6 @@ button[disabled] {
   font-weight: bold;
   transform: rotate(-90deg);
 }
-
 
 #layers-to-add {
   position: absolute;
@@ -924,6 +923,24 @@ button[disabled] {
     height: 430px;
     overflow-y: auto;
     margin: auto;
+  }
+
+  #fullContainer {
+    left: 5px;
+  }
+
+  #addLayers{
+    left: 10px;
+    top: 8px;
+    transform: rotate(0deg);
+  }
+
+  #layers-to-add {
+    border-right: 1px solid #5d5d5d;
+    border-radius: .4rem;
+    width: 250px;
+    left: 0px;
+    top: 46px;
   }
 
   #drag-container {

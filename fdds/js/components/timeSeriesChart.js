@@ -99,13 +99,18 @@ export class TimeSeriesChart extends HTMLElement {
     setLayerSelection() {
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
+        const clientWidth = document.body.clientWidth;
         addLayers.onpointerdown = () => {
             if (layersToAdd.classList.contains('hidden')) {
                 layersToAdd.classList.remove('hidden');
-                addLayers.style.left = '-330px';
+                if (clientWidth >= 770) {
+                    addLayers.style.left = '-330px';
+                }
             } else {
                 layersToAdd.classList.add('hidden');
-                addLayers.style.left = '-80px';
+                if (clientWidth >= 770) {
+                    addLayers.style.left = '-80px';
+                }
             }
         }
     }
