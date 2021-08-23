@@ -935,6 +935,11 @@ button[disabled] {
     transform: rotate(0deg);
   }
 
+  #legendOptions {
+    top: 80px;
+    left: 50px;
+  }
+
   #layers-to-add {
     border-right: 1px solid #5d5d5d;
     border-radius: .4rem;
