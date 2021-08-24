@@ -160,7 +160,6 @@ export class CatalogMenu extends HTMLElement {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
-        // build html for list item for each catalog entry and add it to the proper list depending on its description
         const catalogEntries = await getCatalogEntries();
         for (const [catName, catEntry] of Object.entries(catalogEntries)) {
             this.addOrder.push(catEntry.job_id);
@@ -178,6 +177,27 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         this.sortBy('original-order', false);
+        this.clickMostRecent(navJobId);
+    }
+
+    clickMostRecent(navJobId) {
+        const firesListDOM = this.querySelector('#catalog-fires');
+        if (!navJobId || !navJobId.includes('recent')) {
+            return;
+        }
+        var descSearchTerm = navJobId.split('-')[0];
+        var mostRecentItem = null;
+        for (var fire of firesListDOM.childNodes) {
+            var fireDesc = fire.catEntry.description;
+            if (fireDesc.toLowerCase().includes(descSearchTerm)) {
+                if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
+                    mostRecentItem = fire;
+                }
+            }
+        }
+        if (mostRecentItem != null) {
+            mostRecentItem.handle_catalog_click();
+        }
     }
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */

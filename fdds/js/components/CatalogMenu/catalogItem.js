@@ -56,17 +56,22 @@ export class CatalogItem extends HTMLElement {
         }
 
         this.querySelector('#entry').onclick = () => {
-            this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+            this.handle_catalog_click();
         }
         if (this.navJobId == jobId) {
-            this.handle_catalog_click(jobId, 'simulations/' + manifestPath, description);
+            this.handle_catalog_click();
         }
     }
 
     /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated
      * with a run, 
      */
-    handle_catalog_click(entryID, path, description) {
+    handle_catalog_click() {
+        var entryID = this.catEntry.job_id;
+        var manifestPath = this.catEntry.manifest_path;
+        var path = 'simulations/' + manifestPath;
+        var description = this.catEntry.description;
+
         simVars.currentSimulation = entryID;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').classList.add('hidden');
