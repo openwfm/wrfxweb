@@ -32,12 +32,12 @@ class InfoPanel extends HTMLElement {
                 infoPanel.classList.add('clicked');
             }
         }
-        infoButton.onmouseover = () => {
-            infoPanel.classList.add('hovered');
-        }
-        infoButton.onmouseout = () => {
-            infoPanel.classList.remove('hovered');
-        }
+        // infoButton.onmouseover = () => {
+        //     infoPanel.classList.add('hovered');
+        // }
+        // infoButton.onmouseout = () => {
+        //     infoPanel.classList.remove('hovered');
+        // }
         closePanel.onclick = () => {
             infoPanel.classList.remove('clicked');
         }
