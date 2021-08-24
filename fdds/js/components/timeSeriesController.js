@@ -59,7 +59,7 @@ export class TimeSeriesController extends LayerController {
         super.domainSwitch();
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
         for (var marker of timeSeriesMarkers) {
-            marker.popup.removeFrom(map);
+            marker.hideMarkerInfo();
             marker.marker.removeFrom(map);
         }
         controllers.timeSeriesMarkers.value = [];
