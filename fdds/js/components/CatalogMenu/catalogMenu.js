@@ -138,12 +138,9 @@ export class CatalogMenu extends HTMLElement {
         const catalogButton = this.querySelector('#catalog-button');
         L.DomEvent.disableClickPropagation(catalogButton);
         catalogButton.onpointerdown = () => {
-            console.log('here');
             if (catalogMenu.classList.contains('hidden')) {
-                console.log('show');
                 catalogMenu.classList.remove('hidden');
             } else {
-                console.log('hide');
                 catalogMenu.classList.add('hidden');
             }
         };
