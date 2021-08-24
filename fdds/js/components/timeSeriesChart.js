@@ -100,7 +100,8 @@ export class TimeSeriesChart extends HTMLElement {
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
         const clientWidth = document.body.clientWidth;
-        addLayers.onpointerdown = () => {
+        addLayers.onpointerdown = (e) => {
+            e.stopPropagation();
             if (layersToAdd.classList.contains('hidden')) {
                 layersToAdd.classList.remove('hidden');
                 if (clientWidth >= 770) {
