@@ -22,7 +22,7 @@ export function setURL() {
   addData('job_id', currentSimulation);
   var currentDomain = controllers.currentDomain.getValue();
   var domainInstances = controllers.domainInstance.getValue();
-  if (currentDomain != domainInstances[0]) {
+  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
     addData('domain', currentDomain);
   }
   var startDate = controllers.startDate.getValue();
