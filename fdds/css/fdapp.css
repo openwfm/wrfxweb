@@ -366,7 +366,6 @@ html, body {
 #layer-controller-container {
     position: absolute;
     right: 0px;
-    /* top: 5%; */
     top: 30px;
     width: 300px;
     max-height: 91%;
@@ -405,9 +404,36 @@ html, body {
   height: 30px;
   right: 36px;
   top: 0px;
-  border-radius: 4px 4px 0px 0px;
   z-index: 9000;
+  overflow-x: auto;
+}
+
+.tab {
+  display: inline-block;
+  width: 80px;
   background: #e8e8e8;
+  border-radius: 4px 4px 0px 0px;
+  height: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  overflow-x: hidden;
+}
+
+.tab.active {
+  background: #d6d6d6;
+}
+
+.tab.active .interactive-button {
+  opacity: 100%;
+  cursor: grab;
+}
+
+.innerTab {
+  margin: auto;
+}
+
+#add-simulation.tab {
+  width: 60px;
 }
 
 /* InfoPanel */
