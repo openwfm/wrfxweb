@@ -365,14 +365,29 @@ html, body {
 /* LayerController */
 #layer-controller-container {
     position: absolute;
-    right: 20px;
-    top: 5%;
+    right: 0px;
+    /* top: 5%; */
+    top: 30px;
     width: 300px;
-    max-height: 85%;
+    max-height: 91%;
     background: white;
     font-size: 1.15rem;
     padding: 8px;
     overflow-y: auto;
+}
+
+#layer-controller-wrapper {
+  position: absolute;
+  right: 20px;
+  top: 5%;
+  height: 90%;
+  width: 316px;
+}
+
+
+#layer-controller-container.multi-layer {
+  z-index: 9000;
+  border-radius: 0px 4px 4px 4px;
 }
 
 #layers-button {
@@ -381,6 +396,18 @@ html, body {
 
 .layer-list {
     margin-left: 50px;
+}
+
+/* MultiLayerController */
+#added-simulations {
+  position: absolute;
+  width: 280px;
+  height: 30px;
+  right: 36px;
+  top: 0px;
+  border-radius: 4px 4px 0px 0px;
+  z-index: 9000;
+  background: #e8e8e8;
 }
 
 /* InfoPanel */

@@ -17,24 +17,26 @@ export class LayerController extends HTMLElement {
                 <div id='layers-button' class='mobile-button feature-controller hidden'>
                     layers
                 </div>
-                <div id='layer-controller-container' class='feature-controller hidden'>
-                    <div id='base-maps'>
-                        <h4>Base Maps</h4>
-                        <div id='map-checkboxes' class='layer-list'>
+                <div id='layer-controller-wrapper'>
+                    <div id='layer-controller-container' class='feature-controller hidden'>
+                        <div id='base-maps'>
+                            <h4>Base Maps</h4>
+                            <div id='map-checkboxes' class='layer-list'>
+                            </div>
                         </div>
-                    </div>
-                    <div id='raster-layers' class='hidden'>
-                        <h4>Rasters</h4>
-                        <div id='raster-checkboxes' class='layer-list'>
+                        <div id='raster-layers' class='hidden'>
+                            <h4>Rasters</h4>
+                            <div id='raster-checkboxes' class='layer-list'>
+                            </div>
                         </div>
-                    </div>
-                    <div id='overlay-layers' class='hidden'>
-                        <h4>Overlays</h4>
-                        <div id='overlay-checkboxes' class='layer-list'>
+                        <div id='overlay-layers' class='hidden'>
+                            <h4>Overlays</h4>
+                            <div id='overlay-checkboxes' class='layer-list'>
+                            </div>
                         </div>
-                    </div>
-                    <div id='opacity-slider-container'>
-                        <h4>Top Layer Opacity</h4>
+                        <div id='opacity-slider-container'>
+                            <h4>Top Layer Opacity</h4>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,7 +52,7 @@ export class LayerController extends HTMLElement {
      * and panning. Set up callbacks to trigger when currentdomain updates and currentTimestamp
      * updates. */
     connectedCallback() {
-        const layerController = this.querySelector('#layer-controller-container');
+        const layerController = this.querySelector('#layer-controller-wrapper');
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
