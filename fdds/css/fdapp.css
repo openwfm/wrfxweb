@@ -366,9 +366,9 @@ html, body {
 #layer-controller-container {
     position: absolute;
     right: 0px;
-    top: 30px;
+    /* top: 30px; */
     width: 300px;
-    max-height: 91%;
+    max-height: 100%;
     background: white;
     font-size: 1.15rem;
     padding: 8px;
@@ -379,14 +379,14 @@ html, body {
   position: absolute;
   right: 20px;
   top: 5%;
-  height: 90%;
+  height: 85%;
   width: 316px;
 }
 
 
 #layer-controller-container.multi-layer {
   z-index: 9000;
-  border-radius: 0px 4px 4px 4px;
+  /* border-radius: 0px 4px 4px 4px; */
 }
 
 #layers-button {
@@ -400,15 +400,18 @@ html, body {
 /* MultiLayerController */
 #added-simulations {
   position: absolute;
-  width: 280px;
+  width: 400px;
   height: 30px;
-  right: 36px;
-  top: 0px;
+  right: 131px;
+  top: 200px;
   z-index: 9000;
+  transform: rotate(-90deg);
 }
 
 .tab {
-  display: inline-block;
+  /* display: inline-block; */
+  margin-right: 0px;
+  float: right;
   width: 80px;
   background: #e8e8e8;
   border-radius: 4px 4px 0px 0px;

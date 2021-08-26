@@ -12,7 +12,8 @@ export class LayerTabs extends HTMLElement {
         `;
 
         this.activeTab = null;
-        this.tabs = [];
+        this.tabs = {};
+        this.tabOrder = [];
     }
 
     makeNewTab(id) {
@@ -27,12 +28,34 @@ export class LayerTabs extends HTMLElement {
         innerTab.innerText = id;
         newTab.appendChild(innerTab);
 
-        this.tabs.push(newTab);
+        this.tabs[id] = newTab;
         addedSimulations.insertBefore(newTab, addSimulation)
-        this.switchActiveTab(newTab);
-        newTab.onclick = () => {
-            this.switchActiveTab(newTab);
+        this.switchActiveTab(id);
+        newTab.onpointerdown = () => {
+            this.switchActiveTab(id);
         }
+        newTab.ondblclick = () => {
+            this.removeTab(id)
+        }
+    }
+
+    removeTab(tabDescription) {
+        if (this.tabOrder.length <= 1) {
+            return;
+        }
+
+        const addedSimulations = this.querySelector('#added-simulations');
+        var tab = this.tabs[tabDescription];
+        var index = this.tabOrder.indexOf(tabDescription);
+
+        this.tabOrder.splice(index, 1);
+        if (this.activeTab == tab) {
+            this.switchActiveTab(this.tabOrder[0]);
+        }
+        delete this.tabs[tabDescription];
+
+        controllers.addedSimulations.remove(tabDescription);
+        addedSimulations.removeChild(tab);
     }
 
     connectedCallback() {
@@ -45,23 +68,30 @@ export class LayerTabs extends HTMLElement {
         }, controllers.addedSimulations.addEvent);
         const addedSimulations = this.querySelector('#added-simulations');
         controllers.addedSimulations.subscribe(() => {
-            for (var tab of this.tabs) {
+            for (var tabDescription in this.tabs) {
+                var tab = this.tabs[tabDescription];
                 addedSimulations.removeChild(tab);
             }
-            this.tabs = [];
+            this.tabs = {};
             for (var simulation of controllers.addedSimulations.getValue()) {
                 this.makeNewTab(simulation);
             }
         });
     }
 
-    switchActiveTab(newTab) {
+    switchActiveTab(activeDescription) {
+        var newTab = this.tabs[activeDescription];
         if (this.activeTab == newTab) {
             return;
         }
         if (this.activeTab) {
             this.activeTab.classList.remove('active');
         }
+        var index = this.tabOrder.indexOf(activeDescription);
+        if (index >= 0) {
+            this.tabOrder.splice(index, 1);
+        }
+        this.tabOrder.push(activeDescription);
         this.activeTab = newTab;
         this.activeTab.classList.add('active');
     }

@@ -146,6 +146,9 @@ export class CatalogMenu extends HTMLElement {
                 catalogMenu.classList.remove('hidden');
             } else {
                 catalogMenu.classList.add('hidden');
+                if (controllers.addSimulation.getValue()) {
+                    controllers.addSimulation.setValue(false, controllerEvents.setFalse);
+                }
             }
         };
         this.querySelector('#menu-close').onclick = () => {
