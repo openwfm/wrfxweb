@@ -1,6 +1,7 @@
 import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
+import { controllerEvents, controllers } from '../Controller.js';
 
 /** Creates an Element for each Item of the CatalogMenu. Necessary for each element to have
  * its own component because of how much information is stored within each and how much has to
@@ -67,14 +68,27 @@ export class CatalogItem extends HTMLElement {
      * with a run, 
      */
     handle_catalog_click() {
+        const catalogMenu = document.querySelector('.catalog-menu')
         var entryID = this.catEntry.job_id;
         var manifestPath = this.catEntry.manifest_path;
         var path = 'simulations/' + manifestPath;
         var description = this.catEntry.description;
 
+        if (controllers.addSimulation.getValue()) {
+            if (!controllers.addedSimulations.getValue().includes(description)) {
+                controllers.addedSimulations.add(description);
+                controllers.addSimulation.setValue(false, controllerEvents.setFalse);
+                catalogMenu.classList.add('hidden');
+            }
+            return;
+        }
+        
+        controllers.addedSimulations.setValue([]);
+        controllers.addedSimulations.add(description);
+
         simVars.currentSimulation = entryID;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').classList.add('hidden');
+        catalogMenu.classList.add('hidden');
 
         document.querySelector('#simulation-flags').classList.remove('hidden');
         getSimulation(path);

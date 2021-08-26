@@ -405,7 +405,6 @@ html, body {
   right: 36px;
   top: 0px;
   z-index: 9000;
-  overflow-x: auto;
 }
 
 .tab {
@@ -413,10 +412,12 @@ html, body {
   width: 80px;
   background: #e8e8e8;
   border-radius: 4px 4px 0px 0px;
+  padding: 0px 10px;
   height: 30px;
   font-size: 1rem;
   font-weight: bold;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .tab.active {

@@ -17,8 +17,8 @@ export class LayerController extends HTMLElement {
                 <div id='layers-button' class='mobile-button feature-controller hidden'>
                     layers
                 </div>
-                <div id='layer-controller-wrapper'>
-                    <div id='layer-controller-container' class='feature-controller hidden'>
+                <div id='layer-controller-wrapper' class='hidden'>
+                    <div id='layer-controller-container' class='feature-controller'>
                         <div id='base-maps'>
                             <h4>Base Maps</h4>
                             <div id='map-checkboxes' class='layer-list'>
@@ -104,7 +104,7 @@ export class LayerController extends HTMLElement {
 
         L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
-            const layersSelector = document.querySelector('#layer-controller-container');
+            const layersSelector = document.querySelector('#layer-controller-wrapper');
             if (layersSelector.classList.contains('hidden')) {
                 document.querySelector('.catalog-menu').classList.add('hidden');
                 document.querySelector('#domain-selector').classList.add('hidden');
@@ -201,7 +201,7 @@ export class LayerController extends HTMLElement {
         this.rasterDict = this.clearCache(this.rasterDict);
         this.overlayDict = this.clearCache(this.overlayDict);
 
-        this.querySelector('#layer-controller-container').classList.remove('hidden');
+        this.querySelector('#layer-controller-wrapper').classList.remove('hidden');
         document.querySelector('#copyLink').classList.remove('hidden');
     }
 

@@ -1,6 +1,7 @@
 import { dragElement, utcToLocal } from '../../util.js';
 import { getCatalogEntries } from '../../services.js';
 import { CatalogItem } from './catalogItem.js';
+import { controllerEvents, controllers } from '../Controller.js';
 
 /** A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
  * 
@@ -84,6 +85,9 @@ export class CatalogMenu extends HTMLElement {
         });
         this.setMenuSearching();
         this.buildMenu();
+        controllers.addSimulation.subscribe(() => {
+            catalogMenu.classList.remove('hidden');
+        }, controllerEvents.setTrue);
     }
 
     setMenuSearching() {
@@ -146,6 +150,9 @@ export class CatalogMenu extends HTMLElement {
         };
         this.querySelector('#menu-close').onclick = () => {
             catalogMenu.classList.add('hidden');
+            if (controllers.addSimulation.getValue()) {
+                controllers.addSimulation.setValue(false, controllerEvents.setFalse);
+            }
         }
     }
 

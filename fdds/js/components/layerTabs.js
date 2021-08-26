@@ -1,3 +1,5 @@
+import { controllerEvents, controllers } from './Controller.js';
+
 export class LayerTabs extends HTMLElement {
     constructor() {
         super();
@@ -10,6 +12,7 @@ export class LayerTabs extends HTMLElement {
         `;
 
         this.activeTab = null;
+        this.tabs = [];
     }
 
     makeNewTab(id) {
@@ -24,7 +27,9 @@ export class LayerTabs extends HTMLElement {
         innerTab.innerText = id;
         newTab.appendChild(innerTab);
 
+        this.tabs.push(newTab);
         addedSimulations.insertBefore(newTab, addSimulation)
+        this.switchActiveTab(newTab);
         newTab.onclick = () => {
             this.switchActiveTab(newTab);
         }
@@ -33,8 +38,21 @@ export class LayerTabs extends HTMLElement {
     connectedCallback() {
         const addSimulation = this.querySelector('#add-simulation');
         addSimulation.onclick = () => {
-            this.makeNewTab('1');
+            controllers.addSimulation.setValue(true, controllerEvents.setTrue);
         }
+        controllers.addedSimulations.subscribe((simName) => {
+            this.makeNewTab(simName);
+        }, controllers.addedSimulations.addEvent);
+        const addedSimulations = this.querySelector('#added-simulations');
+        controllers.addedSimulations.subscribe(() => {
+            for (var tab of this.tabs) {
+                addedSimulations.removeChild(tab);
+            }
+            this.tabs = [];
+            for (var simulation of controllers.addedSimulations.getValue()) {
+                this.makeNewTab(simulation);
+            }
+        });
     }
 
     switchActiveTab(newTab) {

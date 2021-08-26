@@ -5,7 +5,9 @@ export const controllerEvents = {
     simReset: 'SIMULATION_RESET',
     valueSet: 'VALUE_SET', 
     slidingValue: 'SLIDING_VALUE',
-    all: 'ALL'
+    all: 'ALL',
+    setTrue: 'SET_TRUE',
+    setFalse: 'SET_FALSE'
 }
 
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
@@ -72,6 +74,22 @@ export class SyncController extends Controller {
     }
 }
 
+function makeArrayController() {
+    var arrayController = new Controller([]);
+    arrayController.removeEvent = 'REMOVE_EVENT';
+    arrayController.addEvent = 'ADD_EVENT';
+    arrayController.add = (newMarker) => {
+        arrayController.value.push(newMarker);
+        arrayController.broadcastEvent(arrayController.addEvent, newMarker);
+    }
+    arrayController.remove = (removeMarker) => {
+        var index = arrayController.value.indexOf(removeMarker);
+        arrayController.value.splice(index, 1);
+        arrayController.broadcastEvent(arrayController.removeEvent, index);
+    }
+    return arrayController;
+}
+
 // global controllers
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
@@ -83,6 +101,8 @@ export const controllers = {
     })(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
+    addSimulation: new Controller(false),
+    addedSimulations: makeArrayController(),
     loadingProgress: (function createLoadProg() {
         const loadingProgress = new Controller(0);
         loadingProgress.nFrames = 0;
@@ -102,19 +122,7 @@ export const controllers = {
 
         return loadingProgress;
     })(),
-    timeSeriesMarkers: (function createTimeSeriesMarkers() {
-        var timeSeriesMarkers = new Controller([]);
-        timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
-        timeSeriesMarkers.add = (newMarker) => {
-            timeSeriesMarkers.value.push(newMarker);
-        }
-        timeSeriesMarkers.remove = (removeMarker) => {
-            var index = timeSeriesMarkers.value.indexOf(removeMarker);
-            timeSeriesMarkers.value.splice(index, 1);
-            timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
-        }
-        return timeSeriesMarkers;
-    })(),
+    timeSeriesMarkers: makeArrayController(),
     opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
