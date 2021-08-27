@@ -153,7 +153,7 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         var itemToNavigateTo = mostRecentItem;
-        if (secondMostRecentItem != null && navJobId.includes('second-recent')) {
+        if (navJobId.includes('second-recent')) {
             itemToNavigateTo = secondMostRecentItem;
         }
         
