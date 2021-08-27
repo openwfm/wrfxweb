@@ -21,16 +21,37 @@ export function setURL() {
   var currentSimulation = simVars.currentSimulation;
   addData('job_id', currentSimulation);
   var currentDomain = controllers.currentDomain.getValue();
-  addData('domain', currentDomain);
-  var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
-  addData('timestamp', timestamp);
-  var startDate = utcToLocal(controllers.startDate.getValue());
-  addData('startDate', startDate);
-  var endDate = utcToLocal(controllers.endDate.getValue());
-  addData('endDate', endDate);
-  var rasterURL = simVars.overlayOrder.join('-');
+  // addData('domain', currentDomain);
+  // var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
+  // addData('timestamp', timestamp);
+  // var startDate = utcToLocal(controllers.startDate.getValue());
+  // addData('startDate', startDate);
+  // var endDate = utcToLocal(controllers.endDate.getValue());
+  // addData('endDate', endDate);
+  // var rasterURL = simVars.overlayOrder.join('-');
+  var domainInstances = controllers.domainInstance.getValue();
+  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
+    addData('domain', currentDomain);
+  }
+  var startDate = controllers.startDate.getValue();
+  if (startDate != simVars.sortedTimestamps[0]) {
+    addData('startDate', utcToLocal(startDate));
+  }
+  var endDate = controllers.endDate.getValue();
+  var nTimestamps = simVars.sortedTimestamps.length;
+  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
+    addData('endDate', utcToLocal(endDate));
+  }
+  var timestamp = controllers.currentTimestamp.getValue();
+  if (timestamp != startDate) {
+    addData('timestamp', utcToLocal(timestamp));
+  }
+  var rasterURL = simVars.overlayOrder.join(',');
   addData('rasters', rasterURL);
   var opacity = controllers.opacity.getValue();
+  if (opacity != 0.5) {
+    addData('opacity', opacity);
+  }
   addData('opacity', opacity);
 
   if (urlVars != '') {
