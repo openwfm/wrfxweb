@@ -1,89 +1,55 @@
 import { Slider } from './slider.js';
 import { utcToLocal, createElement, setURL } from '../util.js';
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
 export class SimulationSlider extends Slider {
     constructor() {
-        super(340, simVars.sortedTimestamps.length - 1);
-        this.currentSimulation = '';
+        var clientWidth = document.body.clientWidth;
+        var width = 340;
+        if (clientWidth < 770) {
+            width = 300;
+        }
+        super(width, simVars.sortedTimestamps.length - 1);
+        this.progressWidth = 0;
     }
 
     connectedCallback() {
         super.connectedCallback();
 
-        controllers.currentDomain.subscribe(() => {
-            this.resetSlider();
-        });
-        controllers.currentTimestamp.subscribe(() => {
+        const updateSlider = () => {
             var currentTimestamp = controllers.currentTimestamp.getValue();
             var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
-
             this.updateHeadPosition(newFrame);
-        });
+        }
+        // assumes that all necessary controllers are set and all I need to do is update my UI.
+        controllers.currentDomain.subscribe(() => {
+            this.nFrames = simVars.sortedTimestamps.length - 1;
+            this.updateStartLocation();
+            this.updateEndLocation();
+            updateSlider();
+            this.updateProgressWidth();
+        }, controllerEvents.all);
+
+        controllers.currentTimestamp.subscribe(updateSlider);
         controllers.loadingProgress.subscribe(() => {
-            this.setLoadProgress();
+            var progress = controllers.loadingProgress.value;
+            this.setLoadProgress(progress);
         });
 
-        const slider = this.shadowRoot.querySelector('#slider');
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const slider = this.querySelector('#slider');
+        slider.classList.add('simulation-slider');
+
+        const sliderHead = this.querySelector('#slider-head');
         const sliderStart = createElement('slider-start', 'slider-marker');
         const sliderEnd = createElement('slider-end', 'slider-marker');
-        const sliderProgress = createElement('slider-progress');
+        const sliderProgress = createElement('slider-progress', 'slider-bar hidden');
         const sliderMarkerInfo = createElement('slider-marker-info');
-        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+        const sliderBar = this.querySelector('#slider-bar');
 
         slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
 
-        sliderBar.style.background = '#d6d6d6';
-        const style = this.shadowRoot.querySelector('style');
-        style.innerText += `
-            #slider-progress {
-                position:absolute;
-                display: none;
-                margin: auto 0;
-                top: 0; bottom: 0; left: 0; right: 0;
-                width: 1%;
-                height: 11px;
-                background: #f8f8f8;
-                border-style: solid;
-                border-radius: 4px;
-                border-width: .5px;
-                border-color: #cccccc;
-                pointer-events: none;
-            }
-            #slider-marker-info {
-                position: absolute;
-                margin: 0 auto;
-                top: 20px; bottom: 0; left: 0; right: 0;
-                background: white;
-                width: 160px;
-                height: 20px;
-                border-radius: .4rem;
-                display: none;
-                font-weight: bold;
-                font-size: 1rem; 
-                padding: 5px 5px 8px 10px;
-            }
-            #slider-marker-info.hovered { 
-                display: block;
-            }
-            #slider-marker-info.clicked {
-                display: block;
-            }
-            .slider-marker {
-                position: absolute;
-                margin: auto 0;
-                top: 0; bottom: 0; left: 0; right: 0;
-                background: #5d5d5d;
-                width: 4px;
-                height: 11px;
-                border-radius: 4px;
-            }
-            #slider-end {
-                left: 340px;
-            }
-        `;
+        sliderBar.classList.add('simulation-slider');
 
         sliderHead.onpointerdown = (e) => {
             const finishedCallback = () => setURL();
@@ -101,59 +67,40 @@ export class SimulationSlider extends Slider {
         this.configureEndSetter();
     }
 
-    resetSlider() {
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
-        var currentTimestamp = controllers.currentTimestamp.getValue();
+    setLoadProgress(progress) {
+        var progressWidth = progress*this.progressWidth + 2;
 
-        if (this.currentSimulation != simVars.currentSimulation) {
-            this.currentSimulation = simVars.currentSimulation;
-            currentTimestamp = startDate;
-        } else if (!(simVars.sortedTimestamps.includes(currentTimestamp))) {
-            var percentage = this.frame / this.nFrames;
-            var timeIndex = Math.floor((simVars.sortedTimestamps.length - 1) * percentage);
-            currentTimestamp = simVars.sortedTimestamps[timeIndex];
-        }
-
-        if (currentTimestamp < startDate) {
-            currentTimestamp = startDate;
-        }
-        if (currentTimestamp > endDate) {
-            currentTimstamp = endDate;
-        }
-
-        this.nFrames = simVars.sortedTimestamps.length - 1;
-        controllers.currentTimestamp.setValue(currentTimestamp);
-    }
-
-    setLoadProgress() {
-        var progress = controllers.loadingProgress.getValue();
-        var progressWidth = progress*this.sliderWidth;
-
-        const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
-        progressBar.style.display = 'block';
+        const progressBar = this.querySelector('#slider-progress'); 
+        progressBar.classList.remove('hidden');
         progressBar.style.width = progressWidth + 'px';
         if (progress == 0) {
-            progressBar.style.display = 'none';
+            progressBar.classList.add('hidden');
             return;
         }
 
         var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
+        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
 
         progressBar.style.left = left + 'px';
     }
 
+    getLeftOfDate(date) {
+        var index = simVars.sortedTimestamps.indexOf(date);
+        var left = Math.floor((index / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
+
+        return left;
+    }
+
     setSliderMarkerInfo(timeStamp) {
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
         var localTime = utcToLocal(timeStamp);
         sliderMarkerInfo.innerHTML = localTime;
     }
 
     configureStartSetter() {
-        const sliderStart = this.shadowRoot.querySelector('#slider-start');
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderStart = this.querySelector('#slider-start');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
 
         sliderStart.onmouseover = () => {
             var startDate = controllers.startDate.getValue();
@@ -168,6 +115,7 @@ export class SimulationSlider extends Slider {
             var startDate = controllers.startDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
             this.setSliderMarkerInfo(startDate);
+            this.setLoadProgress(0);
 
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
@@ -177,11 +125,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.startDate.setValue(newTimestamp);
+                controllers.startDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.startDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
 
@@ -189,17 +138,14 @@ export class SimulationSlider extends Slider {
         }
 
         controllers.startDate.subscribe(() => {
-            var startDate = controllers.startDate.getValue();
-            var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-            var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
-
-            sliderStart.style.left = left + 'px';
-        });
+            this.updateStartLocation();
+            this.updateProgressWidth();
+        }, controllerEvents.all);
     }
 
     configureEndSetter() {
-        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
-        const sliderMarkerInfo = this.shadowRoot.querySelector('#slider-marker-info');
+        const sliderEnd = this.querySelector('#slider-end');
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
 
         sliderEnd.onmouseover = () => {
             var endDate = controllers.endDate.getValue();
@@ -214,6 +160,7 @@ export class SimulationSlider extends Slider {
             var endDate = controllers.endDate.getValue();
             var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
             this.setSliderMarkerInfo(endDate);
+            this.setLoadProgress(0);
             
             const updateCallback = (timeIndex) => {
                 var newTimestamp = simVars.sortedTimestamps[timeIndex];
@@ -223,11 +170,12 @@ export class SimulationSlider extends Slider {
                     newTimestamp = simVars.sortedTimestamps[timeIndex];
                 }
 
-                controllers.endDate.setValue(newTimestamp);
+                controllers.endDate.setValue(newTimestamp, controllerEvents.slidingValue);
                 this.setSliderMarkerInfo(newTimestamp);
             }
             const finishedCallback = () => {
                 sliderMarkerInfo.classList.remove('clicked');
+                controllers.endDate.broadcastEvent(controllerEvents.valueSet);
                 setURL();
             }
             
@@ -235,12 +183,42 @@ export class SimulationSlider extends Slider {
         }
 
         controllers.endDate.subscribe(() => {
-            var endDate = controllers.endDate.getValue();
-            var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
+            this.updateEndLocation();
+            this.updateProgressWidth();
+        }, controllerEvents.all);
+    }
 
-            sliderEnd.style.left = left + 'px';
-        });
+    updateProgressWidth() {
+        var startLeft = this.getStartLeft();
+        var endLeft = this.getEndLeft();
+        var totalWidth = endLeft - (startLeft + 4);
+        this.progressWidth = totalWidth;
+    }
+
+    updateStartLocation() {
+        const sliderStart = this.querySelector('#slider-start');
+        var left = this.getStartLeft();
+
+        sliderStart.style.left = left + 'px';
+    }
+
+    getStartLeft() {
+        var startDate = controllers.startDate.getValue();
+        var left = this.getLeftOfDate(startDate);
+        return left - 2;
+    }
+
+    getEndLeft() {
+        var endDate = controllers.endDate.value;
+        var left = this.getLeftOfDate(endDate);
+        return left + 14;
+    }
+
+    updateEndLocation() {
+        const sliderEnd = this.querySelector('#slider-end');
+        var left = this.getEndLeft();
+
+        sliderEnd.style.left = left + 'px';
     }
 
     setTimestamp(timeIndex) {

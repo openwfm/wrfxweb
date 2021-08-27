@@ -21,7 +21,7 @@ export const simVars = (function createSimVars() {
 
   var rasters = urlParams.get('rasters');
   if (rasters) {
-    rasters = rasters.split('-');
+    rasters = rasters.split(',');
     presetVars.rasters = rasters;
   }
 

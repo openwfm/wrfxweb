@@ -3,8 +3,8 @@ logs/*
 node_modules/
 bower_components/
 fdds/simulations/
-*.gz
 package-lock.json
+*.gz
 tmp
 .DS_Store
 .idea

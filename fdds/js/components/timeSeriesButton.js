@@ -6,7 +6,6 @@ export class TimeSeriesButton extends HTMLElement {
     constructor(dataType = 'continuous') {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/timeSeriesButton.css'/>
             <div id='timeseries-button'>
                 <div>
                     <label class='timeseries-select-label' for='startDate'>start time:</label>
@@ -23,9 +22,16 @@ export class TimeSeriesButton extends HTMLElement {
                         <option value='discrete'>discrete</option>
                     </select>
                 </div>
+                <div>
+                    <label class='timeseries-select-label' for='layer-specification'>for layers: </label>
+                    <select class='timeseries-select' id='layer-specification'>
+                        <option value='all-added-layers'>all added layers</option>
+                        <option value='top-layer'>top layer</option>
+                    </select>
+                </div>
                 <button class='timeSeriesButton' id='timeSeriesButton'>
                     <span>generate timeseries</span>
-                    <div id='progressBar'></div>
+                    <div id='progressBar' class='hidden'></div>
                 </button>
             </div>
         `;
@@ -71,12 +77,12 @@ export class TimeSeriesButton extends HTMLElement {
     setProgress(progress) {
         const progressBar = this.querySelector('#progressBar');
         if (progress < 1) {
-            progressBar.style.display = 'block';
+            progressBar.classList.remove('hidden');
             progressBar.style.width = Math.floor(progress*100) + '%';
             this.getButton().disabled = true;
         } else {
             this.getButton().disabled = false;
-            progressBar.style.display = 'none';
+            progressBar.classList.add('hidden');
         }
     }
 
@@ -109,6 +115,10 @@ export class TimeSeriesButton extends HTMLElement {
 
     getDataType() {
         return this.querySelector('#dataType').value;
+    }
+
+    getLayerSpecification() {
+        return this.querySelector('#layer-specification').value;
     }
 
     setStartDate(newStartDate) {

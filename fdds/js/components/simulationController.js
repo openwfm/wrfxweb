@@ -1,4 +1,4 @@
-import { controllers } from './Controller.js';
+import { controllerEvents, controllers } from './Controller.js';
 import { setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
@@ -13,24 +13,33 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <link rel='stylesheet' href='css/simulationController.css'/>
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
                         <button id='slider-slow-down'>
-                            <img src='icons/fast_rewind_black_24dp.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#fast_rewind_black_24dp"></use>
+                            </svg>
                         </button>
                         <button id='slider-prev'>
-                            <img src='icons/arrow_left-24px.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#arrow_left-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-play-pause'>
-                            <img src='icons/play_arrow-24px.svg'></img>
+                             <svg class='svgIcon interactive-button'>
+                                <use href="#play_arrow-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-next'>
-                            <img src='icons/arrow_right-24px.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#arrow_right-24px"></use>
+                            </svg>
                         </button>
                         <button id='slider-fast-forward'>
-                            <img src='icons/fast_forward_black_24dp.svg'></img>
+                            <svg class='svgIcon interactive-button'>
+                                <use href="#fast_forward_black_24dp"></use>
+                            </svg>
                         </button>
                     </div>
                     <div id='slider-timestamp'>
@@ -45,6 +54,7 @@ export class SimulationController extends HTMLElement {
         this.slowRate = 500;
         this.normalRate = 330;
         this.frameRate = this.normalRate;
+        this.simulationSlider;
     }
 
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
@@ -52,6 +62,7 @@ export class SimulationController extends HTMLElement {
         const container = this.querySelector('.slider-container');
         const slider = new SimulationSlider();
         container.appendChild(slider);
+        this.simulationSlider = slider;
 
         if (document.body.clientWidth < 769) {
             const timeStamp = this.querySelector('#slider-timestamp');
@@ -63,9 +74,19 @@ export class SimulationController extends HTMLElement {
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
-        });
+        }, controllerEvents.all);
         controllers.currentTimestamp.subscribe(() => {
             this.updateSlider();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            e = e || window.event;
+            if (e.key == 'ArrowRight') {
+                this.nextFrame();
+            }
+            if (e.key == 'ArrowLeft') {
+                this.prevFrame();
+            }
         });
 
         this.querySelector('#slider-play-pause').onpointerdown = () => {
@@ -109,11 +130,11 @@ export class SimulationController extends HTMLElement {
 
         const sliderContainer = this.querySelector('.slider-container');
         sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
+        this.updateSlider();
     }
 
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
-        // set current time
         var currentTimestamp = controllers.currentTimestamp.getValue();
         document.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
     }
@@ -154,8 +175,7 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the right. */
     nextFrame() {
-        const simulationSlider = this.querySelector('simulation-slider');
-        var nextTimestamp = simulationSlider.nextTimestamp();
+        var nextTimestamp = this.simulationSlider.nextTimestamp();
 
         controllers.currentTimestamp.setValue(nextTimestamp);
         return nextTimestamp;
@@ -163,8 +183,7 @@ export class SimulationController extends HTMLElement {
 
     /** Moves one frame to the left. */
     prevFrame() {
-        const simulationSlider = this.querySelector('simulation-slider');
-        var prevTimestamp = simulationSlider.prevTimestamp();
+        var prevTimestamp = this.simulationSlider.prevTimestamp();
 
         controllers.currentTimestamp.setValue(prevTimestamp);
         return prevTimestamp;

@@ -1,28 +1,59 @@
-import { setURL } from "../util.js";
+import { debounceInIntervals } from '../util.js';
+
+export const controllerEvents = {
+    quiet: 'QUIET', 
+    simReset: 'SIMULATION_RESET',
+    valueSet: 'VALUE_SET', 
+    slidingValue: 'SLIDING_VALUE',
+    all: 'ALL'
+}
 
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
  * then be called whenever the value in the controller is updated. */
 export class Controller {
     constructor(value=null) {
-        this.listeners = [];
+        this.listeners = {};
         this.value = value;
+        this.debouncedSetValue = debounceInIntervals((setArgs) => {
+            this.setValueCallback(setArgs);
+        }, 100);
     }
 
-    subscribe(callback) {
-        this.listeners.push(callback);
+    subscribe(callback, eventName=controllerEvents.valueSet) {
+        // this.listeners.push(callback);
+        if (!(eventName in this.listeners)) {
+            this.listeners[eventName] = [];
+        }
+        this.listeners[eventName].push(callback);
     }
 
-    setValue(value) {
+    setValue(value, eventName=controllerEvents.valueSet) {
+        this.setValueCallback([value, eventName]);
+    }
+
+    setValueCallback([value, eventName=controllerEvents.valueSet]) {
         this.value = value;
-        this.notifyListeners();
+        if (eventName != controllerEvents.quiet) {
+            this.notifyListeners(this.listeners[eventName]);
+            if (eventName != controllerEvents.all) {
+                this.notifyListeners(this.listeners[controllerEvents.all]);
+            }
+        }
     }
 
     getValue() {
         return this.value;
     }
 
-    notifyListeners() {
-        this.listeners.map(listener => listener());
+    notifyListeners(listeners, args=null) {
+        if (listeners == null) {
+            return;
+        }
+        listeners.map(listener => listener(args));
+    }
+
+    broadcastEvent(event, args=null) {
+        this.notifyListeners(this.listeners[event], args);
     }
 }
 
@@ -43,10 +74,47 @@ export class SyncController extends Controller {
 
 // global controllers
 export const controllers = {
-    currentTimestamp: new Controller(),
+    currentTimestamp: (function createCurrentTimestamp() {
+        var currentTimestamp = new Controller();
+        currentTimestamp.setValue = (value, eventName=controllerEvents.valueSet) => {
+            currentTimestamp.debouncedSetValue([value, eventName]);
+        }
+        return currentTimestamp;
+    })(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),
-    loadingProgress: new Controller(0),
+    loadingProgress: (function createLoadProg() {
+        const loadingProgress = new Controller(0);
+        loadingProgress.nFrames = 0;
+        loadingProgress.loadedFrames = 0;
+
+        loadingProgress.setFrames = (nFrames) => {
+            loadingProgress.nFrames = nFrames;
+            loadingProgress.loadedFrames = 0;
+            loadingProgress.setValue(0);
+        }
+
+        loadingProgress.frameLoaded = (frames = 1) => {
+            loadingProgress.loadedFrames += frames;
+            var progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
+            loadingProgress.setValue(progress);
+        }
+
+        return loadingProgress;
+    })(),
+    timeSeriesMarkers: (function createTimeSeriesMarkers() {
+        var timeSeriesMarkers = new Controller([]);
+        timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
+        timeSeriesMarkers.add = (newMarker) => {
+            timeSeriesMarkers.value.push(newMarker);
+        }
+        timeSeriesMarkers.remove = (removeMarker) => {
+            var index = timeSeriesMarkers.value.indexOf(removeMarker);
+            timeSeriesMarkers.value.splice(index, 1);
+            timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
+        }
+        return timeSeriesMarkers;
+    })(),
     opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
@@ -60,7 +128,10 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
         }
-        startDateController.subscribe(subscriptionFunction);
+        startDateController.subscribe(subscriptionFunction, controllerEvents.all);
+        startDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+            startDateController.debouncedSetValue([value, eventName]);
+        }
 
         return startDateController;
     })(),
@@ -75,7 +146,10 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
         }
-        endDateController.subscribe(subscriptionFunction);
+        endDateController.subscribe(subscriptionFunction, controllerEvents.all);
+        endDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+            endDateController.debouncedSetValue([value, eventName]);
+        }
 
         return endDateController;
     })(),

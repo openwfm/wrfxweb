@@ -1,56 +1,125 @@
-import { TimeSeriesButton } from './timeSeriesButton.js';
+import { rgbToHex } from '../util.js';
+import { map } from '../map.js';
+import { controllers } from './Controller.js';
 
-export class TimeSeriesMarker extends TimeSeriesButton {
+export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
-        const timeSeriesButton = this.querySelector('#timeseries-button');
-        var labelDetails = `
+        this.innerHTML = `
+            <div id='timeSeriesMarker'>
+                <span id='hideMenu' class='interactive-button'>hide</span>
                 <div>
                     <label style='display: inline-block; width: 100px' for='timeseries-custom-name'>Add name: </label>
                     <input id='timeseries-custom-name'></input>
                 </div>
+
                 <div>
                     <span style='margin: 1px; margin-right: 10px'>lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
                     <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
                 </div>
                 <p id='colorbar-location' style='margin: 0'></p>
-        `; 
-        timeSeriesButton.innerHTML = labelDetails + timeSeriesButton.innerHTML;
-        this.rgb = null;
+            </div>
+        `;
+        this.chartColor = null;
+        this.colorInputted = false;
         this.clrbarLocation = null;
+        this.hideOnChart = false;
+        this.infoOpen = false;
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-        this.updateTimestamps();
+    getChartColor() {
+        return this.chartColor;
     }
 
-    getRGB() {
-        return this.rgb;
+    setChartColor(chartColor) {
+        this.chartColor = chartColor;
+        this.colorInputted = true;
+    }
+
+    setName(name) {
+        this.querySelector('#timeseries-custom-name').value = name;
     }
 
     getName() {
         return this.querySelector('#timeseries-custom-name').value;
     }
 
+    bindHide(fun) {
+        const hideButton = this.querySelector('#hideMenu');
+        hideButton.onclick = fun;
+    }
+
     setRGBValues(rgb, clrbarLocation) {
-        this.rgb = rgb[0] + rgb[1] + rgb[2] > 745? [0, 0, 0]: rgb;
+        var [r, g, b] = rgb;
+        if ((r + g + b) > 745) {
+            [r, g, b] = [0, 0, 0];
+        }
+        if (!this.colorInputted) {
+            var hexValue = rgbToHex(r, g, b);
+            this.chartColor = hexValue;
+        }
         this.clrbarLocation = clrbarLocation;
         const clrbarP = this.querySelector('#colorbar-location');
         const rgbP = this.querySelector('#rgb-value');
-        const button = this.getButton();
         clrbarP.style.display = 'none';
         rgbP.innerHTML = 'No layer with colorbar to show values of';
         rgbP.style.color = 'black';
-        button.disabled = true;
         if (clrbarLocation != null) {
             clrbarP.style.display = 'block';
             clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
-            rgbP.style.color = `rgb(${this.rgb[0]},${this.rgb[1]},${this.rgb[2]})`;
-            rgbP.innerHTML = `R: ${rgb[0]} G: ${rgb[1]} B: ${rgb[2]}`;
-            button.disabled = false;
+            rgbP.style.color = `rgb(${r},${g},${b})`;
+            rgbP.innerHTML = `pixel value: R${r} G${g} B${b}`;
         }
+    }
+}
+
+export class Marker {
+    constructor(latLon, coords) {
+        this._latlng = latLon;
+        this.imageCoords = coords;
+
+        this.popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
+        this.timeSeriesMarker = new TimeSeriesMarker(latLon, coords);
+        this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
+        this.popup.setContent(this.timeSeriesMarker);
+        this.popup.getElement().style.display = 'none';
+
+        let svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
+                                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                <path d="M7 10l5 5 5-5H7z"></path>
+                              </svg>`;
+        let myIconUrl = encodeURI("data:image/svg+xml," + svgString).replace('#','%23');
+        var markerIcon = L.icon({iconUrl: myIconUrl, iconAnchor: [13, 16]});
+
+        this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
+        this.popup.on('remove', () => {
+            controllers.timeSeriesMarkers.remove(this);
+            this.marker.removeFrom(map);
+        });
+        this.marker.on('mousedown', () => {
+            if (this.timeSeriesMarker.infoOpen) {
+                this.hideMarkerInfo();
+            } else {
+                this.showMarkerInfo();
+            }
+        });
+    }
+
+    hideMarkerInfo() {
+        var popupElem = this.popup.getElement();
+        popupElem.style.display = 'none';
+        this.timeSeriesMarker.infoOpen = false;
+    }
+
+    showMarkerInfo() {
+        var popupElem = this.popup.getElement();
+        popupElem.style.display = 'block';
+        this.timeSeriesMarker.infoOpen = true;
+    }
+
+    getContent() {
+        return this.timeSeriesMarker;
     }
 }
 

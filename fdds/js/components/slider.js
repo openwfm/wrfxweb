@@ -1,67 +1,24 @@
-const template = document.createElement('template');
-template.innerHTML = `
-    <style>
-        #slider {
-            position: relative;
-            padding-top: 5px;
-            padding-bottom: 5px;
-        }
-
-        #slider-bar {
-            height: 11px;
-            background: #e8e8e8;
-            border-style: solid;
-            border-radius: 4px;
-            border-width: .5px;
-            border-color: #cccccc;
-            cursor: pointer;
-        }
-
-        #slider-head {
-            position: absolute;
-            bottom: 3px; left: 0; right: 0;
-            height: 15px;
-            width: 15px;
-            background: #f6f6f6;
-            border-style: solid; 
-            border-radius: 4px;
-            border-width: .5px;
-            border-color: #dddddd;
-            cursor: grab;
-            z-index: 3000;
-        }
-
-        #slider-head:hover {
-            border-color: black;
-        }
-    </style>
-    <div id='slider'>
-        <div id='slider-bar'></div>
-        <div id='slider-head'></div>
-    </div>
-`;
-
 export class Slider extends HTMLElement {
     constructor(sliderWidth, nFrames) {
         super();
-        this.attachShadow({mode: 'open'});
+        this.innerHTML = `
+            <div id='slider' class='slider'>
+                <div id='slider-bar' class='slider-bar'></div>
+                <div id='slider-head' class='slider-head'></div>
+            </div>
+        `;
         this.sliderWidth = sliderWidth;
         this.nFrames = nFrames;
         this.frame = 0;
     }
 
     connectedCallback() {
-        this.shadowRoot.appendChild(template.content.cloneNode(true));
-
-        const slider = this.shadowRoot.querySelector('#slider');
-        slider.style.width = this.sliderWidth + 'px';
-        
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const sliderHead = this.querySelector('#slider-head');
         sliderHead.onpointerdown = (e) => {
             this.dragSliderHead(e);
         }
 
-        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+        const sliderBar = this.querySelector('#slider-bar');
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
@@ -70,18 +27,20 @@ export class Slider extends HTMLElement {
     updateHeadPosition(newFrame) {
         this.frame = newFrame;
 
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
+        const sliderHead = this.querySelector('#slider-head');
         var percentage = newFrame / this.nFrames;
         var left = Math.floor(percentage * this.sliderWidth *.95);
+        // var left = Math.floor(percentage *.95 * 100);
         sliderHead.style.left = left + 'px';
+        // sliderHead.style.left = left + '%';
     }
 
     /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
      * currentFrame according to the offset. 
      */
     dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {
-        const sliderHead = this.shadowRoot.querySelector('#slider-head');
-        const sliderBar = this.shadowRoot.querySelector('#slider-bar');
+        const sliderHead = this.querySelector('#slider-head');
+        const sliderBar = this.querySelector('#slider-bar');
 
         document.body.classList.add('grabbing');
         sliderHead.style.cursor = 'grabbing';
@@ -127,7 +86,7 @@ export class Slider extends HTMLElement {
      * location. Updates the currentFrame accordingly and calls updateSlider
      */
     clickBar(e, updateCallback = null) {
-        const head = this.shadowRoot.querySelector('#slider-head').getBoundingClientRect();
+        const head = this.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.nFrames);
 
         var newFrame = this.frame + diff;

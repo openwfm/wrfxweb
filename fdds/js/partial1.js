@@ -12,4 +12,9 @@ window.onload = () => {
     console.log('URL Copied: ' + window.location);
     alert('URL Copied: ' + window.location);
   }
+
+  const splash = document.querySelector('#splash-screen');
+  setTimeout(() => {
+    splash.classList.add('hidden');
+  }, 1000);
 }

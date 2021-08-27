@@ -21,17 +21,29 @@ export function setURL() {
   var currentSimulation = simVars.currentSimulation;
   addData('job_id', currentSimulation);
   var currentDomain = controllers.currentDomain.getValue();
-  addData('domain', currentDomain);
-  var timestamp = utcToLocal(controllers.currentTimestamp.getValue());
-  addData('timestamp', timestamp);
-  var startDate = utcToLocal(controllers.startDate.getValue());
-  addData('startDate', startDate);
-  var endDate = utcToLocal(controllers.endDate.getValue());
-  addData('endDate', endDate);
-  var rasterURL = simVars.overlayOrder.join('-');
+  var domainInstances = controllers.domainInstance.getValue();
+  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
+    addData('domain', currentDomain);
+  }
+  var startDate = controllers.startDate.getValue();
+  if (startDate != simVars.sortedTimestamps[0]) {
+    addData('startDate', utcToLocal(startDate));
+  }
+  var endDate = controllers.endDate.getValue();
+  var nTimestamps = simVars.sortedTimestamps.length;
+  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
+    addData('endDate', utcToLocal(endDate));
+  }
+  var timestamp = controllers.currentTimestamp.getValue();
+  if (timestamp != startDate) {
+    addData('timestamp', utcToLocal(timestamp));
+  }
+  var rasterURL = simVars.overlayOrder.join(',');
   addData('rasters', rasterURL);
   var opacity = controllers.opacity.getValue();
-  addData('opacity', opacity);
+  if (opacity != 0.5) {
+    addData('opacity', opacity);
+  }
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
@@ -47,17 +59,29 @@ map.on('moveend', function() {
   setURL();
 });
 
-export function debounce(callback, delay) {
+/** Executes function with a maximum rate of delay. */
+export function debounceInIntervals(callback, delay) {
   let timeout; 
-  return function() {
+  return function(args=null) {
     if (timeout) {
       return;
     }
+    callback(args);
     const callbackInIntervals = () => {
       timeout = null;
-      callback();
     };
     timeout = setTimeout(callbackInIntervals, delay);
+  }
+}
+
+/** Executes a function once at the end of an update cycle lasting delay. */
+export function debounce(callback, delay) {
+  let timeout;
+  return function(args=null) {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => callback(args), delay);
   }
 }
 
@@ -104,6 +128,28 @@ export function createElement(id=null, className=null) {
     return div;
 }
 
+/** Creates the htmlElement for each checkbox in the LayerController. */
+export function buildCheckBox(id, type, name, checked, callback, args=null) {
+  var div = document.createElement('div');
+  div.className = 'layer-checkbox';
+
+  const input = document.createElement('input');
+  input.id = id;
+  input.name = name;
+  input.type = type;
+  input.checked = checked;
+  input.onclick = () => {
+    callback(args);
+  }
+
+  var label = document.createElement('label');
+  label.for = id;
+  label.innerText = id;
+  div.appendChild(input);
+  div.appendChild(label);
+  return div;
+}
+
 export function linkSelects(selectStart, selectEnd) {
   selectStart.childNodes.forEach(startOption => {
     startOption.disabled = false;
@@ -119,6 +165,46 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
+// pulled from https://www.w3docs.com/snippets/javascript/how-to-convert-rgb-to-hex-and-vice-versa.html
+export function rgbToHex(r, g, b) {
+  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+export function darkenHex(hex) {
+  var darkenedHex = '#';
+  for (var decimal of hex.substr(1)) {
+      switch (decimal) {
+          case 'f': 
+              darkenedHex += 'd';
+              break;
+          case 'e': 
+              darkenedHex += 'c';
+              break;
+          case 'd':
+              darkenedHex += 'b';
+              break;
+          case 'c':
+              darkenedHex += 'a';
+              break;
+          case 'b':
+              darkenedHex += '0';
+              break;
+          case 'a': 
+              darkenedHex += '8';
+              break;
+          case '0': 
+              darkenedHex += 'e';
+              break;
+          case '1': 
+              darkenedHex += 'f';
+              break;
+          default:
+              darkenedHex += Number(decimal) - 2;
+      }
+  }
+  return darkenedHex;
+}
+
 /** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -127,7 +213,12 @@ export function dragElement(elmnt, subID) {
   if (clientWidth < 769) {
     return;
   }
-  document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+  var draggableElement = document.getElementById(elmnt.id);
+  if (subID != '') {
+    draggableElement = document.getElementById(subID);
+  }
+  // document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
+  draggableElement.onpointerdown = dragMouseDown;
   window.addEventListener('resize', () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {
@@ -144,6 +235,7 @@ export function dragElement(elmnt, subID) {
   })
 
   function dragMouseDown(e) {
+    document.body.classList.add('grabbing');
     e = e || window.event;
     e.preventDefault();
     e.stopPropagation();
@@ -181,6 +273,7 @@ export function dragElement(elmnt, subID) {
 
   function closeDragElement() {
     // stop moving when mouse button is released:
+    document.body.classList.remove('grabbing');
     document.onpointerup = null;
     document.onpointermove = null;
   }
