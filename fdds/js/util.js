@@ -52,8 +52,6 @@ export function setURL() {
   if (opacity != 0.5) {
     addData('opacity', opacity);
   }
-  addData('opacity', opacity);
-
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
     history.pushState(historyData, 'Data', urlVars);
