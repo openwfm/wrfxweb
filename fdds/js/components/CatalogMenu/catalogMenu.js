@@ -142,18 +142,25 @@ export class CatalogMenu extends HTMLElement {
         }
         var descSearchTerm = navJobId.split('-')[0];
         var mostRecentItem = null;
+        var secondMostRecentItem = null;
         for (var fire of firesListDOM.childNodes) {
             var fireDesc = fire.catEntry.description;
             if (fireDesc.toLowerCase().includes(descSearchTerm)) {
                 if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
+                    secondMostRecentItem = mostRecentItem;
                     mostRecentItem = fire;
                 }
             }
         }
-        if (mostRecentItem != null) {
-            var description = mostRecentItem.catEntry.description;
-            var jobId = mostRecentItem.catEntry.job_id;
-            var manifestPath = mostRecentItem.catEntry.manifest_path;
+        var itemToNavigateTo = mostRecentItem;
+        if (secondMostRecentItem != null && navJobId.includes('second-recent')) {
+            itemToNavigateTo = secondMostRecentItem;
+        }
+        
+        if (itemToNavigateTo != null) {
+            var description = itemToNavigateTo.catEntry.description;
+            var jobId = itemToNavigateTo.catEntry.job_id;
+            var manifestPath = itemToNavigateTo.catEntry.manifest_path;
             var path = 'simulations/' + manifestPath;
             mostRecentItem.handle_catalog_click(jobId, path, description);
         }
