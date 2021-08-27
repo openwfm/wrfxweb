@@ -1,3 +1,4 @@
+import { createElement, createTab } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 
 export class LayerTabs extends HTMLElement {
@@ -20,19 +21,13 @@ export class LayerTabs extends HTMLElement {
         const addedSimulations = this.querySelector('#added-simulations');
         const addSimulation = this.querySelector('#add-simulation');
 
-        const newTab = document.createElement('div');
-        newTab.classList.add('tab');
-        const innerTab = document.createElement('div');
-        innerTab.classList.add('interactive-button');
-        innerTab.classList.add('innerTab');
-        innerTab.innerText = id;
-        newTab.appendChild(innerTab);
+        const newTab = createTab(id);
 
         this.tabs[id] = newTab;
         addedSimulations.insertBefore(newTab, addSimulation)
-        this.switchActiveTab(id);
+        controllers.activeSimulation.setValue(id);
         newTab.onpointerdown = () => {
-            this.switchActiveTab(id);
+            controllers.activeSimulation.setValue(id);
         }
         newTab.ondblclick = () => {
             this.removeTab(id)
@@ -50,7 +45,8 @@ export class LayerTabs extends HTMLElement {
 
         this.tabOrder.splice(index, 1);
         if (this.activeTab == tab) {
-            this.switchActiveTab(this.tabOrder[0]);
+            var newActive = this.tabOrder[0];
+            controllers.activeSimulation.setValue(newActive);
         }
         delete this.tabs[tabDescription];
 
@@ -77,6 +73,10 @@ export class LayerTabs extends HTMLElement {
                 this.makeNewTab(simulation);
             }
         });
+        controllers.activeSimulation.subscribe(() => {
+            var activeSim = controllers.activeSimulation.getValue();
+            this.switchActiveTab(activeSim);
+        });
     }
 
     switchActiveTab(activeDescription) {
@@ -92,8 +92,8 @@ export class LayerTabs extends HTMLElement {
             this.tabOrder.splice(index, 1);
         }
         this.tabOrder.push(activeDescription);
+        newTab.classList.add('active');
         this.activeTab = newTab;
-        this.activeTab.classList.add('active');
     }
 
 }

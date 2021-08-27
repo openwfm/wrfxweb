@@ -103,6 +103,7 @@ export const controllers = {
     currentDomain: new Controller(),
     addSimulation: new Controller(false),
     addedSimulations: makeArrayController(),
+    activeSimulation: new Controller(''),
     loadingProgress: (function createLoadProg() {
         const loadingProgress = new Controller(0);
         loadingProgress.nFrames = 0;

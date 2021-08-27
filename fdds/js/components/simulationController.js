@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { setURL, utcToLocal } from '../util.js';
+import { createTab, setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
@@ -13,37 +13,44 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div class='slider-container'>
-                <div id='slider-header'>
-                    <div id='slider-play-bar'>
-                        <button id='slider-slow-down'>
-                            <svg class='svgIcon interactive-button'>
-                                <use href="#fast_rewind_black_24dp"></use>
-                            </svg>
-                        </button>
-                        <button id='slider-prev'>
-                            <svg class='svgIcon interactive-button'>
-                                <use href="#arrow_left-24px"></use>
-                            </svg>
-                        </button>
-                        <button id='slider-play-pause'>
-                             <svg class='svgIcon interactive-button'>
-                                <use href="#play_arrow-24px"></use>
-                            </svg>
-                        </button>
-                        <button id='slider-next'>
-                            <svg class='svgIcon interactive-button'>
-                                <use href="#arrow_right-24px"></use>
-                            </svg>
-                        </button>
-                        <button id='slider-fast-forward'>
-                            <svg class='svgIcon interactive-button'>
-                                <use href="#fast_forward_black_24dp"></use>
-                            </svg>
-                        </button>
+            <div class='slider-wrapper hidden'>
+                <div id='slider-tabs'>
+                    <div id='combined-slider' class='tab'>
+                        <div class='interactive-button innerTab'>Combined Slider</div>
                     </div>
-                    <div id='slider-timestamp'>
-                        <span id='timestamp'></span>
+                </div>
+                <div class='slider-container'>
+                    <div id='slider-header'>
+                        <div id='slider-play-bar'>
+                            <button id='slider-slow-down'>
+                                <svg class='svgIcon interactive-button'>
+                                    <use href="#fast_rewind_black_24dp"></use>
+                                </svg>
+                            </button>
+                            <button id='slider-prev'>
+                                <svg class='svgIcon interactive-button'>
+                                    <use href="#arrow_left-24px"></use>
+                                </svg>
+                            </button>
+                            <button id='slider-play-pause'>
+                                <svg class='svgIcon interactive-button'>
+                                    <use href="#play_arrow-24px"></use>
+                                </svg>
+                            </button>
+                            <button id='slider-next'>
+                                <svg class='svgIcon interactive-button'>
+                                    <use href="#arrow_right-24px"></use>
+                                </svg>
+                            </button>
+                            <button id='slider-fast-forward'>
+                                <svg class='svgIcon interactive-button'>
+                                    <use href="#fast_forward_black_24dp"></use>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id='slider-timestamp'>
+                            <span id='timestamp'></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,6 +62,8 @@ export class SimulationController extends HTMLElement {
         this.normalRate = 330;
         this.frameRate = this.normalRate;
         this.simulationSlider;
+        this.tabs = {};
+        this.activeTab = null;
     }
 
     /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
@@ -108,6 +117,62 @@ export class SimulationController extends HTMLElement {
         slowDown.onpointerdown = () => {
             this.toggleRate(this.slowRate, slowDown, speedUp);
         }
+
+        this.setMultiLayers();
+    }
+
+    setMultiLayers() {
+        const sliderTabs = this.querySelector('#slider-tabs');
+
+        controllers.addedSimulations.subscribe((id) => {
+            this.makeNewTab(id);
+            if (controllers.addedSimulations.getValue().length > 1) {
+                sliderTabs.classList.remove('hidden');
+            }
+        }, controllers.addedSimulations.addEvent);
+
+        controllers.addedSimulations.subscribe((id) => {
+            this.removeTab(id);
+            if (controllers.addedSimulations.getValue().length <= 1) {
+                sliderTabs.classList.add('hidden');
+            }
+        }, controllers.addedSimulations.removeEvent);
+
+        controllers.activeSimulation.subscribe(() => {
+            var activeSim = controllers.activeSimulation.getValue();
+            this.switchActiveTab(activeSim);
+        });
+    }
+
+    removeTab(id) {
+        // const sliderTabs = this.querySelector('#slider-tabs');
+        // var tab = this.tabs[id];
+        // delete this.tabs[id];
+        // sliderTabs.removeChild(tab);
+    }
+
+    makeNewTab(id) {
+        const sliderTabs = this.querySelector('#slider-tabs');
+        const combinedSlider = this.querySelector('#combined-slider');
+
+        var newTab = createTab(id);
+        this.tabs[id] = newTab;
+        newTab.onpointerdown = () => {
+            controllers.activeSimulation.setValue(id);
+        }
+        sliderTabs.insertBefore(newTab, combinedSlider);
+    }
+
+    switchActiveTab(activeDescription) {
+        var newTab = this.tabs[activeDescription];
+        if (this.activeTab == newTab) {
+            return;
+        }
+        if (this.activeTab) {
+            this.activeTab.classList.remove('active');
+        }
+        newTab.classList.add('active');
+        this.activeTab = newTab;
     }
 
     toggleRate(rate, togglePrimary, toggleSecondary) {
@@ -128,8 +193,15 @@ export class SimulationController extends HTMLElement {
             this.playPause();
         }
 
-        const sliderContainer = this.querySelector('.slider-container');
-        sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
+        // const sliderContainer = this.querySelector('.slider-container');
+        // sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
+        const sliderWrapper = this.querySelector('.slider-wrapper');
+        if (simVars.sortedTimestamps.length >= 2) {
+            sliderWrapper.classList.remove('hidden');
+        } else {
+            sliderWrapper.classList.add('hidden');
+        }
+        
         this.updateSlider();
     }
 

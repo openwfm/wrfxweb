@@ -128,6 +128,15 @@ export function createElement(id=null, className=null) {
     return div;
 }
 
+export function createTab(id) {
+  const newTab = createElement(null, 'tab');
+  const innerTab = createElement(null, 'interactive-button innerTab');
+  innerTab.innerText = id;
+  newTab.appendChild(innerTab);
+
+  return newTab;
+}
+
 /** Creates the htmlElement for each checkbox in the LayerController. */
 export function buildCheckBox(id, type, name, checked, callback, args=null) {
   var div = document.createElement('div');
