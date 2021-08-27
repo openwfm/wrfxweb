@@ -132,6 +132,31 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         this.sortBy('original-order', false);
+        this.clickMostRecent(navJobId);
+    }
+
+    clickMostRecent(navJobId) {
+        const firesListDOM = this.querySelector('#catalog-fires');
+        if (!navJobId || !navJobId.includes('recent')) {
+            return;
+        }
+        var descSearchTerm = navJobId.split('-')[0];
+        var mostRecentItem = null;
+        for (var fire of firesListDOM.childNodes) {
+            var fireDesc = fire.catEntry.description;
+            if (fireDesc.toLowerCase().includes(descSearchTerm)) {
+                if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
+                    mostRecentItem = fire;
+                }
+            }
+        }
+        if (mostRecentItem != null) {
+            var description = mostRecentItem.catEntry.description;
+            var jobId = mostRecentItem.catEntry.job_id;
+            var manifestPath = mostRecentItem.catEntry.manifest_path;
+            var path = 'simulations/' + manifestPath;
+            mostRecentItem.handle_catalog_click(jobId, path, description);
+        }
     }
 
     /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
