@@ -140,7 +140,7 @@ export class CatalogMenu extends HTMLElement {
         if (!navJobId || !navJobId.includes('recent')) {
             return;
         }
-        var descSearchTerm = navJobId.split('-')[0];
+        var descSearchTerm = navJobId.split('-')[0].toLowerCase();
         var mostRecentItem = null;
         var secondMostRecentItem = null;
         for (var fire of firesListDOM.childNodes) {
@@ -149,6 +149,8 @@ export class CatalogMenu extends HTMLElement {
                 if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
                     secondMostRecentItem = mostRecentItem;
                     mostRecentItem = fire;
+                } else if (!secondMostRecentItem || (fire.catEntry.from_utc > secondMostRecentItem.catEntry.from_utc)) {
+                    secondMostRecentItem = fire;
                 }
             }
         }
