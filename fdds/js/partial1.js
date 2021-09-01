@@ -16,5 +16,5 @@ window.onload = () => {
   const splash = document.querySelector('#splash-screen');
   setTimeout(() => {
     splash.classList.add('hidden');
-  }, 1000);
+  }, 500);
 }
