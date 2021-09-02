@@ -92,9 +92,9 @@ export function utcToLocal(utcTime) {
   }
 
   var timezone = 'America/Los_Angeles';
-  var localTime = dayjs(utcTime.replace('_', 'T') + 'Z').tz(timezone);
+  var localTime = dayjs(utcTime.replace('_', 'T') + 'Z');
 
-  return localTime.format('YYYY-MM-DD HH:mm:ss');
+  return localTime.format('YYYY-MM-DD HH:mm:ss', {timeZone: timezone});
 }
 
 export function localToUTC(localTime) {

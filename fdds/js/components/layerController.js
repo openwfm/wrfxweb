@@ -55,6 +55,7 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
         this.setLayerButton();
+        // simplify this
         const domainSubscription = () => {
             this.resetLayers();
             this.domainSwitch();
