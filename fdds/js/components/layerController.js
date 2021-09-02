@@ -124,11 +124,9 @@ export class LayerController extends HTMLElement {
         var loading = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(currentDomain, layerName);
-            if (!layer.isPreloaded(currentTimestamp)) {
-                if (!loading) {
-                    var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-                    this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
-                }
+            if (!loading && !layer.isPreloaded(currentTimestamp)) {
+                var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+                this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
                 loading = true;
             }
             layer.setTimestamp(currentTimestamp);
