@@ -89,11 +89,9 @@ export class LayerController extends HTMLElement {
             var imageURL = simVars.rasterBase + rasterInfo.raster;
             if (imageURL in this.preloaded) {
                 imageURL = this.preloaded[imageURL];
-            } else {
-                if (!reloading) {
-                    var startTime = controllers.currentTimestamp.getValue();
-                    var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-                    this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
+            } else if (!reloading) {
+                if (this.worker) {
+                    this.worker.terminate();
                 }
                 reloading = true;
             }
@@ -107,7 +105,12 @@ export class LayerController extends HTMLElement {
                 rasterColorbar.src = colorbarURL;
             }
         }
-    }
+        if (reloading) {
+            var startTime = controllers.currentTimestamp.getValue();
+            var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+            this.loadWithPriority(startTime, endTime, simVars.overlayOrder);
+        }
+}
 
     loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
