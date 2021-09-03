@@ -16,31 +16,31 @@ export class SimulationController extends HTMLElement {
             <div class='slider-container'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
-                        <button id='slider-slow-down'>
-                            <svg class='svgIcon interactive-button'>
+                        <button class='slider-button' id='slider-slow-down'>
+                            <svg class='svgIcon slider-icon'>
                                 <use href="#fast_rewind_black_24dp"></use>
                             </svg>
                         </button>
-                        <button id='slider-prev'>
-                            <svg class='svgIcon interactive-button'>
+                        <button class='slider-button' id='slider-prev'>
+                            <svg class='svgIcon slider-icon'>
                                 <use href="#arrow_left-24px"></use>
                             </svg>
                         </button>
-                        <button id='slider-play-pause'>
-                            <svg id='play-button' class='svgIcon interactive-button'>
+                        <button class='slider-button' id='slider-play-pause'>
+                            <svg id='play-button' class='svgIcon slider-icon'>
                                 <use href="#play_arrow-24px"></use>
                             </svg>
-                            <svg id='pause-button' class='svgIcon interactive-button hidden'>
+                            <svg id='pause-button' class='svgIcon slider-icon hidden'>
                                 <use href="#pause-24px"></use>
                             </svg>
                         </button>
-                        <button id='slider-next'>
-                            <svg class='svgIcon interactive-button'>
+                        <button class='slider-button' id='slider-next'>
+                            <svg class='svgIcon slider-icon'>
                                 <use href="#arrow_right-24px"></use>
                             </svg>
                         </button>
-                        <button id='slider-fast-forward'>
-                            <svg class='svgIcon interactive-button'>
+                        <button class='slider-button' id='slider-fast-forward'>
+                            <svg class='svgIcon slider-icon'>
                                 <use href="#fast_forward_black_24dp"></use>
                             </svg>
                         </button>
@@ -157,6 +157,8 @@ export class SimulationController extends HTMLElement {
             
             prevButton.disabled = false;
             nextButton.disabled = false;
+            prevButton.classList.remove('disabled-button');
+            nextButton.classList.remove('disabled-button');
             setURL();
         } else {
             playButton.classList.add('hidden');
@@ -164,6 +166,8 @@ export class SimulationController extends HTMLElement {
 
             prevButton.disabled = true;
             nextButton.disabled = true;
+            prevButton.classList.add('disabled-button');
+            nextButton.classList.add('disabled-button');
             this.play();
         }
     }
