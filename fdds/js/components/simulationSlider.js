@@ -140,7 +140,8 @@ export class SimulationSlider extends Slider {
 
         var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
+        // var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
+        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
 
         progressBar.style.left = left + 'px';
     }
@@ -191,7 +192,8 @@ export class SimulationSlider extends Slider {
         controllers.startDate.subscribe(() => {
             var startDate = controllers.startDate.getValue();
             var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-            var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+            // var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth);
+            var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) - 2;
 
             sliderStart.style.left = left + 'px';
         });
@@ -237,7 +239,8 @@ export class SimulationSlider extends Slider {
         controllers.endDate.subscribe(() => {
             var endDate = controllers.endDate.getValue();
             var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
-            let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
+            // let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
+            var left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) + 14;
 
             sliderEnd.style.left = left + 'px';
         });
