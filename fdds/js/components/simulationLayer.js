@@ -127,7 +127,7 @@ export class SimulationLayer {
         this.preloadedColorbars = {};
     }
 
-    setImageLoaded(timestamp, imgURL, colorbar) {
+    async setImageLoaded(timestamp, imgURL, colorbar) {
         const img = new Image();
         img.onload = () => {
             var currentDomain = controllers.currentDomain.value;
