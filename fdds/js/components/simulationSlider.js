@@ -128,7 +128,7 @@ export class SimulationSlider extends Slider {
 
     setLoadProgress() {
         var progress = controllers.loadingProgress.getValue();
-        var progressWidth = progress*this.sliderWidth;
+        var progressWidth = progress*this.sliderWidth + 2;
 
         const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
