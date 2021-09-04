@@ -284,8 +284,18 @@ export class TimeSeriesController extends LayerController {
                 }
                 resolve('resolved'); // timeSeriesData has been populated. can now resolve.
             } else {
+                var imgURL = simVars.rasterBase + rasterInfo.raster;
+                var clrbarURL = simVars.rasterBase + rasterInfo.colorbar;
                 img.onload = () => {
                     markerData = this.drawMarkersOnCanvas(img, markers);
+                    syncController.increment(0);
+                }
+                img.onerror = () => {
+                    markerData = [];
+                    for (var i = 0; i < markers.length; i++) {
+                        markerData.push([0, 0, 0]);
+                    }
+                    console.warn('Problem loading image at URL ' + imgURL);
                     syncController.increment(0);
                 }
                 clrbarImg.onload = () => {
@@ -293,8 +303,11 @@ export class TimeSeriesController extends LayerController {
                     clrbarMap = this.buildColorMap(this.clrbarCanvas, timeStamp);
                     syncController.increment(1);
                 }
-                var imgURL = simVars.rasterBase + rasterInfo.raster;
-                var clrbarURL = simVars.rasterBase + rasterInfo.colorbar;
+                clrbarImg.onerror = () => {
+                    clrbarMap = {};
+                    console.warn('Problem loading colorbar at URL ' + clrbarURL);
+                    syncController.increment(1);
+                }
                 if (imgURL in this.preloaded && clrbarURL in this.preloaded) {
                     imgURL = this.preloaded[imgURL];
                     clrbarURL = this.preloaded[clrbarURL];
