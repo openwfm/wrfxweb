@@ -127,8 +127,15 @@ export class SimulationSlider extends Slider {
     }
 
     setLoadProgress() {
+        var startDate = controllers.startDate.getValue();
         var progress = controllers.loadingProgress.getValue();
-        var progressWidth = progress*this.sliderWidth + 2;
+        const sliderEnd = this.shadowRoot.querySelector('#slider-end');
+        const sliderStart = this.shadowRoot.querySelector('#slider-start');
+        var endBounds = sliderEnd.getBoundingClientRect();
+        var startBounds = sliderStart.getBoundingClientRect();
+        var totalWidth = endBounds.left - startBounds.right;
+        
+        var progressWidth = Math.floor(progress*totalWidth);
 
         const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
@@ -138,10 +145,9 @@ export class SimulationSlider extends Slider {
             return;
         }
 
-        var startDate = controllers.startDate.getValue();
         var startIndex = simVars.sortedTimestamps.indexOf(startDate);
         // var left = Math.floor((startIndex / simVars.sortedTimestamps.length) * this.sliderWidth) + 3;
-        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
+        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) + 1;
 
         progressBar.style.left = left + 'px';
     }

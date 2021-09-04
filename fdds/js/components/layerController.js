@@ -42,6 +42,7 @@ export class LayerController extends HTMLElement {
         this.progressSet = 0;
         this.worker; 
         this.nImages = 0;
+        this.percentToLoad = 1;
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -168,7 +169,7 @@ export class LayerController extends HTMLElement {
                     if ('colorbar' in rasterInfo) {
                         this.progressSet += 1;
                     }
-                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                    controllers.loadingProgress.setValue(this.progressSet / (this.nImages*this.percentToLoad));
                 }
             }
         }
@@ -191,6 +192,11 @@ export class LayerController extends HTMLElement {
             URL.revokeObjectURL(this.preloaded[imgURL]);
         }
         this.preloaded = {};
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+        this.percentToLoad = simVars.sortedTimestamps.filter(timestamp => {
+            return timestamp <= endDate && timestamp >= startDate;
+        }).length / simVars.sortedTimestamps.length;
 
         const reload = () => {
             if (this.currentSimulation != simVars.currentSimulation) {
@@ -198,6 +204,9 @@ export class LayerController extends HTMLElement {
             }
             var startDate = controllers.startDate.getValue();
             var endDate = controllers.endDate.getValue();
+            this.percentToLoad = simVars.sortedTimestamps.filter(timestamp => {
+                return timestamp <= endDate && timestamp >= startDate;
+            }).length / simVars.sortedTimestamps.length;
             this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         }
         controllers.startDate.subscribe(reload);
@@ -349,7 +358,7 @@ export class LayerController extends HTMLElement {
                 this.preloaded[imageURL] = objectURL;
                 if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
                     this.progressSet += 1;
-                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                    controllers.loadingProgress.setValue(this.progressSet / (this.nImages*this.percentToLoad));
                 }
             }
             img.onerror = () => {
@@ -357,7 +366,7 @@ export class LayerController extends HTMLElement {
                 this.preloaded[imageURL] = '';
                 if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
                     this.progressSet += 1;
-                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                    controllers.loadingProgress.setValue(this.progressSet / (this.nImages*this.percentToLoad));
                 }
             }
             img.src = objectURL;
