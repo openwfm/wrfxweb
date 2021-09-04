@@ -138,6 +138,14 @@ export class LayerController extends HTMLElement {
         }
     }
 
+    loadTimestamp(layerNames, timestamp) {
+        var currentDomain = controllers.currentDomain.getValue();
+        for (var layerName of layerNames) {
+            var layer = this.getLayer(currentDomain, layerName);
+            layer.loadTimestamp(timestamp, this.worker);
+        }
+    }
+
     loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
@@ -156,21 +164,15 @@ export class LayerController extends HTMLElement {
         }
         controllers.loadingProgress.setFrames(nFrames);
 
-        const loadTimestamp = (timestamp) => {
-            for (var layerName of layerNames) {
-                var layer = this.getLayer(currentDomain, layerName);
-                layer.loadTimestamp(timestamp, worker);
-            }
-        }
         for (var timestamp of timestampsToLoad) {
             if (timestamp >= startTime && timestamp <= endTime) {
-                loadTimestamp(timestamp);
+                this.loadTimestamp(layerNames, timestamp);
             } else {
                 loadLater.push(timestamp);
             }
         }
         for (var timestamp of loadLater) {
-            loadTimestamp(timestamp);
+            this.loadTimestamp(layerNames, timestamp);
         }
     }
 

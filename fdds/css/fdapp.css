@@ -494,7 +494,7 @@ html, body {
   color: #5d5d5d;
 }
 
-.slider-container button {
+.slider-button {
   display: inline-block;
   background:#d6d6d6;
   border: none;
@@ -505,19 +505,21 @@ html, body {
   margin: 0;
 }
 
-.slider-container button:hover:not([disabled]) {
+.slider-button:hover {
   background: #e5e5e5;
 }
 
-.slider-button:disabled, 
-button[disabled] {
+.slider-icon {
   opacity: 50%;
 }
 
-.slider-container button img {
-  display: block;
-  text-align: center;
-  opacity: .5;
+.disabled-button {
+  opacity: 50%;
+  cursor: grab;
+}
+
+.disabled-button:hover {
+  background:#d6d6d6;
 }
 
 /* Slider */

@@ -127,7 +127,7 @@ export class SimulationLayer {
         this.preloadedColorbars = {};
     }
 
-    setImageLoaded(timestamp, imgURL, colorbar) {
+    async setImageLoaded(timestamp, imgURL, colorbar) {
         const img = new Image();
         img.onload = () => {
             var currentDomain = controllers.currentDomain.value;
@@ -175,6 +175,10 @@ export class SimulationLayer {
 
                 resolve([pixelData[0], pixelData[1], pixelData[2]])
             }
+            img.onerror = () => {
+                console.warn('Problem loading image at url: ' + imgURL);
+                resolve([0, 0, 0]);
+            }
             
             img.src = imgURL;
         });
@@ -200,6 +204,10 @@ export class SimulationLayer {
                 this.colorbarMaps[timestamp] = colorbarMap;
                 resolve(colorbarMap);
             }
+            colorbarImg.onerror = () => {
+                console.warn('Problem loading colorbar at url: ' + colorbarURL);
+                resolve(colorbarMap);
+            }
             colorbarImg.src = colorbarURL;
         });
     }
@@ -208,6 +216,9 @@ export class SimulationLayer {
      * location in clrbarMap. */
     findClosestKey(rgb, clrbarMap) {
         var [r, g, b] = rgb;
+        if (clrbarMap == null) {
+            return null;
+        }
         if (r + g + b == 0) {
             return 0;
         }
