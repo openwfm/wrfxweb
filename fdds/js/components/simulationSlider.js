@@ -238,7 +238,7 @@ export class SimulationSlider extends Slider {
 
         controllers.endDate.subscribe(() => {
             var endDate = controllers.endDate.getValue();
-            var endIndex = simVars.sortedTimestamps.indexOf(endDate) + 1;
+            var endIndex = simVars.sortedTimestamps.indexOf(endDate);
             // let left = Math.floor((endIndex / (simVars.sortedTimestamps.length)) * (this.sliderWidth - 5) + 4);
             var left = Math.floor((endIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95) + 14;
 

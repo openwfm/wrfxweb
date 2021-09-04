@@ -352,6 +352,14 @@ export class LayerController extends HTMLElement {
                     controllers.loadingProgress.setValue(this.progressSet / this.nImages);
                 }
             }
+            img.onerror = () => {
+                var currentDomain = controllers.currentDomain.getValue();
+                this.preloaded[imageURL] = '';
+                if (simVars.overlayOrder.includes(layerName) && layerDomain == currentDomain) {
+                    this.progressSet += 1;
+                    controllers.loadingProgress.setValue(this.progressSet / this.nImages);
+                }
+            }
             img.src = objectURL;
         });
         return worker;
