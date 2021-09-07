@@ -179,6 +179,12 @@ export class TimeSeriesChart extends HTMLElement {
                     pointBackgroundColor: (context) => {
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];
+                        var timestamp = this.labels[index];
+                        var currentDomain = controllers.currentDomain.getValue();
+                        var key = simVars.displayedColorbar + ',' + currentDomain + ',' +  timestamp;
+                        if (simVars.noLevels.has(key)) {
+                            return `rgb(256, 256, 256)`
+                        }
                         if (this.val === '' || isNaN(this.val) || value > this.val) {
                             return color;
                         }

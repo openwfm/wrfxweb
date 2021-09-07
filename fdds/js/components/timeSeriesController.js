@@ -4,6 +4,7 @@ import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { TimeSeriesMarker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
+import { utcToLocal } from '../util.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
@@ -355,7 +356,17 @@ export class TimeSeriesController extends LayerController {
         var levels = rasterInfo.levels;
         var x = clrbarMap.left - 5;
         if (!levels) {
-            return;
+            var key = simVars.displayedColorbar + ',' + currentDomain + ',' + utcToLocal(timeStamp);
+            simVars.noLevels.add(key);
+            var index = simVars.sortedTimestamps.indexOf(timeStamp);
+            var nearIndex = index == 0 ? 1 : index - 1;
+            var nearTimestamp = simVars.sortedTimestamps[nearIndex];
+            var nearRastersAtTime = simVars.rasters[currentDomain][nearTimestamp];
+            var nearRasterInfo = nearRastersAtTime[simVars.displayedColorbar];
+            levels = nearRasterInfo.levels;
+            if (!levels) {
+                return;
+            }
         }
         var stratified = false;
         if (Object.keys(clrbarMap).length - 10 < levels.length) {

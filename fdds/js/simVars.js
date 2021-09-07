@@ -31,6 +31,7 @@ export const simVars = (function createSimVars() {
     rasterBase: '',
     sortedTimestamps: [],
     overlayOrder: [],
+    noLevels: new Set(),
     startTime: null,
     endTime: null,
     displayedColorbar: null,
