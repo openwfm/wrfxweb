@@ -135,7 +135,7 @@ export class SimulationSlider extends Slider {
         var startBounds = sliderStart.getBoundingClientRect();
         var totalWidth = endBounds.left - startBounds.right;
         
-        var progressWidth = Math.floor(progress*totalWidth);
+        var progressWidth = Math.floor(progress*totalWidth)+2;
 
         const progressBar = this.shadowRoot.querySelector('#slider-progress'); 
         progressBar.style.display = 'block';
