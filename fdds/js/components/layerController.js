@@ -65,7 +65,12 @@ export class LayerController extends HTMLElement {
                 var topLayer = this.getLayer(topLayerName);
                 topLayer.setOpacity(newOpacity);
             }
-        })
+        });
+        controllers.currentSimulation.subscribe(() => {
+            if (this.worker) {
+                this.worker.terminate();
+            }
+        });
 
         const opacitySlider = new OpacitySlider();
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');

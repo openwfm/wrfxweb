@@ -41,6 +41,7 @@ export class SyncController extends Controller {
 
 // global controllers
 export const controllers = {
+    currentSimulation: new Controller(''),
     currentTimestamp: new Controller(),
     domainInstance: new Controller(),
     currentDomain: new Controller(),

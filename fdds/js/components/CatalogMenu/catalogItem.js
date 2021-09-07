@@ -1,6 +1,7 @@
 import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
+import { controllers } from '../Controller.js';
 
 const template = document.createElement('template');
 template.innerHTML = `
@@ -101,6 +102,7 @@ export class CatalogItem extends HTMLElement {
         // close selection dialog
         // simVars.currentSimulation = description;
         simVars.currentSimulation = entryID;
+        controllers.currentSimulation.setValue(entryID);
         simVars.currentDescription = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').style.display = 'none';
