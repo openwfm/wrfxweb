@@ -101,6 +101,7 @@ export class CatalogItem extends HTMLElement {
         // close selection dialog
         // simVars.currentSimulation = description;
         simVars.currentSimulation = entryID;
+        simVars.currentDescription = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').style.display = 'none';
         // setURL();

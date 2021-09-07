@@ -27,6 +27,7 @@ export const simVars = (function createSimVars() {
 
   var simVars = ({
     currentSimulation: '',
+    currentDescription: '',
     rasters: [],
     rasterBase: '',
     sortedTimestamps: [],

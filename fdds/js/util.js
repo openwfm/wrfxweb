@@ -34,7 +34,10 @@ export function setURL() {
     addData('domain', currentDomain);
   }
   var startDate = controllers.startDate.getValue();
+  var desc = simVars.currentDescription;
   if (startDate != simVars.sortedTimestamps[0]) {
+    addData('startDate', utcToLocal(startDate));
+  } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
     addData('startDate', utcToLocal(startDate));
   }
   var endDate = controllers.endDate.getValue();
@@ -102,6 +105,13 @@ export function localToUTC(localTime) {
   var utcTime = localTimeDayJS.tz('UTC');
 
   return utcTime.format('YYYY-MM-DD_HH:mm:ss');
+}
+
+export function daysBetween(timestamp1, timestamp2) {
+  var date1 = dayjs(timestamp1);
+  var date2 = dayjs(timestamp2);
+  var diff = date1.diff(date2, 'day');
+  return Math.abs(diff);
 }
 
 export function createOption(timeStamp, utcValue) {

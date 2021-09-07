@@ -16,6 +16,7 @@ jest.mock('../simVars.js', () => ({
         presets: ({ 
             opacity: "0.5"
         }),
+        currentDescription: '',
     }),
 }));
 
