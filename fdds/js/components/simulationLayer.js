@@ -130,16 +130,14 @@ export class SimulationLayer {
     async setImageLoaded(timestamp, imgURL, colorbar) {
         const img = new Image();
         img.onload = () => {
-            var currentDomain = controllers.currentDomain.value;
             if (colorbar) {
                 this.preloadedColorbars[timestamp] = imgURL;
             } else {
                 this.preloadedRasters[timestamp] = imgURL;
             }
-            // if the layer hasnt been removed and the domain hasnt changed while the img was loading
-            if (simVars.overlayOrder.includes(this.layerName) && (this.domain == currentDomain)) {
-                controllers.loadingProgress.frameLoaded();
-            }
+        }
+        img.onerror = () => {
+            console.warn('Problem loading image at url: ' + imgURL);
         }
         img.src = imgURL;
     }
@@ -301,17 +299,15 @@ export class SimulationLayer {
         return clrbarMap;
     }
 
-
-    loadTimestamp(timestamp, worker) {
+    toLoadTimestamp(timestamp) {
         if (this.isPreloaded(timestamp)) {
-            var frames = this.hasColorbar ? 2 : 1;
-            controllers.loadingProgress.frameLoaded(frames);
-            return;
+            return null;
         }
+        var toLoad = [];
         var raster = simVars.rasters[this.domain][timestamp];
         var rasterInfo = raster[this.layerName];
         var imgURL = simVars.rasterBase + rasterInfo.raster;
-        worker.postMessage({
+        toLoad.push({
             imageURL: imgURL,
             timeStamp: timestamp,
             layerName: this.layerName,
@@ -320,7 +316,7 @@ export class SimulationLayer {
         });
         if (this.hasColorbar) {
             var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-            worker.postMessage({
+            toLoad.push({
                 imageURL: colorbarURL,
                 timeStamp: timestamp,
                 layerName: this.layerName,
@@ -328,6 +324,8 @@ export class SimulationLayer {
                 colorbar: true
             });
         }
+        return toLoad;
+
     }
     
     mapLevels(clrbarCanvas, clrbarMap, timeStamp) {

@@ -138,42 +138,51 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    loadTimestamp(layerNames, timestamp) {
-        var currentDomain = controllers.currentDomain.getValue();
-        for (var layerName of layerNames) {
-            var layer = this.getLayer(currentDomain, layerName);
-            layer.loadTimestamp(timestamp, this.worker);
-        }
-    }
-
-    loadWithPriority(startTime, endTime, layerNames) {
+    async loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
         var worker = this.createWorker();
-        var loadLater = [];
-        controllers.loadingProgress.setValue(0);
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
         var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
-            var lowestTime = controllers.startDate.value;
-            var greatestTime = controllers.endDate.value;
-            return (timestamp >= lowestTime && timestamp <= greatestTime);
+            return (timestamp >= startDate && timestamp <= endDate);
         });
+
         var nFrames = 0;
+        var layers = [];
+        controllers.loadingProgress.setValue(0);
         for (var layerName of layerNames) {
             var layer = this.getLayer(currentDomain, layerName);
             var layerFrames = layer.hasColorbar ? 2 : 1;
             nFrames += layerFrames * timestampsToLoad.length;
+            layers.push(layer);
         }
         controllers.loadingProgress.setFrames(nFrames);
 
+        var loadNow = [];
+        var loadLater = [];
+        var preloaded = 0;
         for (var timestamp of timestampsToLoad) {
-            if (timestamp >= startTime && timestamp <= endTime) {
-                this.loadTimestamp(layerNames, timestamp);
-            } else {
-                loadLater.push(timestamp);
+            for (layer of layers) {
+                var toLoad = layer.toLoadTimestamp(timestamp);
+                if (toLoad) {
+                    if (timestamp >= startTime && timestamp <= endTime) {
+                        loadNow = loadNow.concat(toLoad);
+                    } else {
+                        loadLater = loadLater.concat(toLoad);
+                    }
+                } else {
+                    var layerFrames = layer.hasColorbar ? 2 : 1;
+                    preloaded += layerFrames;
+                }
             }
         }
-        for (var timestamp of loadLater) {
-            this.loadTimestamp(layerNames, timestamp);
-        }
+
+        controllers.loadingProgress.frameLoaded(preloaded);
+
+        worker.postMessage({
+            loadFirst: loadNow,
+            loadLater: loadLater,
+        });
     }
 
     resetLayers() {
@@ -307,19 +316,27 @@ export class LayerController extends HTMLElement {
         if (this.worker) {
             this.worker.terminate();
         }
-        var worker = new Worker('imageLoadingWorker.js');
+        var worker = new Worker('threadManager.js');
         this.worker = worker;
-        worker.addEventListener('message', event => {
+        worker.addEventListener('message', async event => {
             const imageData = event.data;
-            const imageURL = imageData.imageURL;
-            const timeStamp = imageData.timeStamp;
-            const layerName = imageData.layerName;
-            const layerDomain = imageData.layerDomain;
-            const colorbar = imageData.colorbar;
+            const batch = imageData.batch;
+            console.log(batch.length);
 
-            const objectURL = URL.createObjectURL(imageData.blob);
-            var layer = this.getLayer(layerDomain, layerName);
-            layer.setImageLoaded(timeStamp, objectURL, colorbar);
+            for (var loadInfo of batch) {
+                const objectURL = loadInfo.objectURL;
+                const layerDomain = loadInfo.layerDomain;
+                const layerName = loadInfo.layerName;
+                const timestamp = loadInfo.timeStamp;
+                const colorbar = loadInfo.colorbar;
+
+                if (objectURL) {
+                    var layer = this.getLayer(layerDomain, layerName);
+                    layer.setImageLoaded(timestamp, objectURL, colorbar);
+                }
+            }
+
+            controllers.loadingProgress.frameLoaded(batch.length);
         });
         return worker;
     }
