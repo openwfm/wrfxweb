@@ -37,7 +37,7 @@ export class SimulationSlider extends Slider {
             var progress = controllers.loadingProgress.value;
             if (progress > 0) {
                 if (progress >= this.progressCheck) {
-                    this.progressCheck = Math.floor((this.progressCheck + .05)*100)/100;
+                    this.progressCheck = Math.floor((this.progressCheck + .01)*100)/100;
                     this.setLoadProgress(progress);
                 }
             } else {
