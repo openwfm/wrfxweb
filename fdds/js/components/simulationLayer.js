@@ -127,14 +127,23 @@ export class SimulationLayer {
         this.preloadedColorbars = {};
     }
 
+    setPreloadedImage(timestamp, imgURL, colorbar) {
+        if (colorbar) {
+            this.preloadedColorbars[timestamp] = imgURL;
+        } else {
+            this.preloadedRasters[timestamp] = imgURL;
+        }
+    }
+
     async setImageLoaded(timestamp, imgURL, colorbar) {
+        if (!imgURL) {
+            this.setPreloadedImage(timestamp, imgURL, colorbar);
+            return;
+        }
+
         const img = new Image();
         img.onload = () => {
-            if (colorbar) {
-                this.preloadedColorbars[timestamp] = imgURL;
-            } else {
-                this.preloadedRasters[timestamp] = imgURL;
-            }
+            this.setPreloadedImage(timestamp, imgURL, colorbar);
         }
         img.onerror = () => {
             console.warn('Problem loading image at url: ' + imgURL);

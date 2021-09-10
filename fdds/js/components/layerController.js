@@ -321,7 +321,6 @@ export class LayerController extends HTMLElement {
         worker.addEventListener('message', async event => {
             const imageData = event.data;
             const batch = imageData.batch;
-            console.log(batch.length);
 
             for (var loadInfo of batch) {
                 const objectURL = loadInfo.objectURL;
@@ -330,10 +329,8 @@ export class LayerController extends HTMLElement {
                 const timestamp = loadInfo.timeStamp;
                 const colorbar = loadInfo.colorbar;
 
-                if (objectURL) {
-                    var layer = this.getLayer(layerDomain, layerName);
-                    layer.setImageLoaded(timestamp, objectURL, colorbar);
-                }
+                var layer = this.getLayer(layerDomain, layerName);
+                layer.setImageLoaded(timestamp, objectURL, colorbar);
             }
 
             controllers.loadingProgress.frameLoaded(batch.length);
