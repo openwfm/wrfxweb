@@ -137,7 +137,7 @@ export class SimulationLayer {
 
     async setImageLoaded(timestamp, imgURL, colorbar) {
         if (!imgURL) {
-            this.setPreloadedImage(timestamp, imgURL, colorbar);
+            this.setPreloadedImage(timestamp, '', colorbar);
             return;
         }
 
