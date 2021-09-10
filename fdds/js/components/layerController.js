@@ -323,12 +323,16 @@ export class LayerController extends HTMLElement {
             const batch = imageData.batch;
 
             for (var loadInfo of batch) {
-                const objectURL = loadInfo.objectURL;
+                const blob = loadInfo.blob;
                 const layerDomain = loadInfo.layerDomain;
                 const layerName = loadInfo.layerName;
                 const timestamp = loadInfo.timeStamp;
                 const colorbar = loadInfo.colorbar;
 
+                var objectURL = null;
+                if (blob.size > 0) {
+                    objectURL = URL.createObjectURL(blob);
+                }
                 var layer = this.getLayer(layerDomain, layerName);
                 layer.setImageLoaded(timestamp, objectURL, colorbar);
             }
