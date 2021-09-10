@@ -1,44 +1,49 @@
-'use strict';
-const MAX_BATCH_SIZE = 100;
-const TIMEOUT_MS = 0;
-
-async function loadImagesInBatches(imageIndex=0, batchSize, imageInfos, postMessage) {
-    let batchLimit = Math.min(imageIndex + batchSize, imageInfos.length - 1);
-    for (imageIndex; imageIndex <= batchLimit; imageIndex++) {
-        let imageInfo = imageInfos[imageIndex];
-        var imageURL = imageInfo.imageURL;
-        const response = await fetch(imageURL);
-        const blob = await response.blob();
-        imageInfo.blob = blob;
-
-        postMessage(imageInfo);
+export class ThreadManager {
+    constructor(updateCallback) {
+        this.updateCallback = updateCallback;
+        this.N_WORKERS = 4;
+        this.workers = [];
     }
-    if (imageIndex < imageInfos.length) {
-        setTimeout(loadImagesInBatches, TIMEOUT_MS, imageIndex, batchSize, imageInfos, postMessage);
-    }
-}
 
-self.addEventListener('message', async event => {
-    const layerData = event.data;
-    var loadFirst = layerData.loadFirst;
-    var loadLater = layerData.loadLater;
-    var framesToLoad = loadFirst.length + loadLater.length;
-    var totalLoaded = 0;
+    loadImages(loadFirst, loadLater) {
+        var firstSize = Math.ceil(loadFirst.length / 4);
+        var laterSize = Math.ceil(loadLater.length / 4);
+        this.cancelLoad();
+        for (var i = 0; i < this.N_WORKERS; i++) {
+            var iFirst = i * firstSize;
+            var jFirst = Math.min((i+1) * firstSize, loadFirst.length);
+            var firstBatch = loadFirst.slice(iFirst, jFirst);
 
-    var batch = [];
-    var frameThreshold = Math.ceil(framesToLoad / 100);
-    const postMessage = async (imageInfo) => {
-        batch.push(imageInfo);
-        if (batch.length >= frameThreshold || batch.length == (framesToLoad - totalLoaded)) {
-            self.postMessage({
-                batch: batch
-            });
-            totalLoaded += batch.length;
-            batch = [];
+            var iLater = i * laterSize;
+            var jLater = Math.min((i+1) * laterSize, loadLater.length);
+            var laterBatch = loadLater.slice(iLater, jLater);
+
+            var worker = this.startThread(firstBatch, laterBatch);
+            this.workers.push(worker);
         }
     }
 
-    var batchSize = Math.min(frameThreshold, MAX_BATCH_SIZE);
-    loadImagesInBatches(0, batchSize, loadFirst, postMessage);
-    loadImagesInBatches(0, batchSize, loadLater, postMessage);
-});
+    startThread(loadFirst, loadLater) {
+        var worker = new Worker('imageLoadingWorker.js');
+        worker.addEventListener('message', async event => {
+            const imageData = event.data;
+            const batch = imageData.batch;
+
+            this.updateCallback(batch);
+        });
+
+        worker.postMessage({
+            loadFirst: loadFirst,
+            loadLater: loadLater
+        })
+
+        return worker;
+    }
+
+    cancelLoad() {
+        for (var worker of this.workers) {
+            worker.terminate();
+        }
+        this.workers = [];
+    } 
+}
