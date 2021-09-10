@@ -1,7 +1,16 @@
 'use strict';
-function loadImages(imageInfos, worker) {
-    for (var imageInfo of imageInfos) {
+const MAX_BATCH_SIZE = 20;
+const TIMEOUT_MS = 75;
+
+async function loadImagesInBatches(imageIndex=0, batchSize, imageInfos, worker) {
+    let batchLimit = Math.min(imageIndex + batchSize, imageInfos.length - 1);
+    for (imageIndex; imageIndex <= batchLimit; imageIndex++) {
+    // for (var imageInfo of imageInfos) {
+        let imageInfo = imageInfos[imageIndex];
         worker.postMessage(imageInfo);
+    }
+    if (imageIndex < imageInfos.length - 1) {
+        setTimeout(loadImagesInBatches, TIMEOUT_MS, imageIndex, batchSize, imageInfos, worker);
     }
 }
 
@@ -33,6 +42,7 @@ self.addEventListener('message', async event => {
         await postMessage();
     });
 
-    loadImages(loadFirst, worker);
-    loadImages(loadLater, worker);
+    var batchSize = Math.min(frameThreshold, MAX_BATCH_SIZE);
+    loadImagesInBatches(0, batchSize, loadFirst, worker);
+    loadImagesInBatches(0, batchSize, loadLater, worker);
 });

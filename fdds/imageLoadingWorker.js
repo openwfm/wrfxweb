@@ -14,11 +14,9 @@ self.addEventListener('message', async event => {
     if (blob.size > 0) {
         objectURL = URL.createObjectURL(blob);
     }
-    // console.log(objectURL);
     self.postMessage({
         imageURL: imageURL, 
         objectURL: objectURL,
-        blob: blob,
         timeStamp: timeStamp,
         layerName: layerName,
         layerDomain: layerDomain,
