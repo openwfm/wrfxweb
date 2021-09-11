@@ -17,7 +17,10 @@ async function loadImagesInBatches(imageIndex=0, batchSize, imageInfos, worker) 
 export class ThreadManager {
     constructor(updateCallback) {
         this.updateCallback = updateCallback;
-        this.N_WORKERS = 1;
+        this.N_WORKERS = 2;
+        if(navigator.userAgent.indexOf("Firefox") != -1 ) {
+            this.N_WORKERS = 1;
+        }
         this.workers = [];
     }
 
