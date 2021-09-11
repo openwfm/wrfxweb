@@ -101,8 +101,9 @@ export class LayerController extends HTMLElement {
     }
 
     startThreadManager() {
-        const callback = (batch) => {
-            for (var loadInfo of batch) {
+        const callback = (loadInfo) => {
+        // const callback = (batch) => {
+        //     for (var loadInfo of batch) {
                 const blob = loadInfo.blob;
                 const layerDomain = loadInfo.layerDomain;
                 const layerName = loadInfo.layerName;
@@ -115,9 +116,10 @@ export class LayerController extends HTMLElement {
                 }
                 var layer = this.getLayer(layerDomain, layerName);
                 layer.setImageLoaded(timestamp, objectURL, colorbar);
-            }
+            // }
 
-            controllers.loadingProgress.frameLoaded(batch.length);
+            // controllers.loadingProgress.frameLoaded(batch.length);
+            controllers.loadingProgress.frameLoaded();
         };
 
         this.threadManager = new ThreadManager(callback);
