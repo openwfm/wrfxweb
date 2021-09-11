@@ -6,8 +6,8 @@ export class ThreadManager {
     }
 
     loadImages(loadFirst, loadLater) {
-        var firstSize = Math.ceil(loadFirst.length / 4);
-        var laterSize = Math.ceil(loadLater.length / 4);
+        var firstSize = Math.ceil(loadFirst.length / this.N_WORKERS);
+        var laterSize = Math.ceil(loadLater.length / this.N_WORKERS);
         this.cancelLoad();
         for (var i = 0; i < this.N_WORKERS; i++) {
             var iFirst = i * firstSize;
