@@ -4,6 +4,7 @@ import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { SimulationLayer } from './simulationLayer.js';
+import { ThreadManager } from '../../threadManager.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -43,7 +44,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.activeLayers = {};
-        this.worker; 
+        this.threadManager;
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -96,6 +97,30 @@ export class LayerController extends HTMLElement {
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
         opacitySliderContainer.appendChild(opacitySlider);
         this.buildMapBase();
+        this.startThreadManager();
+    }
+
+    startThreadManager() {
+        const callback = (batch) => {
+            for (var loadInfo of batch) {
+                const blob = loadInfo.blob;
+                const layerDomain = loadInfo.layerDomain;
+                const layerName = loadInfo.layerName;
+                const timestamp = loadInfo.timeStamp;
+                const colorbar = loadInfo.colorbar;
+
+                var objectURL = null;
+                if (blob.size > 0) {
+                    objectURL = URL.createObjectURL(blob);
+                }
+                var layer = this.getLayer(layerDomain, layerName);
+                layer.setImageLoaded(timestamp, objectURL, colorbar);
+            }
+
+            controllers.loadingProgress.frameLoaded(batch.length);
+        };
+
+        this.threadManager = new ThreadManager(callback);
     }
 
     setLayerButton() {
@@ -126,9 +151,7 @@ export class LayerController extends HTMLElement {
             var layer = this.getLayer(currentDomain, layerName);
             if (!load && !layer.isPreloaded(currentTimestamp)) {
                 load = true;
-                if (this.worker) {
-                    this.worker.terminate();
-                }
+                this.threadManager.cancelLoad();
             }
             layer.setTimestamp(currentTimestamp);
         }
@@ -140,7 +163,6 @@ export class LayerController extends HTMLElement {
 
     async loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
-        var worker = this.createWorker();
         var startDate = controllers.startDate.getValue();
         var endDate = controllers.endDate.getValue();
         var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
@@ -179,16 +201,11 @@ export class LayerController extends HTMLElement {
 
         controllers.loadingProgress.frameLoaded(preloaded);
 
-        worker.postMessage({
-            loadFirst: loadNow,
-            loadLater: loadLater,
-        });
+        this.threadManager.loadImages(loadNow, loadLater);
     }
 
     resetLayers() {
-        if (this.worker) {
-            this.worker.terminate();
-        }
+        this.threadManager.cancelLoad();
         for (var layerName of simVars.overlayOrder) {
             var layer = this.activeLayers[layerName];
             if (layer != null) {
@@ -310,36 +327,6 @@ export class LayerController extends HTMLElement {
             lastLayer.setOpacity(.5);
         }
         setURL();
-    }
-
-    createWorker() {
-        if (this.worker) {
-            this.worker.terminate();
-        }
-        var worker = new Worker('threadManager.js');
-        this.worker = worker;
-        worker.addEventListener('message', async event => {
-            const imageData = event.data;
-            const batch = imageData.batch;
-
-            for (var loadInfo of batch) {
-                const blob = loadInfo.blob;
-                const layerDomain = loadInfo.layerDomain;
-                const layerName = loadInfo.layerName;
-                const timestamp = loadInfo.timeStamp;
-                const colorbar = loadInfo.colorbar;
-
-                var objectURL = null;
-                if (blob.size > 0) {
-                    objectURL = URL.createObjectURL(blob);
-                }
-                var layer = this.getLayer(layerDomain, layerName);
-                layer.setImageLoaded(timestamp, objectURL, colorbar);
-            }
-
-            controllers.loadingProgress.frameLoaded(batch.length);
-        });
-        return worker;
     }
 
     /** Called when a layer is de-selected. */
