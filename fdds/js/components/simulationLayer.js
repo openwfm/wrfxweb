@@ -1,6 +1,7 @@
 import { simVars } from '../simVars.js';
 import { controllers } from './Controller.js';
 import { map } from '../map.js';
+import { utcToLocal } from '../util.js';
 
 /** Layer for a specific domain. */
 export class SimulationLayer {
@@ -348,7 +349,16 @@ export class SimulationLayer {
         var levels = rasterInfo.levels;
         var x = clrbarMap.left - 5;
         if (!levels) {
-            return;
+            simVars.noLevels.add(simVars.displayedColorbar, currentDomain, utcToLocal(timeStamp));
+            var index = simVars.sortedTimestamps.indexOf(timeStamp);
+            var nearIndex = index == 0 ? 1 : index - 1;
+            var nearTimestamp = simVars.sortedTimestamps[nearIndex];
+            var nearRastersAtTime = simVars.rasters[currentDomain][nearTimestamp];
+            var nearRasterInfo = nearRastersAtTime[simVars.displayedColorbar];
+            levels = nearRasterInfo.levels;
+            if (!levels) {
+                return;
+            }
         }
         var stratified = false;
         if (Object.keys(clrbarMap).length - 10 < levels.length) {

@@ -39,6 +39,7 @@ export class DomainSelector extends HTMLElement {
 
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
+        simVars.noLevels.clear();
         var domains = controllers.domainInstance.getValue();
         controllers.loadingProgress.setValue(0);
 
