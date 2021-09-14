@@ -65,7 +65,18 @@ export class TimeSeriesButton extends HTMLElement {
             if (endDate.value > simulationEndDate) {
                 this.setEndDate(simulationEndDate);
             }
-        })
+        });
+
+        const dataTypeSelector = this.querySelector('#dataType');
+        dataTypeSelector.addEventListener('change', () => {
+            var dataType = dataTypeSelector.value;
+            controllers.timeSeriesDataType.setValue(dataType);
+        });
+        controllers.timeSeriesDataType.subscribe(() => {
+            var dataType = controllers.timeSeriesDataType.getValue();
+            dataTypeSelector.value = dataType;
+        });
+        dataTypeSelector.value = controllers.timeSeriesDataType.getValue();
     }
 
     setProgress(progress) {

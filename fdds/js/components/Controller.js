@@ -48,6 +48,7 @@ export const controllers = {
     loadingProgress: new Controller(0),
     opacity: new Controller(0.5),
     syncImageLoad: new SyncController(),
+    timeSeriesDataType: new Controller('continuous'),
     startDate: (function createStartDate() {
         var startDateController = new Controller();
 
