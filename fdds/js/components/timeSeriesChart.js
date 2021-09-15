@@ -263,6 +263,12 @@ export class TimeSeriesChart extends HTMLElement {
                     spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
+                        var index = context.dataIndex;
+                        var timestamp = this.labels[index];
+                        var currentDomain = controllers.currentDomain.getValue();
+                        if (simVars.noLevels.has(simVars.displayedColorbar, currentDomain, timestamp)) {
+                            return `rgb(256, 256, 256)`
+                        }
                         var thresholdValue = this.thresholdValues[this.activeLayer];
                         var index = context.dataIndex;
                         var value = context.dataset.data[index];

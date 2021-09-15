@@ -60,10 +60,10 @@ export class LayerController extends HTMLElement {
         const domainSubscription = () => {
             this.resetLayers();
             this.domainSwitch();
-            this.updateTime();
             var startDate = controllers.startDate.value;
             var endDate = controllers.endDate.value;
             this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+            this.updateTime();
         }
         const domainResetSubscription = () => {
             this.resetLayers();
@@ -102,23 +102,19 @@ export class LayerController extends HTMLElement {
 
     startThreadManager() {
         const callback = (loadInfo) => {
-        // const callback = (batch) => {
-        //     for (var loadInfo of batch) {
-                const blob = loadInfo.blob;
-                const layerDomain = loadInfo.layerDomain;
-                const layerName = loadInfo.layerName;
-                const timestamp = loadInfo.timeStamp;
-                const colorbar = loadInfo.colorbar;
+            const blob = loadInfo.blob;
+            const layerDomain = loadInfo.layerDomain;
+            const layerName = loadInfo.layerName;
+            const timestamp = loadInfo.timeStamp;
+            const colorbar = loadInfo.colorbar;
 
-                var objectURL = null;
-                if (blob.size > 0) {
-                    objectURL = URL.createObjectURL(blob);
-                }
-                var layer = this.getLayer(layerDomain, layerName);
-                layer.setImageLoaded(timestamp, objectURL, colorbar);
-            // }
+            var objectURL = null;
+            if (blob.size > 0) {
+                objectURL = URL.createObjectURL(blob);
+            }
+            var layer = this.getLayer(layerDomain, layerName);
+            layer.setImageLoaded(timestamp, objectURL, colorbar);
 
-            // controllers.loadingProgress.frameLoaded(batch.length);
             controllers.loadingProgress.frameLoaded();
         };
 

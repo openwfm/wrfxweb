@@ -30,6 +30,26 @@ export const simVars = (function createSimVars() {
     rasters: [],
     rasterBase: '',
     sortedTimestamps: [],
+    noLevels: (function makeNoLevels() {
+      const noLevels = new Set();
+      const makeKey = (layerName, domain, timestamp) => {
+        return layerName + ',' + domain + ',' + timestamp;
+      }
+      const addNoLevels = (layerName, domain, timestamp) => {
+        var key = makeKey(layerName, domain, timestamp);
+        noLevels.add(key);
+      }
+      const hasNoLevels = (layerName, domain, timestamp) => {
+        var key = makeKey(layerName, domain, timestamp);
+        return noLevels.has(key);
+      }
+
+      return ({
+        add: addNoLevels,
+        has: hasNoLevels,
+        clear: () => noLevels.clear()
+      });
+    })(),
     overlayOrder: [],
     startTime: null,
     endTime: null,
