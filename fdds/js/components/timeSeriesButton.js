@@ -104,6 +104,7 @@ export class TimeSeriesButton extends HTMLElement {
             // this.getButton().disabled = true;
         } else {
             // this.getButton().disabled = false;
+            this.loading = false;
             this.querySelector('#generate-button-label').classList.remove('hidden');
             this.querySelector('#cancel-button-label').classList.add('hidden');
             progressBar.classList.add('hidden');

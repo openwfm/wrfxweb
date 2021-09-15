@@ -37,14 +37,11 @@ export class TimeSeriesController extends LayerController {
         controllers.syncImageLoad.subscribe(() => {
             this.updateCanvases()
         });
-        const loadTimeSeries = async () => {
+        const loadTimeSeries = () => {
             document.body.classList.add('waiting');
             var startDate = this.timeSeriesButton.getStartDate();
             var endDate = this.timeSeriesButton.getEndDate();
-            var timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
-            // document.body.classList.remove('waiting');
-            // const timeSeriesChart = document.querySelector('timeseries-chart');
-            // timeSeriesChart.populateChart(timeSeriesData);
+            this.generateTimeSeriesData(startDate, endDate);
         }
         this.timeSeriesButton.setGenerateLoader(loadTimeSeries);
         const cancelTimeSeries = () => {
@@ -233,32 +230,8 @@ export class TimeSeriesController extends LayerController {
 
         var layerData = {};
         var batchSize = Math.min(Math.ceil(filteredTimeStamps.length / 20), 10);
-        await this.generateTimeSeriesInBatches(0, batchSize, colorbarLayers, filteredTimeStamps, layerData, frameLoaded);
 
-        // for (var colorbarLayer of colorbarLayers) {
-        //     var layerName = colorbarLayer.layerName;
-        //     var timeSeriesData = [];
-        //     for (var marker of timeSeriesMarkers) {
-        //         var timeSeriesMarker = marker.getContent();
-        //         var dataEntry = ({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
-        //                              dataset: {}, hidden: timeSeriesMarker.hideOnChart});
-        //         for (var timeStamp of filteredTimeStamps) {
-        //             var coords = marker.imageCoords;
-        //             var colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
-        //             if (colorbarValue == null && dataType == 'continuous') {
-        //                 colorbarValue = 0;
-        //             }
-        //             dataEntry.dataset[timeStamp] = colorbarValue;
-        //             progress += 1;
-        //             this.timeSeriesButton.setProgress(progress/totalFramesToLoad);
-        //         }
-        //         timeSeriesData.push(dataEntry);
-        //     }
-        //     layerData[layerName] = timeSeriesData;
-        // }
-        // document.body.classList.remove('waiting');
-
-        return layerData;
+        this.generateTimeSeriesInBatches(0, batchSize, colorbarLayers, filteredTimeStamps, layerData, frameLoaded);
     }
 }
 
