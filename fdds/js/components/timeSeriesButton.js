@@ -30,16 +30,35 @@ export class TimeSeriesButton extends HTMLElement {
                     </select>
                 </div>
                 <button class='timeSeriesButton' id='timeSeriesButton'>
-                    <span>generate timeseries</span>
+                    <span id='generate-button-label'>generate timeseries</span>
+                    <span class='hidden' id='cancel-button-label'>cancel timeseries</span>
                     <div id='progressBar' class='hidden'></div>
                 </button>
             </div>
         `;
         this.querySelector('#dataType').value = dataType;
+        this.generateLoader = null;
+        this.cancelLoader = null;
+        this.loading = false;
     }
 
     connectedCallback() {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
+
+        const timeSeriesButton = this.querySelector('#timeSeriesButton');
+        timeSeriesButton.onpointerdown = () => {
+            if (this.loading) {
+                this.cancelLoader();
+                this.setProgress(1);
+                this.loading = false;
+            } else {
+                this.loading = true;
+                this.setProgress(0);
+                this.querySelector('#generate-button-label').classList.add('hidden');
+                this.querySelector('#cancel-button-label').classList.remove('hidden');
+                this.generateLoader();
+            }
+        }
         const startDate = this.querySelector('#startDate');
         const endDate = this.querySelector('#endDate');
         startDate.addEventListener('change', () => {
@@ -75,17 +94,29 @@ export class TimeSeriesButton extends HTMLElement {
     }
 
     setProgress(progress) {
+        if (!this.loading) {
+            return;
+        }
         const progressBar = this.querySelector('#progressBar');
         if (progress < 1) {
             progressBar.classList.remove('hidden');
             progressBar.style.width = Math.floor(progress*100) + '%';
-            this.getButton().disabled = true;
+            // this.getButton().disabled = true;
         } else {
-            this.getButton().disabled = false;
+            // this.getButton().disabled = false;
+            this.querySelector('#generate-button-label').classList.remove('hidden');
+            this.querySelector('#cancel-button-label').classList.add('hidden');
             progressBar.classList.add('hidden');
         }
     }
 
+    setGenerateLoader(loader) {
+        this.generateLoader = loader;
+    }
+
+    setCancelLoader(cancelLoader) {
+        this.cancelLoader = cancelLoader;
+    }
     
     updateTimestamps() {
         const startDate = this.querySelector('#startDate');
