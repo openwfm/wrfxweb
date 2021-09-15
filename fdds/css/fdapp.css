@@ -1,5 +1,20 @@
 /* app css stylesheet */
 
+/* ====== Table of Contents ======
+          1. Body 
+          2. CatalogMenu
+          3. CatalogItems
+          4. DomainSelector
+          5. LayerController
+          6. InfoPanel
+          7. SimulationController
+          8. Slider
+          9. TimeSeriesChart
+
+  mobile style follows the form: component-mobile, for example: CatalogMenu-mobile
+*/
+
+/* ===== Body ===== */
 html {
   margin-top:0;
   height: 100%;
@@ -100,7 +115,7 @@ h4 {
 
 .fade-in {
   opacity: 0;
-  animation: fadeIn 1s ease-in forwards;
+  animation: fadeIn .6s ease-in forwards;
 }
 
 #map-fd {
@@ -208,8 +223,8 @@ html, body {
   margin-left: 10px !important;
 }
 
-/* catalogMenu css */
-/* Button Style */
+/* ===== CatalogMenu ===== */
+/* button Style */
 .catalog-button {
   height: 40px;
   position: fixed;
@@ -304,7 +319,7 @@ html, body {
   cursor: pointer;
 }
 
-/* CatalogItems */
+/* ===== CatalogItems ===== */
 .catalog-entry {
   list-style-type: none;
   margin-bottom: 10px;
@@ -328,7 +343,7 @@ html, body {
   text-decoration: underline;
 }
 
-/* DomainSelector */
+/* ===== DomainSelector ===== */
 #domain-selector {
   position: fixed;
   left: 20px;
@@ -362,7 +377,7 @@ html, body {
     margin-right: 20px;
 }
 
-/* LayerController */
+/* ===== LayerController ===== */
 #layer-controller-container {
     position: absolute;
     right: 0px;
@@ -397,7 +412,7 @@ html, body {
     margin-left: 50px;
 }
 
-/* MultiLayerController */
+/* ====== MultiLayerController ====== */
 #added-simulations {
   position: absolute;
   width: 400px;
@@ -440,7 +455,7 @@ html, body {
   width: 60px;
 }
 
-/* InfoPanel */
+/* ===== InfoPanel ===== */
 .close-panel {
   position: absolute;
   top: 3px;
@@ -517,7 +532,7 @@ html, body {
   cursor: pointer;
 }
 
-/* Simulation Controller */
+/* ===== SimulationController ===== */
 .slider-wrapper {
   position: fixed;
   left: 20px;
@@ -572,7 +587,7 @@ html, body {
   color: #5d5d5d;
 }
 
-.slider-container button {
+.slider-button {
   display: inline-block;
   background:#d6d6d6;
   border: none;
@@ -583,22 +598,24 @@ html, body {
   margin: 0;
 }
 
-.slider-container button:hover:not([disabled]) {
+.slider-button:hover {
   background: #e5e5e5;
 }
 
-.slider-button:disabled, 
-button[disabled] {
+.slider-icon {
   opacity: 50%;
 }
 
-.slider-container button img {
-  display: block;
-  text-align: center;
-  opacity: .5;
+.disabled-button {
+  opacity: 50%;
+  cursor: grab;
 }
 
-/* Slider */
+.disabled-button:hover {
+  background:#d6d6d6;
+}
+
+/* ====== Slider ====== */
 .slider {
   position: relative;
   padding-top: 5px;
@@ -738,7 +755,7 @@ button[disabled] {
     width: 40%;
 }
 
-/* TimeSeriesChart */
+/* ===== TimeSeriesChart ===== */
 #fullContainer {
   z-index: 9000;
   position: absolute;
@@ -873,6 +890,7 @@ button[disabled] {
 }
 
 @media (max-width: 769px) {
+  /* ===== Body-mobile ===== */
   .displayTest {
     left: 20px;
     top: 50px;
@@ -902,7 +920,7 @@ button[disabled] {
     display: block;
   }
 
-  /* catalogMenu style */
+  /* ===== CatalogMenu-mobile ===== */
   /* button style */
   .catalog-button > div:nth-child(2) {
       visibility: hidden;
@@ -945,14 +963,14 @@ button[disabled] {
       width: 250px;
   }
 
-  /* LayerController */
+  /* ===== LayerController-mobile ===== */
   #layer-controller-container {
     height: 440px;
     top: 85px;
     right: 30px;
   }
 
-  /* InfoPanel */
+  /* ===== InfoPanel-mobile ===== */
   #infoPanel {
     width: 300px;
     height: 600px;
@@ -962,7 +980,7 @@ button[disabled] {
       left: 230px;
   }
 
-  /* SimulationController */
+  /* ===== SimulationController-mobile ===== */
   .slider-container {
     width: 320px;
   }
@@ -987,13 +1005,13 @@ button[disabled] {
       background: #d6d6d6;
   }
 
-  /* Slider */
+  /* ===== Slider-mobile ===== */
   .slider.simulation-slider {
     left: 10px;
     width: 300px;
   }
   
-  /* TimeSeriesChart */
+  /* ====== TimeSeriesChart-mobile ====== */
   #timeSeriesChartContainer {
     padding: 20px;
     padding-left: 10px;

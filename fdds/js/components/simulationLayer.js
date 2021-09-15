@@ -1,6 +1,7 @@
 import { simVars } from '../simVars.js';
 import { controllers } from './Controller.js';
 import { map } from '../map.js';
+import { utcToLocal } from '../util.js';
 
 /** Layer for a specific domain. */
 export class SimulationLayer {
@@ -127,19 +128,26 @@ export class SimulationLayer {
         this.preloadedColorbars = {};
     }
 
-    setImageLoaded(timestamp, imgURL, colorbar) {
+    setPreloadedImage(timestamp, imgURL, colorbar) {
+        if (colorbar) {
+            this.preloadedColorbars[timestamp] = imgURL;
+        } else {
+            this.preloadedRasters[timestamp] = imgURL;
+        }
+    }
+
+    async setImageLoaded(timestamp, imgURL, colorbar) {
+        if (!imgURL) {
+            this.setPreloadedImage(timestamp, '', colorbar);
+            return;
+        }
+
         const img = new Image();
         img.onload = () => {
-            var currentDomain = controllers.currentDomain.value;
-            if (colorbar) {
-                this.preloadedColorbars[timestamp] = imgURL;
-            } else {
-                this.preloadedRasters[timestamp] = imgURL;
-            }
-            // if the layer hasnt been removed and the domain hasnt changed while the img was loading
-            if (simVars.overlayOrder.includes(this.layerName) && (this.domain == currentDomain)) {
-                controllers.loadingProgress.frameLoaded();
-            }
+            this.setPreloadedImage(timestamp, imgURL, colorbar);
+        }
+        img.onerror = () => {
+            console.warn('Problem loading image at url: ' + imgURL);
         }
         img.src = imgURL;
     }
@@ -175,6 +183,10 @@ export class SimulationLayer {
 
                 resolve([pixelData[0], pixelData[1], pixelData[2]])
             }
+            img.onerror = () => {
+                console.warn('Problem loading image at url: ' + imgURL);
+                resolve([0, 0, 0]);
+            }
             
             img.src = imgURL;
         });
@@ -200,6 +212,10 @@ export class SimulationLayer {
                 this.colorbarMaps[timestamp] = colorbarMap;
                 resolve(colorbarMap);
             }
+            colorbarImg.onerror = () => {
+                console.warn('Problem loading colorbar at url: ' + colorbarURL);
+                resolve(colorbarMap);
+            }
             colorbarImg.src = colorbarURL;
         });
     }
@@ -208,6 +224,9 @@ export class SimulationLayer {
      * location in clrbarMap. */
     findClosestKey(rgb, clrbarMap) {
         var [r, g, b] = rgb;
+        if (clrbarMap == null) {
+            return null;
+        }
         if (r + g + b == 0) {
             return 0;
         }
@@ -290,17 +309,15 @@ export class SimulationLayer {
         return clrbarMap;
     }
 
-
-    loadTimestamp(timestamp, worker) {
+    toLoadTimestamp(timestamp) {
         if (this.isPreloaded(timestamp)) {
-            var frames = this.hasColorbar ? 2 : 1;
-            controllers.loadingProgress.frameLoaded(frames);
-            return;
+            return null;
         }
+        var toLoad = [];
         var raster = simVars.rasters[this.domain][timestamp];
         var rasterInfo = raster[this.layerName];
         var imgURL = simVars.rasterBase + rasterInfo.raster;
-        worker.postMessage({
+        toLoad.push({
             imageURL: imgURL,
             timeStamp: timestamp,
             layerName: this.layerName,
@@ -309,7 +326,7 @@ export class SimulationLayer {
         });
         if (this.hasColorbar) {
             var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-            worker.postMessage({
+            toLoad.push({
                 imageURL: colorbarURL,
                 timeStamp: timestamp,
                 layerName: this.layerName,
@@ -317,6 +334,8 @@ export class SimulationLayer {
                 colorbar: true
             });
         }
+        return toLoad;
+
     }
     
     mapLevels(clrbarCanvas, clrbarMap, timeStamp) {
@@ -330,7 +349,16 @@ export class SimulationLayer {
         var levels = rasterInfo.levels;
         var x = clrbarMap.left - 5;
         if (!levels) {
-            return;
+            simVars.noLevels.add(simVars.displayedColorbar, currentDomain, utcToLocal(timeStamp));
+            var index = simVars.sortedTimestamps.indexOf(timeStamp);
+            var nearIndex = index == 0 ? 1 : index - 1;
+            var nearTimestamp = simVars.sortedTimestamps[nearIndex];
+            var nearRastersAtTime = simVars.rasters[currentDomain][nearTimestamp];
+            var nearRasterInfo = nearRastersAtTime[simVars.displayedColorbar];
+            levels = nearRasterInfo.levels;
+            if (!levels) {
+                return;
+            }
         }
         var stratified = false;
         if (Object.keys(clrbarMap).length - 10 < levels.length) {

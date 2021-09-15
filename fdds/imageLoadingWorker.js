@@ -1,21 +1,12 @@
 'use strict';
 
 self.addEventListener('message', async event => {
-    const urlData = event.data;
-    var imageURL = urlData.imageURL;
-    var timeStamp = urlData.timeStamp;
-    var layerName = urlData.layerName;
-    var layerDomain = urlData.layerDomain;
-    var colorbar = urlData.colorbar;
+    const imageInfo = event.data;
 
+    var imageURL = imageInfo.imageURL;
     const response = await fetch(imageURL);
     const blob = await response.blob();
-    self.postMessage({
-        imageURL: imageURL, 
-        blob: blob,
-        timeStamp: timeStamp,
-        layerName: layerName,
-        layerDomain: layerDomain,
-        colorbar: colorbar
-    });
+    imageInfo.blob = blob;
+    
+    postMessage(imageInfo);
 });

@@ -39,16 +39,11 @@ export class DomainSelector extends HTMLElement {
 
     /** Builds the list of domain elements that can be chosen. */
     buildDomains() {
+        simVars.noLevels.clear();
         var domains = controllers.domainInstance.getValue();
         controllers.loadingProgress.setValue(0);
 
-        var presetDomain = domains[0];
-        if (domains.includes(simVars.presets.domain)) {
-            presetDomain = simVars.presets.domain;
-        }
-        simVars.presets.domain = null;
-
-        this.setPresets(presetDomain);
+        var presetDomain = this.setPresets(domains);
 
         const domainCheckboxes = this.querySelector('#domain-checkboxes');
         domainCheckboxes.innerHTML = '';
@@ -95,7 +90,13 @@ export class DomainSelector extends HTMLElement {
         return div;
     }
 
-    setPresets(domId) {
+    setPresets(domains) {
+        var domId = domains[0];
+        if (domains.includes(simVars.presets.domain)) {
+            domId = simVars.presets.domain;
+        }
+        simVars.presets.domain = null;
+
         var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
         simVars.sortedTimestamps = nextTimestamps;
 
@@ -133,6 +134,8 @@ export class DomainSelector extends HTMLElement {
         }
         simVars.presets.timestamp = null;
         controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
+
+        return domId;
     }
 
     /** Function called when a new domain is selected. */

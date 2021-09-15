@@ -12,6 +12,7 @@ export class SimulationSlider extends Slider {
         }
         super(width, simVars.sortedTimestamps.length - 1);
         this.progressWidth = 0;
+        this.progressCheck = 0;
     }
 
     connectedCallback() {
@@ -34,7 +35,15 @@ export class SimulationSlider extends Slider {
         controllers.currentTimestamp.subscribe(updateSlider);
         controllers.loadingProgress.subscribe(() => {
             var progress = controllers.loadingProgress.value;
-            this.setLoadProgress(progress);
+            if (progress > 0) {
+                if (progress >= this.progressCheck) {
+                    this.progressCheck = Math.floor((this.progressCheck + .01)*100)/100;
+                    this.setLoadProgress(progress);
+                }
+            } else {
+                this.progressCheck = 0;
+                this.setLoadProgress(progress);
+            }
         });
 
         const slider = this.querySelector('#slider');

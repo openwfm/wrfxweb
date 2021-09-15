@@ -4,6 +4,7 @@ import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { SimulationLayer } from './simulationLayer.js';
+import { ThreadManager } from '../../threadManager.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
@@ -45,7 +46,7 @@ export class LayerController extends HTMLElement {
         this.overlayDict = {};
         this.rasterDict = {};
         this.activeLayers = {};
-        this.worker; 
+        this.threadManager;
     }
 
     /** Disable map events from within the layer selection window to prevent unwanted zooming
@@ -57,13 +58,14 @@ export class LayerController extends HTMLElement {
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
         this.setLayerButton();
+        // simplify this
         const domainSubscription = () => {
             this.resetLayers();
             this.domainSwitch();
-            this.updateTime();
             var startDate = controllers.startDate.value;
             var endDate = controllers.endDate.value;
             this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+            this.updateTime();
         }
         const domainResetSubscription = () => {
             this.resetLayers();
@@ -97,6 +99,28 @@ export class LayerController extends HTMLElement {
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
         opacitySliderContainer.appendChild(opacitySlider);
         this.buildMapBase();
+        this.startThreadManager();
+    }
+
+    startThreadManager() {
+        const callback = (loadInfo) => {
+            const blob = loadInfo.blob;
+            const layerDomain = loadInfo.layerDomain;
+            const layerName = loadInfo.layerName;
+            const timestamp = loadInfo.timeStamp;
+            const colorbar = loadInfo.colorbar;
+
+            var objectURL = null;
+            if (blob.size > 0) {
+                objectURL = URL.createObjectURL(blob);
+            }
+            var layer = this.getLayer(layerDomain, layerName);
+            layer.setImageLoaded(timestamp, objectURL, colorbar);
+
+            controllers.loadingProgress.frameLoaded();
+        };
+
+        this.threadManager = new ThreadManager(callback);
     }
 
     setLayerButton() {
@@ -122,60 +146,66 @@ export class LayerController extends HTMLElement {
     updateTime() {
         var currentDomain = controllers.currentDomain.getValue();
         var currentTimestamp = controllers.currentTimestamp.getValue();
-        var loading = false;
+        var load = false;
         for (var layerName of simVars.overlayOrder) {
             var layer = this.getLayer(currentDomain, layerName);
-            if (!layer.isPreloaded(currentTimestamp)) {
-                if (!loading) {
-                    var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-                    this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
-                }
-                loading = true;
+            if (!load && !layer.isPreloaded(currentTimestamp)) {
+                load = true;
+                this.threadManager.cancelLoad();
             }
             layer.setTimestamp(currentTimestamp);
         }
+        if (load) {
+            var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+            this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
+        }
     }
 
-    loadWithPriority(startTime, endTime, layerNames) {
+    async loadWithPriority(startTime, endTime, layerNames) {
         var currentDomain = controllers.currentDomain.getValue();
-        var worker = this.createWorker();
-        var loadLater = [];
-        controllers.loadingProgress.setValue(0);
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
         var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
-            var lowestTime = controllers.startDate.value;
-            var greatestTime = controllers.endDate.value;
-            return (timestamp >= lowestTime && timestamp <= greatestTime);
+            return (timestamp >= startDate && timestamp <= endDate);
         });
+
         var nFrames = 0;
+        var layers = [];
+        controllers.loadingProgress.setValue(0);
         for (var layerName of layerNames) {
             var layer = this.getLayer(currentDomain, layerName);
             var layerFrames = layer.hasColorbar ? 2 : 1;
             nFrames += layerFrames * timestampsToLoad.length;
+            layers.push(layer);
         }
         controllers.loadingProgress.setFrames(nFrames);
 
-        const loadTimestamp = (timestamp) => {
-            for (var layerName of layerNames) {
-                var layer = this.getLayer(currentDomain, layerName);
-                layer.loadTimestamp(timestamp, worker);
-            }
-        }
+        var loadNow = [];
+        var loadLater = [];
+        var preloaded = 0;
         for (var timestamp of timestampsToLoad) {
-            if (timestamp >= startTime && timestamp <= endTime) {
-                loadTimestamp(timestamp);
-            } else {
-                loadLater.push(timestamp);
+            for (layer of layers) {
+                var toLoad = layer.toLoadTimestamp(timestamp);
+                if (toLoad) {
+                    if (timestamp >= startTime && timestamp <= endTime) {
+                        loadNow = loadNow.concat(toLoad);
+                    } else {
+                        loadLater = loadLater.concat(toLoad);
+                    }
+                } else {
+                    var layerFrames = layer.hasColorbar ? 2 : 1;
+                    preloaded += layerFrames;
+                }
             }
         }
-        for (var timestamp of loadLater) {
-            loadTimestamp(timestamp);
-        }
+
+        controllers.loadingProgress.frameLoaded(preloaded);
+
+        this.threadManager.loadImages(loadNow, loadLater);
     }
 
     resetLayers() {
-        if (this.worker) {
-            this.worker.terminate();
-        }
+        this.threadManager.cancelLoad();
         for (var layerName of simVars.overlayOrder) {
             var layer = this.activeLayers[layerName];
             if (layer != null) {
@@ -297,27 +327,6 @@ export class LayerController extends HTMLElement {
             lastLayer.setOpacity(.5);
         }
         setURL();
-    }
-
-    createWorker() {
-        if (this.worker) {
-            this.worker.terminate();
-        }
-        var worker = new Worker('imageLoadingWorker.js');
-        this.worker = worker;
-        worker.addEventListener('message', event => {
-            const imageData = event.data;
-            const imageURL = imageData.imageURL;
-            const timeStamp = imageData.timeStamp;
-            const layerName = imageData.layerName;
-            const layerDomain = imageData.layerDomain;
-            const colorbar = imageData.colorbar;
-
-            const objectURL = URL.createObjectURL(imageData.blob);
-            var layer = this.getLayer(layerDomain, layerName);
-            layer.setImageLoaded(timeStamp, objectURL, colorbar);
-        });
-        return worker;
     }
 
     /** Called when a layer is de-selected. */

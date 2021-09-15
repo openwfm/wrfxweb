@@ -22,28 +22,31 @@ export class SimulationController extends HTMLElement {
                 <div class='slider-container'>
                     <div id='slider-header'>
                         <div id='slider-play-bar'>
-                            <button id='slider-slow-down'>
-                                <svg class='svgIcon interactive-button'>
+                            <button class='slider-button' id='slider-slow-down'>
+                                <svg class='svgIcon slider-icon'>
                                     <use href="#fast_rewind_black_24dp"></use>
                                 </svg>
                             </button>
-                            <button id='slider-prev'>
-                                <svg class='svgIcon interactive-button'>
+                            <button class='slider-button' id='slider-prev'>
+                                <svg class='svgIcon slider-icon'>
                                     <use href="#arrow_left-24px"></use>
                                 </svg>
                             </button>
-                            <button id='slider-play-pause'>
-                                <svg class='svgIcon interactive-button'>
+                            <button class='slider-button' id='slider-play-pause'>
+                                <svg id='play-button' class='svgIcon slider-icon'>
                                     <use href="#play_arrow-24px"></use>
                                 </svg>
+                                <svg id='pause-button' class='svgIcon slider-icon hidden'>
+                                    <use href="#pause-24px"></use>
+                                </svg>
                             </button>
-                            <button id='slider-next'>
-                                <svg class='svgIcon interactive-button'>
+                            <button class='slider-button' id='slider-next'>
+                                <svg class='svgIcon slider-icon'>
                                     <use href="#arrow_right-24px"></use>
                                 </svg>
                             </button>
-                            <button id='slider-fast-forward'>
-                                <svg class='svgIcon interactive-button'>
+                            <button class='slider-button' id='slider-fast-forward'>
+                                <svg class='svgIcon slider-icon'>
                                     <use href="#fast_forward_black_24dp"></use>
                                 </svg>
                             </button>
@@ -208,26 +211,35 @@ export class SimulationController extends HTMLElement {
     /** Called to update the UI when the currentFrame has been updated. */
     updateSlider() {
         var currentTimestamp = controllers.currentTimestamp.getValue();
-        document.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
+        this.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
     }
 
     /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
      * changes play icon to pause icon. */
     playPause() {
-        const playPauseButton = document.querySelector('#slider-play-pause');
-        const prevButton = document.querySelector('#slider-prev');
-        const nextButton = document.querySelector('#slider-next');
+        const prevButton = this.querySelector('#slider-prev');
+        const nextButton = this.querySelector('#slider-next');
+        const playButton = this.querySelector('#play-button');
+        const pauseButton = this.querySelector('#pause-button');
 
         this.playing = !this.playing;
         if (!this.playing) {
-            playPauseButton.firstElementChild.src = 'icons/play_arrow-24px.svg';
+            playButton.classList.remove('hidden');
+            pauseButton.classList.add('hidden');
+            
             prevButton.disabled = false;
             nextButton.disabled = false;
+            prevButton.classList.remove('disabled-button');
+            nextButton.classList.remove('disabled-button');
             setURL();
         } else {
-            playPauseButton.firstElementChild.src = 'icons/pause-24px.svg';
+            playButton.classList.add('hidden');
+            pauseButton.classList.remove('hidden');
+
             prevButton.disabled = true;
             nextButton.disabled = true;
+            prevButton.classList.add('disabled-button');
+            nextButton.classList.add('disabled-button');
             this.play();
         }
     }
