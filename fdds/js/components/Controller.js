@@ -74,7 +74,7 @@ export class SyncController extends Controller {
     }
 }
 
-function makeArrayController() {
+function makeArrayController(controllerType = null) {
     var arrayController = new Controller([]);
     arrayController.removeEvent = 'REMOVE_EVENT';
     arrayController.addEvent = 'ADD_EVENT';
@@ -82,11 +82,16 @@ function makeArrayController() {
         arrayController.value.push(newMarker);
         arrayController.broadcastEvent(arrayController.addEvent, newMarker);
     }
-    arrayController.remove = (removeMarker) => {
-        var index = arrayController.value.indexOf(removeMarker);
+    arrayController.remove = (arrayElement) => {
+        var index = arrayController.value.indexOf(arrayElement);
         arrayController.value.splice(index, 1);
-        arrayController.broadcastEvent(arrayController.removeEvent, index);
+        if (controllerType == null) {
+            arrayController.broadcastEvent(arrayController.removeEvent, index);
+        } else {
+            arrayController.broadcastEvent(arrayController.removeEvent, arrayElement);
+        }
     }
+
     return arrayController;
 }
 
@@ -102,8 +107,8 @@ export const controllers = {
     domainInstance: new Controller(),
     currentDomain: new Controller(),
     addSimulation: new Controller(false),
-    addedSimulations: makeArrayController(),
-    activeSimulation: new Controller(''),
+    addedSimulations: makeArrayController(1),
+    // activeSimulation: new Controller(''),
     loadingProgress: (function createLoadProg() {
         const loadingProgress = new Controller(0);
         loadingProgress.nFrames = 0;

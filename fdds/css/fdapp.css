@@ -6,10 +6,11 @@
           3. CatalogItems
           4. DomainSelector
           5. LayerController
-          6. InfoPanel
-          7. SimulationController
-          8. Slider
-          9. TimeSeriesChart
+          6. MultiLayerController
+          7. InfoPanel
+          8. SimulationController
+          9. Slider
+          10. TimeSeriesChart
 
   mobile style follows the form: component-mobile, for example: CatalogMenu-mobile
 */
@@ -21,12 +22,16 @@ html {
   overflow-y: hidden;
 }
 
-h4 {
-  margin: 0;
-}
-
 .body {
   font-family: helvetica;
+}
+
+html, body {
+  height: 100vh;
+}
+
+h4 {
+  margin: 0;
 }
 
 #hideMenu {
@@ -157,14 +162,10 @@ div.control-column {
   margin-right: auto;
 }
 
-html, body {
-  height: 100vh;
-}
-
 #raster-colorbar {
   position: fixed;
   left: 60px;
-  bottom: 100px;
+  bottom: 110px;
   width: 200px;
   height: 400px;
   z-index: 2000;
@@ -428,7 +429,8 @@ html, body {
   margin-right: 0px;
   float: right;
   width: 80px;
-  background: #e8e8e8;
+  background: #d6d6d6;
+  color: #5d5d5d;
   border-radius: 4px 4px 0px 0px;
   padding: 0px 10px;
   height: 30px;
@@ -439,7 +441,15 @@ html, body {
 }
 
 .tab.active {
-  background: #d6d6d6;
+  background: #e8e8e8;
+}
+
+.tab .interactive-button {
+  opacity: 75%;
+}
+
+.tab .interactive-button:hover {
+  opacity: 100%;
 }
 
 .tab.active .interactive-button {
@@ -536,7 +546,7 @@ html, body {
 .slider-wrapper {
   position: fixed;
   left: 20px;
-  bottom: 30px;
+  bottom: 10px;
   z-index: 8000;
 }
 
@@ -560,12 +570,12 @@ html, body {
 
 #slider-tabs .tab {
   float: left;
-  background: white;
+  /* background: white; */
 }
 
-#slider-tabs .tab.active {
+/* #slider-tabs .tab.active {
   background:#d6d6d6;
-}
+} */
 
 #slider-header {
   display: block;

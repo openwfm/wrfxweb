@@ -14,7 +14,7 @@ export class SimulationController extends HTMLElement {
         super();
         this.innerHTML = `
             <div class='slider-wrapper hidden'>
-                <div id='slider-tabs'>
+                <div id='slider-tabs' class='not-hidden'>
                     <div id='combined-slider' class='tab'>
                         <div class='interactive-button innerTab'>Combined Slider</div>
                     </div>
@@ -126,6 +126,16 @@ export class SimulationController extends HTMLElement {
 
     setMultiLayers() {
         const sliderTabs = this.querySelector('#slider-tabs');
+        const combinedTab = this.querySelector('#combined-slider');
+        var combinedId = 'combinedTab';
+        this.tabs[combinedId] = combinedTab;
+        combinedTab.onpointerdown = () => {
+            this.switchActiveTab(combinedId);
+        }
+
+        controllers.currentDomain.subscribe(() => {
+            sliderTabs.classList.add('hidden');
+        }, controllerEvents.simReset);
 
         controllers.addedSimulations.subscribe((id) => {
             this.makeNewTab(id);
@@ -141,17 +151,17 @@ export class SimulationController extends HTMLElement {
             }
         }, controllers.addedSimulations.removeEvent);
 
-        controllers.activeSimulation.subscribe(() => {
-            var activeSim = controllers.activeSimulation.getValue();
-            this.switchActiveTab(activeSim);
-        });
     }
 
     removeTab(id) {
-        // const sliderTabs = this.querySelector('#slider-tabs');
-        // var tab = this.tabs[id];
-        // delete this.tabs[id];
-        // sliderTabs.removeChild(tab);
+        const sliderTabs = this.querySelector('#slider-tabs');
+        var tab = this.tabs[id];
+        sliderTabs.removeChild(tab);
+        delete this.tabs[id];
+        if (id == this.activeTab) {
+            var newActive = Object.keys(this.tabs)[0];
+            this.switchActiveTab(newActive);
+        }
     }
 
     makeNewTab(id) {
@@ -161,9 +171,10 @@ export class SimulationController extends HTMLElement {
         var newTab = createTab(id);
         this.tabs[id] = newTab;
         newTab.onpointerdown = () => {
-            controllers.activeSimulation.setValue(id);
+            this.switchActiveTab(id);
         }
         sliderTabs.insertBefore(newTab, combinedSlider);
+        this.switchActiveTab(id);
     }
 
     switchActiveTab(activeDescription) {
@@ -196,8 +207,6 @@ export class SimulationController extends HTMLElement {
             this.playPause();
         }
 
-        // const sliderContainer = this.querySelector('.slider-container');
-        // sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
         const sliderWrapper = this.querySelector('.slider-wrapper');
         if (simVars.sortedTimestamps.length >= 2) {
             sliderWrapper.classList.remove('hidden');

@@ -1,4 +1,4 @@
-import { createElement, createTab } from '../util.js';
+import { createTab } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 
 export class LayerTabs extends HTMLElement {
@@ -25,9 +25,9 @@ export class LayerTabs extends HTMLElement {
 
         this.tabs[id] = newTab;
         addedSimulations.insertBefore(newTab, addSimulation)
-        controllers.activeSimulation.setValue(id);
+        this.switchActiveTab(id);
         newTab.onpointerdown = () => {
-            controllers.activeSimulation.setValue(id);
+            this.switchActiveTab(id);
         }
         newTab.ondblclick = () => {
             this.removeTab(id)
@@ -46,7 +46,7 @@ export class LayerTabs extends HTMLElement {
         this.tabOrder.splice(index, 1);
         if (this.activeTab == tab) {
             var newActive = this.tabOrder[0];
-            controllers.activeSimulation.setValue(newActive);
+            this.switchActiveTab(newActive);
         }
         delete this.tabs[tabDescription];
 
@@ -72,10 +72,6 @@ export class LayerTabs extends HTMLElement {
             for (var simulation of controllers.addedSimulations.getValue()) {
                 this.makeNewTab(simulation);
             }
-        });
-        controllers.activeSimulation.subscribe(() => {
-            var activeSim = controllers.activeSimulation.getValue();
-            this.switchActiveTab(activeSim);
         });
     }
 
