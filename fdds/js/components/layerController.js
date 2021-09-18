@@ -332,8 +332,10 @@ export class LayerController extends HTMLElement {
             this.nImages += simVars.sortedTimestamps.length;
             var cb_url = simVars.rasterBase + raster_info.colorbar;
             const rasterColorbar = document.querySelector('#raster-colorbar');
+            const rasterColorbarBG = document.querySelector('#raster-colorbar-bg');
             rasterColorbar.src = cb_url;
             rasterColorbar.style.display = 'block';
+            rasterColorbarBG.style.display = 'block';
             simVars.displayedColorbar = name;
         }
         var startDate = controllers.currentTimestamp.getValue();
@@ -390,6 +392,7 @@ export class LayerController extends HTMLElement {
             lastLayer.setOpacity(topOpacity);
         }
         const rasterColorbar = document.querySelector('#raster-colorbar');
+        const rasterColorbarBG = document.querySelector('#raster-colorbar-bg');
         var rasters_now = simVars.rasters[controllers.currentDomain.getValue()][controllers.currentTimestamp.getValue()];
         var mostRecentColorbar = null;
         var colorbarSrc = '';
@@ -413,6 +416,7 @@ export class LayerController extends HTMLElement {
         simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
+        rasterColorbarBG.style.display = colorbarDisplay;
         var startDate = controllers.currentTimestamp.getValue();
         var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);

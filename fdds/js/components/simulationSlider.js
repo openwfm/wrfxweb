@@ -5,7 +5,9 @@ import { simVars } from '../simVars.js';
 
 export class SimulationSlider extends Slider {
     constructor() {
-        super(340, simVars.sortedTimestamps.length - 1);
+        const clientWidth = document.body.clientWidth;
+        var sliderWidth = (clientWidth < 769) ? 310 : 340; 
+        super(sliderWidth, simVars.sortedTimestamps.length - 1);
         this.currentSimulation = '';
     }
 
