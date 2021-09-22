@@ -9,8 +9,16 @@ import { ThreadManager } from '../../threadManager.js';
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window
  * to choose different layers available to add. 
+ * 
+ *              Contents
+ *  1. Initialization block
+ *  2. Reset block
+ *  3. DomainSwitch block 
+ *  4. AddRemoveLayers block
+ *  5. Util block
  */
 export class LayerController extends HTMLElement {
+    /**  ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -40,88 +48,32 @@ export class LayerController extends HTMLElement {
                 </div>
             </div>
         `;
-        this.mapType = 'OSM';
+        this.currentMapType = 'OSM';
         this.overlayDict = {};
         this.rasterDict = {};
         this.activeLayers = {};
         this.threadManager;
     }
 
-    /** Disable map events from within the layer selection window to prevent unwanted zooming
-     * and panning. Set up callbacks to trigger when currentdomain updates and currentTimestamp
-     * updates. */
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-container');
         dragElement(layerController, '');
         L.DomEvent.disableClickPropagation(layerController);
         L.DomEvent.disableScrollPropagation(layerController);
-        this.setLayerButton();
-        // simplify this
-        const domainSubscription = () => {
-            this.resetLayers();
-            this.domainSwitch();
-            var startDate = controllers.startDate.value;
-            var endDate = controllers.endDate.value;
-            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-            this.updateTime();
-        }
-        const domainResetSubscription = () => {
-            this.resetLayers();
-            this.resetLayerController();
-            this.domainSwitch();
-            this.updateTime();
-        }
-        controllers.currentDomain.subscribe(domainSubscription);
-        controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
 
-        controllers.currentTimestamp.subscribe(() => this.updateTime());
-        controllers.opacity.subscribe(() => {
-            var newOpacity = controllers.opacity.getValue();
-            if (simVars.overlayOrder.length > 0) {
-                var currentDomain = controllers.currentDomain.getValue();
-                var topLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
-                var topLayer = this.getLayer(currentDomain, topLayerName);
-                topLayer.setOpacity(newOpacity);
-            }
-        });
+        this.initializeLayerButton();
 
-        const reload = () => {
-            var startDate = controllers.startDate.getValue();
-            var endDate = controllers.endDate.getValue();
-            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-        }
-        controllers.startDate.subscribe(reload);
-        controllers.endDate.subscribe(reload);
+        this.subscribeToCurrentDomain();
+        controllers.currentTimestamp.subscribe(() => this.updateToCurrentTimestamp());
+        this.subscribeToTopLayerOpacity();
+        this.subscribeToSimulationStartAndEndDates();
 
-        const opacitySlider = new OpacitySlider();
-        const opacitySliderContainer = this.querySelector('#opacity-slider-container');
-        opacitySliderContainer.appendChild(opacitySlider);
-        this.buildMapBase();
-        this.startThreadManager();
+        this.createOpacitySlider();
+        this.createMapBaseCheckBoxes();
+        this.createThreadManager();
     }
 
-    startThreadManager() {
-        const callback = (loadInfo) => {
-            const blob = loadInfo.blob;
-            const layerDomain = loadInfo.layerDomain;
-            const layerName = loadInfo.layerName;
-            const timestamp = loadInfo.timeStamp;
-            const colorbar = loadInfo.colorbar;
-
-            var objectURL = null;
-            if (blob.size > 0) {
-                objectURL = URL.createObjectURL(blob);
-            }
-            var layer = this.getLayer(layerDomain, layerName);
-            layer.setImageLoaded(timestamp, objectURL, colorbar);
-
-            controllers.loadingProgress.frameLoaded();
-        };
-
-        this.threadManager = new ThreadManager(callback);
-    }
-
-    setLayerButton() {
+    initializeLayerButton() {
         const layersButton = this.querySelector('#layers-button');
 
         L.DomEvent.disableClickPropagation(layersButton);
@@ -137,79 +89,121 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    /** Triggered whenever currentTimestamp is changed. For every layer currently selected 
-     * need to set its image url to the point to the image associated with the current time.
-     * Need to update the colorbar on top to the current time as well.
-     */
-    updateTime() {
-        var currentDomain = controllers.currentDomain.getValue();
-        var currentTimestamp = controllers.currentTimestamp.getValue();
-        var load = false;
-        for (var layerName of simVars.overlayOrder) {
-            var layer = this.getLayer(currentDomain, layerName);
-            if (!load && !layer.isPreloaded(currentTimestamp)) {
-                load = true;
-                this.threadManager.cancelLoad();
-            }
-            layer.setTimestamp(currentTimestamp);
+    subscribeToCurrentDomain() {
+        const domainSubscription = () => {
+            this.resetLayers();
+            this.switchDomain();
+            let startDate = controllers.startDate.value;
+            let endDate = controllers.endDate.value;
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+            this.updateToCurrentTimestamp();
         }
-        if (load) {
-            var endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        const domainResetSubscription = () => {
+            this.resetLayers();
+            this.resetLayerController();
+            this.switchDomain();
+            this.updateToCurrentTimestamp();
+        }
+        controllers.currentDomain.subscribe(domainSubscription);
+        controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
+    }
+
+    updateToCurrentTimestamp() {
+        let currentDomain = controllers.currentDomain.getValue();
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        let shouldLoadAtEnd = false;
+        for (let addedLayerName of simVars.overlayOrder) {
+            let addedLayer = this.getLayer(currentDomain, addedLayerName);
+            if (!shouldLoadAtEnd && !addedLayer.timestampIsPreloaded(currentTimestamp)) {
+                shouldLoadAtEnd = true;
+                this.threadManager.cancelCurrentLoad();
+            }
+            addedLayer.setTimestamp(currentTimestamp);
+        }
+        if (shouldLoadAtEnd) {
+            let endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
             this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
         }
     }
 
-    async loadWithPriority(startTime, endTime, layerNames) {
-        var currentDomain = controllers.currentDomain.getValue();
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
-        var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
-            return (timestamp >= startDate && timestamp <= endDate);
-        });
-
-        var nFrames = 0;
-        var layers = [];
-        controllers.loadingProgress.setValue(0);
-        for (var layerName of layerNames) {
-            var layer = this.getLayer(currentDomain, layerName);
-            var layerFrames = layer.hasColorbar ? 2 : 1;
-            nFrames += layerFrames * timestampsToLoad.length;
-            layers.push(layer);
+    subscribeToSimulationStartAndEndDates() {
+        const reload = () => {
+            var startDate = controllers.startDate.getValue();
+            var endDate = controllers.endDate.getValue();
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         }
-        controllers.loadingProgress.setFrames(nFrames);
-
-        var loadNow = [];
-        var loadLater = [];
-        var preloaded = 0;
-        for (var timestamp of timestampsToLoad) {
-            for (layer of layers) {
-                var toLoad = layer.toLoadTimestamp(timestamp);
-                if (toLoad) {
-                    if (timestamp >= startTime && timestamp <= endTime) {
-                        loadNow = loadNow.concat(toLoad);
-                    } else {
-                        loadLater = loadLater.concat(toLoad);
-                    }
-                } else {
-                    var layerFrames = layer.hasColorbar ? 2 : 1;
-                    preloaded += layerFrames;
-                }
-            }
-        }
-
-        controllers.loadingProgress.frameLoaded(preloaded);
-
-        this.threadManager.loadImages(loadNow, loadLater);
+        controllers.startDate.subscribe(reload);
+        controllers.endDate.subscribe(reload);
     }
 
-    resetLayers() {
-        this.threadManager.cancelLoad();
-        for (var layerName of simVars.overlayOrder) {
-            var layer = this.activeLayers[layerName];
-            if (layer != null) {
-                layer.imageOverlay.remove(map);
+    subscribeToTopLayerOpacity() {
+        controllers.opacity.subscribe(() => {
+            let newOpacity = controllers.opacity.getValue();
+            if (simVars.overlayOrder.length > 0) {
+                let currentDomain = controllers.currentDomain.getValue();
+                let topLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
+                let topLayer = this.getLayer(currentDomain, topLayerName);
+                topLayer.setOpacity(newOpacity);
             }
-            delete this.activeLayers[layerName];
+        });
+    }
+
+    createOpacitySlider() {
+        const opacitySliderContainer = this.querySelector('#opacity-slider-container');
+
+        const opacitySlider = new OpacitySlider();
+        opacitySliderContainer.appendChild(opacitySlider);
+    }
+
+    createMapBaseCheckBoxes() {
+       const baseMapDiv = this.querySelector('#map-checkboxes');
+       const mapCheckCallback = ([layerName, layer]) => {
+           if (layerName != this.currentMapType) {
+               layer.addTo(map);
+               this.currentMapType = layerName; 
+               layer.bringToFront();
+           } else {
+               layer.remove(map);
+           }
+       }
+       for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
+           var checked = layerName == this.currentMapType;
+           let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
+                                            checked, mapCheckCallback, [layerName, layer]);
+           baseMapDiv.appendChild(mapCheckBox);
+       }
+    }
+
+    createThreadManager() {
+        const imageLoadedCallback = (loadInfo) => {
+            const blob = loadInfo.blob;
+            const layerDomain = loadInfo.layerDomain;
+            const layerName = loadInfo.layerName;
+            const timestamp = loadInfo.timeStamp;
+            const colorbar = loadInfo.colorbar;
+
+            var objectURL = null;
+            if (blob.size > 0) {
+                objectURL = URL.createObjectURL(blob);
+            }
+            var layer = this.getLayer(layerDomain, layerName);
+            layer.setImageLoaded(timestamp, objectURL, colorbar);
+
+            controllers.loadingProgress.frameLoaded();
+        }
+
+        this.threadManager = new ThreadManager(imageLoadedCallback);
+    }
+
+    /** ====== Reset block ====== */
+    resetLayers() {
+        this.threadManager.cancelCurrentLoad();
+        for (var currentlyAddedLayerName of simVars.overlayOrder) {
+            let currentlyAddedLayer = this.activeLayers[currentlyAddedLayerName];
+            if (currentlyAddedLayer != null) {
+                currentlyAddedLayer.imageOverlay.remove(map);
+            }
+            delete this.activeLayers[currentlyAddedLayerName];
         }
         simVars.displayedColorbar = null;
         const rasterColorbar = document.querySelector('#raster-colorbar');
@@ -225,7 +219,6 @@ export class LayerController extends HTMLElement {
             simVars.presets.rasters = null;
         }
 
-        // clear cache
         this.rasterDict = this.clearCache(this.rasterDict);
         this.overlayDict = this.clearCache(this.overlayDict);
 
@@ -244,47 +237,55 @@ export class LayerController extends HTMLElement {
         return {};
     }
 
-    /** Called when a new domain is selected or a new simulation is selected. */
-    domainSwitch() {
-        // build the layer groups of the current domain
-        var currentDomain = controllers.currentDomain.getValue();
-        var timestamp = simVars.sortedTimestamps[0];
-        if (this.rasterDict[currentDomain] == null) {
-            this.rasterDict[currentDomain] = {};
-        }
-        if (this.overlayDict[currentDomain] == null) {
-            this.overlayDict[currentDomain] = {};
-        }
+    /** ===== DomainSwitch block ===== */
+    switchDomain() {
+        let currentDomain = controllers.currentDomain.getValue();
+        let timestamp = simVars.sortedTimestamps[0];
 
-        var firstRasters = simVars.rasters[currentDomain][timestamp];
-        var vars = Object.keys(firstRasters);
-        var cs = firstRasters[vars[0]].coords;
+        this.initDomainToLayerDictionary(currentDomain, this.rasterDict);
+        this.initDomainToLayerDictionary(currentDomain, this.overlayDict);
+        let firstRasters = simVars.rasters[currentDomain][timestamp];
+        this.makeLayersForDomainAndRasters(currentDomain, firstRasters);
 
-        for (var layerName in firstRasters) {
-            var rasterInfo = firstRasters[layerName];
-            var layer = this.getLayer(currentDomain, layerName);
-            if (layer == null) {
-                layer = new SimulationLayer(layerName, currentDomain, rasterInfo);
-                if(simVars.overlayList.indexOf(layerName) >= 0) {
-                    this.overlayDict[currentDomain][layerName] = layer;
-                } else {
-                    this.rasterDict[currentDomain][layerName] = layer;
-                }
-            }
-        };
-
-        var filteredOverlays = simVars.overlayOrder.filter(overlay => {
+        var previouslyAddedLayerNames = simVars.overlayOrder.filter(overlay => {
             return (overlay in this.overlayDict[currentDomain]) || (overlay in this.rasterDict[currentDomain]);
         })
-        simVars.overlayOrder = filteredOverlays;
+        simVars.overlayOrder = previouslyAddedLayerNames;
 
+        let layerNames = Object.keys(firstRasters);
+        let coords = firstRasters[layerNames[0]].coords;
+        this.setMapView(coords);
+        
+        this.buildLayerBoxes();
+    }
+
+    initDomainToLayerDictionary(domain, domainToLayerDict) {
+        if (domainToLayerDict[domain] == null) {
+            domainToLayerDict[domain] = {};
+        }
+    }
+
+    makeLayersForDomainAndRasters(domain, rasters) {
+        for (let layerName in rasters) {
+            let rasterInfo = rasters[layerName];
+            let layer = this.getLayer(domain, layerName);
+            if (layer == null) {
+                layer = new SimulationLayer(layerName, domain, rasterInfo);
+                if(simVars.overlayList.indexOf(layerName) >= 0) {
+                    this.overlayDict[domain][layerName] = layer;
+                } else {
+                    this.rasterDict[domain][layerName] = layer;
+                }
+            }
+        }
+    }
+
+    setMapView(coords) {
         if (simVars.presets.pan || simVars.presets.zoom) {
             this.setPresetView();
         } else { 
-            map.fitBounds([ [cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]] ]);
+            map.fitBounds([ [coords[0][1], coords[0][0]], [coords[2][1], coords[2][0]] ]);
         }
-        
-        this.buildLayerBoxes();
     }
 
     setPresetView() {
@@ -304,6 +305,50 @@ export class LayerController extends HTMLElement {
         map.setView(pan, zoom);
     }
 
+    buildLayerBoxes() {
+        const rasterRegion = this.querySelector('#raster-layers');
+        rasterRegion.classList.remove('hidden');
+        if (Object.keys(this.rasterDict).length == 0) {
+            rasterRegion.classList.add('hidden');
+        }
+        const overlayRegion = this.querySelector('#overlay-layers');
+        overlayRegion.classList.remove('hidden');
+        if (Object.keys(this.overlayDict).length == 0) {
+            overlayRegion.classList.add('hidden');
+        }
+
+        const rasterDiv = this.querySelector('#raster-checkboxes');
+        rasterDiv.innerHTML = '';
+        const overlayDiv = this.querySelector('#overlay-checkboxes');
+        overlayDiv.innerHTML = '';
+
+        var currentDomain = controllers.currentDomain.getValue();
+        var rasterDict = this.rasterDict[currentDomain];
+        var overlayDict = this.overlayDict[currentDomain];
+        const layerClick = (layerName) => {
+            if (!simVars.overlayOrder.includes(layerName)) {
+                var startDate = controllers.currentTimestamp.getValue();
+                var endDate = controllers.endDate.getValue();
+                this.handleOverlayadd(layerName);
+                this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+            } else {
+                this.handleOverlayRemove(layerName);
+            }
+        };
+        for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {
+            for (var layerName in layerDict) {
+                var checked = simVars.overlayOrder.includes(layerName);
+                var layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
+                                                checked, layerClick, layerName);
+                layerDiv.appendChild(layerBox);
+            }
+        }
+        for (var layerName of simVars.overlayOrder) {
+            this.handleOverlayadd(layerName);
+        }
+    }
+
+    /** ===== AddRemoveLayers block ===== */
     /** Called when a layer is selected. */
     handleOverlayadd(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
@@ -364,7 +409,50 @@ export class LayerController extends HTMLElement {
         setURL();
     }
 
-    /** Returns the layer associated with a given name */
+    async loadWithPriority(startTime, endTime, layerNames) {
+        var currentDomain = controllers.currentDomain.getValue();
+        var startDate = controllers.startDate.getValue();
+        var endDate = controllers.endDate.getValue();
+        var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
+            return (timestamp >= startDate && timestamp <= endDate);
+        });
+
+        var nFrames = 0;
+        var layers = [];
+        controllers.loadingProgress.setValue(0);
+        for (var layerName of layerNames) {
+            var layer = this.getLayer(currentDomain, layerName);
+            var layerFrames = layer.hasColorbar ? 2 : 1;
+            nFrames += layerFrames * timestampsToLoad.length;
+            layers.push(layer);
+        }
+        controllers.loadingProgress.setFrames(nFrames);
+
+        var loadNow = [];
+        var loadLater = [];
+        var preloaded = 0;
+        for (var timestamp of timestampsToLoad) {
+            for (layer of layers) {
+                var toLoad = layer.toLoadTimestamp(timestamp);
+                if (toLoad) {
+                    if (timestamp >= startTime && timestamp <= endTime) {
+                        loadNow = loadNow.concat(toLoad);
+                    } else {
+                        loadLater = loadLater.concat(toLoad);
+                    }
+                } else {
+                    var layerFrames = layer.hasColorbar ? 2 : 1;
+                    preloaded += layerFrames;
+                }
+            }
+        }
+
+        controllers.loadingProgress.frameLoaded(preloaded);
+
+        this.threadManager.loadImages(loadNow, loadLater);
+    }
+
+    /** ===== Util block ===== */
     getLayer(domain, name) {
         if (simVars.overlayList.includes(name)) {
             if (this.overlayDict[domain] == null) {
@@ -376,71 +464,6 @@ export class LayerController extends HTMLElement {
             return;
         }
         return this.rasterDict[domain][name];
-    }
-
-    /** Adds checkboxes for the different available map types. Should only be called once after
-     * the map has been initialized. */
-    buildMapBase() {
-        const baseMapDiv = this.querySelector('#map-checkboxes');
-        const mapCheckCallback = ([layerName, layer]) => {
-            if (layerName != this.mapType) {
-                layer.addTo(map);
-                this.mapType = layerName; 
-                layer.bringToFront();
-            } else {
-                layer.remove(map);
-            }
-        }
-        for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
-            var checked = layerName == this.mapType;
-            let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
-                                             checked, mapCheckCallback, [layerName, layer]);
-            baseMapDiv.appendChild(mapCheckBox);
-        }
-    }
-
-    /** Builds a checkbox for each raster layer and overlay layer */
-    buildLayerBoxes() {
-        const rasterRegion = this.querySelector('#raster-layers');
-        rasterRegion.classList.remove('hidden');
-        if (Object.keys(this.rasterDict).length == 0) {
-            rasterRegion.classList.add('hidden');
-        }
-        const overlayRegion = this.querySelector('#overlay-layers');
-        overlayRegion.classList.remove('hidden');
-        if (Object.keys(this.overlayDict).length == 0) {
-            overlayRegion.classList.add('hidden');
-        }
-
-        const rasterDiv = this.querySelector('#raster-checkboxes');
-        rasterDiv.innerHTML = '';
-        const overlayDiv = this.querySelector('#overlay-checkboxes');
-        overlayDiv.innerHTML = '';
-
-        var currentDomain = controllers.currentDomain.getValue();
-        var rasterDict = this.rasterDict[currentDomain];
-        var overlayDict = this.overlayDict[currentDomain];
-        const layerClick = (layerName) => {
-            if (!simVars.overlayOrder.includes(layerName)) {
-                var startDate = controllers.currentTimestamp.getValue();
-                var endDate = controllers.endDate.getValue();
-                this.handleOverlayadd(layerName);
-                this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-            } else {
-                this.handleOverlayRemove(layerName);
-            }
-        };
-        for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {
-            for (var layerName in layerDict) {
-                var checked = simVars.overlayOrder.includes(layerName);
-                var layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
-                                              checked, layerClick, layerName);
-                layerDiv.appendChild(layerBox);
-            }
-        }
-        for (var layerName of simVars.overlayOrder) {
-            this.handleOverlayadd(layerName);
-        }
     }
 }
 

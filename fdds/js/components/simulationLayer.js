@@ -34,7 +34,7 @@ export class SimulationLayer {
         this.clrbarCanvas = document.createElement('canvas');
     }
 
-    isPreloaded(timestamp) {
+    timestampIsPreloaded(timestamp) {
         var rasterCheck = this.preloadedRasters[timestamp] != null;
         var colorbarCheck = true;
         if (this.hasColorbar) {
@@ -310,7 +310,7 @@ export class SimulationLayer {
     }
 
     toLoadTimestamp(timestamp) {
-        if (this.isPreloaded(timestamp)) {
+        if (this.timestampIsPreloaded(timestamp)) {
             return null;
         }
         var toLoad = [];

@@ -54,9 +54,9 @@ export class TimeSeriesController extends LayerController {
     }
 
     /** When domain is switched, remove all timeSeries markers. */
-    domainSwitch() {
+    switchDomain() {
         this.timeSeriesButton.updateTimestamps();
-        super.domainSwitch();
+        super.switchDomain();
         var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
         for (var marker of timeSeriesMarkers) {
             marker.hideMarkerInfo();
@@ -99,8 +99,8 @@ export class TimeSeriesController extends LayerController {
         }
     }
 
-    updateTime() {
-        super.updateTime();
+    updateToCurrentTimestamp() {
+        super.updateToCurrentTimestamp();
         this.updateMarkers();
     }
 
