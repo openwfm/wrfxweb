@@ -14,7 +14,7 @@ import { ThreadManager } from '../../threadManager.js';
  *  1. Initialization block
  *  2. Reset block
  *  3. DomainSwitch block 
- *  4. AddRemoveLayers block
+ *  4. AddAndRemoveLayers block
  *  5. Util block
  */
 export class LayerController extends HTMLElement {
@@ -128,8 +128,8 @@ export class LayerController extends HTMLElement {
 
     subscribeToSimulationStartAndEndDates() {
         const reload = () => {
-            var startDate = controllers.startDate.getValue();
-            var endDate = controllers.endDate.getValue();
+            let startDate = controllers.startDate.getValue();
+            let endDate = controllers.endDate.getValue();
             this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         }
         controllers.startDate.subscribe(reload);
@@ -182,11 +182,11 @@ export class LayerController extends HTMLElement {
             const timestamp = loadInfo.timeStamp;
             const colorbar = loadInfo.colorbar;
 
-            var objectURL = null;
+            let objectURL = null;
             if (blob.size > 0) {
                 objectURL = URL.createObjectURL(blob);
             }
-            var layer = this.getLayer(layerDomain, layerName);
+            let layer = this.getLayer(layerDomain, layerName);
             layer.setImageLoaded(timestamp, objectURL, colorbar);
 
             controllers.loadingProgress.frameLoaded();
@@ -198,7 +198,7 @@ export class LayerController extends HTMLElement {
     /** ====== Reset block ====== */
     resetLayers() {
         this.threadManager.cancelCurrentLoad();
-        for (var currentlyAddedLayerName of simVars.overlayOrder) {
+        for (let currentlyAddedLayerName of simVars.overlayOrder) {
             let currentlyAddedLayer = this.activeLayers[currentlyAddedLayerName];
             if (currentlyAddedLayer != null) {
                 currentlyAddedLayer.imageOverlay.remove(map);
@@ -213,8 +213,8 @@ export class LayerController extends HTMLElement {
 
     resetLayerController() {
         simVars.overlayOrder = [];
-        var presetRasters = simVars.presets.rasters;
-        if (presetRasters) {
+        let presetRasters = simVars.presets.rasters;
+        if (presetRasters != null) {
             simVars.overlayOrder = presetRasters;
             simVars.presets.rasters = null;
         }
@@ -226,11 +226,11 @@ export class LayerController extends HTMLElement {
         document.querySelector('#copyLink').classList.remove('hidden');
     }
 
-    clearCache(domainDict) {
-        for (var domain in domainDict) {
-            var layerDict = domainDict[domain];
-            for (var timestamp in layerDict) {
-                var layer = layerDict[timestamp];
+    clearCache(domainsToLayersDict) {
+        for (let domain in domainsToLayersDict) {
+            let layersDict = domainsToLayersDict[domain];
+            for (var timestamp in layersDict) {
+                let layer = layersDict[timestamp];
                 layer.clearCache();
             }
         }
@@ -247,7 +247,7 @@ export class LayerController extends HTMLElement {
         let firstRasters = simVars.rasters[currentDomain][timestamp];
         this.makeLayersForDomainAndRasters(currentDomain, firstRasters);
 
-        var previouslyAddedLayerNames = simVars.overlayOrder.filter(overlay => {
+        let previouslyAddedLayerNames = simVars.overlayOrder.filter(overlay => {
             return (overlay in this.overlayDict[currentDomain]) || (overlay in this.rasterDict[currentDomain]);
         })
         simVars.overlayOrder = previouslyAddedLayerNames;
@@ -256,7 +256,7 @@ export class LayerController extends HTMLElement {
         let coords = firstRasters[layerNames[0]].coords;
         this.setMapView(coords);
         
-        this.buildLayerBoxes();
+        this.createLayerCheckboxes();
     }
 
     initDomainToLayerDictionary(domain, domainToLayerDict) {
@@ -282,21 +282,21 @@ export class LayerController extends HTMLElement {
 
     setMapView(coords) {
         if (simVars.presets.pan || simVars.presets.zoom) {
-            this.setPresetView();
+            this.setPresetMapView();
         } else { 
             map.fitBounds([ [coords[0][1], coords[0][0]], [coords[2][1], coords[2][0]] ]);
         }
     }
 
-    setPresetView() {
-        var pan = simVars.presets.pan;
+    setPresetMapView() {
+        let pan = simVars.presets.pan;
         if (!pan || pan.length != 2 || isNaN(pan[0]) || isNaN(pan[1])) {
-            var mapCenter = map.getCenter();
+            let mapCenter = map.getCenter();
             pan = [mapCenter.lat.toFixed(2), mapCenter.lng.toFixed(2)];
         } 
         simVars.presets.pan = null;
 
-        var zoom = simVars.presets.zoom;
+        let zoom = simVars.presets.zoom;
         if (!zoom || isNaN(zoom)) {
             zoom = map.getZoom();
         }
@@ -305,68 +305,75 @@ export class LayerController extends HTMLElement {
         map.setView(pan, zoom);
     }
 
-    buildLayerBoxes() {
+    createLayerCheckboxes() {
+        let currentDomain = controllers.currentDomain.getValue();
+
         const rasterRegion = this.querySelector('#raster-layers');
-        rasterRegion.classList.remove('hidden');
-        if (Object.keys(this.rasterDict).length == 0) {
-            rasterRegion.classList.add('hidden');
-        }
         const overlayRegion = this.querySelector('#overlay-layers');
-        overlayRegion.classList.remove('hidden');
-        if (Object.keys(this.overlayDict).length == 0) {
-            overlayRegion.classList.add('hidden');
-        }
-
         const rasterDiv = this.querySelector('#raster-checkboxes');
-        rasterDiv.innerHTML = '';
         const overlayDiv = this.querySelector('#overlay-checkboxes');
-        overlayDiv.innerHTML = '';
 
-        var currentDomain = controllers.currentDomain.getValue();
-        var rasterDict = this.rasterDict[currentDomain];
-        var overlayDict = this.overlayDict[currentDomain];
+        this.setVisibilityOfLayerRegion(rasterRegion, this.rasterDict);
+        this.setVisibilityOfLayerRegion(overlayRegion, this.overlayDict);
+
+        rasterDiv.innerHTML = '';
+        overlayDiv.innerHTML = '';
+        let rasterDict = this.rasterDict[currentDomain];
+        let overlayDict = this.overlayDict[currentDomain];
+
+        this.createCheckBoxesForLayerRegion(rasterDiv, rasterDict);
+        this.createCheckBoxesForLayerRegion(overlayDiv, overlayDict);
+
+        for (let layerName of simVars.overlayOrder) {
+            this.handleOverlayadd(layerName);
+        }
+    }
+
+    setVisibilityOfLayerRegion(layerRegion, layerDict) {
+        layerRegion.classList.remove('hidden');
+        if (Object.keys(layerDict).length == 0) {
+            layerRegion.classList.add('hidden');
+        }
+    }
+
+    createCheckBoxesForLayerRegion(layerDiv, layerDict) {
         const layerClick = (layerName) => {
             if (!simVars.overlayOrder.includes(layerName)) {
-                var startDate = controllers.currentTimestamp.getValue();
-                var endDate = controllers.endDate.getValue();
+                let startDate = controllers.currentTimestamp.getValue();
+                let endDate = controllers.endDate.getValue();
                 this.handleOverlayadd(layerName);
                 this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
             } else {
                 this.handleOverlayRemove(layerName);
             }
-        };
-        for (const [layerDiv, layerDict] of [[rasterDiv, rasterDict], [overlayDiv, overlayDict]]) {
-            for (var layerName in layerDict) {
-                var checked = simVars.overlayOrder.includes(layerName);
-                var layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
-                                                checked, layerClick, layerName);
-                layerDiv.appendChild(layerBox);
-            }
         }
-        for (var layerName of simVars.overlayOrder) {
-            this.handleOverlayadd(layerName);
+        for (let layerName in layerDict) {
+            let isChecked = simVars.overlayOrder.includes(layerName);
+            let layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
+                                            isChecked, layerClick, layerName);
+            layerDiv.appendChild(layerBox);
         }
     }
 
-    /** ===== AddRemoveLayers block ===== */
+    /** ===== AddAndRemoveLayers block ===== */
     /** Called when a layer is selected. */
     handleOverlayadd(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
-        var currentDomain = controllers.currentDomain.getValue();
-        var layer = this.getLayer(currentDomain, layerName);
+        let currentDomain = controllers.currentDomain.getValue();
+        let layer = this.getLayer(currentDomain, layerName);
         console.log('name ' + layerName + ' layer ' + layer.imageOverlay);
         layer.addLayerToMap();
         this.activeLayers[layerName] = layer;
         // Make sure overlays are still on top
-        for (var overlay of simVars.overlayOrder) {
+        for (let overlay of simVars.overlayOrder) {
             if (simVars.overlayList.includes(overlay)) {
-                var overlayLayer = this.getLayer(currentDomain, overlay);
+                let overlayLayer = this.getLayer(currentDomain, overlay);
                 overlayLayer.bringToFront();
             }
         }
         if (simVars.overlayOrder.length > 1) {
-            var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
-            var lastLayer = this.getLayer(currentDomain, lastLayerName);
+            let lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
+            let lastLayer = this.getLayer(currentDomain, lastLayerName);
             lastLayer.setOpacity(.5);
         }
         setURL();
@@ -374,24 +381,38 @@ export class LayerController extends HTMLElement {
 
     /** Called when a layer is de-selected. */
     handleOverlayRemove(layerName) {
-        var currentDomain = controllers.currentDomain.getValue();
-        var currentTimestamp = controllers.currentTimestamp.getValue();
-        var removedLayer = this.getLayer(currentDomain, layerName);
+        let currentDomain = controllers.currentDomain.getValue();
+        let removedLayer = this.getLayer(currentDomain, layerName);
         removedLayer.removeLayer();
         delete this.activeLayers[layerName];
 
         if (simVars.overlayOrder.length > 0) {
-            var topOpacity = controllers.opacity.value;
-            var lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
-            var lastLayer = this.getLayer(currentDomain, lastLayerName);
+            let topOpacity = controllers.opacity.value;
+            let lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 1];
+            let lastLayer = this.getLayer(currentDomain, lastLayerName);
             lastLayer.setOpacity(topOpacity);
         }
+
+        this.bringMostRecentLayerWithColorbarToFront();
+
+        var startDate = controllers.currentTimestamp.getValue();
+        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
+
+        setURL();
+    }
+
+    bringMostRecentLayerWithColorbarToFront() {
         const rasterColorbar = document.querySelector('#raster-colorbar');
-        var rasters_now = simVars.rasters[currentDomain][currentTimestamp];
-        var mostRecentColorbar = null;
-        var colorbarSrc = '';
-        var colorbarDisplay = 'none';
-        for (var i = simVars.overlayOrder.length - 1; i >= 0; i--) {
+
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        let currentDomain = controllers.currentDomain.getValue();
+        let rasters_now = simVars.rasters[currentDomain][currentTimestamp];
+        let mostRecentColorbar = null;
+        let colorbarSrc = '';
+        let colorbarDisplay = 'none';
+        
+        for (let i = simVars.overlayOrder.length - 1; i >= 0; i--) { // iterate over overlayOrder in reverse
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
                 mostRecentColorbar = simVars.overlayOrder[i];
                 colorbarSrc = simVars.rasterBase + rasters_now[simVars.overlayOrder[i]].colorbar;
@@ -403,10 +424,6 @@ export class LayerController extends HTMLElement {
         simVars.displayedColorbar = mostRecentColorbar;
         rasterColorbar.src = colorbarSrc;
         rasterColorbar.style.display = colorbarDisplay;
-        var startDate = controllers.currentTimestamp.getValue();
-        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-        this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
-        setURL();
     }
 
     async loadWithPriority(startTime, endTime, layerNames) {
