@@ -75,8 +75,8 @@ export class TimeSeriesController extends LayerController {
     /** If a colorbar is included in the new added layer, need to set it up for timeSeries:
      * Update the current canvases and markers to point to the new layer and create a callback to 
      * build a new marker when the new layer is double clicked. */
-    handleOverlayadd(layerName) {
-        super.handleOverlayadd(layerName);
+    addLayerToMap(layerName) {
+        super.addLayerToMap(layerName);
         var currentDomain = controllers.currentDomain.value;
         var layer = this.getLayer(currentDomain, layerName);
         var img = layer.imageOverlay._image;
@@ -135,8 +135,8 @@ export class TimeSeriesController extends LayerController {
 
     /** When removing a layer, need to find the most recent colorbar and update the timeSeries canvases
      * to that layer. */
-    handleOverlayRemove(layerName) {
-        super.handleOverlayRemove(layerName);
+    removeLayerFromMap(layerName) {
+        super.removeLayerFromMap(layerName);
         if (!simVars.displayedColorbar) {
             this.timeSeriesButton.getButton().disabled = true;
         }

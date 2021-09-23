@@ -325,7 +325,7 @@ export class LayerController extends HTMLElement {
         this.createCheckBoxesForLayerRegion(overlayDiv, overlayDict);
 
         for (let layerName of simVars.overlayOrder) {
-            this.handleOverlayadd(layerName);
+            this.addLayerToMap(layerName);
         }
     }
 
@@ -341,10 +341,10 @@ export class LayerController extends HTMLElement {
             if (!simVars.overlayOrder.includes(layerName)) {
                 let startDate = controllers.currentTimestamp.getValue();
                 let endDate = controllers.endDate.getValue();
-                this.handleOverlayadd(layerName);
+                this.addLayerToMap(layerName);
                 this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
             } else {
-                this.handleOverlayRemove(layerName);
+                this.removeLayerFromMap(layerName);
             }
         }
         for (let layerName in layerDict) {
@@ -356,8 +356,8 @@ export class LayerController extends HTMLElement {
     }
 
     /** ===== AddAndRemoveLayers block ===== */
-    /** Called when a layer is selected. */
-    handleOverlayadd(layerName) {
+
+    addLayerToMap(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
         let currentDomain = controllers.currentDomain.getValue();
         let layer = this.getLayer(currentDomain, layerName);
@@ -379,8 +379,7 @@ export class LayerController extends HTMLElement {
         setURL();
     }
 
-    /** Called when a layer is de-selected. */
-    handleOverlayRemove(layerName) {
+    removeLayerFromMap(layerName) {
         let currentDomain = controllers.currentDomain.getValue();
         let removedLayer = this.getLayer(currentDomain, layerName);
         removedLayer.removeLayer();
@@ -427,46 +426,51 @@ export class LayerController extends HTMLElement {
     }
 
     async loadWithPriority(startTime, endTime, layerNames) {
-        var currentDomain = controllers.currentDomain.getValue();
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
-        var timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
+        let startDate = controllers.startDate.getValue();
+        let endDate = controllers.endDate.getValue();
+        let timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
             return (timestamp >= startDate && timestamp <= endDate);
         });
+        let layersToLoad = this.getLayersAndSetNumberOfFramesToLoad(layerNames, timestampsToLoad.length);
+        let loadNow = [];
+        let loadLater = [];
+        let preloaded = 0;
 
-        var nFrames = 0;
-        var layers = [];
-        controllers.loadingProgress.setValue(0);
-        for (var layerName of layerNames) {
-            var layer = this.getLayer(currentDomain, layerName);
-            var layerFrames = layer.hasColorbar ? 2 : 1;
-            nFrames += layerFrames * timestampsToLoad.length;
-            layers.push(layer);
-        }
-        controllers.loadingProgress.setFrames(nFrames);
-
-        var loadNow = [];
-        var loadLater = [];
-        var preloaded = 0;
-        for (var timestamp of timestampsToLoad) {
-            for (layer of layers) {
-                var toLoad = layer.toLoadTimestamp(timestamp);
-                if (toLoad) {
+        for (let timestamp of timestampsToLoad) {
+            for (let layer of layersToLoad) {
+                let layerDataArrayToLoad = layer.dataArrayToLoadForTimestamp(timestamp);
+                if (layerDataArrayToLoad != null) {
                     if (timestamp >= startTime && timestamp <= endTime) {
-                        loadNow = loadNow.concat(toLoad);
+                        loadNow = loadNow.concat(layerDataArrayToLoad);
                     } else {
-                        loadLater = loadLater.concat(toLoad);
+                        loadLater = loadLater.concat(layerDataArrayToLoad);
                     }
                 } else {
-                    var layerFrames = layer.hasColorbar ? 2 : 1;
+                    let layerFrames = layer.hasColorbar ? 2 : 1;
                     preloaded += layerFrames;
                 }
             }
         }
 
         controllers.loadingProgress.frameLoaded(preloaded);
-
         this.threadManager.loadImages(loadNow, loadLater);
+    }
+
+    getLayersAndSetNumberOfFramesToLoad(layerNames, timestampsToLoad) {
+        let currentDomain = controllers.currentDomain.getValue();
+        let nFrames = 0;
+        let layers = [];
+
+        controllers.loadingProgress.setValue(0);
+        for (let layerName of layerNames) {
+            let layer = this.getLayer(currentDomain, layerName);
+            let layerFrames = layer.hasColorbar ? 2 : 1;
+            nFrames += layerFrames * timestampsToLoad;
+            layers.push(layer);
+        }
+        controllers.loadingProgress.setFrames(nFrames);
+        
+        return layers;
     }
 
     /** ===== Util block ===== */

@@ -309,7 +309,7 @@ export class SimulationLayer {
         return clrbarMap;
     }
 
-    toLoadTimestamp(timestamp) {
+    dataArrayToLoadForTimestamp(timestamp) {
         if (this.timestampIsPreloaded(timestamp)) {
             return null;
         }
