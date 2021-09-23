@@ -356,7 +356,6 @@ export class LayerController extends HTMLElement {
     }
 
     /** ===== AddAndRemoveLayers block ===== */
-
     addLayerToMap(layerName) {
         // register in currently displayed layers and bring to front if it's an overlay
         let currentDomain = controllers.currentDomain.getValue();
