@@ -10,7 +10,6 @@ import { utcToLocal } from '../util.js';
  *  3. LoadTimestamp block
  *  4. ColorbarMap block
  * 
- * 
 */
 export class SimulationLayer {
     /** ===== Initialization block ===== */
@@ -248,7 +247,7 @@ export class SimulationLayer {
             let colorbarURL = this.getColorbarURLAtTimestamp(timestamp);
             let colorbarImg = new Image();
             colorbarImg.onload = () => {
-                colorbarMap = this.createMapOfRGBToColorbarValues(colorbarImg, timestamp);
+                colorbarMap = this.mapRGBsToColorbarValues(colorbarImg, timestamp);
                 this.timestampsToColorbarMaps[timestamp] = colorbarMap;
                 resolve(colorbarMap);
             }
@@ -288,27 +287,27 @@ export class SimulationLayer {
         return clrbarMap[closestKey];
     }
 
-    createMapOfRGBToColorbarValues(colorbarImg, timeStamp) {
+    mapRGBsToColorbarValues(colorbarImg, timestamp) {
         this.drawColorbarCanvas(colorbarImg);
         let clrbarMap = {};
         if (!this.clrbarCanvas) {
             return clrbarMap;
         }
-        let [left, right] = this.getHorizontalBoundsOfColorbar();
+        let [left, right] = this.getColorbarHorizontalBounds();
         let horizontalCenterOfColorbar = Math.floor((right + left)/2);
-        let [top, bottom] = this.getVerticalBoundsOfColorbarAndPopulateMapWithRGBValuesToHeight(horizontalCenterOfColorbar, clrbarMap);
-        this.convertHeightValuesInMapToProportionalHeights(clrbarMap, top, bottom);
+        let [top, bottom] = this.getColorbarVerticalBoundsAndMapRGBsToHeights(horizontalCenterOfColorbar, clrbarMap);
+        this.convertHeightsToProportionalHeights(clrbarMap, top, bottom);
 
         clrbarMap.start = top;
         clrbarMap.end = bottom;
         clrbarMap.right = right;
         clrbarMap.left = left;
 
-        this.convertProportionalHeightsToColorbarValues(clrbarMap, timeStamp);
+        this.convertProportionalHeightsToColorbarValues(clrbarMap, timestamp);
         return clrbarMap;
     }
 
-    getHorizontalBoundsOfColorbar() {
+    getColorbarHorizontalBounds() {
         let right = 0;
         let left = 0;
         let y = Math.round(this.clrbarCanvas.height / 2);
@@ -328,7 +327,7 @@ export class SimulationLayer {
         return [left, right];
     }
 
-    getVerticalBoundsOfColorbarAndPopulateMapWithRGBValuesToHeight(horizontalCenterOfColorbar, clrbarMap) {
+    getColorbarVerticalBoundsAndMapRGBsToHeights(horizontalCenterOfColorbar, clrbarMap) {
         let top = 0;
         let bottom = 0;
         for (let j = 0; j < this.clrbarCanvas.height; j++) {
@@ -349,19 +348,19 @@ export class SimulationLayer {
         return [top, bottom];
     }
 
-    convertHeightValuesInMapToProportionalHeights(clrbarMap, top, bottom) {
+    convertHeightsToProportionalHeights(clrbarMap, top, bottom) {
         const computeLocation = (key) => 1 - (clrbarMap[key] - top) / (bottom - top);
         for (let rgbKey in clrbarMap) {
             clrbarMap[rgbKey] = computeLocation(rgbKey);
         }
     }
     
-    convertProportionalHeightsToColorbarValues(clrbarMap, timeStamp) {
+    convertProportionalHeightsToColorbarValues(clrbarMap, timestamp) {
         if (simVars.displayedColorbar == null) {
             return;
         }
 
-        let levels = this.getColorbarLevelsAtTimestamp(timeStamp);
+        let levels = this.getColorbarLevelsAtTimestamp(timestamp);
         if (!levels) {
             return;
         }
@@ -378,7 +377,7 @@ export class SimulationLayer {
             // find closest key in levelMap
             let closestKey = location;
             let minDistance = 1;
-            for (var key in levelMap) {
+            for (let key in levelMap) {
                 let distance = Math.abs(key - location);
                 if (distance < minDistance) {
                     closestKey = key;
@@ -427,7 +426,7 @@ export class SimulationLayer {
         let location;
         let lastLevel = [];
         const computeLocation = (y) => 1 - (y - clrbarMap.start) / (clrbarMap.end - clrbarMap.start);
-        for (var y = 0; y < this.clrbarCanvas.height; y++) {
+        for (let y = 0; y < this.clrbarCanvas.height; y++) {
             if (levelIndex < 0) {
                 break;
             }

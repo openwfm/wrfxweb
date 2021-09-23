@@ -16,6 +16,7 @@ import { ThreadManager } from '../../threadManager.js';
  *  3. DomainSwitch block 
  *  4. AddAndRemoveLayers block
  *  5. Util block
+ * 
  */
 export class LayerController extends HTMLElement {
     /**  ===== Initialization block ===== */
@@ -106,24 +107,6 @@ export class LayerController extends HTMLElement {
         }
         controllers.currentDomain.subscribe(domainSubscription);
         controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
-    }
-
-    updateToCurrentTimestamp() {
-        let currentDomain = controllers.currentDomain.getValue();
-        let currentTimestamp = controllers.currentTimestamp.getValue();
-        let shouldLoadAtEnd = false;
-        for (let addedLayerName of simVars.overlayOrder) {
-            let addedLayer = this.getLayer(currentDomain, addedLayerName);
-            if (!shouldLoadAtEnd && !addedLayer.timestampIsPreloaded(currentTimestamp)) {
-                shouldLoadAtEnd = true;
-                this.threadManager.cancelCurrentLoad();
-            }
-            addedLayer.setLayerImagesToTimestamp(currentTimestamp);
-        }
-        if (shouldLoadAtEnd) {
-            let endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
-            this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
-        }
     }
 
     subscribeToSimulationStartAndEndDates() {
@@ -473,6 +456,24 @@ export class LayerController extends HTMLElement {
     }
 
     /** ===== Util block ===== */
+    updateToCurrentTimestamp() {
+        let currentDomain = controllers.currentDomain.getValue();
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        let shouldLoadAtEnd = false;
+        for (let addedLayerName of simVars.overlayOrder) {
+            let addedLayer = this.getLayer(currentDomain, addedLayerName);
+            if (!shouldLoadAtEnd && !addedLayer.timestampIsPreloaded(currentTimestamp)) {
+                shouldLoadAtEnd = true;
+                this.threadManager.cancelCurrentLoad();
+            }
+            addedLayer.setLayerImagesToTimestamp(currentTimestamp);
+        }
+        if (shouldLoadAtEnd) {
+            let endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+            this.loadWithPriority(currentTimestamp, endTime, simVars.overlayOrder);
+        }
+    }
+
     getLayer(domain, name) {
         if (simVars.overlayList.includes(name)) {
             if (this.overlayDict[domain] == null) {
