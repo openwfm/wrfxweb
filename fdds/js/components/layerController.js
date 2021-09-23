@@ -118,7 +118,7 @@ export class LayerController extends HTMLElement {
                 shouldLoadAtEnd = true;
                 this.threadManager.cancelCurrentLoad();
             }
-            addedLayer.setTimestamp(currentTimestamp);
+            addedLayer.setLayerImagesToTimestamp(currentTimestamp);
         }
         if (shouldLoadAtEnd) {
             let endTime = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
@@ -187,7 +187,7 @@ export class LayerController extends HTMLElement {
                 objectURL = URL.createObjectURL(blob);
             }
             let layer = this.getLayer(layerDomain, layerName);
-            layer.setImageLoaded(timestamp, objectURL, colorbar);
+            layer.setImageLoadedAtTimestamp(timestamp, objectURL, colorbar);
 
             controllers.loadingProgress.frameLoaded();
         }
