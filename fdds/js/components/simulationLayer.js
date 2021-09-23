@@ -84,6 +84,43 @@ export class SimulationLayer {
     }
 
     /** ===== LoadingTimestamp block ===== */
+    dataArrayToLoadForTimestamp(timestamp) {
+        if (this.timestampIsPreloaded(timestamp)) {
+            return null;
+        }
+        var toLoad = [];
+        var raster = simVars.rasters[this.domain][timestamp];
+        var rasterInfo = raster[this.layerName];
+        var imgURL = simVars.rasterBase + rasterInfo.raster;
+        toLoad.push({
+            imageURL: imgURL,
+            timeStamp: timestamp,
+            layerName: this.layerName,
+            layerDomain: this.domain,
+            colorbar: false
+        });
+        if (this.hasColorbar) {
+            var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
+            toLoad.push({
+                imageURL: colorbarURL,
+                timeStamp: timestamp,
+                layerName: this.layerName,
+                layerDomain: this.domain,
+                colorbar: true
+            });
+        }
+        return toLoad;
+    }
+
+    timestampIsPreloaded(timestamp) {
+        var rasterCheck = this.preloadedRasters[timestamp] != null;
+        var colorbarCheck = true;
+        if (this.hasColorbar) {
+            colorbarCheck = this.preloadedColorbars[timestamp] != null;
+        } 
+        return rasterCheck && colorbarCheck; 
+    }
+
     setLayerImagesToTimestamp(timestamp) {
         var imageURL = this.getURLAtTimestamp(timestamp);
         this.imageOverlay.setUrl(imageURL);
@@ -117,15 +154,6 @@ export class SimulationLayer {
             colorbarURL = this.preloadedColorbars[timestamp];
         }
         return colorbarURL;
-    }
-
-    timestampIsPreloaded(timestamp) {
-        var rasterCheck = this.preloadedRasters[timestamp] != null;
-        var colorbarCheck = true;
-        if (this.hasColorbar) {
-            colorbarCheck = this.preloadedColorbars[timestamp] != null;
-        } 
-        return rasterCheck && colorbarCheck; 
     }
 
     clearCache() {
@@ -164,7 +192,6 @@ export class SimulationLayer {
     }
 
     /** ===== ColorbarMap block ===== */
-
     async colorValueAtLocation(timestamp, coords) {
         var key = timestamp + coords.join(',');
         if (key in this.coordAndTimestampToColorbarValueCache) {
@@ -173,7 +200,7 @@ export class SimulationLayer {
         var [r, g, b] = await this.rgbValueAtLocation(timestamp, coords);
         var colorValue = null;
         if ((r + g + b) != 0) {
-            colorValue = await this.rgbValueToColorValue(timestamp, [r, g, b]);
+            colorValue = await this.rgbValueToColorbarValue(timestamp, [r, g, b]);
         }
         this.coordAndTimestampToColorbarValueCache[key] = colorValue;
         return colorValue;
@@ -205,10 +232,10 @@ export class SimulationLayer {
         });
     }
 
-    async rgbValueToColorValue(timestamp, rgbValue) {
+    async rgbValueToColorbarValue(timestamp, rgbValue) {
         var colorbarMap = await this.generateColorbarMap(timestamp);
-        var colorValue = this.findClosestKey(rgbValue, colorbarMap);
-        return colorValue;
+        var colorbarValue = this.findClosestKey(rgbValue, colorbarMap);
+        return colorbarValue;
     }
 
     async generateColorbarMap(timestamp) {
@@ -221,7 +248,7 @@ export class SimulationLayer {
             var colorbarURL = this.getColorbarURLAtTimestamp(timestamp);
             var colorbarImg = new Image();
             colorbarImg.onload = () => {
-                colorbarMap = this.buildColorMap(colorbarImg, timestamp);
+                colorbarMap = this.createMapOfRGBToColorbarValues(colorbarImg, timestamp);
                 this.timestampsToColorbarMaps[timestamp] = colorbarMap;
                 resolve(colorbarMap);
             }
@@ -261,24 +288,31 @@ export class SimulationLayer {
         return clrbarMap[closestKey];
     }
 
-    /** Builds a map of rgb values in a colorbar to its height in the colorbar. Also includes the start and 
-     * end pixels of the colorbar so that relative positions in the colobar can be calculated. Starts from a 
-     * y value half the height of the image and iterates over x until a non black pixel is located. Advances one
-     * more pixel away to avoid distortion and sets this as the xCoordinate band that the colorbard spans. Then
-     * iterates over the height of the colorbar keeping the xCoord constant mapping the value of the rgb value 
-     * to the yCoord. */
-    buildColorMap(colorbarImg, timeStamp) {
+    createMapOfRGBToColorbarValues(colorbarImg, timeStamp) {
         this.drawColorbarCanvas(colorbarImg);
-        var clrbarCanvas = this.clrbarCanvas;
-        var clrbarMap = {};
-        if (!clrbarCanvas) {
+        let clrbarMap = {};
+        if (!this.clrbarCanvas) {
             return clrbarMap;
         }
-        var right = 0;
-        var left = 0;
-        var y = Math.round(clrbarCanvas.height / 2);
-        for (var x = clrbarCanvas.width - 1; x > 0; x--) {
-            var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
+        let [left, right] = this.getHorizontalBoundsOfColorbar();
+        let horizontalCenterOfColorbar = Math.floor((right + left)/2);
+        let [top, bottom] = this.getVerticalBoundsOfColorbarAndPopulateMapWithRGBValuesToHeight(horizontalCenterOfColorbar, clrbarMap);
+        this.convertHeightValuesInMapToProportionalHeights(clrbarMap, top, bottom);
+
+        clrbarMap.start = top;
+        clrbarMap.end = bottom;
+        clrbarMap.right = right;
+        clrbarMap.left = left;
+        this.mapLevels(clrbarMap, timeStamp);
+        return clrbarMap;
+    }
+
+    getHorizontalBoundsOfColorbar() {
+        let right = 0;
+        let left = 0;
+        let y = Math.round(this.clrbarCanvas.height / 2);
+        for (let x = this.clrbarCanvas.width - 1; x > 0; x--) {
+            let colorbarData = this.clrbarCanvas.getContext('2d').getImageData(x, y, 1, 1).data;
             if (right == 0) {
                 if (colorbarData[0] + colorbarData[1] + colorbarData[2] != 0) {
                     right = x;
@@ -286,72 +320,43 @@ export class SimulationLayer {
             } else {
                 if (colorbarData[0] + colorbarData[1] + colorbarData[2] == 0) {
                     left = x;
-                    x = Math.floor((right + left)/2);
                     break;
                 }
             }
         }
-        var start = 0;
-        var end = 0;
-        for (var j = 0; j < clrbarCanvas.height; j++) {
-            var colorbarData = clrbarCanvas.getContext('2d').getImageData(x, j, 1, 1).data;
-            var r = colorbarData[0];
-            var g = colorbarData[1];
-            var b = colorbarData[2];
-            if (start == 0) {
+        return [left, right];
+    }
+
+    getVerticalBoundsOfColorbarAndPopulateMapWithRGBValuesToHeight(horizontalCenterOfColorbar, clrbarMap) {
+        let top = 0;
+        let bottom = 0;
+        for (var j = 0; j < this.clrbarCanvas.height; j++) {
+            let [r, g, b, alpha] = this.clrbarCanvas.getContext('2d').getImageData(horizontalCenterOfColorbar, j, 1, 1).data;
+            if (top == 0) {
                 if (r + g + b != 0) {
-                    start = j + 1;
+                    top = j + 1;
                 }
             } else {
                 if (r + g + b == 0) {
-                    end = j - 1;
+                    bottom = j - 1;
                     break;
                 }
             }
             clrbarMap[r + ',' + g + ',' + b] = j;
         }
-        const computeLocation = (key) => 1 - (clrbarMap[key] - start) / (end - start);
+
+        return [top, bottom];
+    }
+
+    convertHeightValuesInMapToProportionalHeights(clrbarMap, top, bottom) {
+        const computeLocation = (key) => 1 - (clrbarMap[key] - top) / (bottom - top);
         for (var rgbKey in clrbarMap) {
             clrbarMap[rgbKey] = computeLocation(rgbKey);
         }
-        clrbarMap.start = start;
-        clrbarMap.end = end;
-        clrbarMap.right = right;
-        clrbarMap.left = left;
-        this.mapLevels(clrbarCanvas, clrbarMap, timeStamp);
-        return clrbarMap;
-    }
-
-    dataArrayToLoadForTimestamp(timestamp) {
-        if (this.timestampIsPreloaded(timestamp)) {
-            return null;
-        }
-        var toLoad = [];
-        var raster = simVars.rasters[this.domain][timestamp];
-        var rasterInfo = raster[this.layerName];
-        var imgURL = simVars.rasterBase + rasterInfo.raster;
-        toLoad.push({
-            imageURL: imgURL,
-            timeStamp: timestamp,
-            layerName: this.layerName,
-            layerDomain: this.domain,
-            colorbar: false
-        });
-        if (this.hasColorbar) {
-            var colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
-            toLoad.push({
-                imageURL: colorbarURL,
-                timeStamp: timestamp,
-                layerName: this.layerName,
-                layerDomain: this.domain,
-                colorbar: true
-            });
-        }
-        return toLoad;
-
     }
     
-    mapLevels(clrbarCanvas, clrbarMap, timeStamp) {
+    mapLevels(clrbarMap, timeStamp) {
+        let clrbarCanvas = this.clrbarCanvas;
         var currentDomain = controllers.currentDomain.getValue();
         var levelMap = {};
         if (simVars.displayedColorbar == null) {

@@ -121,7 +121,7 @@ export class TimeSeriesController extends LayerController {
             var layer = this.getLayer(currentDomain, simVars.displayedColorbar);
 
             rgb = await layer.rgbValueAtLocation(currentTimestamp, marker.imageCoords);
-            clrbarLocation = await layer.rgbValueToColorValue(currentTimestamp, rgb);
+            clrbarLocation = await layer.rgbValueToColorbarValue(currentTimestamp, rgb);
         }
         marker.getContent().setRGBValues(rgb, clrbarLocation);
     }
