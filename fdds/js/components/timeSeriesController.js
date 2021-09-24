@@ -24,6 +24,9 @@ export class TimeSeriesController extends LayerController {
     constructor() {
         super();
         this.createTimeSeriesLayerGroup();
+
+        this.totalFramesToLoad = 0;
+        this.framesLoaded = 0;
     }
 
     createTimeSeriesLayerGroup() {
@@ -141,21 +144,39 @@ export class TimeSeriesController extends LayerController {
         this.updateMarker(marker);
     }
 
-    /** Iterates over all timestamps in given range of current simulation, loads the corresponding image and colorbar,
-     * and adds the value of the color at the xCoord, yCoord in the colorbar to a dictionary under a key representing
-     * the corresponding timestamp. */
     async generateTimeSeriesData(startDate, endDate) {
         if (simVars.displayedColorbar == null) {
             return;
         }
-        let currentDomain = controllers.currentDomain.value;
-        document.body.classList.add('waiting');
-        this.timeSeriesButton.setProgress(0);
 
-        let filteredTimeStamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        let dataType = this.timeSeriesButton.getDataType();
-        let layerSpecification = this.timeSeriesButton.getLayerSpecification();
+        document.body.classList.add('waiting');
         let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
+        this.timeSeriesButton.setProgress(0);
+        this.framesLoaded = 0;
+
+        let filteredTimestamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        let layersForTimeSeries = this.getLayersToGenerateTimeSeriesOver();
+        this.totalFramesToLoad = filteredTimestamps.length * timeSeriesMarkers.length * layersForTimeSeries.length;
+
+        let layerData = {};
+        for (let colorbarLayer of layersForTimeSeries) {
+            let layerName = colorbarLayer.layerName;
+            let timeSeriesData = [];
+            for (let marker of timeSeriesMarkers) {
+                let dataEntry = await this.generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, filteredTimestamps);
+                timeSeriesData.push(dataEntry);
+            }
+            layerData[layerName] = timeSeriesData;
+        }
+        
+        document.body.classList.remove('waiting');
+        return layerData;
+    }
+
+    getLayersToGenerateTimeSeriesOver() {
+        let layerSpecification = this.timeSeriesButton.getLayerSpecification();
+        let currentDomain = controllers.currentDomain.getValue();
+
         let colorbarLayers = simVars.overlayOrder.map(layerName => {
             return this.getLayer(currentDomain, layerName)
         }).filter(layer => {
@@ -165,34 +186,26 @@ export class TimeSeriesController extends LayerController {
             return layer.hasColorbar;
         });
 
-        let progress = 0;
-        let totalFramesToLoad = filteredTimeStamps.length * timeSeriesMarkers.length * colorbarLayers.length;
+        return colorbarLayers;
+    }
 
-        let layerData = {};
-        for (let colorbarLayer of colorbarLayers) {
-            let layerName = colorbarLayer.layerName;
-            let timeSeriesData = [];
-            for (let marker of timeSeriesMarkers) {
-                let timeSeriesMarker = marker.getContent();
-                let dataEntry = ({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
-                                     dataset: {}, hidden: timeSeriesMarker.hideOnChart});
-                for (let timeStamp of filteredTimeStamps) {
-                    let coords = marker.imageCoords;
-                    let colorbarValue = await colorbarLayer.colorValueAtLocation(timeStamp, coords);
-                    if (colorbarValue == null && dataType == 'continuous') {
-                        colorbarValue = 0;
-                    }
-                    dataEntry.dataset[timeStamp] = colorbarValue;
-                    progress += 1;
-                    this.timeSeriesButton.setProgress(progress/totalFramesToLoad);
-                }
-                timeSeriesData.push(dataEntry);
+    async generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, filteredTimestamps) {
+        let timeSeriesMarker = marker.getContent();
+        let dataType = this.timeSeriesButton.getDataType();
+        let dataEntry = ({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
+                                dataset: {}, hidden: timeSeriesMarker.hideOnChart});
+        for (let timestamp of filteredTimestamps) {
+            let coords = marker.imageCoords;
+            let colorbarValue = await colorbarLayer.colorValueAtLocation(timestamp, coords);
+            if (colorbarValue == null && dataType == 'continuous') {
+                colorbarValue = 0;
             }
-            layerData[layerName] = timeSeriesData;
+            dataEntry.dataset[timestamp] = colorbarValue;
+            this.framesLoaded += 1;
+            this.timeSeriesButton.setProgress(this.framesLoaded/this.totalFramesToLoad);
         }
-        document.body.classList.remove('waiting');
 
-        return layerData;
+        return dataEntry;
     }
 
     /** ===== Util block ===== */
