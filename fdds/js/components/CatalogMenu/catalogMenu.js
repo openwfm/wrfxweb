@@ -193,7 +193,7 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         if (mostRecentItem != null) {
-            mostRecentItem.handle_catalog_click();
+            mostRecentItem.clickItem();
         }
     }
 
