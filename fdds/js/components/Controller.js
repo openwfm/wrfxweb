@@ -20,7 +20,6 @@ export class Controller {
     }
 
     subscribe(callback, eventName=controllerEvents.VALUE_SET) {
-        // this.listeners.push(callback);
         if (!(eventName in this.listeners)) {
             this.listeners[eventName] = [];
         }
@@ -57,25 +56,10 @@ export class Controller {
     }
 }
 
-/** Class to synchronise a function call at the end of two asynchronous events.
- * Useful for executing a function after both a layer and its colorbar have loaded. */
-export class SyncController extends Controller {
-    constructor() {
-        super([false, false]);
-    }
-
-    increment(i) {
-        this.value[i] = true;
-        if (this.value[0] && this.value[1]) {
-            this.setValue([false, false]);
-        }
-    }
-}
-
 // global controllers
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
-        var currentTimestamp = new Controller();
+        let currentTimestamp = new Controller();
         currentTimestamp.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             currentTimestamp.debouncedSetValue([value, eventName]);
         }
@@ -96,33 +80,32 @@ export const controllers = {
 
         loadingProgress.frameLoaded = (frames = 1) => {
             loadingProgress.loadedFrames += frames;
-            var progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
+            let progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
             loadingProgress.setValue(progress);
         }
 
         return loadingProgress;
     })(),
     timeSeriesMarkers: (function createTimeSeriesMarkers() {
-        var timeSeriesMarkers = new Controller([]);
+        let timeSeriesMarkers = new Controller([]);
         timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
         timeSeriesMarkers.add = (newMarker) => {
             timeSeriesMarkers.value.push(newMarker);
         }
         timeSeriesMarkers.remove = (removeMarker) => {
-            var index = timeSeriesMarkers.value.indexOf(removeMarker);
+            let index = timeSeriesMarkers.value.indexOf(removeMarker);
             timeSeriesMarkers.value.splice(index, 1);
             timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
         }
         return timeSeriesMarkers;
     })(),
     opacity: new Controller(0.5),
-    syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
-        var startDateController = new Controller();
+        let startDateController = new Controller();
 
         const subscriptionFunction = () => {
-            var newStartDate = startDateController.getValue();
-            var currentTimestamp = controllers.currentTimestamp.getValue();
+            let newStartDate = startDateController.getValue();
+            let currentTimestamp = controllers.currentTimestamp.getValue();
 
             if (newStartDate > currentTimestamp) {
                 controllers.currentTimestamp.setValue(newStartDate);
@@ -136,11 +119,11 @@ export const controllers = {
         return startDateController;
     })(),
     endDate: (function createEndDate() {
-        var endDateController = new Controller();
+        let endDateController = new Controller();
 
         const subscriptionFunction = ()=> {
-            var newEndDate = endDateController.getValue();
-            var currentTimestamp = controllers.currentTimestamp.getValue();
+            let newEndDate = endDateController.getValue();
+            let currentTimestamp = controllers.currentTimestamp.getValue();
 
             if (newEndDate < currentTimestamp) {
                 controllers.currentTimestamp.setValue(newEndDate);
