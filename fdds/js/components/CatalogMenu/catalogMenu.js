@@ -15,7 +15,6 @@ export class CatalogMenu extends HTMLElement {
     /** ===== Initialization block ===== */
     constructor() {
         super();
-        // Arrays of catalog entries based on their descriptions.
         this.firesList = [];
         this.fuelMoistureList = [];
         this.satelliteList = [];
@@ -225,18 +224,22 @@ export class CatalogMenu extends HTMLElement {
         const catalogSearch = this.querySelector('#search-for');
         catalogSearch.value = '';
         const sortingFunction = (listElem1, listElem2) => {
-            let result = false;
-            if (sortBy == 'original-order') {
-                result = this.sortByOriginalOrder(listElem1, listElem2);
-            }
-            if (sortBy == 'description') {
-                result = this.sortByDescription(listElem1, listElem2);
-            }
-            if (sortBy == 'start-date') {
-                result = this.sortByStartDate(listElem1, listElem2);
-            }
-            if (sortBy == 'end-date') {
-                result = this.sortByEndDate(listElem1, listElem2);
+            let result;
+            switch(sortBy) {
+                case 'original-order':
+                    result = this.sortByOriginalOrder(listElem1, listElem2);
+                    break;
+                case 'description':
+                    result = this.sortByDescription(listElem1, listElem2);
+                    break;
+                case 'start-date':
+                    result = this.sortByStartDate(listElem1, listElem2);
+                    break;
+                case 'end-date':
+                    result = this.sortByEndDate(listElem1, listElem2);
+                    break;
+                default: 
+                    result = false;
             }
             if (reverseOrder) {
                 result = !result;
