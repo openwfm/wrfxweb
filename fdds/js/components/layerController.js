@@ -106,7 +106,7 @@ export class LayerController extends HTMLElement {
             this.updateToCurrentTimestamp();
         }
         controllers.currentDomain.subscribe(domainSubscription);
-        controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.simReset);
+        controllers.currentDomain.subscribe(domainResetSubscription, controllerEvents.SIM_RESET);
     }
 
     subscribeToSimulationStartAndEndDates() {

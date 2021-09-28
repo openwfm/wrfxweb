@@ -40,7 +40,7 @@ export class OpacitySlider extends Slider {
 
         controllers.currentDomain.subscribe(() => {
             this.updateOpacity();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
     updateHeadPosition(newFrame) {

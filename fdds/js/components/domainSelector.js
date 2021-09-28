@@ -60,7 +60,7 @@ export class DomainSelector extends HTMLElement {
         let presetDomain = this.presetSimValues(domains);
         this.createDomainCheckboxes(domains, presetDomain);
 
-        controllers.currentDomain.setValue(presetDomain, controllerEvents.simReset);
+        controllers.currentDomain.setValue(presetDomain, controllerEvents.SIM_RESET);
     }
 
     createDomainCheckboxes(domains, presetDomain) {
@@ -137,7 +137,7 @@ export class DomainSelector extends HTMLElement {
             startDate = presetStartDate;
         }
         simVars.presets.startDate = null;
-        controllers.startDate.setValue(startDate, controllerEvents.quiet);
+        controllers.startDate.setValue(startDate, controllerEvents.QUIET);
     }
 
     presetEndDate(nextTimestamps) {
@@ -147,7 +147,7 @@ export class DomainSelector extends HTMLElement {
             endDate = presetEndDate;
         }
         simVars.presets.endDate = null;
-        controllers.endDate.setValue(endDate, controllerEvents.quiet);
+        controllers.endDate.setValue(endDate, controllerEvents.QUIET);
     }
 
     presetCurrentTimestamp(nextTimestamps) {
@@ -160,7 +160,7 @@ export class DomainSelector extends HTMLElement {
             currentTimestamp = presetTimestamp;
         }
         simVars.presets.timestamp = null;
-        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
     }
 
     presetOpacity() {
@@ -173,7 +173,7 @@ export class DomainSelector extends HTMLElement {
             }
         }
         simVars.presets.opacity = null;
-        controllers.opacity.setValue(opacity, controllerEvents.quiet);
+        controllers.opacity.setValue(opacity, controllerEvents.QUIET);
     }
 
     /** ===== DomainSwitch block ===== */
@@ -193,19 +193,19 @@ export class DomainSelector extends HTMLElement {
     updateStartDate(prevTimestamps) {
         let startDate = controllers.startDate.getValue();
         startDate = this.convertPrevTimestampToCurrentTimestamp(startDate, prevTimestamps);
-        controllers.startDate.setValue(startDate, controllerEvents.quiet);
+        controllers.startDate.setValue(startDate, controllerEvents.QUIET);
     }
 
     updateEndDate(prevTimestamps) {
         let endDate = controllers.endDate.getValue();
         endDate = this.convertPrevTimestampToCurrentTimestamp(endDate, prevTimestamps);
-        controllers.endDate.setValue(endDate, controllerEvents.quiet);
+        controllers.endDate.setValue(endDate, controllerEvents.QUIET);
     }
 
     updateCurrentTimestamp(prevTimestamps) {
         let currentTimestamp = controllers.currentTimestamp.getValue();
         currentTimestamp = this.convertPrevTimestampToCurrentTimestamp(currentTimestamp, prevTimestamps);
-        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
     }
 
     convertPrevTimestampToCurrentTimestamp(prevTimestamp, prevTimestamps) {

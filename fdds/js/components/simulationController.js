@@ -77,7 +77,7 @@ export class SimulationController extends HTMLElement {
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
         controllers.currentTimestamp.subscribe(() => {
             this.updateSlider();
         });

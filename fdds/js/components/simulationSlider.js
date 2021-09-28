@@ -67,7 +67,7 @@ export class SimulationSlider extends Slider {
             this.updateEndLocation();
             this.updateSliderToCurrentTimestamp();
             this.updateProgressWidth();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
     subsribeToLoadingProgress() {
@@ -115,7 +115,7 @@ export class SimulationSlider extends Slider {
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
             this.updateProgressWidth();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
     initializeEndSetter() {
@@ -137,7 +137,7 @@ export class SimulationSlider extends Slider {
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
             this.updateProgressWidth();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
     setBoundingDateMouseOver(boundingDateController, sliderMarker) {
@@ -177,7 +177,7 @@ export class SimulationSlider extends Slider {
             newTimestamp = simVars.sortedTimestamps[boundingIndex];
         }
 
-        updatingController.setValue(newTimestamp, controllerEvents.slidingValue);
+        updatingController.setValue(newTimestamp, controllerEvents.SLIDING_VALUE);
         this.setSliderMarkerInfo(newTimestamp);
     }
 
@@ -185,7 +185,7 @@ export class SimulationSlider extends Slider {
         const sliderMarkerInfo = this.querySelector('#slider-marker-info');
 
         sliderMarkerInfo.classList.remove('clicked');
-        dateController.broadcastEvent(controllerEvents.valueSet);
+        dateController.broadcastEvent(controllerEvents.VALUE_SET);
         setURL();
     }
 

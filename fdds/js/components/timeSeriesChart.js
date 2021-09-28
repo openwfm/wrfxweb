@@ -91,7 +91,7 @@ export class TimeSeriesChart extends HTMLElement {
         }
         controllers.currentDomain.subscribe(() => {
             fullContainer.classList.add('hidden');
-        }, controllerEvents.simReset); 
+        }, controllerEvents.SIM_RESET); 
 
         this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
     }

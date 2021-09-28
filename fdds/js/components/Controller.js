@@ -1,11 +1,11 @@
 import { debounceInIntervals } from '../util.js';
 
 export const controllerEvents = {
-    quiet: 'QUIET', 
-    simReset: 'SIMULATION_RESET',
-    valueSet: 'VALUE_SET', 
-    slidingValue: 'SLIDING_VALUE',
-    all: 'ALL'
+    QUIET: 'QUIET', 
+    SIM_RESET: 'SIMULATION_RESET',
+    VALUE_SET: 'VALUE_SET', 
+    SLIDING_VALUE: 'SLIDING_VALUE',
+    ALL: 'ALL'
 }
 
 /** Class that enables data binding. Allows for callback functions to subscribe to the Controller which will
@@ -19,7 +19,7 @@ export class Controller {
         }, 100);
     }
 
-    subscribe(callback, eventName=controllerEvents.valueSet) {
+    subscribe(callback, eventName=controllerEvents.VALUE_SET) {
         // this.listeners.push(callback);
         if (!(eventName in this.listeners)) {
             this.listeners[eventName] = [];
@@ -27,16 +27,16 @@ export class Controller {
         this.listeners[eventName].push(callback);
     }
 
-    setValue(value, eventName=controllerEvents.valueSet) {
+    setValue(value, eventName=controllerEvents.VALUE_SET) {
         this.setValueCallback([value, eventName]);
     }
 
-    setValueCallback([value, eventName=controllerEvents.valueSet]) {
+    setValueCallback([value, eventName=controllerEvents.VALUE_SET]) {
         this.value = value;
-        if (eventName != controllerEvents.quiet) {
+        if (eventName != controllerEvents.QUIET) {
             this.notifyListeners(this.listeners[eventName]);
-            if (eventName != controllerEvents.all) {
-                this.notifyListeners(this.listeners[controllerEvents.all]);
+            if (eventName != controllerEvents.ALL) {
+                this.notifyListeners(this.listeners[controllerEvents.ALL]);
             }
         }
     }
@@ -76,7 +76,7 @@ export class SyncController extends Controller {
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
         var currentTimestamp = new Controller();
-        currentTimestamp.setValue = (value, eventName=controllerEvents.valueSet) => {
+        currentTimestamp.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             currentTimestamp.debouncedSetValue([value, eventName]);
         }
         return currentTimestamp;
@@ -128,8 +128,8 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
         }
-        startDateController.subscribe(subscriptionFunction, controllerEvents.all);
-        startDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+        startDateController.subscribe(subscriptionFunction, controllerEvents.ALL);
+        startDateController.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             startDateController.debouncedSetValue([value, eventName]);
         }
 
@@ -146,8 +146,8 @@ export const controllers = {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
         }
-        endDateController.subscribe(subscriptionFunction, controllerEvents.all);
-        endDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+        endDateController.subscribe(subscriptionFunction, controllerEvents.ALL);
+        endDateController.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             endDateController.debouncedSetValue([value, eventName]);
         }
 
