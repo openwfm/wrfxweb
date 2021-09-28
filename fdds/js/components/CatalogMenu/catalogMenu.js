@@ -2,12 +2,17 @@ import { dragElement, utcToLocal } from '../../util.js';
 import { getCatalogEntries } from '../../services.js';
 import { CatalogItem } from './catalogItem.js';
 
-/** A Component that builds the CatalogMenu. Can be added to html using <catalog-menu></catalog-menu> 
- * 
- * Includes three different columns for data related to fires, fuel moisture, and satellite data. 
+/** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data. 
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
- * supports searching columns for data that matches a description. */
+ * supports searching columns for data that matches a description.
+ * 
+ *                  Contents
+ *  1. Initialization block
+ *  2. Searching block
+ * 
+ */
 export class CatalogMenu extends HTMLElement {
+    /** ===== Initialization block ===== */
     constructor() {
         super();
         // Arrays of catalog entries based on their descriptions.
@@ -70,8 +75,6 @@ export class CatalogMenu extends HTMLElement {
         `;
     }
 
-    /** This function is called once the HTML Element has been added to the DOM. Add all the UI events and change some 
-     * presentation details based on whether on mobile. */
     connectedCallback() {
         const catalogMenu = this.querySelector('.catalog-menu');
         L.DomEvent.disableClickPropagation(catalogMenu);
@@ -82,55 +85,8 @@ export class CatalogMenu extends HTMLElement {
         window.addEventListener('resize', () => { 
             this.responsiveUI();
         });
-        this.setMenuSearching();
-        this.buildMenu();
-    }
-
-    setMenuSearching() {
-        const sortBy = this.querySelector('#sort-by');
-        const reverseOrder = this.querySelector('#reverse-order');
-        const menuSearch = this.querySelector('#search-for');
-        const menuSelect = this.querySelector('#mobile-selector');
-
-        menuSearch.onpointerdown = (e) => {
-            e.stopPropagation();
-        }
-        menuSearch.oninput = () => {
-            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
-        }
-        sortBy.onchange = () => {
-            this.sortBy(sortBy.value, reverseOrder.checked);
-        }
-        reverseOrder.onclick = () => {
-            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
-        }
-        menuSelect.onchange = () => {
-            this.selectCategory(menuSelect.value);
-        }
-    }
-
-    responsiveUI() {
-        const clientWidth = document.body.clientWidth;
-
-        const catalogMenu = this.querySelector('.catalog-menu');
-        const reverseLabel = this.querySelector('#reverse-label');
-        const menuSearch = this.querySelector('#search-for');
-
-        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
-        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
-        var searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
-        menuSearch.placeholder = searchDescription;
-        if (clientWidth < 769) {
-            this.selectCategory('Fires');
-        } else {
-            const firesListDOM = this.querySelector('#fires-column');
-            const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-            const satelliteListDOM = this.querySelector('#satellite-column');
-            firesListDOM.classList.remove('hidden');
-            fuelMoistureListDOM.classList.remove('hidden');
-            satelliteListDOM.classList.remove('hidden');
-        }
-        
+        this.initializeMenuSearching();
+        this.createMenuEntries();
     }
 
     hideShowMenu() {
@@ -149,19 +105,64 @@ export class CatalogMenu extends HTMLElement {
         }
     }
 
-    /** Function that retrieves catalog Entries from services.js and builds a CatalogItem for each and adds it to the 
-     * appropriate category in the menu. */
-    async buildMenu() {
+    responsiveUI() {
+        const clientWidth = document.body.clientWidth;
+
+        const catalogMenu = this.querySelector('.catalog-menu');
+        const reverseLabel = this.querySelector('#reverse-label');
+        const menuSearch = this.querySelector('#search-for');
+
+        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
+        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
+        let searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
+        menuSearch.placeholder = searchDescription;
+        if (clientWidth < 769) {
+            this.selectCategory('Fires');
+        } else {
+            const firesListDOM = this.querySelector('#fires-column');
+            const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
+            const satelliteListDOM = this.querySelector('#satellite-column');
+            firesListDOM.classList.remove('hidden');
+            fuelMoistureListDOM.classList.remove('hidden');
+            satelliteListDOM.classList.remove('hidden');
+        }
+    }
+
+    initializeMenuSearching() {
+        const sortBy = this.querySelector('#sort-by');
+        const reverseOrder = this.querySelector('#reverse-order');
+        const menuSearch = this.querySelector('#search-for');
+        const menuSelect = this.querySelector('#mobile-selector');
+
+        menuSearch.onpointerdown = (e) => {
+            e.stopPropagation();
+        }
+        menuSearch.oninput = () => {
+            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
+        }
+        sortBy.onchange = () => {
+            this.sortMenu(sortBy.value, reverseOrder.checked);
+        }
+        reverseOrder.onclick = () => {
+            this.searchCatalog(menuSearch.value.toLowerCase(), sortBy.value, reverseOrder.checked);
+        }
+        menuSelect.onchange = () => {
+            this.selectCategory(menuSelect.value);
+        }
+    }
+
+    async createMenuEntries() {
         const urlParams = new URLSearchParams(window.location.search);
         const navJobId = urlParams.get('job_id');
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
         const catalogEntries = await getCatalogEntries();
-        for (const [catName, catEntry] of Object.entries(catalogEntries)) {
+        for (let catName in catalogEntries) {
+            let catEntry = catalogEntries[catName];
             this.addOrder.push(catEntry.job_id);
             let desc = catEntry.description;
-            var newLI = new CatalogItem(catEntry, navJobId);
+            let newLI = new CatalogItem(catEntry, navJobId);
             if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
                 this.fuelMoistureList.push(catEntry);
                 fuelMoistureListDOM.appendChild(newLI);
@@ -173,7 +174,7 @@ export class CatalogMenu extends HTMLElement {
                 firesListDOM.appendChild(newLI);
             }
         }
-        this.sortBy('original-order', false);
+        this.sortMenu('original-order', false);
         this.clickMostRecent(navJobId);
     }
 
@@ -182,10 +183,10 @@ export class CatalogMenu extends HTMLElement {
         if (!navJobId || !navJobId.includes('recent')) {
             return;
         }
-        var descSearchTerm = navJobId.split('-')[0];
-        var mostRecentItem = null;
-        for (var fire of firesListDOM.childNodes) {
-            var fireDesc = fire.catEntry.description;
+        let descSearchTerm = navJobId.split('-')[0];
+        let mostRecentItem = null;
+        for (let fire of firesListDOM.childNodes) {
+            let fireDesc = fire.catEntry.description;
             if (fireDesc.toLowerCase().includes(descSearchTerm)) {
                 if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
                     mostRecentItem = fire;
@@ -197,7 +198,7 @@ export class CatalogMenu extends HTMLElement {
         }
     }
 
-    /** Called each time a character is entered into the search input. filters the stored array of catalog entries by search text */
+    /** ===== Searching block ===== */
     searchCatalog(searchText, sortBy, reverseOrder) {
         const filterFunction = (catalogEntry) => {
             if (sortBy == 'original-order' || sortBy == 'description') {
@@ -211,7 +212,7 @@ export class CatalogMenu extends HTMLElement {
             }
         }
         const createList = (list) => {
-            var filteredList = list.filter(filterFunction);
+            let filteredList = list.filter(filterFunction);
             if (reverseOrder) {
                 filteredList.reverse();
             }
@@ -220,37 +221,22 @@ export class CatalogMenu extends HTMLElement {
         this.filterColumns(createList);
     }
 
-    /** Function that sorts the lists in the menu. Takes @sortBy the selected category to sortBy and @reverseOrder indicating if 
-     * the order should be reversed. */
-    sortBy(sortBy, reverseOrder) {
+    sortMenu(sortBy, reverseOrder) {
         const catalogSearch = this.querySelector('#search-for');
         catalogSearch.value = '';
         const sortingFunction = (listElem1, listElem2) => {
             let result = false;
             if (sortBy == 'original-order') {
-                var desc = listElem1.description;
-                if (desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
-                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
-                } else {
-                    result = this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
-                }
+                result = this.sortByOriginalOrder(listElem1, listElem2);
             }
             if (sortBy == 'description') {
-                result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+                result = this.sortByDescription(listElem1, listElem2);
             }
             if (sortBy == 'start-date') {
-                if (listElem1.from_utc == listElem2.from_utc) {
-                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
-                } else {
-                    result = listElem1.from_utc > listElem2.from_utc;
-                }
+                result = this.sortByStartDate(listElem1, listElem2);
             }
             if (sortBy == 'end-date') {
-                if (listElem1.to_utc == listElem2.to_utc) {
-                    result = listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
-                } else {
-                    result = listElem1.to_utc > listElem2.to_utc;
-                }
+                result = this.sortByEndDate(listElem1, listElem2);
             }
             if (reverseOrder) {
                 result = !result;
@@ -263,20 +249,51 @@ export class CatalogMenu extends HTMLElement {
         this.filterColumns(createList);
     }
 
-    /** Clears each catalog column on the DOM, filters the stored array of catalog entries by 
-     * provided function. Builds <li> html for filtered catalog entries and adds them to the columns */
+    sortByOriginalOrder(listElem1, listElem2) {
+        let desc = listElem1.description;
+        if (desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
+            return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+        } else {
+            return this.addOrder.indexOf(listElem1.job_id) > this.addOrder.indexOf(listElem2.job_id);
+        }
+    }
+
+    sortByDescription(listElem1, listElem2) {
+        return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+    }
+
+    sortByStartDate(listElem1, listElem2) {
+        if (listElem1.from_utc == listElem2.from_utc) {
+            return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+        } else {
+            return listElem1.from_utc > listElem2.from_utc;
+        }
+    }
+
+    sortByEndDate(listElem1, listElem2) {
+        if (listElem1.to_utc == listElem2.to_utc) {
+            return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
+        } else {
+            return listElem1.to_utc > listElem2.to_utc;
+        }
+    }
+
     filterColumns(listCreator) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
         const satelliteListDOM = this.querySelector('#catalog-satellite-data');
-        let catalogColumns = [[firesListDOM, this.firesList], [fuelMoistureListDOM, this.fuelMoistureList], [satelliteListDOM, this.satelliteList]];
-        for (var [listDOM, list] of catalogColumns) {
-            listDOM.innerHTML = '';
-            var newList = listCreator(list);
-            for (var catalogEntry of newList) {
-                var newLI = new CatalogItem(catalogEntry, null);
-                listDOM.append(newLI);
-            }
+
+        this.filterColumn(firesListDOM, this.firesList, listCreator);
+        this.filterColumn(fuelMoistureListDOM, this.fuelMoistureList, listCreator);
+        this.filterColumn(satelliteListDOM, this.satelliteList, listCreator);
+    }
+
+    filterColumn(categoryDOM, categoryList, listCreator) {
+        categoryDOM.innerHTML = '';
+        let newList = listCreator(categoryList);
+        for (let catalogEntry of newList) {
+            let newLI = new CatalogItem(catalogEntry, null);
+            categoryDOM.append(newLI);
         }
     }
 
