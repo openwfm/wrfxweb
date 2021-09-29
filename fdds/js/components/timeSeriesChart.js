@@ -2,7 +2,16 @@ import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement,
 import { controllers, controllerEvents } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
+/**        Contents
+ *  1. Constructor
+ *  2. Initialization block
+ *  3. CreateChart block
+ *  4. LegendActions block 
+ *  5. ZoomIntoData block
+ * 
+ */
 export class TimeSeriesChart extends HTMLElement {
+    /** ===== Constructor block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -64,14 +73,9 @@ export class TimeSeriesChart extends HTMLElement {
         this.endDate = '';
     }
 
+    /** ===== Initialization block ===== */
     connectedCallback() {
-        // set the position of the timeSeriesChart
-        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
-        const fullContainer = this.querySelector('#fullContainer');
-        dragElement(fullContainer, 'drag-container');
-        L.DomEvent.disableScrollPropagation(timeSeriesChart);
-        L.DomEvent.disableClickPropagation(timeSeriesChart);
-
+        this.initializeChartUI();
         const timeSeries = this.querySelector('#timeSeriesChart');
         this.ctx = timeSeries.getContext('2d');
         
@@ -80,58 +84,31 @@ export class TimeSeriesChart extends HTMLElement {
         this.setZoomOptions(timeSeries);
         this.setDataClicking(timeSeries);
         this.setLayerSelection();
+
         this.debouncedPopulateChart = debounce((chartArgs) => {
             this.populateChartCallback(chartArgs);
         }, 100);
+    }
+
+    initializeChartUI() {
+        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
+        const fullContainer = this.querySelector('#fullContainer');
+
+        L.DomEvent.disableScrollPropagation(timeSeriesChart);
+        L.DomEvent.disableClickPropagation(timeSeriesChart);
+
+        dragElement(fullContainer, 'drag-container');
+        this.querySelector('#closeTimeSeriesChart').onclick = () => {
+            this.thresholdLabels = {};
+            this.thresholdValues = {};
+            fullContainer.classList.add('hidden');
+        }
 
         this.querySelector('#closeTimeSeriesChart').onclick = () => {
             this.thresholdLabels = {};
             this.thresholdValues = {};
             fullContainer.classList.add('hidden');
         }
-        controllers.currentDomain.subscribe(() => {
-            fullContainer.classList.add('hidden');
-        }, controllerEvents.SIM_RESET); 
-
-        this.xAdjust = (document.body.clientWidth < 769) ? 90 : 220;
-    }
-
-    setLayerSelection() {
-        const addLayers = this.querySelector('#addLayers');
-        const layersToAdd = this.querySelector('#layers-to-add');
-        const clientWidth = document.body.clientWidth;
-        addLayers.onpointerdown = (e) => {
-            e.stopPropagation();
-            if (layersToAdd.classList.contains('hidden')) {
-                layersToAdd.classList.remove('hidden');
-                if (clientWidth >= 770) {
-                    addLayers.style.left = '-330px';
-                }
-            } else {
-                layersToAdd.classList.add('hidden');
-                if (clientWidth >= 770) {
-                    addLayers.style.left = '-80px';
-                }
-            }
-        }
-    }
-
-    updateDataOnRemove() {
-        const legendOptions = this.querySelector('#legendOptions');
-        const chart = this.querySelector('#fullContainer');
-        const updateData = (index) => {
-            if (chart.classList.contains('hidden')) {
-                return;
-            }
-            legendOptions.classList.add('hidden');
-            for (var layerName in this.allData) {
-                var data = this.allData[layerName];
-                data.splice(index, 1);
-            }
-            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
-        }
-        var markerController = controllers.timeSeriesMarkers;
-        markerController.subscribe(updateData, markerController.removeEvent);
     }
 
     setThresholdOptions() {
@@ -174,46 +151,58 @@ export class TimeSeriesChart extends HTMLElement {
             const points = this.chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
             if (points.length) {
                 const firstPoint = points[0];
-                var label = this.chart.data.labels[firstPoint.index];
-                var timestamp = localToUTC(label);
+                let label = this.chart.data.labels[firstPoint.index];
+                let timestamp = localToUTC(label);
                 controllers.currentTimestamp.setValue(timestamp);
                 setURL();
             }
         });
     }
 
+    setLayerSelection() {
+        const addLayers = this.querySelector('#addLayers');
+        const layersToAdd = this.querySelector('#layers-to-add');
+        const clientWidth = document.body.clientWidth;
+        addLayers.onpointerdown = (e) => {
+            e.stopPropagation();
+            if (layersToAdd.classList.contains('hidden')) {
+                layersToAdd.classList.remove('hidden');
+                if (clientWidth >= 770) {
+                    addLayers.style.left = '-330px';
+                }
+            } else {
+                layersToAdd.classList.add('hidden');
+                if (clientWidth >= 770) {
+                    addLayers.style.left = '-80px';
+                }
+            }
+        }
+    }
+
+    updateDataOnRemove() {
+        const legendOptions = this.querySelector('#legendOptions');
+        const chart = this.querySelector('#fullContainer');
+        const updateData = (index) => {
+            if (chart.classList.contains('hidden')) {
+                return;
+            }
+            legendOptions.classList.add('hidden');
+            for (let layerName in this.allData) {
+                let data = this.allData[layerName];
+                data.splice(index, 1);
+            }
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
+        }
+        let markerController = controllers.timeSeriesMarkers;
+        markerController.subscribe(updateData, markerController.removeEvent);
+    }
+
+    /** ===== CreateChart block ===== */
     populateChart(data, startDate='', endDate='', activeLayer=simVars.displayedColorbar) {
         this.debouncedPopulateChart([data, startDate, endDate, activeLayer]);
     }
 
-    setThresholdValues() {
-        const thresholdSetter = this.querySelector('#threshold-setter');
-        const labelSetter = this.querySelector('#threshold-label');
-
-        var thresholdLabel = this.thresholdLabels[this.activeLayer];
-        var thresholdValue = this.thresholdValues[this.activeLayer];
-        labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
-        thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
-    }
-
-    populateLayers() {
-        const selectLayers = this.querySelector('#layers-to-add');
-        selectLayers.innerHTML = '';
-        const selectCallback = (layerName) => {
-            this.activeLayer = layerName;
-            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
-        }
-        for (var layerName in this.allData) {
-            var checked = layerName == this.activeLayer;
-            var checkbox = buildCheckBox(layerName, 'checkbox', 'chartLayer',
-                                         checked, selectCallback, layerName);
-            checkbox.className = 'layerCheckbox';
-            selectLayers.appendChild(checkbox);
-        }
-    }
-
     populateChartCallback([allData, startDate='', endDate='', activeLayer=simVars.displayedColorbar]) {
-        const timeSeriesChart = this.querySelector('#timeSeriesChartContainer');
         const fullContainer = this.querySelector('#fullContainer');
 
         this.activeLayer = activeLayer;
@@ -222,22 +211,19 @@ export class TimeSeriesChart extends HTMLElement {
         this.allData = allData;
         this.populateLayers();
         this.setThresholdValues();
-        var data = allData[activeLayer];
+        let data = allData[activeLayer];
         if (data.length == 0) {
             fullContainer.classList.add('hidden');
             return;
         }
 
-        var labels = Object.keys(data[0].dataset).map(timeStamp => {
-            return utcToLocal(timeStamp);
-        });
-        this.labels = labels;
-        this.populateZoomSelectors(labels, startDate, endDate);
+        let labels = this.createLabels(data, startDate, endDate);
 
         if (this.chart) {
             this.chart.destroy();
         }
-        var dataset = this.createChartDataset(data);
+
+        let dataset = this.createChartDataset(data);
         this.chart = new Chart(this.ctx, {
             type: 'line',
             data: {
@@ -249,12 +235,48 @@ export class TimeSeriesChart extends HTMLElement {
         fullContainer.classList.remove('hidden');
     }
 
+    populateLayers() {
+        const selectLayers = this.querySelector('#layers-to-add');
+        selectLayers.innerHTML = '';
+        const selectCallback = (layerName) => {
+            this.activeLayer = layerName;
+            this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
+        }
+        for (let layerName in this.allData) {
+            let checked = layerName == this.activeLayer;
+            let checkbox = buildCheckBox(layerName, 'checkbox', 'chartLayer',
+                                         checked, selectCallback, layerName);
+            checkbox.className = 'layerCheckbox';
+            selectLayers.appendChild(checkbox);
+        }
+    }
+
+    createLabels(data, startDate, endDate) {
+        let labels = Object.keys(data[0].dataset).map(timeStamp => {
+            return utcToLocal(timeStamp);
+        });
+        this.labels = labels;
+        this.populateZoomSelectors(labels, startDate, endDate);
+
+        return labels;
+    }
+
+    setThresholdValues() {
+        const thresholdSetter = this.querySelector('#threshold-setter');
+        const labelSetter = this.querySelector('#threshold-label');
+
+        let thresholdLabel = this.thresholdLabels[this.activeLayer];
+        let thresholdValue = this.thresholdValues[this.activeLayer];
+        labelSetter.value = (thresholdLabel == null) ? '' : thresholdLabel;
+        thresholdSetter.value = (thresholdValue == null) ? '' : thresholdValue;
+    }
+
     createChartDataset(data) {
         const roundLatLon = (num) => Math.round(num*100) / 100;
-        var dataset = [];
-        for (var timeSeriesDataset of data) {
+        let dataset = [];
+        for (let timeSeriesDataset of data) {
             let color = timeSeriesDataset.color; // use let here to create block scope
-            var timeSeriesData = {
+            let timeSeriesData = {
                     label: timeSeriesDataset.label + ' values at lat: ' + roundLatLon(timeSeriesDataset.latLon.lat) + ' lon: ' + roundLatLon(timeSeriesDataset.latLon.lng),
                     fill: false,
                     data: Object.entries(timeSeriesDataset.dataset).map(entry => entry[1]),
@@ -263,15 +285,14 @@ export class TimeSeriesChart extends HTMLElement {
                     spanGaps: true,
                     backgroundColor: color,
                     pointBackgroundColor: (context) => {
-                        var index = context.dataIndex;
-                        var timestamp = this.labels[index];
-                        var currentDomain = controllers.currentDomain.getValue();
+                        let index = context.dataIndex;
+                        let timestamp = this.labels[index];
+                        let currentDomain = controllers.currentDomain.getValue();
                         if (simVars.noLevels.has(simVars.displayedColorbar, currentDomain, timestamp)) {
                             return `rgb(256, 256, 256)`
                         }
-                        var thresholdValue = this.thresholdValues[this.activeLayer];
-                        var index = context.dataIndex;
-                        var value = context.dataset.data[index];
+                        let thresholdValue = this.thresholdValues[this.activeLayer];
+                        let value = context.dataset.data[index];
                         if (thresholdValue === '' || isNaN(thresholdValue) || value > thresholdValue) {
                             return color;
                         }
@@ -286,12 +307,12 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     getOptions(startDate, endDate) {
-        var thresholdLabel = this.thresholdLabels[this.activeLayer];
+        let thresholdLabel = this.thresholdLabels[this.activeLayer];
         if (thresholdLabel == null) {
             thresholdLabel = '';
         }
-        var thresholdValue = this.thresholdValues[this.activeLayer];
-        var xAxisOptions = {
+        let thresholdValue = this.thresholdValues[this.activeLayer];
+        let xAxisOptions = {
             title: {
                 display: true,
                 text: 'Timestamp'
@@ -344,10 +365,11 @@ export class TimeSeriesChart extends HTMLElement {
                 });
     }
 
+    /** ===== LegendActions block ===== */
     legendClick(legendItem) {
-        var index = legendItem.datasetIndex;
-        var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        var timeSeriesMarker = timeSeriesMarkers[index].getContent();
+        let index = legendItem.datasetIndex;
+        let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
+        let timeSeriesMarker = timeSeriesMarkers[index].getContent();
 
         this.setOpeningMarker(index, timeSeriesMarker);
         this.setHidingDataOnChart(index, timeSeriesMarker);
@@ -363,11 +385,11 @@ export class TimeSeriesChart extends HTMLElement {
     }
 
     setOpeningMarker(index, timeSeriesMarker) {
-        var timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
+        let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
         const openMarker = this.querySelector('#openMarker');
         openMarker.checked = timeSeriesMarker.infoOpen;
         openMarker.oninput = () => {
-            var open = openMarker.checked;
+            let open = openMarker.checked;
             if (open) {
                 timeSeriesMarkers[index].showMarkerInfo();
             } else {
@@ -378,12 +400,12 @@ export class TimeSeriesChart extends HTMLElement {
 
     setHidingDataOnChart(index, timeSeriesMarker) {
         const hideData = this.querySelector('#hideData');
-        var dataPoint = this.allData[this.activeLayer][index];
+        let dataPoint = this.allData[this.activeLayer][index];
         hideData.checked = dataPoint.hidden;
         hideData.oninput = () => {
-            var hidden = hideData.checked;
-            for (var layerName in this.allData) {
-                var data = this.allData[layerName];
+            let hidden = hideData.checked;
+            for (let layerName in this.allData) {
+                let data = this.allData[layerName];
                 data[index].hidden = hidden;
             }
             timeSeriesMarker.hideOnChart = hidden;
@@ -396,8 +418,8 @@ export class TimeSeriesChart extends HTMLElement {
         colorInput.value = this.allData[this.activeLayer][index].color;
 
         colorInput.oninput = () => {
-            for (var layerName in this.allData) {
-                var data = this.allData[layerName];
+            for (let layerName in this.allData) {
+                let data = this.allData[layerName];
                 data[index].color = colorInput.value;
             }
             timeSeriesMarker.setChartColor(colorInput.value);
@@ -410,8 +432,8 @@ export class TimeSeriesChart extends HTMLElement {
         addChangeName.value = timeSeriesMarker.getName();
         addChangeName.oninput = () => {
             timeSeriesMarker.setName(addChangeName.value);
-            for (var layerName in this.allData) {
-                var data = this.allData[layerName];
+            for (let layerName in this.allData) {
+                let data = this.allData[layerName];
                 data[index].label = addChangeName.value;
             }
             
@@ -419,6 +441,7 @@ export class TimeSeriesChart extends HTMLElement {
         }
     }
 
+    /** ===== ZoomIntoData block ===== */
     populateZoomSelectors(timeStamps, startDate, endDate) {
         if (startDate == '') {
             startDate = timeStamps[0]
@@ -430,7 +453,7 @@ export class TimeSeriesChart extends HTMLElement {
         const zoomEnd = this.querySelector('#zoom-end');
         zoomStart.innerHTML = '';
         zoomEnd.innerHTML = '';
-        for (var timeStamp of timeStamps) {
+        for (let timeStamp of timeStamps) {
             zoomStart.appendChild(createOption(timeStamp, false));
             zoomEnd.appendChild(createOption(timeStamp, false));
         }
@@ -447,43 +470,40 @@ export class TimeSeriesChart extends HTMLElement {
         if (e.layerY < this.chart.legend.bottom) {
             return;
         }
-        var [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
-        // position the drawn box
+        this.initializeZoomBox(e.clientX, e.clientY);
+
+        let [zoomLeft, zoomRight, zoomTop, zoomBottom] = [e.clientX, e.clientX, e.clientY, e.clientY];
+        let zoomCoords = {zoomLeft: zoomLeft, zoomRight: zoomRight, zoomTop: zoomTop, zoomBottom: zoomBottom};
+        this.setDrawingBoxCompletion(zoomCoords);
+        this.setDrawingBoxUpdate(zoomCoords);
+    }
+
+    initializeZoomBox(startX, startY) {
         const zoomBoxArea = this.querySelector('#zoomBox');
+
+        // position the drawn box
         zoomBoxArea.style.width = '0px';
         zoomBoxArea.style.height = '0px';
         zoomBoxArea.style.display = 'block';
-        zoomBoxArea.style.left = e.clientX + 'px';
-        zoomBoxArea.style.top = e.clientY + 'px';
-        // get the bounds of the chart to ensure we don't overdraw
-        const canvas = this.querySelector('#timeSeriesChart');
-        var boundingRect = canvas.getBoundingClientRect();
-        // get the data of each point on the chart
-        var dataset = [];
-        var dataLength = this.allData[this.activeLayer].length;
-        for (var i = 0; i < dataLength; i++) {
-            dataset.push(this.chart.getDatasetMeta(i).data);
-        }
+        zoomBoxArea.style.left = startX + 'px';
+        zoomBoxArea.style.top = startY + 'px';
+    }
+
+    setDrawingBoxCompletion(zoomCoords) {
+        const zoomBoxArea = this.querySelector('#zoomBox');
 
         document.onpointerup = () => {
             document.onpointerup = null;
             document.onpointermove = null;
-
             zoomBoxArea.style.display = 'none';
-            // get the index and y value of each data point that is inside the drawn box
-            var zoomData = dataset.map(data => data.filter(datapoint => {
-                var xCheck = datapoint.x >= zoomLeft - boundingRect.left && datapoint.x <= zoomRight - boundingRect.left;
-                var yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
-                return xCheck && yCheck;
-            }).map(datapoint => {
-                return [datapoint.parsed.x, datapoint.parsed.y];
-            }));
-            var labelIndices = zoomData.map(dataset => dataset.map(data => data[0]));
-            var yValues = zoomData.map(dataset => dataset.map(data => data[1]));
+
+            let zoomData = this.getDataInZoomBox(zoomCoords);
+            let labelIndices = zoomData.map(dataset => dataset.map(data => data[0]));
+            let yValues = zoomData.map(dataset => dataset.map(data => data[1]));
             // get the min/max indices and values to set the bound of the chart
             const minValue = (values) => Math.min(...values.map(dataValues => Math.min(...dataValues)));
             const maxValue = (values) => Math.max(...values.map(dataValues => Math.max(...dataValues)));
-            var [minIndex, maxIndex, yMin, yMax] = [minValue(labelIndices), maxValue(labelIndices), minValue(yValues), maxValue(yValues)];
+            let [minIndex, maxIndex, yMin, yMax] = [minValue(labelIndices), maxValue(labelIndices), minValue(yValues), maxValue(yValues)];
             // if there are selected points zoom the chart to them
             if (yMax > -Infinity) {
                 minIndex = Math.max(0, minIndex - 1);
@@ -494,6 +514,37 @@ export class TimeSeriesChart extends HTMLElement {
                 this.chart.update(this.allData[this.activeLayer]);
             }
         };
+    }
+
+    getDataInZoomBox(zoomCoords) {
+        const canvas = this.querySelector('#timeSeriesChart');
+        let boundingRect = canvas.getBoundingClientRect();
+        let {zoomLeft, zoomRight, zoomTop, zoomBottom} = zoomCoords;
+
+        let dataset = [];
+        let dataLength = this.allData[this.activeLayer].length;
+        for (let i = 0; i < dataLength; i++) {
+            dataset.push(this.chart.getDatasetMeta(i).data);
+        }
+
+        // get the index and y value of each data point that is inside the drawn box
+        let zoomData = dataset.map(data => data.filter(datapoint => {
+            let xCheck = datapoint.x >= zoomLeft - boundingRect.left && datapoint.x <= zoomRight - boundingRect.left;
+            let yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
+            return xCheck && yCheck;
+        }).map(datapoint => {
+            return [datapoint.parsed.x, datapoint.parsed.y];
+        }));
+
+        return zoomData;
+    }
+
+    setDrawingBoxUpdate(zoomCoords) {
+        const canvas = this.querySelector('#timeSeriesChart');
+        const zoomBoxArea = this.querySelector('#zoomBox');
+        let boundingRect = canvas.getBoundingClientRect();
+        let {zoomLeft, zoomTop} = zoomCoords;
+
         // call a function whenever the cursor moves: draws a zoombox
         document.onpointermove = (e2) => {
             e2 = e2 || window.event;
@@ -505,8 +556,9 @@ export class TimeSeriesChart extends HTMLElement {
             }
             let xDiff = e2.clientX - zoomLeft;
             let yDiff = e2.clientY - zoomTop;
-            zoomRight = zoomLeft + xDiff;
-            zoomBottom = zoomTop + yDiff;
+
+            zoomCoords.zoomRight = zoomLeft + xDiff;
+            zoomCoords.zoomBottom = zoomTop + yDiff;
             zoomBoxArea.style.width = xDiff + 'px';
             zoomBoxArea.style.height = yDiff + 'px';
         }
@@ -525,9 +577,9 @@ export class TimeSeriesChart extends HTMLElement {
         this.startDate = startDate;
         this.endDate = endDate;
         linkSelects(zoomStart, zoomEnd);
-        var startCheck = zoomStart.value == this.labels[0];
-        var endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
-        var yAxisCheck = isNaN(yMin);
+        let startCheck = zoomStart.value == this.labels[0];
+        let endCheck = zoomEnd.value == this.labels[this.labels.length - 1];
+        let yAxisCheck = isNaN(yMin);
         if (startCheck && endCheck && yAxisCheck) {
             undoZoomD.classList.add('hidden');
             undoZoomDisplay = 'none';
