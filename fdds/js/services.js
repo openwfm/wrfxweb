@@ -11,9 +11,9 @@ export async function getConfigurations() {
     
         if (configData.flags) {
             const simulationFlags = document.querySelector('#simulation-flags');
-            var flags = configData.flags;
+            let flags = configData.flags;
             flags.map(flag => {
-                var spanElement = document.createElement('span');
+                let spanElement = document.createElement('span');
                 spanElement.className = 'displayTest';
                 spanElement.innerText = flag;
                 simulationFlags.appendChild(spanElement);

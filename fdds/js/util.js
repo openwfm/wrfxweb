@@ -2,9 +2,22 @@ import { controllers } from './components/Controller.js';
 import { simVars } from './simVars.js';
 import { map } from './map.js';
 
+/** Utility functions that can be imported and used in components from anywhere. 
+ * 
+ *      Contents
+ * 1. SetURL block
+ * 2. Debounce block
+ * 3. TimeConversion block
+ * 4. CreateDomElements block
+ * 5. Color block
+ * 6. Drag Elements block
+ * 
+ */
+
+/** ===== SetURL block ===== */
 export function setURL() {
-  var historyData = {};
-  var urlVars = '';
+  let historyData = {};
+  let urlVars = '';
 
   const addData = (key, data) => {
     if (data) {
@@ -13,41 +26,77 @@ export function setURL() {
     }
   }
 
-  var zoom = map.getZoom();
-  addData('zoom', zoom);
-  var center = map.getCenter();
-  var pan = center.lat.toFixed(2) + ',' + center.lng.toFixed(2);
-  addData('pan', pan);
-  var currentSimulation = simVars.currentSimulation;
-  addData('job_id', currentSimulation);
-  var currentDomain = controllers.currentDomain.getValue();
-  var domainInstances = controllers.domainInstance.getValue();
-  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
-    addData('domain', currentDomain);
-  }
-  var startDate = controllers.startDate.getValue();
-  if (startDate != simVars.sortedTimestamps[0]) {
-    addData('startDate', utcToLocal(startDate));
-  }
-  var endDate = controllers.endDate.getValue();
-  var nTimestamps = simVars.sortedTimestamps.length;
-  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
-    addData('endDate', utcToLocal(endDate));
-  }
-  var timestamp = controllers.currentTimestamp.getValue();
-  if (timestamp != startDate) {
-    addData('timestamp', utcToLocal(timestamp));
-  }
-  var rasterURL = simVars.overlayOrder.join(',');
-  addData('rasters', rasterURL);
-  var opacity = controllers.opacity.getValue();
-  if (opacity != 0.5) {
-    addData('opacity', opacity);
-  }
+  zoomToURL(addData);
+  panToURL(addData);
+  jobIdToURL(addData);
+  domainToURL(addData);
+  startDateToURL(addData);
+  endDateToURL(addData);
+  timestampToURL(addData);
+  addedLayersToURL(addData);
+  opacityToURL(addData);
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);
     history.pushState(historyData, 'Data', urlVars);
+  }
+}
+
+function zoomToURL(addData) {
+  let zoom = map.getZoom();
+  addData('zoom', zoom);
+}
+
+function panToURL(addData) {
+  let center = map.getCenter();
+  let pan = center.lat.toFixed(2) + ',' + center.lng.toFixed(2);
+  addData('pan', pan);
+}
+
+function jobIdToURL(addData) {
+  let currentSimulation = simVars.currentSimulation;
+  addData('job_id', currentSimulation);
+}
+
+function domainToURL(addData) {
+  let currentDomain = controllers.currentDomain.getValue();
+  let domainInstances = controllers.domainInstance.getValue();
+  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
+    addData('domain', currentDomain);
+  }
+}
+
+function startDateToURL(addData) {
+  let startDate = controllers.startDate.getValue();
+  if (startDate != simVars.sortedTimestamps[0]) {
+    addData('startDate', utcToLocal(startDate));
+  }
+}
+
+function endDateToURL(addData) {
+  let endDate = controllers.endDate.getValue();
+  let nTimestamps = simVars.sortedTimestamps.length;
+  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
+    addData('endDate', utcToLocal(endDate));
+  }
+}
+
+function timestampToURL(addData) {
+  let timestamp = controllers.currentTimestamp.getValue();
+  if (timestamp != startDate) {
+    addData('timestamp', utcToLocal(timestamp));
+  }
+}
+
+function addedLayersToURL(addData) {
+  let rasterURL = simVars.overlayOrder.join(',');
+  addData('rasters', rasterURL);
+}
+
+function opacityToURL(addData) {
+  let opacity = controllers.opacity.getValue();
+  if (opacity != 0.5) {
+    addData('opacity', opacity);
   }
 }
 
@@ -59,6 +108,7 @@ map.on('moveend', function() {
   setURL();
 });
 
+/** ===== Debounce block ===== */
 /** Executes function with a maximum rate of delay. */
 export function debounceInIntervals(callback, delay) {
   let timeout; 
@@ -85,14 +135,14 @@ export function debounce(callback, delay) {
   }
 }
 
+/** ===== TimeConversion block ===== */
 /** Function to convert UTC timestamp to PT timestamp. */
 export function utcToLocal(utcTime) {
   if (!utcTime) {
     return;
   }
-
-  var timezone = 'America/Los_Angeles';
-  var localTime = dayjs(utcTime.replace('_', 'T') + 'Z');
+  let timezone = 'America/Los_Angeles';
+  let localTime = dayjs(utcTime.replace('_', 'T') + 'Z');
 
   return localTime.format('YYYY-MM-DD HH:mm:ss', {timeZone: timezone});
 }
@@ -101,18 +151,18 @@ export function localToUTC(localTime) {
   if (!localTime) {
     return;
   }
-
-  var timezone = 'America/Los_Angeles';
-  var localTimeDayJS = dayjs(localTime).tz(timezone);
-  var utcTime = localTimeDayJS.tz('UTC');
+  let timezone = 'America/Los_Angeles';
+  let localTimeDayJS = dayjs(localTime).tz(timezone);
+  let utcTime = localTimeDayJS.tz('UTC');
 
   return utcTime.format('YYYY-MM-DD_HH:mm:ss');
 }
 
+/** ===== CreateDomElements block ===== */
 export function createOption(timeStamp, utcValue) {
-  var option = document.createElement('option');
+  let option = document.createElement('option');
   option.value = timeStamp;
-  var innerText = utcValue ? utcToLocal(timeStamp) : timeStamp;
+  let innerText = utcValue ? utcToLocal(timeStamp) : timeStamp;
   option.innerText = innerText;
   return option;
 }
@@ -130,7 +180,7 @@ export function createElement(id=null, className=null) {
 
 /** Creates the htmlElement for each checkbox in the LayerController. */
 export function buildCheckBox(id, type, name, checked, callback, args=null) {
-  var div = document.createElement('div');
+  let div = document.createElement('div');
   div.className = 'layer-checkbox';
 
   const input = document.createElement('input');
@@ -142,7 +192,7 @@ export function buildCheckBox(id, type, name, checked, callback, args=null) {
     callback(args);
   }
 
-  var label = document.createElement('label');
+  let label = document.createElement('label');
   label.for = id;
   label.innerText = id;
   div.appendChild(input);
@@ -165,14 +215,15 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
+/** ===== Color block ===== */
 // pulled from https://www.w3docs.com/snippets/javascript/how-to-convert-rgb-to-hex-and-vice-versa.html
 export function rgbToHex(r, g, b) {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 export function darkenHex(hex) {
-  var darkenedHex = '#';
-  for (var decimal of hex.substr(1)) {
+  let darkenedHex = '#';
+  for (let decimal of hex.substr(1)) {
       switch (decimal) {
           case 'f': 
               darkenedHex += 'd';
@@ -205,15 +256,16 @@ export function darkenHex(hex) {
   return darkenedHex;
 }
 
+/** ===== DragElements block ===== */
 /** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  var elmntLeft = 0, elmntTop = 0;
-  var clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  let elmntLeft = 0, elmntTop = 0;
+  let clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
   if (clientWidth < 769) {
     return;
   }
-  var draggableElement = document.getElementById(elmnt.id);
+  let draggableElement = document.getElementById(elmnt.id);
   if (subID != '') {
     draggableElement = document.getElementById(subID);
   }

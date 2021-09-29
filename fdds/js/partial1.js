@@ -3,7 +3,7 @@
 window.onload = () => {
   const copyLink = document.querySelector('#copyLink');
   copyLink.onclick = () => {
-    var input = document.body.appendChild(document.createElement("input"));
+    let input = document.body.appendChild(document.createElement("input"));
     input.value = window.location.href;
     input.focus();
     input.select();
