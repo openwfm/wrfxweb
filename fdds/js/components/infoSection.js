@@ -24,26 +24,19 @@ export class InfoSection extends HTMLElement {
     }
 
     connectedCallback() {
-        const header = this.querySelector('#header');
-        const subsections = this.querySelector('#subheaders');
-        const expandCollapse = this.querySelector('#expand-collapse');
+        this.initializeHeader();
+        this.createSubHeaders();
+    }
 
-        const expandSection = () => {
-            subsections.classList.remove('hidden');
-            expandCollapse.innerHTML = '[-]';
-            this.expanded = true;
-        }
-        const contractSection = () => {
-            subsections.classList.add('hidden');
-            expandCollapse.innerHTML = '[+]';
-            this.expanded = false;
-        }
+    initializeHeader() {
+        const header = this.querySelector('#header');
+        const expandCollapse = this.querySelector('#expand-collapse');
 
         header.onclick = () => {
             if (this.expanded) {
-                contractSection();
+                this.contractSection();
             } else {
-                expandSection();
+                this.expandSection();
             }
         }
         header.onmouseover = () => {
@@ -52,12 +45,33 @@ export class InfoSection extends HTMLElement {
         header.onmouseout = () => {
             expandCollapse.classList.remove('hover');
         }
+    }
 
+    expandSection() {
+        const subsections = this.querySelector('#subheaders');
+        const expandCollapse = this.querySelector('#expand-collapse');
+
+        subsections.classList.remove('hidden');
+        expandCollapse.innerHTML = '[-]';
+        this.expanded = true;
+    }
+
+    contractSection() {
+        const subsections = this.querySelector('#subheaders');
+        const expandCollapse = this.querySelector('#expand-collapse');
+
+        subsections.classList.add('hidden');
+        expandCollapse.innerHTML = '[+]';
+        this.expanded = false;
+    }
+
+    createSubHeaders() {
+        const subsections = this.querySelector('#subheaders');
         this.sectionDivs[this.header] = this.querySelector('#generalDescription');
-        for (var subheader of this.subheaders) {
-            var div = document.createElement('div');
+        for (let subheader of this.subheaders) {
+            let div = document.createElement('div');
             div.id = this.formatHeader(subheader);
-            var h4 = document.createElement('h4');
+            let h4 = document.createElement('h4');
             h4.innerHTML = subheader;
             div.appendChild(h4);
             subsections.appendChild(div);
@@ -74,7 +88,7 @@ export class InfoSection extends HTMLElement {
         if (subSection == null) {
             return;
         }
-        var p = document.createElement('p');
+        let p = document.createElement('p');
         p.innerHTML = description;
         subSection.appendChild(p);
     }
