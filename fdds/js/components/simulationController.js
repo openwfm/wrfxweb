@@ -14,14 +14,15 @@ const NORMAL_RATE = 330;
  * 
  *                  Contents
  *      1. Initialization block
- *      2.
+ *      2. UI block
+ *      3. FrameNavigation block
  */
 export class SimulationController extends HTMLElement {
     /** ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = `
-            <div class='slider-container'>
+            <div id='sim-controller' class='slider-container hidden'>
                 <div id='slider-header'>
                     <div id='slider-play-bar'>
                         <button class='slider-button' id='slider-slow-down'>
@@ -66,26 +67,35 @@ export class SimulationController extends HTMLElement {
     }
 
     connectedCallback() {
-        const container = this.querySelector('.slider-container');
-        const slider = new SimulationSlider();
-        container.appendChild(slider);
-        this.simulationSlider = slider;
-
-        if (document.body.clientWidth < 769) {
-            const timeStamp = this.querySelector('#slider-timestamp');
-            const playButtons = this.querySelector('#slider-play-bar');
-            timeStamp.parentNode.insertBefore(timeStamp, playButtons);
-        }
-        L.DomEvent.disableScrollPropagation(container);
-        L.DomEvent.disableClickPropagation(container);
+        this.initializeContainer();
+        this.responsiveUI();
+        this.createSimulationSlider();
+        this.initializeFrameNavigation();
+        this.initializeFrameRates();
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
         }, controllerEvents.ALL);
         controllers.currentTimestamp.subscribe(() => {
-            this.updateSlider();
+            this.updateDisplayedTimestamp();
         });
+    }
 
+    initializeContainer() {
+        const container = this.querySelector('.slider-container');
+        L.DomEvent.disableScrollPropagation(container);
+        L.DomEvent.disableClickPropagation(container);
+    }
+
+    createSimulationSlider() {
+        const container = this.querySelector('.slider-container');
+
+        const slider = new SimulationSlider();
+        container.appendChild(slider);
+        this.simulationSlider = slider;
+    }
+
+    initializeFrameNavigation() {
         document.addEventListener('keydown', (e) => {
             e = e || window.event;
             if (e.key == 'ArrowRight') {
@@ -107,8 +117,12 @@ export class SimulationController extends HTMLElement {
             this.nextFrame();
             setURL();
         }
+    }
+
+    initializeFrameRates() {
         const speedUp = this.querySelector('#slider-fast-forward');
         const slowDown = this.querySelector('#slider-slow-down');
+
         speedUp.onpointerdown = () => {
             this.toggleRate(FAST_RATE, speedUp, slowDown);
         }
@@ -117,8 +131,104 @@ export class SimulationController extends HTMLElement {
         }
     }
 
+    resetSlider() {
+        const sliderContainer = this.querySelector('#sim-controller');
+        
+        if (this.playing) {
+            this.playPause();
+        }
+        if (simVars.sortedTimestamps.length < 2) {
+            sliderContainer.classList.add('hidden');
+        } else {
+            sliderContainer.classList.remove('hidden');
+        }
+
+        this.updateDisplayedTimestamp();
+    }
+
+    /** ===== UI block ===== */
+    responsiveUI() {
+        if (document.body.clientWidth < 769) {
+            const timeStamp = this.querySelector('#slider-timestamp');
+            const playButtons = this.querySelector('#slider-play-bar');
+            timeStamp.parentNode.insertBefore(timeStamp, playButtons);
+        }
+    }
+
+    updateDisplayedTimestamp() {
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        this.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
+    }
+
+    setPlayingUI() {
+        const prevButton = this.querySelector('#slider-prev');
+        const nextButton = this.querySelector('#slider-next');
+        const playButton = this.querySelector('#play-button');
+        const pauseButton = this.querySelector('#pause-button');
+
+        playButton.classList.add('hidden');
+        pauseButton.classList.remove('hidden');
+        prevButton.disabled = true;
+        nextButton.disabled = true;
+        prevButton.classList.add('disabled-button');
+        nextButton.classList.add('disabled-button');
+    }
+
+    setPausedUI() {
+        const prevButton = this.querySelector('#slider-prev');
+        const nextButton = this.querySelector('#slider-next');
+        const playButton = this.querySelector('#play-button');
+        const pauseButton = this.querySelector('#pause-button');
+
+        playButton.classList.remove('hidden');
+        pauseButton.classList.add('hidden');
+        prevButton.disabled = false;
+        nextButton.disabled = false;
+        prevButton.classList.remove('disabled-button');
+        nextButton.classList.remove('disabled-button');
+    }
+
+    /** ===== FrameNavigation block ===== */
+    playPause() {
+        this.playing = !this.playing;
+        if (!this.playing) {
+            this.setPausedUI();
+            setURL();
+        } else {
+            this.setPlayingUI();
+            this.play();
+        }
+    }
+
+    /** Iterates to next frame while still playing */
+    play() {
+        if (this.playing) {
+            let endDate = controllers.endDate.getValue();
+            let nextTimestamp = this.nextFrame();
+            if (nextTimestamp == endDate) {
+                window.setTimeout(() => this.play(), 2*this.frameRate);
+            } else {
+                window.setTimeout(() => this.play(), this.frameRate);
+            }
+        }
+    }
+
+    nextFrame() {
+        let nextTimestamp = this.simulationSlider.nextTimestamp();
+
+        controllers.currentTimestamp.setValue(nextTimestamp);
+        return nextTimestamp;
+    }
+
+    prevFrame() {
+        let prevTimestamp = this.simulationSlider.prevTimestamp();
+
+        controllers.currentTimestamp.setValue(prevTimestamp);
+        return prevTimestamp;
+    }
+
     toggleRate(rate, togglePrimary, toggleSecondary) {
-        var unPressedColor = '#d6d6d6';
+        let unPressedColor = '#d6d6d6';
         togglePrimary.style.background = unPressedColor;
         toggleSecondary.style.background = unPressedColor;
 
@@ -128,81 +238,6 @@ export class SimulationController extends HTMLElement {
             this.frameRate = rate;
             togglePrimary.style.background = '#e5e5e5';
         }
-    }
-
-    resetSlider() {
-        if (this.playing) {
-            this.playPause();
-        }
-
-        const sliderContainer = this.querySelector('.slider-container');
-        sliderContainer.style.display = (simVars.sortedTimestamps.length < 2) ? 'none' : 'block';
-        this.updateSlider();
-    }
-
-    /** Called to update the UI when the currentFrame has been updated. */
-    updateSlider() {
-        var currentTimestamp = controllers.currentTimestamp.getValue();
-        this.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
-    }
-
-    /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
-     * changes play icon to pause icon. */
-    playPause() {
-        const prevButton = this.querySelector('#slider-prev');
-        const nextButton = this.querySelector('#slider-next');
-        const playButton = this.querySelector('#play-button');
-        const pauseButton = this.querySelector('#pause-button');
-
-        this.playing = !this.playing;
-        if (!this.playing) {
-            playButton.classList.remove('hidden');
-            pauseButton.classList.add('hidden');
-            
-            prevButton.disabled = false;
-            nextButton.disabled = false;
-            prevButton.classList.remove('disabled-button');
-            nextButton.classList.remove('disabled-button');
-            setURL();
-        } else {
-            playButton.classList.add('hidden');
-            pauseButton.classList.remove('hidden');
-
-            prevButton.disabled = true;
-            nextButton.disabled = true;
-            prevButton.classList.add('disabled-button');
-            nextButton.classList.add('disabled-button');
-            this.play();
-        }
-    }
-
-    /** Iterates to next frame while still playing */
-    play() {
-        if (this.playing) {
-            var endDate = controllers.endDate.getValue();
-            var nextTimestamp = this.nextFrame();
-            if (nextTimestamp == endDate) {
-                window.setTimeout(() => this.play(), 2*this.frameRate);
-            } else {
-                window.setTimeout(() => this.play(), this.frameRate);
-            }
-        }
-    }
-
-    /** Moves one frame to the right. */
-    nextFrame() {
-        var nextTimestamp = this.simulationSlider.nextTimestamp();
-
-        controllers.currentTimestamp.setValue(nextTimestamp);
-        return nextTimestamp;
-    }
-
-    /** Moves one frame to the left. */
-    prevFrame() {
-        var prevTimestamp = this.simulationSlider.prevTimestamp();
-
-        controllers.currentTimestamp.setValue(prevTimestamp);
-        return prevTimestamp;
     }
 }
 
