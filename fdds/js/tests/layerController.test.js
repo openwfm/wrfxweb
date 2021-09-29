@@ -22,6 +22,14 @@ jest.mock('../map.js', () => ({
     },
 }));
 
+const {OpacitySlider} = require('../components/opacitySlider.js');
+jest.mock('../components/opacitySlider.js');
+const opacitySliderConstructor = () => {
+    const div = document.createElement('div');
+    return div;
+}
+OpacitySlider.mockImplementation(() => opacitySliderConstructor());
+
 const simVars = require('../simVars.js');
 jest.mock('../simVars.js', () => ({
     simVars: ({
@@ -102,11 +110,16 @@ jest.mock('../util.js', () => ({
     dragElement: jest.fn(),
     debounce: jest.fn(),
     setURL: jest.fn(),
-    buildCheckBox: jest.fn()
+    buildCheckBox: jest.fn(),
+    createElement: jest.fn()
 }));
 
-const div = document.createElement('div');
-util.buildCheckBox = () => div;
+const buildCheckBoxDiv = document.createElement('div');
+util.buildCheckBox = () => buildCheckBoxDiv;
+const createElementDiv = document.createElement('div');
+createElementDiv.id = '#opacity-display';
+util.createElement = () => createElementDiv;
+
 
 HTMLCanvasElement.prototype.getContext = () => { 
     return {drawImage: jest.fn()}
