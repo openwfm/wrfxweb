@@ -3,13 +3,21 @@ import { setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
-/**
- * A Component that builds the animation controller for the simulation. Creates a UI component that 
- * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
- * slider bar with a head that indicates relative position in animation that can be dragged to a 
- * specific location. Bar itself can also be clicked to seek to a specific position.
+const FAST_RATE = 150;
+const SLOW_RATE = 500; 
+const NORMAL_RATE = 330;
+
+/** Creates a UI component that includes a play / pause / prev / next buttons to iterate through 
+ *  the simulation. Also includes a slider bar with a head that indicates relative position in 
+ *  simulation that can be dragged to a specific location. Bar can also be clicked to seek 
+ *  to a specific position.
+ * 
+ *                  Contents
+ *      1. Initialization block
+ *      2.
  */
 export class SimulationController extends HTMLElement {
+    /** ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -53,14 +61,10 @@ export class SimulationController extends HTMLElement {
         `;
         
         this.playing = false;
-        this.fastRate = 150;
-        this.slowRate = 500;
-        this.normalRate = 330;
-        this.frameRate = this.normalRate;
+        this.frameRate = NORMAL_RATE;
         this.simulationSlider;
     }
 
-    /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
         const container = this.querySelector('.slider-container');
         const slider = new SimulationSlider();
@@ -106,10 +110,10 @@ export class SimulationController extends HTMLElement {
         const speedUp = this.querySelector('#slider-fast-forward');
         const slowDown = this.querySelector('#slider-slow-down');
         speedUp.onpointerdown = () => {
-            this.toggleRate(this.fastRate, speedUp, slowDown);
+            this.toggleRate(FAST_RATE, speedUp, slowDown);
         }
         slowDown.onpointerdown = () => {
-            this.toggleRate(this.slowRate, slowDown, speedUp);
+            this.toggleRate(SLOW_RATE, slowDown, speedUp);
         }
     }
 
@@ -119,7 +123,7 @@ export class SimulationController extends HTMLElement {
         toggleSecondary.style.background = unPressedColor;
 
         if (this.frameRate == rate) {
-            this.frameRate = this.normalRate;
+            this.frameRate = NORMAL_RATE;
         } else {
             this.frameRate = rate;
             togglePrimary.style.background = '#e5e5e5';
