@@ -109,7 +109,7 @@ describe('sorting fetched data', () => {
     });
     
     test('DOM should support sort by description', () => {
-        catalogMenu.sortBy('description', false);
+        catalogMenu.sortMenu('description', false);
         let correctOrder = catalogMenu.innerHTML.indexOf('mocked Fire 1') < catalogMenu.innerHTML.indexOf('mocked Fire 2');
 
         expect(catalogMenu.innerHTML).toContain('mocked Fire 1');
@@ -118,7 +118,7 @@ describe('sorting fetched data', () => {
     });
 
     test('DOM should support sort by start date', () => {
-        catalogMenu.sortBy('start-date', false);
+        catalogMenu.sortMenu('start-date', false);
         let correctOrder = catalogMenu.innerHTML.indexOf('mocked GACC 2') < catalogMenu.innerHTML.indexOf('mocked GACC 1');
 
         expect(catalogMenu.innerHTML).toContain('mocked GACC 1');
@@ -127,7 +127,7 @@ describe('sorting fetched data', () => {
     });
 
     test('DOM should support sort by end date', () => {
-        catalogMenu.sortBy('end-date', false);
+        catalogMenu.sortMenu('end-date', false);
         let correctOrder = catalogMenu.innerHTML.indexOf('mocked SAT 2') < catalogMenu.innerHTML.indexOf('mocked SAT 1');
 
         expect(catalogMenu.innerHTML).toContain('mocked SAT 1');
@@ -136,8 +136,8 @@ describe('sorting fetched data', () => {
     });
 
     test('DOM should support original order sorting', () => {
-        catalogMenu.sortBy('start-date', false);
-        catalogMenu.sortBy('original-order', false);
+        catalogMenu.sortMenu('start-date', false);
+        catalogMenu.sortMenu('original-order', false);
         let correctOrder = catalogMenu.innerHTML.indexOf('mocked GACC 1') < catalogMenu.innerHTML.indexOf('mocked GACC 2');
 
         expect(catalogMenu.innerHTML).toContain('mocked GACC 1');
@@ -146,7 +146,7 @@ describe('sorting fetched data', () => {
     });
 
     test('DOM should support reversing order', () => {
-        catalogMenu.sortBy('original-order', true);
+        catalogMenu.sortMenu('original-order', true);
         let correctOrder = catalogMenu.innerHTML.indexOf('mocked Fire 1') < catalogMenu.innerHTML.indexOf('mocked Fire 2');
 
         expect(catalogMenu.innerHTML).toContain('mocked Fire 1');

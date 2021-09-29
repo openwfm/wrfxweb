@@ -81,7 +81,7 @@ jest.mock('../components/Controller.js', () => ({
         })
     }),
     controllerEvents: ({
-        simReset: 'simReset'
+        SIM_RESET: 'simReset'
     })
     
 }));
