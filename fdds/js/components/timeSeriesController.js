@@ -32,6 +32,7 @@ export class TimeSeriesController extends LayerController {
     createTimeSeriesLayerGroup() {
         this.timeSeriesButton = new TimeSeriesButton();
         this.timeSeriesButton.getButton().disabled = true;
+        this.loadingTimeSeries = false;
 
         const container = this.querySelector('#layer-controller-container');
         const timeSeriesDiv = document.createElement('div');
@@ -58,8 +59,6 @@ export class TimeSeriesController extends LayerController {
             let endDate = this.timeSeriesButton.getEndDate();
             let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
             document.body.classList.remove('waiting');
-            const timeSeriesChart = document.querySelector('timeseries-chart');
-            timeSeriesChart.populateChart(timeSeriesData);
         }
     }
 

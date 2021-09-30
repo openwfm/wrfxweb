@@ -37,17 +37,35 @@ export class TimeSeriesButton extends HTMLElement {
                     </select>
                 </div>
                 <button class='timeSeriesButton' id='timeSeriesButton'>
-                    <span>generate timeseries</span>
+                    <span id='generate-button-label'>generate timeseries</span>
+                    <span class='hidden' id='cancel-button-label'>cancel timeseries</span>
                     <div id='progressBar' class='hidden'></div>
                 </button>
             </div>
         `;
         this.querySelector('#dataType').value = dataType;
+        this.generateLoader = null;
+        this.cancelLoader = null;
+        this.loading = false;
     }
 
     connectedCallback() {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
 
+        const timeSeriesButton = this.querySelector('#timeSeriesButton');
+        timeSeriesButton.onpointerdown = () => {
+            if (this.loading) {
+                this.cancelLoader();
+                this.setProgress(1);
+                this.loading = false;
+            } else {
+                this.loading = true;
+                this.setProgress(0);
+                this.querySelector('#generate-button-label').classList.add('hidden');
+                this.querySelector('#cancel-button-label').classList.remove('hidden');
+                this.generateLoader();
+            }
+        }
         this.initializeStartDateSelector();
         this.initializeEndDateSelector();
 
@@ -111,6 +129,7 @@ export class TimeSeriesButton extends HTMLElement {
         return this.querySelector('#layer-specification').value;
     }
 
+
     /** ===== Setters block ===== */
     updateTimestamps() {
         const startDate = this.querySelector('#startDate');
@@ -125,19 +144,23 @@ export class TimeSeriesButton extends HTMLElement {
         startDate.value = controllers.startDate.getValue();
         endDate.value = controllers.endDate.getValue();
     }
-    
+
     setProgress(progress) {
+        if (!this.loading) {
+            return;
+        }
         const progressBar = this.querySelector('#progressBar');
         if (progress < 1) {
             progressBar.classList.remove('hidden');
             progressBar.style.width = Math.floor(progress*100) + '%';
-            this.getButton().disabled = true;
         } else {
-            this.getButton().disabled = false;
+            this.loading = false;
+            this.querySelector('#generate-button-label').classList.remove('hidden');
+            this.querySelector('#cancel-button-label').classList.add('hidden');
             progressBar.classList.add('hidden');
         }
     }
-
+    
     setStartDate(newStartDate) {
         let newStartIndex = simVars.sortedTimestamps.indexOf(newStartDate);
         if (newStartIndex == simVars.sortedTimestamps.length - 1) {
@@ -172,6 +195,14 @@ export class TimeSeriesButton extends HTMLElement {
         endDate.value = newEndDate;
 
         linkSelects(startDate, endDate);
+    }
+
+    setGenerateLoader(loader) {
+        this.generateLoader = loader;
+    }
+
+    setCancelLoader(cancelLoader) {
+        this.cancelLoader = cancelLoader;
     }
 }
 
