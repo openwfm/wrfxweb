@@ -397,12 +397,12 @@ export class SimulationLayer {
         let levels = rasterInfo.levels;
 
         if (!levels) {
-            simVars.noLevels.add(simVars.displayedColorbar, this.domain, utcToLocal(timestamp));
+            simVars.noLevels.add(this.layerName, this.domain, utcToLocal(timestamp));
             let index = simVars.sortedTimestamps.indexOf(timestamp);
             let nearIndex = index == 0 ? 1 : index - 1;
             let nearTimestamp = simVars.sortedTimestamps[nearIndex];
             let nearRastersAtTime = simVars.rasters[this.domain][nearTimestamp];
-            let nearRasterInfo = nearRastersAtTime[simVars.displayedColorbar];
+            let nearRasterInfo = nearRastersAtTime[this.layerName];
             levels = nearRasterInfo.levels;
         }
 
