@@ -5,6 +5,9 @@ import { map } from '../map.js';
 import { Marker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
 
+const TIMESERIES_BATCHSIZE = 10;
+const TIMEOUT_MS = 80;
+
 /** TimeSeriesController extends LayerController and adds functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
  * range. Uses the layer that is on top. To use, double click on image to bring up
@@ -53,13 +56,21 @@ export class TimeSeriesController extends LayerController {
     }
 
     initializeTimeSeriesButton() {
-        this.timeSeriesButton.getButton().onclick = async () => {
+        const generateTimeSeriesCallback = async () => {
+        // this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
+            this.loadingTimeSeries = true;
             let startDate = this.timeSeriesButton.getStartDate();
             let endDate = this.timeSeriesButton.getEndDate();
             let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
             document.body.classList.remove('waiting');
         }
+        this.timeSeriesButton.setGenerateLoader(generateTimeSeriesCallback);
+
+        const cancelTimeSeriesCallback = () => {
+            this.loadingTimeSeries = false;
+        }
+        this.timeSeriesButton.setCancelLoader(cancelTimeSeriesCallback);
     }
 
     subscribeToMarkerController() {
@@ -143,7 +154,7 @@ export class TimeSeriesController extends LayerController {
         this.updateMarker(marker);
     }
 
-    async generateTimeSeriesData(startDate, endDate) {
+    generateTimeSeriesData(startDate, endDate) {
         if (simVars.displayedColorbar == null) {
             return;
         }
@@ -153,23 +164,17 @@ export class TimeSeriesController extends LayerController {
         this.timeSeriesButton.setProgress(0);
         this.framesLoaded = 0;
 
-        let filteredTimestamps = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
+        let timestampsToLoad = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
         let layersForTimeSeries = this.getLayersToGenerateTimeSeriesOver();
-        this.totalFramesToLoad = filteredTimestamps.length * timeSeriesMarkers.length * layersForTimeSeries.length;
+        this.totalFramesToLoad = timestampsToLoad.length * timeSeriesMarkers.length * layersForTimeSeries.length;
 
         let layerData = {};
-        for (let colorbarLayer of layersForTimeSeries) {
-            let layerName = colorbarLayer.layerName;
-            let timeSeriesData = [];
-            for (let marker of timeSeriesMarkers) {
-                let dataEntry = await this.generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, filteredTimestamps);
-                timeSeriesData.push(dataEntry);
-            }
-            layerData[layerName] = timeSeriesData;
+        let timeSeriesGenerationInfo = {
+            layersForTimeSeries: layersForTimeSeries, 
+            timeSeriesMarkers: timeSeriesMarkers,
+            timestampsToLoad: timestampsToLoad
         }
-        
-        document.body.classList.remove('waiting');
-        return layerData;
+        this.batchLoadTimeSeries(layerData, timeSeriesGenerationInfo);
     }
 
     getLayersToGenerateTimeSeriesOver() {
@@ -186,6 +191,50 @@ export class TimeSeriesController extends LayerController {
         });
 
         return colorbarLayers;
+    }
+
+    async batchLoadTimeSeries(layerData, timeSeriesGenerationInfo, index = 0, batchSize = TIMESERIES_BATCHSIZE) {
+        if (!this.loadingTimeSeries) {
+            document.body.classList.remove('waiting');
+            return;
+        }
+        let {timestampsToLoad} = timeSeriesGenerationInfo;
+        let batchEnd = Math.min(index + batchSize, timestampsToLoad.length);
+        await this.loadTimeSeriesBatch(layerData, timeSeriesGenerationInfo, index, batchEnd);
+
+        if (batchEnd < timestampsToLoad.length) {
+            const batchLoadAfterTimeout = () => {
+                this.batchLoadTimeSeries(layerData, timeSeriesGenerationInfo, batchEnd);
+            }
+            setTimeout(batchLoadAfterTimeout, TIMEOUT_MS);
+
+        } else {
+            document.body.classList.remove('waiting');
+
+            const timeSeriesChart = document.querySelector('timeseries-chart');
+            timeSeriesChart.populateChart(layerData);
+            return layerData;
+        }
+    }
+
+    async loadTimeSeriesBatch(layerData, timeSeriesGenerationInfo, index, batchEnd) {
+        let {layersForTimeSeries, timeSeriesMarkers, timestampsToLoad } = timeSeriesGenerationInfo;
+        let timestampBatch = timestampsToLoad.slice(index, batchEnd);
+
+        for (let colorbarLayer of layersForTimeSeries) {
+            let layerName = colorbarLayer.layerName;
+            let timeSeriesData = (index == 0) ? [] : layerData[layerName];
+            for (let markerIndex = 0; markerIndex < timeSeriesMarkers.length; markerIndex++) {
+                let marker = timeSeriesMarkers[markerIndex];
+                let dataEntry = await this.generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, timestampBatch);
+                if (index == 0) {
+                    timeSeriesData.push(dataEntry);
+                } else {
+                    timeSeriesData[markerIndex].dataset = {...timeSeriesData[markerIndex].dataset, ...dataEntry.dataset };
+                }
+            }
+            layerData[layerName] = timeSeriesData;
+        }
     }
 
     async generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, filteredTimestamps) {
