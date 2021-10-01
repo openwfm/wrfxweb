@@ -17,12 +17,10 @@ export class SimulationLayer {
         let cs = rasterInfo.coords;
         let layerURL = simVars.rasterBase + rasterInfo.raster;
         let hasColorbar = ('colorbar' in rasterInfo);
-        const rasterColorbar = document.querySelector('#raster-colorbar');
 
         this.layerName = layerName;
         this.domain = domain;
         this.hasColorbar = hasColorbar;
-        this.rasterColorbar = rasterColorbar;
         this.imageOverlay = L.imageOverlay(layerURL,
                                     [[cs[0][1], cs[0][0]], [cs[2][1], cs[2][0]]],
                                     {
@@ -58,9 +56,8 @@ export class SimulationLayer {
         this.imageOverlay.setOpacity(opacity);
         if (this.hasColorbar) {
             let cbURL = simVars.rasterBase + rasterInfo.colorbar;
-            // const rasterColorbar = document.querySelector('#raster-colorbar');
-            this.rasterColorbar.src = cbURL;
-            this.rasterColorbar.style.display = 'block';
+            simVars.setColorbarURL(cbURL);
+            simVars.showColorbar();
             simVars.displayedColorbar = this.layerName;
         }
     }
@@ -126,7 +123,7 @@ export class SimulationLayer {
         if (this.layerName == simVars.displayedColorbar) {
             let colorbarURL = this.getColorbarURLAtTimestamp(timestamp);
             if (colorbarURL != null) {
-                this.rasterColorbar.src = colorbarURL;
+                simVars.setColorbarURL(colorbarURL);
             }
         }
     }

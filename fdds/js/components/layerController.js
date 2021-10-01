@@ -189,9 +189,7 @@ export class LayerController extends HTMLElement {
             delete this.activeLayers[currentlyAddedLayerName];
         }
         simVars.displayedColorbar = null;
-        const rasterColorbar = document.querySelector('#raster-colorbar');
-        rasterColorbar.src = '';
-        rasterColorbar.style.display = 'none';
+        simVars.hideColorbar();
     }
 
     resetLayerController() {
@@ -384,27 +382,28 @@ export class LayerController extends HTMLElement {
     }
 
     bringMostRecentLayerWithColorbarToFront() {
-        const rasterColorbar = document.querySelector('#raster-colorbar');
-
         let currentTimestamp = controllers.currentTimestamp.getValue();
         let currentDomain = controllers.currentDomain.getValue();
         let rasters_now = simVars.rasters[currentDomain][currentTimestamp];
         let mostRecentColorbar = null;
         let colorbarSrc = '';
-        let colorbarDisplay = 'none';
         
         for (let i = simVars.overlayOrder.length - 1; i >= 0; i--) { // iterate over overlayOrder in reverse
             if ('colorbar' in rasters_now[simVars.overlayOrder[i]]) {
                 mostRecentColorbar = simVars.overlayOrder[i];
                 colorbarSrc = simVars.rasterBase + rasters_now[simVars.overlayOrder[i]].colorbar;
-                colorbarDisplay = 'block';
                 break;
             }
         }
         
+        if (colorbarSrc != '') {
+            simVars.setColorbarURL(colorbarSrc);
+            simVars.showColorbar();
+        } else {
+            simVars.hideColorbar();
+        }
+
         simVars.displayedColorbar = mostRecentColorbar;
-        rasterColorbar.src = colorbarSrc;
-        rasterColorbar.style.display = colorbarDisplay;
     }
 
     async loadWithPriority(startTime, endTime, layerNames) {

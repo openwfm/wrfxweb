@@ -170,7 +170,6 @@ html, body {
   height: 350px;
   background-color: white;
   border-radius: .4rem;
-  display: none;
 }
 
 #raster-colorbar {
@@ -180,7 +179,6 @@ html, body {
   width: 200px;
   height: 400px;
   z-index: 2000;
-  display: none;
 }
 
 #copyLink {
