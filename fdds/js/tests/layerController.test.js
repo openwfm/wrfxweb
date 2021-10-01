@@ -52,6 +52,9 @@ jest.mock('../simVars.js', () => ({
         displayedColorbar: null,
         organization: 'SJSU',
         overlayList: ['overlay'],
+        showColorbar: jest.fn(),
+        hideColorbar: jest.fn(),
+        setColorbarURL: jest.fn(),
         baseLayerDict: {},
         presets: {
             rasters: null
