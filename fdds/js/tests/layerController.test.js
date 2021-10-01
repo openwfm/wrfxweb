@@ -52,12 +52,27 @@ jest.mock('../simVars.js', () => ({
         displayedColorbar: null,
         organization: 'SJSU',
         overlayList: ['overlay'],
+        showColorbar: jest.fn(),
+        hideColorbar: jest.fn(),
+        setColorbarURL: jest.fn(),
         baseLayerDict: {},
         presets: {
             rasters: null
         }
     })
 }));
+simVars.showColorbar = () => {
+    const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
+    rasterColorbarContainer.classList.remove('hidden');
+}
+simVars.hideColorbar = () => {
+    const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
+    rasterColorbarContainer.classList.add('hidden');
+}
+simVars.setColorbarURL= (url) => {
+    const rasterColorbar = document.querySelector('#raster-colorbar');
+    rasterColorbar.src = url;
+}
    
 var domainSubscriptions = [];
 const controller = require('../components/Controller.js');
