@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { localToUTC } from '../util.js';
+import { daysBetween, localToUTC } from '../util.js';
 import { simVars } from '../simVars.js';
 
 /** Component for the Active Domain selection bar.
@@ -126,17 +126,26 @@ export class DomainSelector extends HTMLElement {
             domId = simVars.presets.domain;
         }
         simVars.presets.domain = null;
-
         return domId;
     }
 
     presetStartDate(nextTimestamps) {
         let startDate = nextTimestamps[0];
         let presetStartDate = localToUTC(simVars.presets.startDate);
+        let desc = simVars.currentDescription;
         if (nextTimestamps.includes(presetStartDate)) {
             startDate = presetStartDate;
+            simVars.presets.startDate = null;
+        } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
+            let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
+            for (let i = 2; i <= nextTimestamps.length; i++) {
+                startDate = nextTimestamps[nextTimestamps.length - i];
+                if (daysBetween(startDate, lastTimestamp) >= 15) {
+                    startDate = nextTimestamps[nextTimestamps.length - i + 1];
+                    break;
+                }
+            }
         }
-        simVars.presets.startDate = null;
         controllers.startDate.setValue(startDate, controllerEvents.QUIET);
     }
 

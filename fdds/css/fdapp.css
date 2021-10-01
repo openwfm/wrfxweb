@@ -161,10 +161,22 @@ html, body {
   height: 100vh;
 }
 
+#raster-colorbar-bg {
+  position: fixed;
+  z-index: 1999;
+  left: 60px;
+  bottom: 103px;
+  width: 200px;
+  height: 350px;
+  background-color: white;
+  border-radius: .4rem;
+  display: none;
+}
+
 #raster-colorbar {
   position: fixed;
   left: 60px;
-  bottom: 100px;
+  bottom: 103px;
   width: 200px;
   height: 400px;
   z-index: 2000;
@@ -833,7 +845,14 @@ html, body {
   #raster-colorbar {
     height: 160px;
     width: 80px;
-    bottom: 120px;
+    bottom: 130px;
+    left: 40px;
+  }
+
+  #raster-colorbar-bg {
+    height: 140px;
+    width: 80px;
+    bottom: 130px;
     left: 40px;
   }
 

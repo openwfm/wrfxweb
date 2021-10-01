@@ -158,6 +158,13 @@ export function localToUTC(localTime) {
   return utcTime.format('YYYY-MM-DD_HH:mm:ss');
 }
 
+export function daysBetween(timestamp1, timestamp2) {
+  var date1 = dayjs(timestamp1);
+  var date2 = dayjs(timestamp2);
+  var diff = date1.diff(date2, 'day');
+  return Math.abs(diff);
+}
+
 /** ===== CreateDomElements block ===== */
 export function createOption(timeStamp, utcValue) {
   let option = document.createElement('option');

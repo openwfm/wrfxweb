@@ -69,19 +69,11 @@ export class TimeSeriesButton extends HTMLElement {
         this.initializeStartDateSelector();
         this.initializeEndDateSelector();
 
-        controllers.startDate.subscribe(() => {
-            let simulationStartDate = controllers.startDate.getValue();
-            if (startDate.value < simulationStartDate) {
-                this.setStartDate(simulationStartDate);
-            }
+        const dataTypeSelector = this.querySelector('#dataType');
+        dataTypeSelector.addEventListener('change', () => {
+            var dataType = dataTypeSelector.value;
+            controllers.timeSeriesDataType.setValue(dataType);
         });
-
-        controllers.endDate.subscribe(() => {
-            let simulationEndDate = controllers.endDate.getValue();
-            if (endDate.value > simulationEndDate) {
-                this.setEndDate(simulationEndDate);
-            }
-        })
     }
 
     initializeStartDateSelector() {

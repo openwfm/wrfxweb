@@ -182,18 +182,27 @@ export class CatalogMenu extends HTMLElement {
         if (!navJobId || !navJobId.includes('recent')) {
             return;
         }
-        let descSearchTerm = navJobId.split('-')[0];
+        let descSearchTerm = navJobId.split('-')[0].toLowerCase();
         let mostRecentItem = null;
+        let secondMostRecentItem = null;
         for (let fire of firesListDOM.childNodes) {
             let fireDesc = fire.catEntry.description;
             if (fireDesc.toLowerCase().includes(descSearchTerm)) {
                 if (!mostRecentItem || (fire.catEntry.from_utc > mostRecentItem.catEntry.from_utc)) {
+                    secondMostRecentItem = mostRecentItem;
                     mostRecentItem = fire;
+                } else if (!secondMostRecentItem || (fire.catEntry.from_utc > secondMostRecentItem.catEntry.from_utc)) {
+                    secondMostRecentItem = fire;
                 }
             }
         }
-        if (mostRecentItem != null) {
-            mostRecentItem.clickItem();
+        let itemToNavigateTo = mostRecentItem;
+        if (navJobId.includes('second-recent')) {
+            itemToNavigateTo = secondMostRecentItem;
+        }
+        
+        if (itemToNavigateTo != null) {
+            itemToNavigateTo.clickItem();
         }
     }
 
