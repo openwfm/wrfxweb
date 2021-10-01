@@ -1,6 +1,7 @@
 import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
+import { controllers } from '../Controller.js';
 
 export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
@@ -73,6 +74,7 @@ export class CatalogItem extends HTMLElement {
         let description = this.catEntry.description;
 
         simVars.currentSimulation = entryID;
+        simVars.currentDescription = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         document.querySelector('.catalog-menu').classList.add('hidden');
 

@@ -1,5 +1,5 @@
 import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox } from '../util.js';
-import { controllers, controllerEvents } from '../components/Controller.js';
+import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
 /**        Contents

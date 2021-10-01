@@ -86,6 +86,9 @@ jest.mock('../components/Controller.js', () => ({
         endDate: ({
             getValue: () => '2021',
             subscribe: (fun) => {} 
+        }),
+        currentSimulation: ({
+            subscribe: (fun) => {}
         })
     }),
     controllerEvents: ({
