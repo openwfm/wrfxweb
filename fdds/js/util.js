@@ -159,9 +159,9 @@ export function localToUTC(localTime) {
 }
 
 export function daysBetween(timestamp1, timestamp2) {
-  var date1 = dayjs(timestamp1);
-  var date2 = dayjs(timestamp2);
-  var diff = date1.diff(date2, 'day');
+  let date1 = dayjs(timestamp1);
+  let date2 = dayjs(timestamp2);
+  let diff = date1.diff(date2, 'day');
   return Math.abs(diff);
 }
 
