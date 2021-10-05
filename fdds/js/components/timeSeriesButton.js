@@ -71,7 +71,7 @@ export class TimeSeriesButton extends HTMLElement {
 
         const dataTypeSelector = this.querySelector('#dataType');
         dataTypeSelector.addEventListener('change', () => {
-            var dataType = dataTypeSelector.value;
+            let dataType = dataTypeSelector.value;
             controllers.timeSeriesDataType.setValue(dataType);
         });
     }

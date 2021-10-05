@@ -150,7 +150,7 @@ export class LayerController extends HTMLElement {
            }
        }
        for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
-           var checked = layerName == this.currentMapType;
+           let checked = layerName == this.currentMapType;
            let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
                                             checked, mapCheckCallback, [layerName, layer]);
            baseMapDiv.appendChild(mapCheckBox);
@@ -210,7 +210,7 @@ export class LayerController extends HTMLElement {
     clearCache(domainsToLayersDict) {
         for (let domain in domainsToLayersDict) {
             let layersDict = domainsToLayersDict[domain];
-            for (var timestamp in layersDict) {
+            for (let timestamp in layersDict) {
                 let layer = layersDict[timestamp];
                 layer.clearCache();
             }
@@ -374,8 +374,8 @@ export class LayerController extends HTMLElement {
 
         this.bringMostRecentLayerWithColorbarToFront();
 
-        var startDate = controllers.currentTimestamp.getValue();
-        var endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
+        let startDate = controllers.currentTimestamp.getValue();
+        let endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
 
         setURL();

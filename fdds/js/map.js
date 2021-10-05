@@ -4,19 +4,19 @@ import { simVars } from './simVars.js';
 // construct map with the base layers
 export const map = (function buildMap() {
   getConfigurations();
-  var center = [39.7392, -104.9903];
-  var presetCenter = simVars.presets.pan;
+  let center = [39.7392, -104.9903];
+  let presetCenter = simVars.presets.pan;
   if (presetCenter && presetCenter.length == 2) {
     center = presetCenter
   } else if (simVars.organization.includes('SJSU')) {
     center = [37.34, -121.89];
   }
-  var zoom = 7;
-  var presetZoom = simVars.presets.zoom;
+  let zoom = 7;
+  let presetZoom = simVars.presets.zoom;
   if (presetZoom && !isNaN(presetZoom)) {
     zoom = presetZoom;
   }
-  var leafletMap = L.map('map-fd', {
+  let leafletMap = L.map('map-fd', {
     keyboard: false,
     layers: [simVars.baseLayerDict['OSM']],
     zoomControl: true,
