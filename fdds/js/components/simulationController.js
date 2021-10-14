@@ -23,7 +23,7 @@ export class SimulationController extends HTMLElement {
         super();
         this.innerHTML = `
             <div id='sim-controller' class='slider-wrapper hidden'>
-                <div id='slider-tabs' class='not-hidden'>
+                <div id='slider-tabs' class='hidden'>
                     <div id='combined-slider' class='tab'>
                         <div class='interactive-button innerTab'>Combined Slider</div>
                     </div>
@@ -81,6 +81,7 @@ export class SimulationController extends HTMLElement {
         this.createSimulationSlider();
         this.initializeFrameNavigation();
         this.initializeFrameRates();
+        this.initializeSimulationTabs();
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
@@ -88,6 +89,7 @@ export class SimulationController extends HTMLElement {
         controllers.currentTimestamp.subscribe(() => {
             this.updateDisplayedTimestamp();
         });
+
     }
 
     initializeContainer() {
@@ -153,6 +155,71 @@ export class SimulationController extends HTMLElement {
         }
 
         this.updateDisplayedTimestamp();
+    }
+
+    /** ===== SimulationTabs block ===== */
+    initializeSimulationTabs() {
+        const sliderTabs = this.querySelector('#slider-tabs');
+        const combinedTab = this.querySelector('#combined-slider');
+        let combinedId = 'combinedTab';
+        this.tabs[combinedId] = combinedTab;
+        combinedTab.onpointerdown = () => {
+            this.switchActiveTab(combinedId);
+        }
+
+        controllers.currentDomain.subscribe(() => {
+            sliderTabs.classList.add('hidden');
+        }, controllerEvents.SIM_RESET);
+
+        controllers.addedSimulations.subscribe((id) => {
+            this.makeNewTab(id);
+            if (controllers.addedSimulations.getValue().length > 1) {
+                sliderTabs.classList.remove('hidden');
+            }
+        }, controllers.addedSimulations.addEvent);
+
+        controllers.addedSimulations.subscribe((id) => {
+            this.removeTab(id);
+            if (controllers.addedSimulations.getValue().length <= 1) {
+                sliderTabs.classList.add('hidden');
+            }
+        }, controllers.addedSimulations.removeEvent);
+    }
+
+    removeTab(id) {
+        const sliderTabs = this.querySelector('#slider-tabs');
+        let tab = this.tabs[id];
+        sliderTabs.removeChild(tab);
+        delete this.tabs[id];
+        if (id == this.activeTab) {
+            let newActive = Object.keys(this.tabs)[0];
+            this.switchActiveTab(newActive);
+        }
+    }
+
+    makeNewTab(id) {
+        const sliderTabs = this.querySelector('#slider-tabs');
+        const combinedSlider = this.querySelector('#combined-slider');
+
+        let newTab = createTab(id);
+        this.tabs[id] = newTab;
+        newTab.onpointerdown = () => {
+            this.switchActiveTab(id);
+        }
+        sliderTabs.insertBefore(newTab, combinedSlider);
+        this.switchActiveTab(id);
+    }
+
+    switchActiveTab(activeDescription) {
+        let newTab = this.tabs[activeDescription];
+        if (this.activeTab == newTab) {
+            return;
+        }
+        if (this.activeTab) {
+            this.activeTab.classList.remove('active');
+        }
+        newTab.classList.add('active');
+        this.activeTab = newTab;
     }
 
     /** ===== UI block ===== */
