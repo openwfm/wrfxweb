@@ -3,13 +3,22 @@ import { createTab, setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
-/**
- * A Component that builds the animation controller for the simulation. Creates a UI component that 
- * includes a play / pause / prev / next buttons to iterate through the simulation. Also includes a 
- * slider bar with a head that indicates relative position in animation that can be dragged to a 
- * specific location. Bar itself can also be clicked to seek to a specific position.
+const FAST_RATE = 150;
+const SLOW_RATE = 500; 
+const NORMAL_RATE = 330;
+
+/** Creates a UI component that includes a play / pause / prev / next buttons to iterate through 
+ *  the simulation. Also includes a slider bar with a head that indicates relative position in 
+ *  simulation that can be dragged to a specific location. Bar can also be clicked to seek 
+ *  to a specific position.
+ * 
+ *                  Contents
+ *      1. Initialization block
+ *      2. UI block
+ *      3. FrameNavigation block
  */
 export class SimulationController extends HTMLElement {
+    /** ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -60,37 +69,42 @@ export class SimulationController extends HTMLElement {
         `;
         
         this.playing = false;
-        this.fastRate = 150;
-        this.slowRate = 500;
-        this.normalRate = 330;
-        this.frameRate = this.normalRate;
+        this.frameRate = NORMAL_RATE;
         this.simulationSlider;
         this.tabs = {};
         this.activeTab = null;
     }
 
-    /** Called when component is attached to DOM. Sets up functionality for buttons and slider. */
     connectedCallback() {
-        const container = this.querySelector('.slider-container');
-        const slider = new SimulationSlider();
-        container.appendChild(slider);
-        this.simulationSlider = slider;
-
-        if (document.body.clientWidth < 769) {
-            const timeStamp = this.querySelector('#slider-timestamp');
-            const playButtons = this.querySelector('#slider-play-bar');
-            timeStamp.parentNode.insertBefore(timeStamp, playButtons);
-        }
-        L.DomEvent.disableScrollPropagation(container);
-        L.DomEvent.disableClickPropagation(container);
+        this.initializeContainer();
+        this.responsiveUI();
+        this.createSimulationSlider();
+        this.initializeFrameNavigation();
+        this.initializeFrameRates();
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
         controllers.currentTimestamp.subscribe(() => {
-            this.updateSlider();
+            this.updateDisplayedTimestamp();
         });
+    }
 
+    initializeContainer() {
+        const container = this.querySelector('.slider-container');
+        L.DomEvent.disableScrollPropagation(container);
+        L.DomEvent.disableClickPropagation(container);
+    }
+
+    createSimulationSlider() {
+        const container = this.querySelector('.slider-container');
+
+        const slider = new SimulationSlider();
+        container.appendChild(slider);
+        this.simulationSlider = slider;
+    }
+
+    initializeFrameNavigation() {
         document.addEventListener('keydown', (e) => {
             e = e || window.event;
             if (e.key == 'ArrowRight') {
@@ -112,143 +126,85 @@ export class SimulationController extends HTMLElement {
             this.nextFrame();
             setURL();
         }
+    }
+
+    initializeFrameRates() {
         const speedUp = this.querySelector('#slider-fast-forward');
         const slowDown = this.querySelector('#slider-slow-down');
+
         speedUp.onpointerdown = () => {
-            this.toggleRate(this.fastRate, speedUp, slowDown);
+            this.toggleRate(FAST_RATE, speedUp, slowDown);
         }
         slowDown.onpointerdown = () => {
-            this.toggleRate(this.slowRate, slowDown, speedUp);
-        }
-
-        this.setMultiLayers();
-    }
-
-    setMultiLayers() {
-        const sliderTabs = this.querySelector('#slider-tabs');
-        const combinedTab = this.querySelector('#combined-slider');
-        var combinedId = 'combinedTab';
-        this.tabs[combinedId] = combinedTab;
-        combinedTab.onpointerdown = () => {
-            this.switchActiveTab(combinedId);
-        }
-
-        controllers.currentDomain.subscribe(() => {
-            sliderTabs.classList.add('hidden');
-        }, controllerEvents.simReset);
-
-        controllers.addedSimulations.subscribe((id) => {
-            this.makeNewTab(id);
-            if (controllers.addedSimulations.getValue().length > 1) {
-                sliderTabs.classList.remove('hidden');
-            }
-        }, controllers.addedSimulations.addEvent);
-
-        controllers.addedSimulations.subscribe((id) => {
-            this.removeTab(id);
-            if (controllers.addedSimulations.getValue().length <= 1) {
-                sliderTabs.classList.add('hidden');
-            }
-        }, controllers.addedSimulations.removeEvent);
-
-    }
-
-    removeTab(id) {
-        const sliderTabs = this.querySelector('#slider-tabs');
-        var tab = this.tabs[id];
-        sliderTabs.removeChild(tab);
-        delete this.tabs[id];
-        if (id == this.activeTab) {
-            var newActive = Object.keys(this.tabs)[0];
-            this.switchActiveTab(newActive);
-        }
-    }
-
-    makeNewTab(id) {
-        const sliderTabs = this.querySelector('#slider-tabs');
-        const combinedSlider = this.querySelector('#combined-slider');
-
-        var newTab = createTab(id);
-        this.tabs[id] = newTab;
-        newTab.onpointerdown = () => {
-            this.switchActiveTab(id);
-        }
-        sliderTabs.insertBefore(newTab, combinedSlider);
-        this.switchActiveTab(id);
-    }
-
-    switchActiveTab(activeDescription) {
-        var newTab = this.tabs[activeDescription];
-        if (this.activeTab == newTab) {
-            return;
-        }
-        if (this.activeTab) {
-            this.activeTab.classList.remove('active');
-        }
-        newTab.classList.add('active');
-        this.activeTab = newTab;
-    }
-
-    toggleRate(rate, togglePrimary, toggleSecondary) {
-        var unPressedColor = '#d6d6d6';
-        togglePrimary.style.background = unPressedColor;
-        toggleSecondary.style.background = unPressedColor;
-
-        if (this.frameRate == rate) {
-            this.frameRate = this.normalRate;
-        } else {
-            this.frameRate = rate;
-            togglePrimary.style.background = '#e5e5e5';
+            this.toggleRate(SLOW_RATE, slowDown, speedUp);
         }
     }
 
     resetSlider() {
+        const sliderContainer = this.querySelector('#sim-controller');
+        
         if (this.playing) {
             this.playPause();
         }
-
-        const sliderWrapper = this.querySelector('.slider-wrapper');
-        if (simVars.sortedTimestamps.length >= 2) {
-            sliderWrapper.classList.remove('hidden');
+        if (simVars.sortedTimestamps.length < 2) {
+            sliderContainer.classList.add('hidden');
         } else {
-            sliderWrapper.classList.add('hidden');
+            sliderContainer.classList.remove('hidden');
         }
-        
-        this.updateSlider();
+
+        this.updateDisplayedTimestamp();
     }
 
-    /** Called to update the UI when the currentFrame has been updated. */
-    updateSlider() {
-        var currentTimestamp = controllers.currentTimestamp.getValue();
+    /** ===== UI block ===== */
+    responsiveUI() {
+        if (document.body.clientWidth < 769) {
+            const timeStamp = this.querySelector('#slider-timestamp');
+            const playButtons = this.querySelector('#slider-play-bar');
+            timeStamp.parentNode.insertBefore(timeStamp, playButtons);
+        }
+    }
+
+    updateDisplayedTimestamp() {
+        let currentTimestamp = controllers.currentTimestamp.getValue();
         this.querySelector('#timestamp').innerText = utcToLocal(currentTimestamp);
     }
 
-    /** Called when play/pause button clicked. Starts animation, disables prev / next buttons
-     * changes play icon to pause icon. */
-    playPause() {
+    setPlayingUI() {
         const prevButton = this.querySelector('#slider-prev');
         const nextButton = this.querySelector('#slider-next');
         const playButton = this.querySelector('#play-button');
         const pauseButton = this.querySelector('#pause-button');
 
+        playButton.classList.add('hidden');
+        pauseButton.classList.remove('hidden');
+        prevButton.disabled = true;
+        nextButton.disabled = true;
+        prevButton.classList.add('disabled-button');
+        nextButton.classList.add('disabled-button');
+    }
+
+    setPausedUI() {
+        const prevButton = this.querySelector('#slider-prev');
+        const nextButton = this.querySelector('#slider-next');
+        const playButton = this.querySelector('#play-button');
+        const pauseButton = this.querySelector('#pause-button');
+
+        playButton.classList.remove('hidden');
+        pauseButton.classList.add('hidden');
+        prevButton.disabled = false;
+        nextButton.disabled = false;
+        prevButton.classList.remove('disabled-button');
+        nextButton.classList.remove('disabled-button');
+    }
+
+    /** ===== FrameNavigation block ===== */
+    playPause() {
         this.playing = !this.playing;
         if (!this.playing) {
-            playButton.classList.remove('hidden');
-            pauseButton.classList.add('hidden');
-            
-            prevButton.disabled = false;
-            nextButton.disabled = false;
-            prevButton.classList.remove('disabled-button');
-            nextButton.classList.remove('disabled-button');
+            this.setPausedUI();
             setURL();
         } else {
-            playButton.classList.add('hidden');
-            pauseButton.classList.remove('hidden');
-
-            prevButton.disabled = true;
-            nextButton.disabled = true;
-            prevButton.classList.add('disabled-button');
-            nextButton.classList.add('disabled-button');
+            this.setPlayingUI();
             this.play();
         }
     }
@@ -256,8 +212,8 @@ export class SimulationController extends HTMLElement {
     /** Iterates to next frame while still playing */
     play() {
         if (this.playing) {
-            var endDate = controllers.endDate.getValue();
-            var nextTimestamp = this.nextFrame();
+            let endDate = controllers.endDate.getValue();
+            let nextTimestamp = this.nextFrame();
             if (nextTimestamp == endDate) {
                 window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
@@ -266,20 +222,31 @@ export class SimulationController extends HTMLElement {
         }
     }
 
-    /** Moves one frame to the right. */
     nextFrame() {
-        var nextTimestamp = this.simulationSlider.nextTimestamp();
+        let nextTimestamp = this.simulationSlider.nextTimestamp();
 
         controllers.currentTimestamp.setValue(nextTimestamp);
         return nextTimestamp;
     }
 
-    /** Moves one frame to the left. */
     prevFrame() {
-        var prevTimestamp = this.simulationSlider.prevTimestamp();
+        let prevTimestamp = this.simulationSlider.prevTimestamp();
 
         controllers.currentTimestamp.setValue(prevTimestamp);
         return prevTimestamp;
+    }
+
+    toggleRate(rate, togglePrimary, toggleSecondary) {
+        let unPressedColor = '#d6d6d6';
+        togglePrimary.style.background = unPressedColor;
+        toggleSecondary.style.background = unPressedColor;
+
+        if (this.frameRate == rate) {
+            this.frameRate = NORMAL_RATE;
+        } else {
+            this.frameRate = rate;
+            togglePrimary.style.background = '#e5e5e5';
+        }
     }
 }
 

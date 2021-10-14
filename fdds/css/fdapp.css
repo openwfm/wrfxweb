@@ -162,14 +162,28 @@ div.control-column {
   margin-right: auto;
 }
 
+html, body {
+  height: 100vh;
+}
+
+#raster-colorbar-bg {
+  position: fixed;
+  z-index: 1999;
+  left: 60px;
+  bottom: 103px;
+  width: 200px;
+  height: 350px;
+  background-color: white;
+  border-radius: .4rem;
+}
+
 #raster-colorbar {
   position: fixed;
   left: 60px;
-  bottom: 110px;
+  bottom: 103px;
   width: 200px;
   height: 400px;
   z-index: 2000;
-  display: none;
 }
 
 #copyLink {
@@ -922,7 +936,14 @@ div.control-column {
   #raster-colorbar {
     height: 160px;
     width: 80px;
-    bottom: 120px;
+    bottom: 130px;
+    left: 40px;
+  }
+
+  #raster-colorbar-bg {
+    height: 140px;
+    width: 80px;
+    bottom: 130px;
     left: 40px;
   }
 

@@ -51,12 +51,12 @@ export class TimeSeriesMarker extends HTMLElement {
     }
 
     setRGBValues(rgb, clrbarLocation) {
-        var [r, g, b] = rgb;
+        let [r, g, b] = rgb;
         if ((r + g + b) > 745) {
             [r, g, b] = [0, 0, 0];
         }
         if (!this.colorInputted) {
-            var hexValue = rgbToHex(r, g, b);
+            let hexValue = rgbToHex(r, g, b);
             this.chartColor = hexValue;
         }
         this.clrbarLocation = clrbarLocation;
@@ -90,7 +90,7 @@ export class Marker {
                                 <path d="M7 10l5 5 5-5H7z"></path>
                               </svg>`;
         let myIconUrl = encodeURI("data:image/svg+xml," + svgString).replace('#','%23');
-        var markerIcon = L.icon({iconUrl: myIconUrl, iconAnchor: [13, 16]});
+        let markerIcon = L.icon({iconUrl: myIconUrl, iconAnchor: [13, 16]});
 
         this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         this.popup.on('remove', () => {
@@ -107,13 +107,13 @@ export class Marker {
     }
 
     hideMarkerInfo() {
-        var popupElem = this.popup.getElement();
+        let popupElem = this.popup.getElement();
         popupElem.style.display = 'none';
         this.timeSeriesMarker.infoOpen = false;
     }
 
     showMarkerInfo() {
-        var popupElem = this.popup.getElement();
+        let popupElem = this.popup.getElement();
         popupElem.style.display = 'block';
         this.timeSeriesMarker.infoOpen = true;
     }

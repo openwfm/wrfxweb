@@ -11,9 +11,9 @@ export async function getConfigurations() {
     
         if (configData.flags) {
             const simulationFlags = document.querySelector('#simulation-flags');
-            var flags = configData.flags;
+            let flags = configData.flags;
             flags.map(flag => {
-                var spanElement = document.createElement('span');
+                let spanElement = document.createElement('span');
                 spanElement.className = 'displayTest';
                 spanElement.innerText = flag;
                 simulationFlags.appendChild(spanElement);
@@ -47,6 +47,7 @@ export function getSimulation(path) {
         // retrieve all domains
         controllers.domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
-        console.error('Error fetching simulation at ' + path + ': ' + error);
+        console.error('Error fetching simulation at ' + path);
+        console.log(error);
     });
 }

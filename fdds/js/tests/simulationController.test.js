@@ -44,7 +44,7 @@ jest.mock('../components/Controller.js', () => ({
         })
     }),
     controllerEvents: ({
-        all: 'all'
+        ALL: 'all'
     })
 }));
 
@@ -77,7 +77,7 @@ describe('Simulation Controller Tests', () => {
     });
     
     test('Selecting nextFrame should advance frame', () => {
-        simulationController.updateSlider();
+        // simulationController.updateSlider();
         simulationController.nextFrame();
 
         expect(controller.controllers.currentTimestamp.getValue()).toEqual('2021');

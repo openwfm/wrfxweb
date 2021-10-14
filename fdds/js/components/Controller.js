@@ -1,11 +1,11 @@
 import { debounceInIntervals } from '../util.js';
 
 export const controllerEvents = {
-    quiet: 'QUIET', 
-    simReset: 'SIMULATION_RESET',
-    valueSet: 'VALUE_SET', 
-    slidingValue: 'SLIDING_VALUE',
-    all: 'ALL',
+    QUIET: 'QUIET', 
+    SIM_RESET: 'SIMULATION_RESET',
+    VALUE_SET: 'VALUE_SET', 
+    SLIDING_VALUE: 'SLIDING_VALUE',
+    ALL: 'ALL',
     setTrue: 'SET_TRUE',
     setFalse: 'SET_FALSE'
 }
@@ -21,24 +21,23 @@ export class Controller {
         }, 100);
     }
 
-    subscribe(callback, eventName=controllerEvents.valueSet) {
-        // this.listeners.push(callback);
+    subscribe(callback, eventName=controllerEvents.VALUE_SET) {
         if (!(eventName in this.listeners)) {
             this.listeners[eventName] = [];
         }
         this.listeners[eventName].push(callback);
     }
 
-    setValue(value, eventName=controllerEvents.valueSet) {
+    setValue(value, eventName=controllerEvents.VALUE_SET) {
         this.setValueCallback([value, eventName]);
     }
 
-    setValueCallback([value, eventName=controllerEvents.valueSet]) {
+    setValueCallback([value, eventName=controllerEvents.VALUE_SET]) {
         this.value = value;
-        if (eventName != controllerEvents.quiet) {
+        if (eventName != controllerEvents.QUIET) {
             this.notifyListeners(this.listeners[eventName]);
-            if (eventName != controllerEvents.all) {
-                this.notifyListeners(this.listeners[controllerEvents.all]);
+            if (eventName != controllerEvents.ALL) {
+                this.notifyListeners(this.listeners[controllerEvents.ALL]);
             }
         }
     }
@@ -59,47 +58,11 @@ export class Controller {
     }
 }
 
-/** Class to synchronise a function call at the end of two asynchronous events.
- * Useful for executing a function after both a layer and its colorbar have loaded. */
-export class SyncController extends Controller {
-    constructor() {
-        super([false, false]);
-    }
-
-    increment(i) {
-        this.value[i] = true;
-        if (this.value[0] && this.value[1]) {
-            this.setValue([false, false]);
-        }
-    }
-}
-
-function makeArrayController(controllerType = null) {
-    var arrayController = new Controller([]);
-    arrayController.removeEvent = 'REMOVE_EVENT';
-    arrayController.addEvent = 'ADD_EVENT';
-    arrayController.add = (newMarker) => {
-        arrayController.value.push(newMarker);
-        arrayController.broadcastEvent(arrayController.addEvent, newMarker);
-    }
-    arrayController.remove = (arrayElement) => {
-        var index = arrayController.value.indexOf(arrayElement);
-        arrayController.value.splice(index, 1);
-        if (controllerType == null) {
-            arrayController.broadcastEvent(arrayController.removeEvent, index);
-        } else {
-            arrayController.broadcastEvent(arrayController.removeEvent, arrayElement);
-        }
-    }
-
-    return arrayController;
-}
-
 // global controllers
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
-        var currentTimestamp = new Controller();
-        currentTimestamp.setValue = (value, eventName=controllerEvents.valueSet) => {
+        let currentTimestamp = new Controller();
+        currentTimestamp.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             currentTimestamp.debouncedSetValue([value, eventName]);
         }
         return currentTimestamp;
@@ -122,46 +85,57 @@ export const controllers = {
 
         loadingProgress.frameLoaded = (frames = 1) => {
             loadingProgress.loadedFrames += frames;
-            var progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
+            let progress = loadingProgress.loadedFrames / loadingProgress.nFrames;
             loadingProgress.setValue(progress);
         }
 
         return loadingProgress;
     })(),
-    timeSeriesMarkers: makeArrayController(),
+    timeSeriesMarkers: (function createTimeSeriesMarkers() {
+        let timeSeriesMarkers = new Controller([]);
+        timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
+        timeSeriesMarkers.add = (newMarker) => {
+            timeSeriesMarkers.value.push(newMarker);
+        }
+        timeSeriesMarkers.remove = (removeMarker) => {
+            let index = timeSeriesMarkers.value.indexOf(removeMarker);
+            timeSeriesMarkers.value.splice(index, 1);
+            timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
+        }
+        return timeSeriesMarkers;
+    })(),
     opacity: new Controller(0.5),
-    syncImageLoad: new SyncController(),
     startDate: (function createStartDate() {
-        var startDateController = new Controller();
+        let startDateController = new Controller();
 
         const subscriptionFunction = () => {
-            var newStartDate = startDateController.getValue();
-            var currentTimestamp = controllers.currentTimestamp.getValue();
+            let newStartDate = startDateController.getValue();
+            let currentTimestamp = controllers.currentTimestamp.getValue();
 
             if (newStartDate > currentTimestamp) {
                 controllers.currentTimestamp.setValue(newStartDate);
             }
         }
-        startDateController.subscribe(subscriptionFunction, controllerEvents.all);
-        startDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+        startDateController.subscribe(subscriptionFunction, controllerEvents.ALL);
+        startDateController.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             startDateController.debouncedSetValue([value, eventName]);
         }
 
         return startDateController;
     })(),
     endDate: (function createEndDate() {
-        var endDateController = new Controller();
+        let endDateController = new Controller();
 
         const subscriptionFunction = ()=> {
-            var newEndDate = endDateController.getValue();
-            var currentTimestamp = controllers.currentTimestamp.getValue();
+            let newEndDate = endDateController.getValue();
+            let currentTimestamp = controllers.currentTimestamp.getValue();
 
             if (newEndDate < currentTimestamp) {
                 controllers.currentTimestamp.setValue(newEndDate);
             }
         }
-        endDateController.subscribe(subscriptionFunction, controllerEvents.all);
-        endDateController.setValue = (value, eventName=controllerEvents.valueSet) => {
+        endDateController.subscribe(subscriptionFunction, controllerEvents.ALL);
+        endDateController.setValue = (value, eventName=controllerEvents.VALUE_SET) => {
             endDateController.debouncedSetValue([value, eventName]);
         }
 

@@ -1,7 +1,7 @@
 export const simVars = (function createSimVars() {
   const urlParams = new URLSearchParams(window.location.search);
 
-  var presetVars = ({
+  let presetVars = ({
     zoom: urlParams.get('zoom'),
     pan: urlParams.get('pan'),
     jobId: urlParams.get('job_id'),
@@ -13,34 +13,47 @@ export const simVars = (function createSimVars() {
     opacity: urlParams.get('opacity'),
   });
 
-  var pan = urlParams.get('pan');
+  let pan = urlParams.get('pan');
   if (pan) {
     pan = pan.split(',').map(coord => Number(coord));
     presetVars.pan = pan;
   }
 
-  var rasters = urlParams.get('rasters');
+  let rasters = urlParams.get('rasters');
   if (rasters) {
     rasters = rasters.split(',');
     presetVars.rasters = rasters;
   }
 
-  var simVars = ({
+  let simVars = ({
     currentSimulation: '',
+    currentDescription: '',
     rasters: [],
     rasterBase: '',
     sortedTimestamps: [],
+    showColorbar: () => {
+      const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
+      rasterColorbarContainer.classList.remove('hidden');
+    },
+    hideColorbar: () => {
+      const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
+      rasterColorbarContainer.classList.add('hidden');
+    },
+    setColorbarURL: (url) => {
+      const rasterColorbar = document.querySelector('#raster-colorbar');
+      rasterColorbar.src = url;
+    },
     noLevels: (function makeNoLevels() {
       const noLevels = new Set();
       const makeKey = (layerName, domain, timestamp) => {
         return layerName + ',' + domain + ',' + timestamp;
       }
       const addNoLevels = (layerName, domain, timestamp) => {
-        var key = makeKey(layerName, domain, timestamp);
+        let key = makeKey(layerName, domain, timestamp);
         noLevels.add(key);
       }
       const hasNoLevels = (layerName, domain, timestamp) => {
-        var key = makeKey(layerName, domain, timestamp);
+        let key = makeKey(layerName, domain, timestamp);
         return noLevels.has(key);
       }
 

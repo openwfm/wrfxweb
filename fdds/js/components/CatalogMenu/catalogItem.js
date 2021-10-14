@@ -3,10 +3,6 @@ import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
 import { controllerEvents, controllers } from '../Controller.js';
 
-/** Creates an Element for each Item of the CatalogMenu. Necessary for each element to have
- * its own component because of how much information is stored within each and how much has to
- * happen after one is clicked. 
- */
 export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
         super();
@@ -29,50 +25,53 @@ export class CatalogItem extends HTMLElement {
     }
 
     connectedCallback() {
-        let description = this.catEntry.description;
-        let jobId = this.catEntry.job_id;
-        let to = this.catEntry.to_utc;
-        let from = this.catEntry.from_utc;
-        let kmlURL = this.catEntry.kml_url;
-        let kmlSize = this.catEntry.kml_size;
-        let zipURL = this.catEntry.zip_url;
-        let zipSize = this.catEntry.zip_size;
-        let manifestPath = this.catEntry.manifest_path;
+        let  { description, job_id, to_utc, from_utc } = this.catEntry;
 
         this.querySelector('h3').innerText = description;
-        this.querySelector('#jobID').innerText += ' ' + jobId;
-        this.querySelector('#from').innerText += ' ' + utcToLocal(from);
-        this.querySelector('#to').innerText += ' ' + utcToLocal(to);
+        this.querySelector('#jobID').innerText += ' ' + job_id;
+        this.querySelector('#from').innerText += ' ' + utcToLocal(from_utc);
+        this.querySelector('#to').innerText += ' ' + utcToLocal(to_utc);
+
+        this.initializeKMLURL();
+        this.initializeZipURL();
+
+        this.querySelector('#entry').onclick = () => {
+            this.clickItem();
+        }
+        if (this.navJobId == job_id) {
+            this.clickItem();
+        }
+    }
+
+    initializeKMLURL() {
+        let kmlURL = this.catEntry.kml_url;
+        let kmlSize = this.catEntry.kml_size;
+
         if(kmlURL) {
             let mb = Math.round(10*kmlSize/1048576.0)/10;
             const kmlLink = this.querySelector('#kml');
             kmlLink.href = kmlURL;
             kmlLink.innerText = 'Download KMZ ' + mb.toString() + ' MB';
         }
+    }
+
+    initializeZipURL() {
+        let zipURL = this.catEntry.zip_url;
+        let zipSize = this.catEntry.zip_size;
+
         if(zipURL) {
             let mb = Math.round(10*zipSize/1048576.0)/10;
             const zipLink = this.querySelector('#zip');
             zipLink.href = zipURL;
             zipLink.innerText = 'Download ZIP ' + mb.toString() + ' MB';
         }
-
-        this.querySelector('#entry').onclick = () => {
-            this.handle_catalog_click();
-        }
-        if (this.navJobId == jobId) {
-            this.handle_catalog_click();
-        }
     }
 
-    /** Called when an item of the catalog is clicked. Closes the menu, fetches data associated
-     * with a run, 
-     */
-    handle_catalog_click() {
-        const catalogMenu = document.querySelector('.catalog-menu')
-        var entryID = this.catEntry.job_id;
-        var manifestPath = this.catEntry.manifest_path;
-        var path = 'simulations/' + manifestPath;
-        var description = this.catEntry.description;
+    clickItem() {
+        let entryID = this.catEntry.job_id;
+        let manifestPath = this.catEntry.manifest_path;
+        let path = 'simulations/' + manifestPath;
+        let description = this.catEntry.description;
 
         if (controllers.addSimulation.getValue()) {
             if (!controllers.addedSimulations.getValue().includes(description)) {
@@ -87,6 +86,7 @@ export class CatalogItem extends HTMLElement {
         controllers.addedSimulations.add(description);
 
         simVars.currentSimulation = entryID;
+        simVars.currentDescription = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         catalogMenu.classList.add('hidden');
 

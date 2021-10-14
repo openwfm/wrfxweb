@@ -3,10 +3,20 @@ import { utcToLocal, createElement, setURL } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
+/**        Contents
+ *  1. Initialization block
+ *      1.a BoundingDateInitialization block
+ *  2. Getter block
+ *  3. Setter block
+ *  4. Update block
+ *  5. Util block
+ * 
+ */
 export class SimulationSlider extends Slider {
+    /** ===== Initialization block ===== */
     constructor() {
-        var clientWidth = document.body.clientWidth;
-        var width = 340;
+        let clientWidth = document.body.clientWidth;
+        let width = 340;
         if (clientWidth < 770) {
             width = 300;
         }
@@ -17,48 +27,24 @@ export class SimulationSlider extends Slider {
 
     connectedCallback() {
         super.connectedCallback();
+        this.initializeSlider();
 
-        const updateSlider = () => {
-            var currentTimestamp = controllers.currentTimestamp.getValue();
-            var newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
-            this.updateHeadPosition(newFrame);
-        }
-        // assumes that all necessary controllers are set and all I need to do is update my UI.
-        controllers.currentDomain.subscribe(() => {
-            this.nFrames = simVars.sortedTimestamps.length - 1;
-            this.updateStartLocation();
-            this.updateEndLocation();
-            updateSlider();
-            this.updateProgressWidth();
-        }, controllerEvents.all);
+        this.subscibeToCurrentDomain();
+        controllers.currentTimestamp.subscribe(() => this.updateSliderToCurrentTimestamp());
+        this.subsribeToLoadingProgress();
 
-        controllers.currentTimestamp.subscribe(updateSlider);
-        controllers.loadingProgress.subscribe(() => {
-            var progress = controllers.loadingProgress.value;
-            if (progress > 0) {
-                if (progress >= this.progressCheck) {
-                    this.progressCheck = Math.floor((this.progressCheck + .01)*100)/100;
-                    this.setLoadProgress(progress);
-                }
-            } else {
-                this.progressCheck = 0;
-                this.setLoadProgress(progress);
-            }
-        });
+        this.initializeStartSetter();
+        this.initializeEndSetter();
+    }
 
+    initializeSlider() {
         const slider = this.querySelector('#slider');
-        slider.classList.add('simulation-slider');
-
-        const sliderHead = this.querySelector('#slider-head');
-        const sliderStart = createElement('slider-start', 'slider-marker');
-        const sliderEnd = createElement('slider-end', 'slider-marker');
-        const sliderProgress = createElement('slider-progress', 'slider-bar hidden');
-        const sliderMarkerInfo = createElement('slider-marker-info');
         const sliderBar = this.querySelector('#slider-bar');
+        const sliderHead = this.querySelector('#slider-head');
 
-        slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
-
+        slider.classList.add('simulation-slider');
         sliderBar.classList.add('simulation-slider');
+        this.createProgressBar();
 
         sliderHead.onpointerdown = (e) => {
             const finishedCallback = () => setURL();
@@ -71,169 +57,163 @@ export class SimulationSlider extends Slider {
         sliderBar.onclick = (e) => {
             this.clickBar(e, clickBarCallback);
         }
-
-        this.configureStartSetter();
-        this.configureEndSetter();
     }
 
-    setLoadProgress(progress) {
-        var progressWidth = progress*this.progressWidth + 2;
-
-        const progressBar = this.querySelector('#slider-progress'); 
-        progressBar.classList.remove('hidden');
-        progressBar.style.width = progressWidth + 'px';
-        if (progress == 0) {
-            progressBar.classList.add('hidden');
-            return;
-        }
-
-        var startDate = controllers.startDate.getValue();
-        var startIndex = simVars.sortedTimestamps.indexOf(startDate);
-        var left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
-
-        progressBar.style.left = left + 'px';
+    subscibeToCurrentDomain() {
+        // assumes that all necessary controllers are set and all I need to do is update my UI.
+        controllers.currentDomain.subscribe(() => {
+            this.nFrames = simVars.sortedTimestamps.length - 1;
+            this.updateStartLocation();
+            this.updateEndLocation();
+            this.updateSliderToCurrentTimestamp();
+            this.updateProgressWidth();
+        }, controllerEvents.ALL);
     }
 
-    getLeftOfDate(date) {
-        var index = simVars.sortedTimestamps.indexOf(date);
-        var left = Math.floor((index / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
-
-        return left;
-    }
-
-    setSliderMarkerInfo(timeStamp) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-        var localTime = utcToLocal(timeStamp);
-        sliderMarkerInfo.innerHTML = localTime;
-    }
-
-    configureStartSetter() {
-        const sliderStart = this.querySelector('#slider-start');
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-
-        sliderStart.onmouseover = () => {
-            var startDate = controllers.startDate.getValue();
-            sliderMarkerInfo.classList.add('hovered');
-            this.setSliderMarkerInfo(startDate);
-        }
-        sliderStart.onmouseout = () => {
-            sliderMarkerInfo.classList.remove('hovered');
-        }
-        sliderStart.onpointerdown = (e) => {
-            sliderMarkerInfo.classList.add('clicked');
-            var startDate = controllers.startDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(startDate);
-            this.setSliderMarkerInfo(startDate);
-            this.setLoadProgress(0);
-
-            const updateCallback = (timeIndex) => {
-                var newTimestamp = simVars.sortedTimestamps[timeIndex];
-                var endDate = controllers.endDate.getValue();
-                if (newTimestamp >= endDate) {
-                    timeIndex = simVars.sortedTimestamps.indexOf(endDate) - 1;
-                    newTimestamp = simVars.sortedTimestamps[timeIndex];
+    subsribeToLoadingProgress() {
+        controllers.loadingProgress.subscribe(() => {
+            let progress = controllers.loadingProgress.value;
+            if (progress > 0) {
+                if (progress >= this.progressCheck) {
+                    this.progressCheck = Math.floor((this.progressCheck + .01)*100)/100;
+                    this.setLoadProgress(progress);
                 }
-
-                controllers.startDate.setValue(newTimestamp, controllerEvents.slidingValue);
-                this.setSliderMarkerInfo(newTimestamp);
+            } else {
+                this.progressCheck = 0;
+                this.setLoadProgress(progress);
             }
-            const finishedCallback = () => {
-                sliderMarkerInfo.classList.remove('clicked');
-                controllers.startDate.broadcastEvent(controllerEvents.valueSet);
-                setURL();
-            }
+        });
+    }
 
-            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
+    createProgressBar() {
+        const slider = this.querySelector('#slider');
+        const sliderStart = createElement('slider-start', 'slider-marker');
+        const sliderEnd = createElement('slider-end', 'slider-marker');
+        const sliderProgress = createElement('slider-progress', 'slider-bar hidden');
+        const sliderMarkerInfo = createElement('slider-marker-info');
+
+        slider.append(sliderProgress, sliderStart, sliderEnd, sliderMarkerInfo);
+    }
+
+    /** ===== BoundingDateInitialization block ===== */
+    initializeStartSetter() {
+        const sliderStart = this.querySelector('#slider-start');
+        const updateCallback = (timeIndex) => {
+            let endDate = controllers.endDate.getValue();
+            const dateComparator = (newTimestamp) => newTimestamp >= endDate;
+            let boundingIndex = simVars.sortedTimestamps.indexOf(endDate) - 1;
+            this.boundingDateDragUpdate(timeIndex, controllers.startDate, dateComparator, boundingIndex);
         }
+        const finishedCallback = () => {
+            this.boundingDateDragComplete(controllers.startDate);
+        }
+
+        this.setBoundingDateMouseOver(controllers.startDate, sliderStart);
+        this.setBoundingDateMouseOut(sliderStart);
+        this.setBoundingDatePointerDown(controllers.startDate, sliderStart, updateCallback, finishedCallback);
 
         controllers.startDate.subscribe(() => {
             this.updateStartLocation();
             this.updateProgressWidth();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
-    configureEndSetter() {
+    initializeEndSetter() {
         const sliderEnd = this.querySelector('#slider-end');
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-
-        sliderEnd.onmouseover = () => {
-            var endDate = controllers.endDate.getValue();
-            this.setSliderMarkerInfo(endDate);
-            sliderMarkerInfo.classList.add('hovered');
-        };
-        sliderEnd.onmouseout = () => {
-            sliderMarkerInfo.classList.remove('hovered');
-        };
-        sliderEnd.onpointerdown = (e) => {
-            sliderMarkerInfo.classList.add('clicked');
-            var endDate = controllers.endDate.getValue();
-            var originalFrame = simVars.sortedTimestamps.indexOf(endDate);
-            this.setSliderMarkerInfo(endDate);
-            this.setLoadProgress(0);
-            
-            const updateCallback = (timeIndex) => {
-                var newTimestamp = simVars.sortedTimestamps[timeIndex];
-                var startDate = controllers.startDate.getValue();
-                if (newTimestamp <= startDate) {
-                    timeIndex = simVars.sortedTimestamps.indexOf(startDate) + 1;
-                    newTimestamp = simVars.sortedTimestamps[timeIndex];
-                }
-
-                controllers.endDate.setValue(newTimestamp, controllerEvents.slidingValue);
-                this.setSliderMarkerInfo(newTimestamp);
-            }
-            const finishedCallback = () => {
-                sliderMarkerInfo.classList.remove('clicked');
-                controllers.endDate.broadcastEvent(controllerEvents.valueSet);
-                setURL();
-            }
-            
-            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
+        const updateCallback = (timeIndex) => {
+            let startDate = controllers.startDate.getValue();
+            const dateComparator = (newTimestamp) => newTimestamp < startDate;
+            let boundingIndex = simVars.sortedTimestamps.indexOf(startDate) + 1;
+            this.boundingDateDragUpdate(timeIndex, controllers.endDate, dateComparator, boundingIndex);
         }
+        const finishedCallback = () => {
+            this.boundingDateDragComplete(controllers.endDate);
+        }
+
+        this.setBoundingDateMouseOver(controllers.endDate, sliderEnd);
+        this.setBoundingDateMouseOut(sliderEnd);
+        this.setBoundingDatePointerDown(controllers.endDate, sliderEnd, updateCallback, finishedCallback);
 
         controllers.endDate.subscribe(() => {
             this.updateEndLocation();
             this.updateProgressWidth();
-        }, controllerEvents.all);
+        }, controllerEvents.ALL);
     }
 
-    updateProgressWidth() {
-        var startLeft = this.getStartLeft();
-        var endLeft = this.getEndLeft();
-        var totalWidth = endLeft - (startLeft + 4);
-        this.progressWidth = totalWidth;
+    setBoundingDateMouseOver(boundingDateController, sliderMarker) {
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
+        sliderMarker.onmouseover = () => {
+            let boundingDate = boundingDateController.getValue();
+
+            this.setSliderMarkerInfo(boundingDate);
+            sliderMarkerInfo.classList.add('hovered');
+        }
     }
 
-    updateStartLocation() {
-        const sliderStart = this.querySelector('#slider-start');
-        var left = this.getStartLeft();
-
-        sliderStart.style.left = left + 'px';
+    setBoundingDateMouseOut(sliderMarker) {
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
+        sliderMarker.onmouseout = () => {
+            sliderMarkerInfo.classList.remove('hovered');
+        };
     }
 
+    setBoundingDatePointerDown(boundingDateController, sliderMarker, updateCallback, finishedCallback) {
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
+
+        sliderMarker.onpointerdown = (e) => {
+            sliderMarkerInfo.classList.add('clicked');
+            let boundingDate = boundingDateController.getValue();
+            let originalFrame = simVars.sortedTimestamps.indexOf(boundingDate);
+
+            this.setSliderMarkerInfo(boundingDate);
+            this.setLoadProgress(0);
+            this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
+        }
+    }
+
+    boundingDateDragUpdate(timeIndex, updatingController, dateComparator, boundingIndex) {
+        let newTimestamp = simVars.sortedTimestamps[timeIndex];
+        if (dateComparator(newTimestamp)) {
+            newTimestamp = simVars.sortedTimestamps[boundingIndex];
+        }
+
+        updatingController.setValue(newTimestamp, controllerEvents.SLIDING_VALUE);
+        this.setSliderMarkerInfo(newTimestamp);
+    }
+
+    boundingDateDragComplete(dateController) {
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
+
+        sliderMarkerInfo.classList.remove('clicked');
+        dateController.broadcastEvent(controllerEvents.VALUE_SET);
+        setURL();
+    }
+
+    /** ===== Getter block ===== */
     getStartLeft() {
-        var startDate = controllers.startDate.getValue();
-        var left = this.getLeftOfDate(startDate);
+        let startDate = controllers.startDate.getValue();
+        let left = this.getLeftOfDate(startDate);
         return left - 2;
     }
 
     getEndLeft() {
-        var endDate = controllers.endDate.value;
-        var left = this.getLeftOfDate(endDate);
+        let endDate = controllers.endDate.value;
+        let left = this.getLeftOfDate(endDate);
         return left + 14;
     }
 
-    updateEndLocation() {
-        const sliderEnd = this.querySelector('#slider-end');
-        var left = this.getEndLeft();
+    getLeftOfDate(date) {
+        let index = simVars.sortedTimestamps.indexOf(date);
+        let left = Math.floor((index / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
 
-        sliderEnd.style.left = left + 'px';
+        return left;
     }
 
+    /** ===== Setter block ===== */
     setTimestamp(timeIndex) {
-        var newTimestamp = simVars.sortedTimestamps[timeIndex];
-        var endDate = controllers.endDate.getValue();
-        var startDate = controllers.startDate.getValue();
+        let newTimestamp = simVars.sortedTimestamps[timeIndex];
+        let endDate = controllers.endDate.getValue();
+        let startDate = controllers.startDate.getValue();
 
         if (newTimestamp > endDate) {
             newTimestamp = endDate;
@@ -244,12 +224,65 @@ export class SimulationSlider extends Slider {
         controllers.currentTimestamp.setValue(newTimestamp);
     }
 
-    nextTimestamp() {
-        var nextFrame = (this.frame + 1) % (this.nFrames + 1);
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
+    setLoadProgress(progress) {
+        let progressWidth = progress*this.progressWidth + 2;
 
-        var nextTimestamp = simVars.sortedTimestamps[nextFrame];
+        const progressBar = this.querySelector('#slider-progress'); 
+        progressBar.classList.remove('hidden');
+        progressBar.style.width = progressWidth + 'px';
+        if (progress == 0) {
+            progressBar.classList.add('hidden');
+            return;
+        }
+
+        let startDate = controllers.startDate.getValue();
+        let startIndex = simVars.sortedTimestamps.indexOf(startDate);
+        let left = Math.floor((startIndex / (simVars.sortedTimestamps.length - 1)) * this.sliderWidth * .95);
+
+        progressBar.style.left = left + 'px';
+    }
+
+    setSliderMarkerInfo(timeStamp) {
+        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
+        let localTime = utcToLocal(timeStamp);
+        sliderMarkerInfo.innerHTML = localTime;
+    }
+
+    /** ===== Update block ===== */
+    updateProgressWidth() {
+        let startLeft = this.getStartLeft();
+        let endLeft = this.getEndLeft();
+        let totalWidth = endLeft - (startLeft + 4);
+        this.progressWidth = totalWidth;
+    }
+
+    updateStartLocation() {
+        const sliderStart = this.querySelector('#slider-start');
+        let left = this.getStartLeft();
+
+        sliderStart.style.left = left + 'px';
+    }
+
+    updateSliderToCurrentTimestamp() {
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        let newFrame = simVars.sortedTimestamps.indexOf(currentTimestamp);
+        this.updateHeadPosition(newFrame);
+    }
+
+    updateEndLocation() {
+        const sliderEnd = this.querySelector('#slider-end');
+        let left = this.getEndLeft();
+
+        sliderEnd.style.left = left + 'px';
+    }
+
+    /** ===== Util block ===== */
+    nextTimestamp() {
+        let nextFrame = (this.frame + 1) % (this.nFrames + 1);
+        let startDate = controllers.startDate.getValue();
+        let endDate = controllers.endDate.getValue();
+
+        let nextTimestamp = simVars.sortedTimestamps[nextFrame];
         if (nextTimestamp > endDate || nextFrame == 0) {
             nextTimestamp = startDate;
         }
@@ -258,15 +291,15 @@ export class SimulationSlider extends Slider {
     }
 
     prevTimestamp() {
-        var prevFrame = (this.frame - 1) % (this.nFrames + 1);
-        var startDate = controllers.startDate.getValue();
-        var endDate = controllers.endDate.getValue();
+        let prevFrame = (this.frame - 1) % (this.nFrames + 1);
+        let startDate = controllers.startDate.getValue();
+        let endDate = controllers.endDate.getValue();
 
         if (prevFrame < 0) {
             prevFrame = this.nFrames;
         }
 
-        var prevTimestamp = simVars.sortedTimestamps[prevFrame];
+        let prevTimestamp = simVars.sortedTimestamps[prevFrame];
         if (prevTimestamp < startDate || prevTimestamp > endDate) {
             prevTimestamp = endDate;
         }

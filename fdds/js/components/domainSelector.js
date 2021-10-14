@@ -1,9 +1,18 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { localToUTC } from '../util.js';
+import { daysBetween, localToUTC } from '../util.js';
 import { simVars } from '../simVars.js';
 
-/** Component for the Active Domain selection bar. */
+/** Component for the Active Domain selection bar.
+ * 
+ *          Contents
+ *  1. Initialization block
+ *  2. CreateDomainsForCurrentSimulation block
+ *  3. GetPresets block
+ *  4. DomainSwitch block
+ * 
+ */
 export class DomainSelector extends HTMLElement {
+    /** ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -21,8 +30,12 @@ export class DomainSelector extends HTMLElement {
 
     connectedCallback() {
         controllers.domainInstance.subscribe(() => {
-            this.buildDomains();
+            this.createDomainsForCurrentSimulation();
         });
+        this.initializeDomainSelectorButton();
+    }
+
+    initializeDomainSelectorButton() {
         const domainButton = this.querySelector('#domain-selector-button');
         L.DomEvent.disableClickPropagation(domainButton);
         domainButton.onpointerdown = () => {
@@ -37,40 +50,34 @@ export class DomainSelector extends HTMLElement {
         }
     }
 
-    /** Builds the list of domain elements that can be chosen. */
-    buildDomains() {
+    /** ===== CreateDomainsForCurrentSimulation block ===== */
+    createDomainsForCurrentSimulation() {
+        this.responsiveUI();
         simVars.noLevels.clear();
-        var domains = controllers.domainInstance.getValue();
+        let domains = controllers.domainInstance.getValue();
         controllers.loadingProgress.setValue(0);
 
-        var presetDomain = this.setPresets(domains);
+        let presetDomain = this.presetSimValues(domains);
+        this.createDomainCheckboxes(domains, presetDomain);
 
-        const domainCheckboxes = this.querySelector('#domain-checkboxes');
-        domainCheckboxes.innerHTML = '';
-        for(var dom in domains) {
-            var dom_id = domains[dom];
-            var domainCheckbox = this.buildDomainCheckbox(dom_id, presetDomain);
-            domainCheckboxes.appendChild(domainCheckbox);
-        }
-
-        var clientWidth = document.body.clientWidth;
-        if (clientWidth >= 769) {
-            this.querySelector('#domain-selector').classList.remove('hidden');
-        }
-        this.querySelector('#domain-selector-button').classList.remove('hidden');
-        document.querySelector('#layers-button').classList.remove('hidden');
-
-        controllers.currentDomain.setValue(presetDomain, controllerEvents.simReset);
+        controllers.currentDomain.setValue(presetDomain, controllerEvents.SIM_RESET);
     }
 
-    /** Create a div element for each domain checkbox. When clicked an element is clicked, 
-     * it should call setUpForDomain
-     */
-    buildDomainCheckbox(dom_id, presetDomain) {
-        var div = document.createElement('div');
+    createDomainCheckboxes(domains, presetDomain) {
+        const domainCheckboxes = this.querySelector('#domain-checkboxes');
+        domainCheckboxes.innerHTML = '';
+        for(let dom in domains) {
+            let domId = domains[dom];
+            let domainCheckbox = this.createDomainCheckbox(domId, presetDomain);
+            domainCheckboxes.appendChild(domainCheckbox);
+        }
+    }
+
+    createDomainCheckbox(dom_id, presetDomain) {
+        let div = document.createElement('div');
         div.className = 'domain-checkbox';
 
-        var input = document.createElement('input');
+        let input = document.createElement('input');
         input.type = 'radio';
         input.name = 'domains';
         input.id = dom_id;
@@ -81,7 +88,7 @@ export class DomainSelector extends HTMLElement {
             this.setUpForDomain(dom_id);
         }
 
-        var label = document.createElement('label');
+        let label = document.createElement('label');
         label.for = dom_id;
         label.innerText = dom_id;
 
@@ -90,34 +97,84 @@ export class DomainSelector extends HTMLElement {
         return div;
     }
 
-    setPresets(domains) {
-        var domId = domains[0];
+    responsiveUI() {
+        let clientWidth = document.body.clientWidth;
+        if (clientWidth >= 769) {
+            this.querySelector('#domain-selector').classList.remove('hidden');
+        }
+        this.querySelector('#domain-selector-button').classList.remove('hidden');
+        document.querySelector('#layers-button').classList.remove('hidden');
+    }
+
+    /** ===== GetPresets block ===== */
+    presetSimValues(domains) {
+        let domId = this.presetDomain(domains);
+        let nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
+        simVars.sortedTimestamps = nextTimestamps;
+
+        this.presetStartDate(nextTimestamps);
+        this.presetEndDate(nextTimestamps);
+        this.presetCurrentTimestamp(nextTimestamps);
+        this.presetOpacity();
+
+        return domId;
+    }
+
+    presetDomain(domains) {
+        let domId = domains[0];
         if (domains.includes(simVars.presets.domain)) {
             domId = simVars.presets.domain;
         }
         simVars.presets.domain = null;
+        return domId;
+    }
 
-        var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
-        simVars.sortedTimestamps = nextTimestamps;
-
-        var startDate = nextTimestamps[0];
-        var presetStartDate = localToUTC(simVars.presets.startDate);
+    presetStartDate(nextTimestamps) {
+        let startDate = nextTimestamps[0];
+        let presetStartDate = localToUTC(simVars.presets.startDate);
+        let desc = simVars.currentDescription;
         if (nextTimestamps.includes(presetStartDate)) {
             startDate = presetStartDate;
+            simVars.presets.startDate = null;
+        } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
+            let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
+            for (let i = 2; i <= nextTimestamps.length; i++) {
+                startDate = nextTimestamps[nextTimestamps.length - i];
+                if (daysBetween(startDate, lastTimestamp) >= 15) {
+                    startDate = nextTimestamps[nextTimestamps.length - i + 1];
+                    break;
+                }
+            }
         }
-        simVars.presets.startDate = null;
-        controllers.startDate.setValue(startDate, controllerEvents.quiet);
+        controllers.startDate.setValue(startDate, controllerEvents.QUIET);
+    }
 
-        var endDate = nextTimestamps[nextTimestamps.length - 1];
-        var presetEndDate = localToUTC(simVars.presets.endDate);
+    presetEndDate(nextTimestamps) {
+        let endDate = nextTimestamps[nextTimestamps.length - 1];
+        let presetEndDate = localToUTC(simVars.presets.endDate);
         if (nextTimestamps.includes(presetEndDate)) {
             endDate = presetEndDate;
         }
         simVars.presets.endDate = null;
-        controllers.endDate.setValue(endDate, controllerEvents.quiet);
+        controllers.endDate.setValue(endDate, controllerEvents.QUIET);
+    }
 
-        var opacity = 0.5;
-        var presetOpacity = simVars.presets.opacity;
+    presetCurrentTimestamp(nextTimestamps) {
+        let startDate = controllers.startDate.getValue();
+        let endDate = controllers.endDate.getValue();
+
+        let currentTimestamp = startDate;
+        let presetTimestamp = localToUTC(simVars.presets.timestamp);
+        if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
+            currentTimestamp = presetTimestamp;
+        }
+        simVars.presets.timestamp = null;
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
+    }
+
+    presetOpacity() {
+        let opacity = 0.5;
+        let presetOpacity = simVars.presets.opacity;
         if (presetOpacity && !isNaN(presetOpacity)) {
             presetOpacity = Number(presetOpacity);
             if (presetOpacity >= 0 && presetOpacity <= 1) {
@@ -125,49 +182,51 @@ export class DomainSelector extends HTMLElement {
             }
         }
         simVars.presets.opacity = null;
-        controllers.opacity.setValue(opacity, controllerEvents.quiet);
-
-        var currentTimestamp = startDate;
-        var presetTimestamp = localToUTC(simVars.presets.timestamp);
-        if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
-            currentTimestamp = presetTimestamp;
-        }
-        simVars.presets.timestamp = null;
-        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
-
-        return domId;
+        controllers.opacity.setValue(opacity, controllerEvents.QUIET);
     }
 
-    /** Function called when a new domain is selected. */
+    /** ===== DomainSwitch block ===== */
     setUpForDomain(domId) {
         // set the current domain, must be updated in this order: sortedTimestamps, currentTimestamp, currentDomain
-        var nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
-        var prevTimestamps = simVars.sortedTimestamps;
-
+        let nextTimestamps = Object.keys(simVars.rasters[domId]).sort();
+        let prevTimestamps = simVars.sortedTimestamps;
         simVars.sortedTimestamps = nextTimestamps;
-        const findNewTimestamp = (oldTimestamp) => {
-            if (nextTimestamps.includes(oldTimestamp)) {
-                return oldTimestamp;
-            }
-            var oldIndex = prevTimestamps.indexOf(oldTimestamp);
-            var percentage = oldIndex / prevTimestamps.length;
-            var newIndex = Math.floor(nextTimestamps.length * percentage);
-            return nextTimestamps[newIndex];
-        }
 
-        var startDate = controllers.startDate.getValue();
-        startDate = findNewTimestamp(startDate);
-        controllers.startDate.setValue(startDate, controllerEvents.quiet);
-
-        var endDate = controllers.endDate.getValue();
-        endDate = findNewTimestamp(endDate);
-        controllers.endDate.setValue(endDate, controllerEvents.quiet);
-
-        var currentTimestamp = controllers.currentTimestamp.getValue();
-        currentTimestamp = findNewTimestamp(currentTimestamp);
-        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.quiet);
+        this.updateStartDate(prevTimestamps);
+        this.updateEndDate(prevTimestamps);
+        this.updateCurrentTimestamp(prevTimestamps);
 
         controllers.currentDomain.setValue(domId);
+    }
+
+    updateStartDate(prevTimestamps) {
+        let startDate = controllers.startDate.getValue();
+        startDate = this.convertPrevTimestampToCurrentTimestamp(startDate, prevTimestamps);
+        controllers.startDate.setValue(startDate, controllerEvents.QUIET);
+    }
+
+    updateEndDate(prevTimestamps) {
+        let endDate = controllers.endDate.getValue();
+        endDate = this.convertPrevTimestampToCurrentTimestamp(endDate, prevTimestamps);
+        controllers.endDate.setValue(endDate, controllerEvents.QUIET);
+    }
+
+    updateCurrentTimestamp(prevTimestamps) {
+        let currentTimestamp = controllers.currentTimestamp.getValue();
+        currentTimestamp = this.convertPrevTimestampToCurrentTimestamp(currentTimestamp, prevTimestamps);
+        controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
+    }
+
+    convertPrevTimestampToCurrentTimestamp(prevTimestamp, prevTimestamps) {
+        let nextTimestamps = simVars.sortedTimestamps;
+        if (nextTimestamps.includes(prevTimestamp)) {
+            return prevTimestamp;
+        }
+        let prevIndex = prevTimestamps.indexOf(prevTimestamp);
+        let percentage = prevIndex / prevTimestamps.length;
+        let newIndex = Math.floor(nextTimestamps.length * percentage);
+
+        return nextTimestamps[newIndex];
     }
 }
 

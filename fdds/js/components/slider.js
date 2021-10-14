@@ -24,20 +24,6 @@ export class Slider extends HTMLElement {
         }
     }
 
-    updateHeadPosition(newFrame) {
-        this.frame = newFrame;
-
-        const sliderHead = this.querySelector('#slider-head');
-        var percentage = newFrame / this.nFrames;
-        var left = Math.floor(percentage * this.sliderWidth *.95);
-        // var left = Math.floor(percentage *.95 * 100);
-        sliderHead.style.left = left + 'px';
-        // sliderHead.style.left = left + '%';
-    }
-
-    /** Called when slider head is dragged. As dragged, calculates distance dragged and updates
-     * currentFrame according to the offset. 
-     */
     dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {
         const sliderHead = this.querySelector('#slider-head');
         const sliderBar = this.querySelector('#slider-bar');
@@ -49,8 +35,17 @@ export class Slider extends HTMLElement {
         e = e || window.event;
         e.stopPropagation();
         e.preventDefault();
-        // get the mouse cursor position at startup:
-        var pos3 = e.clientX;
+        // get the mouse cursor position at startup
+        let pos3 = e.clientX;
+
+        this.setSliderHeadDragUpdates(pos3, originalFrame, updateCallback);
+        this.setEndOfSliderHeadDrag(finishedCallback);
+    }
+
+    setEndOfSliderHeadDrag(finishedCallback = null) {
+        const sliderHead = this.querySelector('#slider-head');
+        const sliderBar = this.querySelector('#slider-bar');
+
         document.onpointerup = () => {
             if (finishedCallback) {
                 finishedCallback();
@@ -62,7 +57,9 @@ export class Slider extends HTMLElement {
             document.onpointerup = null;
             document.onpointermove = null;
         };
-        // call a function whenever the cursor moves:
+    }
+
+    setSliderHeadDragUpdates(pos3, originalFrame, updateCallback = null) {
         document.onpointermove = (e2) => {
             e2 = e2 || window.event;
             e2.preventDefault();
@@ -70,7 +67,7 @@ export class Slider extends HTMLElement {
             // calculate the new cursor position:
             let diff = Math.floor((e2.clientX - pos3) / this.sliderWidth * this.nFrames);
 
-            var newFrame = originalFrame + diff;
+            let newFrame = originalFrame + diff;
             newFrame = Math.min(newFrame, this.nFrames);
             newFrame = Math.max(newFrame, 0);
 
@@ -82,14 +79,20 @@ export class Slider extends HTMLElement {
         }
     }
 
-    /** Called when the slider bar is cicked. Calculates distance between slider-head and click
-     * location. Updates the currentFrame accordingly and calls updateSlider
-     */
+    updateHeadPosition(newFrame) {
+        this.frame = newFrame;
+
+        const sliderHead = this.querySelector('#slider-head');
+        let percentage = newFrame / this.nFrames;
+        let left = Math.floor(percentage * this.sliderWidth *.95);
+        sliderHead.style.left = left + 'px';
+    }
+
     clickBar(e, updateCallback = null) {
         const head = this.querySelector('#slider-head').getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.nFrames);
 
-        var newFrame = this.frame + diff;
+        let newFrame = this.frame + diff;
 
         if (updateCallback == null) {
             this.updateHeadPosition(newFrame);
