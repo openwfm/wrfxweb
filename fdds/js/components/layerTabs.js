@@ -1,3 +1,4 @@
+import { simVars } from '../simVars.js';
 import { createTab } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 
@@ -90,6 +91,13 @@ export class LayerTabs extends HTMLElement {
         this.tabOrder.push(activeDescription);
         newTab.classList.add('active');
         this.activeTab = newTab;
+        
+        let switchedSimInfo = simVars.simInfos[activeDescription];
+        simVars.currentDescription = activeDescription;
+        simVars.currentSimulation = switchedSimInfo.jobId;
+        simVars.rasterBase = switchedSimInfo.rasterBase;
+        simVars.rasters = switchedSimInfo.rasters;
+        controllers.domainInstance.setValue(switchedSimInfo.domainInstance); 
     }
 
 }

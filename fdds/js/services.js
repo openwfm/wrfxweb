@@ -42,10 +42,22 @@ export function getSimulation(path) {
     fetch(path.replaceAll(':', '_')).then(response => response.json()).then(function(selectedSimulation) {
         // store in global state
         simVars.rasters = selectedSimulation;
-        // simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
-        simVars.rasterBase = path.replaceAll(':', '_').substring(0, path.lastIndexOf('/') + 1);
+        // let rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
+        let rasterBase = path.replaceAll(':', '_').substring(0, path.lastIndexOf('/') + 1);
+        simVars.rasterBase = rasterBase;
         // retrieve all domains
-        controllers.domainInstance.setValue(Object.keys(selectedSimulation));
+        let domainInstances = Object.keys(selectedSimulation);
+
+        let simInfo = simVars.simInfos[simVars.currentDescription];
+        simVars.simInfos[simVars.currentDescription] = {
+            ...simInfo,
+            domainInstance: domainInstances,
+            rasterBase: rasterBase,
+            rasters: selectedSimulation,
+        };
+
+        controllers.addedSimulations.add(simVars.currentDescription);
+        controllers.domainInstance.setValue(domainInstances);
     }).catch(error => {
         console.error('Error fetching simulation at ' + path);
         console.log(error);

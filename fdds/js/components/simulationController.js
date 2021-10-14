@@ -168,7 +168,9 @@ export class SimulationController extends HTMLElement {
         }
 
         controllers.currentDomain.subscribe(() => {
-            sliderTabs.classList.add('hidden');
+            if (controllers.addedSimulations.getValue().length == 1)  {
+                sliderTabs.classList.add('hidden');
+            }
         }, controllerEvents.SIM_RESET);
 
         controllers.addedSimulations.subscribe((id) => {

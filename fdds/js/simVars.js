@@ -26,6 +26,7 @@ export const simVars = (function createSimVars() {
   }
 
   let simVars = ({
+    simInfos: {},
     currentSimulation: '',
     currentDescription: '',
     rasters: [],
