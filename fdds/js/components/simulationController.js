@@ -22,7 +22,7 @@ export class SimulationController extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div class='slider-wrapper hidden'>
+            <div id='sim-controller' class='slider-wrapper hidden'>
                 <div id='slider-tabs' class='not-hidden'>
                     <div id='combined-slider' class='tab'>
                         <div class='interactive-button innerTab'>Combined Slider</div>

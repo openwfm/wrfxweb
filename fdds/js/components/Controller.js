@@ -58,6 +58,27 @@ export class Controller {
     }
 }
 
+function makeArrayController(controllerType = null) {
+    var arrayController = new Controller([]);
+    arrayController.removeEvent = 'REMOVE_EVENT';
+    arrayController.addEvent = 'ADD_EVENT';
+    arrayController.add = (newMarker) => {
+        arrayController.value.push(newMarker);
+        arrayController.broadcastEvent(arrayController.addEvent, newMarker);
+    }
+    arrayController.remove = (arrayElement) => {
+        var index = arrayController.value.indexOf(arrayElement);
+        arrayController.value.splice(index, 1);
+        if (controllerType == null) {
+            arrayController.broadcastEvent(arrayController.removeEvent, index);
+        } else {
+            arrayController.broadcastEvent(arrayController.removeEvent, arrayElement);
+        }
+    }
+
+    return arrayController;
+}
+
 // global controllers
 export const controllers = {
     currentTimestamp: (function createCurrentTimestamp() {
@@ -91,19 +112,7 @@ export const controllers = {
 
         return loadingProgress;
     })(),
-    timeSeriesMarkers: (function createTimeSeriesMarkers() {
-        let timeSeriesMarkers = new Controller([]);
-        timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
-        timeSeriesMarkers.add = (newMarker) => {
-            timeSeriesMarkers.value.push(newMarker);
-        }
-        timeSeriesMarkers.remove = (removeMarker) => {
-            let index = timeSeriesMarkers.value.indexOf(removeMarker);
-            timeSeriesMarkers.value.splice(index, 1);
-            timeSeriesMarkers.broadcastEvent(timeSeriesMarkers.removeEvent, index);
-        }
-        return timeSeriesMarkers;
-    })(),
+    timeSeriesMarkers: makeArrayController(),
     opacity: new Controller(0.5),
     startDate: (function createStartDate() {
         let startDateController = new Controller();
