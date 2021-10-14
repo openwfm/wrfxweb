@@ -109,6 +109,9 @@ export class CatalogMenu extends HTMLElement {
                 controllers.addSimulation.setValue(false, controllerEvents.setFalse);
             }
         }
+        controllers.addSimulation.subscribe(() => {
+            catalogMenu.classList.remove('hidden');
+        }, controllerEvents.setTrue);
     }
 
     responsiveUI() {

@@ -180,22 +180,6 @@ export class LayerController extends HTMLElement {
         this.threadManager = new ThreadManager(imageLoadedCallback);
     }
 
-    setLayerButton() {
-        const layersButton = this.querySelector('#layers-button');
-
-        L.DomEvent.disableClickPropagation(layersButton);
-        layersButton.onpointerdown = (e) => {
-            const layersSelector = document.querySelector('#layer-controller-wrapper');
-            if (layersSelector.classList.contains('hidden')) {
-                document.querySelector('.catalog-menu').classList.add('hidden');
-                document.querySelector('#domain-selector').classList.add('hidden');
-                layersSelector.classList.remove('hidden');
-            } else {
-                layersSelector.classList.add('hidden');
-            }
-        }
-    }
-
     /** ====== Reset block ====== */
     resetLayers() {
         this.threadManager.cancelCurrentLoad();

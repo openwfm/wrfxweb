@@ -77,7 +77,7 @@ export class CatalogItem extends HTMLElement {
             if (!controllers.addedSimulations.getValue().includes(description)) {
                 controllers.addedSimulations.add(description);
                 controllers.addSimulation.setValue(false, controllerEvents.setFalse);
-                catalogMenu.classList.add('hidden');
+                this.hideCatalogMenu();
             }
             return;
         }
@@ -88,10 +88,14 @@ export class CatalogItem extends HTMLElement {
         simVars.currentSimulation = entryID;
         simVars.currentDescription = description;
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').classList.add('hidden');
+        this.hideCatalogMenu();
 
         document.querySelector('#simulation-flags').classList.remove('hidden');
         getSimulation(path);
+    }
+
+    hideCatalogMenu() {
+        document.querySelector('.catalog-menu').classList.add('hidden');
     }
 }
 
