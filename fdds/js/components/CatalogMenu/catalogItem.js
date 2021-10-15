@@ -100,7 +100,7 @@ export class CatalogItem extends HTMLElement {
     updateCurrentSimulation(entryID, description) {
         simVars.currentSimulation = entryID;
         simVars.currentDescription = description;
-        simVars.simInfos[description] = {jobId: description};
+        simVars.simInfos[description] = {jobId: entryID};
         document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
 
     }

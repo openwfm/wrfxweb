@@ -6,11 +6,12 @@ import { map } from './map.js';
  * 
  *      Contents
  * 1. SetURL block
- * 2. Debounce block
- * 3. TimeConversion block
- * 4. CreateDomElements block
- * 5. Color block
- * 6. Drag Elements block
+ * 2. ChangeSimulation block
+ * 3. Debounce block
+ * 4. TimeConversion block
+ * 5. CreateDomElements block
+ * 6. Color block
+ * 7. Drag Elements block
  * 
  */
 
@@ -107,6 +108,20 @@ map.on('zoomend', function() {
 map.on('moveend', function() {
   setURL();
 });
+
+/** ===== ChangeSimulation block ===== */
+export function switchActiveSimulation(activeDescription) {
+  let switchedSimInfo = simVars.simInfos[activeDescription];
+  if (!switchedSimInfo) {
+    return;
+  }
+
+  simVars.currentDescription = activeDescription;
+  simVars.currentSimulation = switchedSimInfo.jobId;
+  simVars.rasterBase = switchedSimInfo.rasterBase;
+  simVars.rasters = switchedSimInfo.rasters;
+  controllers.domainInstance.setValue(switchedSimInfo.domainInstance);
+}
 
 /** ===== Debounce block ===== */
 /** Executes function with a maximum rate of delay. */

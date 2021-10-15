@@ -1,5 +1,5 @@
 import { simVars } from '../simVars.js';
-import { createTab } from '../util.js';
+import { createTab, switchActiveSimulation } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 
 export class LayerTabs extends HTMLElement {
@@ -28,7 +28,8 @@ export class LayerTabs extends HTMLElement {
         addedSimulations.insertBefore(newTab, addSimulation)
         this.switchActiveTab(id);
         newTab.onpointerdown = () => {
-            this.switchActiveTab(id);
+            // this.switchActiveTab(id);
+            switchActiveSimulation(id);
         }
         newTab.ondblclick = () => {
             this.removeTab(id)
@@ -47,7 +48,8 @@ export class LayerTabs extends HTMLElement {
         this.tabOrder.splice(index, 1);
         if (this.activeTab == tab) {
             let newActive = this.tabOrder[0];
-            this.switchActiveTab(newActive);
+            // this.switchActiveTab(newActive);
+            switchActiveSimulation(newActive);
         }
         delete this.tabs[tabDescription];
 
@@ -74,6 +76,9 @@ export class LayerTabs extends HTMLElement {
                 this.makeNewTab(simulation);
             }
         });
+        controllers.currentDomain.subscribe(() => {
+            this.switchActiveTab(simVars.currentDescription);
+        }, controllerEvents.SIM_RESET);
     }
 
     switchActiveTab(activeDescription) {
@@ -91,13 +96,6 @@ export class LayerTabs extends HTMLElement {
         this.tabOrder.push(activeDescription);
         newTab.classList.add('active');
         this.activeTab = newTab;
-        
-        let switchedSimInfo = simVars.simInfos[activeDescription];
-        simVars.currentDescription = activeDescription;
-        simVars.currentSimulation = switchedSimInfo.jobId;
-        simVars.rasterBase = switchedSimInfo.rasterBase;
-        simVars.rasters = switchedSimInfo.rasters;
-        controllers.domainInstance.setValue(switchedSimInfo.domainInstance); 
     }
 
 }

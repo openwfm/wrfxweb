@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { createTab, setURL, utcToLocal } from '../util.js';
+import { createTab, setURL, switchActiveSimulation, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
@@ -171,6 +171,7 @@ export class SimulationController extends HTMLElement {
             if (controllers.addedSimulations.getValue().length == 1)  {
                 sliderTabs.classList.add('hidden');
             }
+            this.switchActiveTab(simVars.currentDescription);
         }, controllerEvents.SIM_RESET);
 
         controllers.addedSimulations.subscribe((id) => {
@@ -206,7 +207,7 @@ export class SimulationController extends HTMLElement {
         let newTab = createTab(id);
         this.tabs[id] = newTab;
         newTab.onpointerdown = () => {
-            this.switchActiveTab(id);
+            switchActiveSimulation(id);
         }
         sliderTabs.insertBefore(newTab, combinedSlider);
         this.switchActiveTab(id);
