@@ -189,7 +189,8 @@ export class LayerController extends HTMLElement {
             delete this.activeLayers[currentlyAddedLayerName];
         }
         simVars.displayedColorbar = null;
-        simVars.hideColorbar();
+        controllers.colorbarURL.setValue(null);
+        // simVars.hideColorbar();
     }
 
     resetLayerController() {
