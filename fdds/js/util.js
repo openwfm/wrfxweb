@@ -153,8 +153,8 @@ export function doubleClick(elmnt, doubleClickFunction) {
   const DOUBLE_CLICK_MS = 200;
   let timeout = null;
   elmnt.onpointerdown = (e) => {
-    e.stopPropagation();
     if (timeout != null) {
+      e.stopPropagation();
       clearTimeout(timeout);
       timeout = null;
       doubleClickFunction(e);
