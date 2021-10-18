@@ -264,6 +264,24 @@ export function darkenHex(hex) {
 }
 
 /** ===== DragElements block ===== */
+/** A custom double click implementation needed to handle double clicking on ios. */
+export function doubleClick(elmnt, doubleClickFunction) {
+  const DOUBLE_CLICK_MS = 200;
+  let timeout = null;
+  elmnt.onpointerdown = (e) => {
+    if (timeout != null) {
+      e.stopPropagation();
+      clearTimeout(timeout);
+      timeout = null;
+      doubleClickFunction(e);
+    } else {
+      timeout = setTimeout(() => {
+        timeout = null;
+      }, DOUBLE_CLICK_MS);
+    }
+  }
+}
+
 /** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
