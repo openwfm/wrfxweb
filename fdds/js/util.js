@@ -268,7 +268,8 @@ export function darkenHex(hex) {
 export function doubleClick(elmnt, doubleClickFunction) {
   const DOUBLE_CLICK_MS = 200;
   let timeout = null;
-  elmnt.onpointerdown = (e) => {
+  elmnt.addEventListener('pointerdown', (e) => {
+  // elmnt.onpointerdown = (e) => {
     if (timeout != null) {
       e.stopPropagation();
       clearTimeout(timeout);
@@ -279,7 +280,7 @@ export function doubleClick(elmnt, doubleClickFunction) {
         timeout = null;
       }, DOUBLE_CLICK_MS);
     }
-  }
+  });
 }
 
 /** Makes given element draggable from sub element with id 'subID' */
@@ -295,7 +296,8 @@ export function dragElement(elmnt, subID='') {
     draggableElement = document.getElementById(subID);
   }
   // document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
-  draggableElement.onpointerdown = dragMouseDown;
+  // draggableElement.onpointerdown = dragMouseDown;
+  draggableElement.addEventListener('pointerdown', dragMouseDown);
   window.addEventListener('resize', () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {

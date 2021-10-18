@@ -232,15 +232,17 @@ html, body {
   cursor: pointer;
 }
 
-#raster-colorbar-bg {
+.colorbar-bg {
   position: fixed;
   z-index: 1999;
   left: 60px;
   bottom: 103px;
   width: 150px;
   height: 350px;
-  background-color: white;
+  /* background-color: white; */
+  background-color: rgba(255, 255, 255, 1);
   border-radius: .4rem;
+  font-size: 1.2rem;
 }
 
 #raster-colorbar {
