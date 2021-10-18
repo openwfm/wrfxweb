@@ -4,7 +4,7 @@ import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { TimeSeriesMarker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
-import { utcToLocal } from '../util.js';
+import { doubleClick, utcToLocal } from '../util.js';
 
 /** This class extends LayerController and adds to it functionality for generating a timeseries
  * mapping a specific pixel value to its corresponing location on the colorbar over a certain time
@@ -83,7 +83,7 @@ export class TimeSeriesController extends LayerController {
         var img = layer._image;
         const rasterColorbar = document.querySelector('#raster-colorbar');
         if ('colorbar' in rastersNow[name]) {
-            img.ondblclick = (e) => {
+            let doubleClickCallback = (e) => {
                 var latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
                 var xCoord = e.offsetX / img.width;
@@ -91,6 +91,7 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
+            doubleClick(img, doubleClickCallback);
             img.onload = () => {
                 controllers.syncImageLoad.increment(0);
             }
