@@ -1,12 +1,13 @@
+import { dragElement } from '../util.js';
 import { controllers } from './Controller.js';
 
 export class ColorbarPanel extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id='colorbar-panel'>
-                <div id='colorbar-tab'>
-                    colorbar
+            <div id='colorbar-panel' class='hidden'>
+                <div id='colorbar-tab' class='feature-controller'>
+                    <span>colorbar</span>
                 </div>
                 <div id='raster-colorbar-bg'>
                     <img id='raster-colorbar'/>
@@ -17,6 +18,9 @@ export class ColorbarPanel extends HTMLElement {
 
     connectedCallback() {
         const colorbarImg = this.querySelector('#raster-colorbar');
+        const colorbarTab = this.querySelector('#colorbar-tab');
+        const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
+
         controllers.colorbarURL.subscribe(() => {
             let colorbarURL = controllers.colorbarURL.getValue();
             if (colorbarURL == null) {
@@ -26,7 +30,15 @@ export class ColorbarPanel extends HTMLElement {
                 colorbarImg.src = colorbarURL;
             }
         });
-    }
+        colorbarTab.onpointerdown = () => {
+            if (colorbarBgImg.classList.contains('hidden')) {
+                this.showColorbar();
+            } else {
+                this.hideColorbar();
+            }
+        }
+        dragElement(colorbarBgImg);
+   }
 
     hidePanel() {
         const colorbarImgContainer = this.querySelector('#colorbar-panel');
@@ -39,11 +51,13 @@ export class ColorbarPanel extends HTMLElement {
     }
 
     showColorbar() {
-
+        const colorbarImg = this.querySelector('#raster-colorbar-bg');
+        colorbarImg.classList.remove('hidden');
     }
 
     hideColorbar() {
-
+        const colorbarImg = this.querySelector('#raster-colorbar-bg');
+        colorbarImg.classList.add('hidden');
     }
 }
 

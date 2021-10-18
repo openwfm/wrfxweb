@@ -283,7 +283,7 @@ export function doubleClick(elmnt, doubleClickFunction) {
 }
 
 /** Makes given element draggable from sub element with id 'subID' */
-export function dragElement(elmnt, subID) {
+export function dragElement(elmnt, subID='') {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   let elmntLeft = 0, elmntTop = 0;
   let clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;

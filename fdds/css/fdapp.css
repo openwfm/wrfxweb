@@ -1,20 +1,21 @@
 /* app css stylesheet */
 
 /* ====== Table of Contents ======
-          1. Body 
-          2. CatalogMenu
-          3. CatalogItems
-          4. DomainSelector
-          5. LayerController
-          6. InfoPanel
-          7. SimulationController
-          8. Slider
-          9. TimeSeriesChart
+          * Body block
+          * ColorbarPanel block
+          * CatalogMenu block
+          * CatalogItems block
+          * DomainSelector block
+          * LayerController block
+          * InfoPanel block
+          * SimulationController block
+          * Slider block 
+          * TimeSeriesChart block
 
   mobile style follows the form: component-mobile, for example: CatalogMenu-mobile
 */
 
-/* ===== Body ===== */
+/* ===== Body block ===== */
 html {
   margin-top:0;
   height: 100%;
@@ -161,26 +162,6 @@ html, body {
   height: 100vh;
 }
 
-#raster-colorbar-bg {
-  position: fixed;
-  z-index: 1999;
-  left: 60px;
-  bottom: 103px;
-  width: 200px;
-  height: 350px;
-  background-color: white;
-  border-radius: .4rem;
-}
-
-#raster-colorbar {
-  position: fixed;
-  left: 60px;
-  bottom: 103px;
-  width: 200px;
-  height: 400px;
-  z-index: 2000;
-}
-
 #copyLink {
   position: fixed;
   padding: 10px;
@@ -233,7 +214,44 @@ html, body {
   margin-left: 10px !important;
 }
 
-/* ===== CatalogMenu ===== */
+/* ===== ColorbarPanel Block ===== */
+#colorbar-tab {
+  padding: 10px;
+  position: absolute;
+  z-index: 9001;
+  width: 100px;
+  /* top:130px; */
+  left: -38px;
+  bottom: 200px;
+  /* border-right: 1px solid #5d5d5d; */
+  border-radius: .4rem .4rem 0 0;
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: bold;
+  transform: rotate(90deg);
+  cursor: pointer;
+}
+
+#raster-colorbar-bg {
+  position: fixed;
+  z-index: 1999;
+  left: 60px;
+  bottom: 103px;
+  width: 150px;
+  height: 350px;
+  background-color: white;
+  border-radius: .4rem;
+}
+
+#raster-colorbar {
+  position: relative;
+  bottom: 50px;
+  width: 200px;
+  height: 400px;
+  z-index: 2000;
+}
+
+/* ===== CatalogMenu block ===== */
 /* button Style */
 .catalog-button {
   height: 40px;
@@ -329,7 +347,7 @@ html, body {
   cursor: pointer;
 }
 
-/* ===== CatalogItems ===== */
+/* ===== CatalogItems block ===== */
 .catalog-entry {
   list-style-type: none;
   margin-bottom: 10px;
@@ -353,7 +371,7 @@ html, body {
   text-decoration: underline;
 }
 
-/* ===== DomainSelector ===== */
+/* ===== DomainSelector block ===== */
 #domain-selector {
   position: fixed;
   left: 20px;
@@ -387,7 +405,7 @@ html, body {
     margin-right: 20px;
 }
 
-/* ===== LayerController ===== */
+/* ===== LayerController block ===== */
 #layer-controller-container {
     position: absolute;
     right: 20px;
@@ -408,7 +426,7 @@ html, body {
     margin-left: 50px;
 }
 
-/* ===== InfoPanel ===== */
+/* ===== InfoPanel block ===== */
 .close-panel {
   position: absolute;
   top: 3px;
@@ -485,7 +503,7 @@ html, body {
   cursor: pointer;
 }
 
-/* ===== SimulationController ===== */
+/* ===== SimulationController block ===== */
 .slider-container {
   position: fixed;
   left: 20px;
@@ -686,7 +704,7 @@ html, body {
     width: 40%;
 }
 
-/* ===== TimeSeriesChart ===== */
+/* ===== TimeSeriesChart block ===== */
 #fullContainer {
   z-index: 9000;
   position: absolute;
@@ -821,7 +839,7 @@ html, body {
 }
 
 @media (max-width: 769px) {
-  /* ===== Body-mobile ===== */
+  /* ===== Body-mobile block ===== */
   .displayTest {
     left: 20px;
     top: 50px;
@@ -858,7 +876,7 @@ html, body {
     display: block;
   }
 
-  /* ===== CatalogMenu-mobile ===== */
+  /* ===== CatalogMenu-mobile block ===== */
   /* button style */
   .catalog-button > div:nth-child(2) {
       visibility: hidden;
@@ -901,14 +919,14 @@ html, body {
       width: 250px;
   }
 
-  /* ===== LayerController-mobile ===== */
+  /* ===== LayerController-mobile block ===== */
   #layer-controller-container {
     height: 440px;
     top: 85px;
     right: 30px;
   }
 
-  /* ===== InfoPanel-mobile ===== */
+  /* ===== InfoPanel-mobile block ===== */
   #infoPanel {
     width: 300px;
     height: 600px;
@@ -918,7 +936,7 @@ html, body {
       left: 230px;
   }
 
-  /* ===== SimulationController-mobile ===== */
+  /* ===== SimulationController-mobile block ===== */
   .slider-container {
     width: 320px;
   }
@@ -943,7 +961,7 @@ html, body {
       background: #d6d6d6;
   }
 
-  /* ===== Slider-mobile ===== */
+  /* ===== Slider-mobile block ===== */
   .slider.simulation-slider {
     left: 10px;
     width: 300px;
