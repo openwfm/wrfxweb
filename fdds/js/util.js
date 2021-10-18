@@ -148,6 +148,23 @@ export function linkSelects(selectStart, selectEnd) {
   });
 }
 
+/** A custom double click implementation needed to handle double clicking on ios. */
+export function doubleClick(elmnt, doubleClickFunction) {
+  const DOUBLE_CLICK_MS = 100;
+  let timeout = null;
+  elmnt.onpointerdown = (e) => {
+    e.stopPropagation();
+    if (timeOutFunction != null) {
+      clearTimeout(timeout);
+      doubleClickFunction(e);
+    } else {
+      timeout = setTimeout(() => {
+        timeout = null;
+      }, DOUBLE_CLICK_MS);
+    }
+  }
+}
+
 /** Makes given element draggable from sub element with id 'subID' */
 export function dragElement(elmnt, subID) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
