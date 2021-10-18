@@ -4,6 +4,7 @@ import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { Marker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
+import { doubleClick } from '../util.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;
@@ -120,7 +121,7 @@ export class TimeSeriesController extends LayerController {
         let layer = this.getLayer(currentDomain, layerName);
         let img = layer.imageOverlay._image;
         if (layer.hasColorbar) {
-            img.ondblclick = (e) => {
+            let doubleClickCallback = (e) => {
                 let latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
                 let xCoord = e.offsetX / img.width;
@@ -128,6 +129,7 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
+            doubleClick(img, doubleClickCallback);
             let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
             if (timeSeriesMarkers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
