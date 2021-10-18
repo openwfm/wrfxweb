@@ -45,6 +45,7 @@ export function getSimulation(path) {
         // retrieve all domains
         controllers.domainInstance.setValue(Object.keys(selectedSimulation));
     }).catch(error => {
-        console.error('Error fetching simulation at ' + path + ': ' + error);
+        console.error('Error fetching simulation at ' + path);
+        console.log(error);
     });
 }
