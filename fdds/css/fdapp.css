@@ -218,12 +218,10 @@ html, body {
 #colorbar-tab {
   padding: 10px;
   position: absolute;
-  z-index: 9001;
+  z-index: 5000;
   width: 100px;
-  /* top:130px; */
   left: -38px;
   bottom: 200px;
-  /* border-right: 1px solid #5d5d5d; */
   border-radius: .4rem .4rem 0 0;
   font-size: 1.2rem;
   text-align: center;
@@ -240,7 +238,6 @@ html, body {
   bottom: 103px;
   width: 150px;
   height: 350px;
-  /* background-color: white; */
   background-color: rgba(255, 255, 255, 1);
   border-radius: .4rem;
   font-size: 1.2rem;
@@ -879,22 +876,22 @@ html, body {
     margin-left: 303px !important;
   }
 
+  .mobile-button {
+    display: block;
+  }
+
+  /* ===== ColorbarPanel-mobile block ===== */
   #raster-colorbar {
     height: 160px;
     width: 80px;
-    bottom: 130px;
-    left: 40px;
+    bottom: 20px;
   }
 
   #raster-colorbar-bg {
     height: 140px;
     width: 80px;
-    bottom: 130px;
-    left: 40px;
-  }
-
-  .mobile-button {
-    display: block;
+    bottom: 135px;
+    left: 55px;
   }
 
   /* ===== CatalogMenu-mobile block ===== */
