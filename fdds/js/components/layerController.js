@@ -190,7 +190,6 @@ export class LayerController extends HTMLElement {
         }
         simVars.displayedColorbar = null;
         controllers.colorbarURL.setValue(null);
-        // simVars.hideColorbar();
     }
 
     resetLayerController() {
