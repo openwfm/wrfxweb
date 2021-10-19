@@ -22,6 +22,8 @@ export class Slider extends HTMLElement {
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
+
+        this.querySelector('#slider').style.width = this.sliderWidth + 'px';
     }
 
     dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {

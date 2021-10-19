@@ -165,7 +165,7 @@ html, body {
 #copyLink {
   position: fixed;
   padding: 10px;
-  top: 155px;
+  top: 145px;
   left: 20px;
   font-size: 1rem;
   font-weight: bold;
@@ -234,6 +234,7 @@ html, body {
 
 .colorbar-bg {
   position: fixed;
+  padding: 5px;
   z-index: 1999;
   left: 60px;
   bottom: 103px;
@@ -251,6 +252,24 @@ html, body {
   width: 200px;
   height: 400px;
   z-index: 2000;
+}
+
+#colorbar-opacity {
+  position: relative;
+  top: 100px;
+}
+
+#colorbar-opacity-done {
+  position: relative;
+  top: 10px;
+  left: 50px;
+}
+
+#colorbar-opacity-label {
+  position: relative;
+  font-size: 1rem;
+  font-weight: bold;
+  left: 18px;
 }
 
 /* ===== CatalogMenu block ===== */

@@ -134,7 +134,7 @@ export class LayerController extends HTMLElement {
     createOpacitySlider() {
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
 
-        const opacitySlider = new OpacitySlider();
+        const opacitySlider = new OpacitySlider(null, controllers.opacity);
         opacitySliderContainer.appendChild(opacitySlider);
     }
 

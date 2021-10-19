@@ -1,5 +1,6 @@
 import { doubleClick, dragElement } from '../util.js';
 import { controllers } from './Controller.js';
+import { OpacitySlider } from './opacitySlider.js';
 
 export class ColorbarPanel extends HTMLElement {
     constructor() {
@@ -12,7 +13,7 @@ export class ColorbarPanel extends HTMLElement {
                 <div id='raster-colorbar-bg' class='colorbar-bg'>
                     <img id='raster-colorbar'/>
                     <div id='colorbar-opacity' class='hidden'>
-                        <opacity-slider></opacity-slider>
+                        <span id='colorbar-opacity-label'>Adjust Opacity</span>
                         <button id='colorbar-opacity-done'>done</button>
                     </div>
                 </div>
@@ -60,6 +61,11 @@ export class ColorbarPanel extends HTMLElement {
         const colorbarImg = this.querySelector('#raster-colorbar');
         const doneButton = this.querySelector('#colorbar-opacity-done');
         const colorbarOpacity = this.querySelector('#colorbar-opacity');
+        const opacityUpdateCallback = (opacity) => {
+            colorbarBgImg.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
+        }
+        const opacitySlider = new OpacitySlider(opacityUpdateCallback, null, 1, 140);
+        colorbarOpacity.insertBefore(opacitySlider, doneButton);
         let doubleClickCallback = () => {
             if (colorbarImg.classList.contains('hidden')) {
                 colorbarImg.classList.remove('hidden');
