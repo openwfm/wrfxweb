@@ -1,4 +1,4 @@
-import { doubleClick, dragElement } from '../util.js';
+import { doubleClick, dragElement, IS_MOBILE } from '../util.js';
 import { controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 
@@ -23,7 +23,7 @@ export class ColorbarPanel extends HTMLElement {
 
     connectedCallback() {
         const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
-        dragElement(colorbarBgImg);
+        dragElement(colorbarBgImg, '', true);
 
         this.subscribeToColorbarURL();
 
@@ -61,10 +61,12 @@ export class ColorbarPanel extends HTMLElement {
         const colorbarImg = this.querySelector('#raster-colorbar');
         const doneButton = this.querySelector('#colorbar-opacity-done');
         const colorbarOpacity = this.querySelector('#colorbar-opacity');
+
         const opacityUpdateCallback = (opacity) => {
             colorbarBgImg.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
         }
-        const opacitySlider = new OpacitySlider(opacityUpdateCallback, null, 1, 140);
+        const sliderWidth = IS_MOBILE ? 70 : 140;
+        const opacitySlider = new OpacitySlider(opacityUpdateCallback, null, 1, sliderWidth);
         colorbarOpacity.insertBefore(opacitySlider, doneButton);
         let doubleClickCallback = () => {
             if (colorbarImg.classList.contains('hidden')) {

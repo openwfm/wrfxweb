@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox, IS_MOBILE } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -162,17 +162,16 @@ export class TimeSeriesChart extends HTMLElement {
     setLayerSelection() {
         const addLayers = this.querySelector('#addLayers');
         const layersToAdd = this.querySelector('#layers-to-add');
-        const clientWidth = document.body.clientWidth;
         addLayers.onpointerdown = (e) => {
             e.stopPropagation();
             if (layersToAdd.classList.contains('hidden')) {
                 layersToAdd.classList.remove('hidden');
-                if (clientWidth >= 770) {
+                if (!IS_MOBILE) {
                     addLayers.style.left = '-330px';
                 }
             } else {
                 layersToAdd.classList.add('hidden');
-                if (clientWidth >= 770) {
+                if (!IS_MOBILE) {
                     addLayers.style.left = '-80px';
                 }
             }

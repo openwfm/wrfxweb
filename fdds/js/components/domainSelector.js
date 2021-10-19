@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { daysBetween, localToUTC } from '../util.js';
+import { daysBetween, IS_MOBILE, localToUTC } from '../util.js';
 import { simVars } from '../simVars.js';
 
 /** Component for the Active Domain selection bar.
@@ -98,8 +98,7 @@ export class DomainSelector extends HTMLElement {
     }
 
     responsiveUI() {
-        let clientWidth = document.body.clientWidth;
-        if (clientWidth >= 769) {
+        if (!IS_MOBILE) {
             this.querySelector('#domain-selector').classList.remove('hidden');
         }
         this.querySelector('#domain-selector-button').classList.remove('hidden');

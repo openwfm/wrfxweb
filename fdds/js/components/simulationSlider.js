@@ -1,5 +1,5 @@
 import { Slider } from './slider.js';
-import { utcToLocal, createElement, setURL } from '../util.js';
+import { utcToLocal, createElement, setURL, IS_MOBILE } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -15,11 +15,7 @@ import { simVars } from '../simVars.js';
 export class SimulationSlider extends Slider {
     /** ===== Initialization block ===== */
     constructor() {
-        let clientWidth = document.body.clientWidth;
-        let width = 340;
-        if (clientWidth < 770) {
-            width = 300;
-        }
+        let width = IS_MOBILE ? 300 : 340;
         super(width, simVars.sortedTimestamps.length - 1);
         this.progressWidth = 0;
         this.progressCheck = 0;
