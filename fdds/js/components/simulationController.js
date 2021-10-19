@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { setURL, utcToLocal } from '../util.js';
+import { IS_MOBILE, setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
@@ -148,7 +148,7 @@ export class SimulationController extends HTMLElement {
 
     /** ===== UI block ===== */
     responsiveUI() {
-        if (document.body.clientWidth < 769) {
+        if (IS_MOBILE) {
             const timeStamp = this.querySelector('#slider-timestamp');
             const playButtons = this.querySelector('#slider-play-bar');
             timeStamp.parentNode.insertBefore(timeStamp, playButtons);
