@@ -151,14 +151,25 @@ export function linkSelects(selectStart, selectEnd) {
 /** A custom double click implementation needed to handle double clicking on ios. */
 export function doubleClick(elmnt, doubleClickFunction) {
   const DOUBLE_CLICK_MS = 200;
+  const MAX_DOUBLE_CLICK_DIST = 30;
   let timeout = null;
+  let previousE;
   elmnt.onpointerdown = (e) => {
     if (timeout != null) {
+      let xDiff = Math.abs(e.clientX - previousE.clientX);
+      let yDiff = Math.abs(e.clientY - previousE.clientY);
+      if ((xDiff + yDiff) > MAX_DOUBLE_CLICK_DIST) {
+        timeout = null;
+        previousE = null;
+        return;
+      }
       e.stopPropagation();
       clearTimeout(timeout);
       timeout = null;
+      previousE = null;
       doubleClickFunction(e);
     } else {
+      previousE = e;
       timeout = setTimeout(() => {
         timeout = null;
       }, DOUBLE_CLICK_MS);
