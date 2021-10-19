@@ -4,15 +4,20 @@ import { map } from './map.js';
 
 /** Utility functions that can be imported and used in components from anywhere. 
  * 
- *      Contents
- * 1. SetURL block
- * 2. Debounce block
- * 3. TimeConversion block
- * 4. CreateDomElements block
- * 5. Color block
- * 6. Drag Elements block
+ *        Contents
+ *    - Constants block
+ *    - SetURL block
+ *    - Debounce block
+ *    - TimeConversion block
+ *    - CreateDomElements block
+ *    - Color block
+ *    - Drag Elements block
  * 
  */
+
+/** ===== Constants block */
+export const CLIENT_WIDTH = document.body.clientWidth;
+export const IS_MOBILE = CLIENT_WIDTH < 769; 
 
 /** ===== SetURL block ===== */
 export function setURL() {

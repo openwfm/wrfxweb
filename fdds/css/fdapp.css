@@ -894,6 +894,22 @@ html, body {
     left: 55px;
   }
 
+  #colorbar-opacity {
+    top: 30px;
+    font-size: .6rem;
+  }
+
+  #colorbar-opacity-label {
+    font-size: .6rem;
+    font-weight: bold;
+    left: 5px;
+  }
+
+  #colorbar-opacity-done {
+    font-size: .6rem;
+    left: 25px;
+  }
+
   /* ===== CatalogMenu-mobile block ===== */
   /* button style */
   .catalog-button > div:nth-child(2) {
