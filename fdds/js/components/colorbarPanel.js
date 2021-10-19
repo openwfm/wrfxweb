@@ -23,7 +23,7 @@ export class ColorbarPanel extends HTMLElement {
 
     connectedCallback() {
         const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
-        dragElement(colorbarBgImg);
+        dragElement(colorbarBgImg, '', true);
 
         this.subscribeToColorbarURL();
 
