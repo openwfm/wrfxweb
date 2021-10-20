@@ -1,5 +1,5 @@
 import { createOption, linkSelects } from '../util.js';
-import { controllers } from './Controller.js';
+import { controllers, controllerEvents } from './Controller.js';
 import { simVars } from '../simVars.js';
 
 /**      Contents 
@@ -88,6 +88,7 @@ export class TimeSeriesButton extends HTMLElement {
             let simulationStartDate = controllers.startDate.getValue();
             if (startDate.value < simulationStartDate) {
                 controllers.startDate.setValue(startDate.value);
+                controllers.startDate.broadcastEvent(controllerEvents.VALUE_SET)
             }
             linkSelects(startDate, endDate);
         });
@@ -100,6 +101,7 @@ export class TimeSeriesButton extends HTMLElement {
             let simulationEndDate = controllers.endDate.getValue();
             if (endDate.value > simulationEndDate) {
                 controllers.endDate.setValue(endDate.value);
+                controllers.endDate.broadcastEvent(controllerEvents.VALUE_SET)
             }
             linkSelects(startDate, endDate);
         });
