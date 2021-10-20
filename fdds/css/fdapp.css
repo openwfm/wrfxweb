@@ -530,6 +530,10 @@ html, body {
     border: none;
 }
 
+.timeSeriesButton:disabled {
+  background:#d6d6d6;
+}
+
 .timeSeriesButton:hover:not([disabled]) {
     cursor: pointer;
     background: #e5e5e5;
