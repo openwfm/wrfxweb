@@ -61,6 +61,7 @@ export class TimeSeriesButton extends HTMLElement {
             let dataType = dataTypeSelector.value;
             controllers.timeSeriesDataType.setValue(dataType);
         });
+        this.updateTimestamps();
     }
 
     initializeTimeSeriesButton() {
@@ -143,7 +144,6 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        // endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         startDate.value = controllers.startDate.getValue();
         endDate.value = controllers.endDate.getValue();
     }

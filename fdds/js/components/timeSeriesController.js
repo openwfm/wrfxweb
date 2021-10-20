@@ -162,7 +162,6 @@ export class TimeSeriesController extends LayerController {
 
         document.body.classList.add('waiting');
         let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        // this.timeSeriesButton.setProgress(0);
         controllers.timeSeriesProgress.setValue(0);
         this.framesLoaded = 0;
 
@@ -253,7 +252,6 @@ export class TimeSeriesController extends LayerController {
             dataEntry.dataset[timestamp] = colorbarValue;
             this.framesLoaded += 1;
             let progress = this.framesLoaded / this.totalFramesToLoad;
-            // this.timeSeriesButton.setProgress(this.framesLoaded/this.totalFramesToLoad);
             controllers.timeSeriesProgress.setValue(progress);
         }
 
