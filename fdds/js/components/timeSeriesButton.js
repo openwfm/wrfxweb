@@ -44,18 +44,30 @@ export class TimeSeriesButton extends HTMLElement {
             </div>
         `;
         this.querySelector('#dataType').value = dataType;
-        this.generateLoader = null;
-        this.cancelLoader = null;
         this.loading = false;
     }
 
     connectedCallback() {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
 
+        this.initializeTimeSeriesButton();
+        this.initializeStartDateSelector();
+        this.initializeEndDateSelector();
+
+        this.subscribeToTimeSeriesProgress();
+
+        const dataTypeSelector = this.querySelector('#dataType');
+        dataTypeSelector.addEventListener('change', () => {
+            let dataType = dataTypeSelector.value;
+            controllers.timeSeriesDataType.setValue(dataType);
+        });
+    }
+
+    initializeTimeSeriesButton() {
         const timeSeriesButton = this.querySelector('#timeSeriesButton');
         timeSeriesButton.onpointerdown = () => {
             if (this.loading) {
-                this.cancelLoader();
+                simVars.cancelTimeSeriesCallback();
                 this.setProgress(1);
                 this.loading = false;
             } else {
@@ -63,17 +75,9 @@ export class TimeSeriesButton extends HTMLElement {
                 this.setProgress(0);
                 this.querySelector('#generate-button-label').classList.add('hidden');
                 this.querySelector('#cancel-button-label').classList.remove('hidden');
-                this.generateLoader();
+                simVars.generateTimeSeriesCallback();
             }
         }
-        this.initializeStartDateSelector();
-        this.initializeEndDateSelector();
-
-        const dataTypeSelector = this.querySelector('#dataType');
-        dataTypeSelector.addEventListener('change', () => {
-            let dataType = dataTypeSelector.value;
-            controllers.timeSeriesDataType.setValue(dataType);
-        });
     }
 
     initializeStartDateSelector() {
@@ -97,6 +101,13 @@ export class TimeSeriesButton extends HTMLElement {
                 controllers.endDate.setValue(endDate.value);
             }
             linkSelects(startDate, endDate);
+        });
+    }
+
+    subscribeToTimeSeriesProgress() {
+        controllers.timeSeriesProgress.subscribe(() => {
+            let progress = controllers.timeSeriesProgress.getValue();
+            this.setProgress(progress);
         });
     }
 
@@ -187,14 +198,6 @@ export class TimeSeriesButton extends HTMLElement {
         endDate.value = newEndDate;
 
         linkSelects(startDate, endDate);
-    }
-
-    setGenerateLoader(loader) {
-        this.generateLoader = loader;
-    }
-
-    setCancelLoader(cancelLoader) {
-        this.cancelLoader = cancelLoader;
     }
 }
 

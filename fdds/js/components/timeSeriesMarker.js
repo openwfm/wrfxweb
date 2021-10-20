@@ -1,6 +1,7 @@
 import { rgbToHex } from '../util.js';
 import { map } from '../map.js';
 import { controllers } from './Controller.js';
+import { TimeSeriesButton } from './timeSeriesButton.js';
 
 export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
@@ -20,12 +21,11 @@ export class TimeSeriesMarker extends HTMLElement {
                         <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
                     </div>
                     <p id='colorbar-location' style='margin: 0'></p>
-                    <button class='timeSeriesButton' id='generate-timeseries-marker'>generate timeseries</button>
+                    <button class='timeSeriesButton' id='open-timeseries-menu'>generate timeseries</button>
                 </div>
 
                 <div id='timeseries-menu' class='hidden'>
                     <span id='close-timeseries-menu' class='hideMenu interactive-button'>cancel</span>
-                    <timeseries-button></timeseries-button>
                 </div>
             </div>
         `;
@@ -34,6 +34,14 @@ export class TimeSeriesMarker extends HTMLElement {
         this.clrbarLocation = null;
         this.hideOnChart = false;
         this.infoOpen = false;
+        this.timeSeriesButton = this.createTimeSeriesButton();
+    }
+
+    createTimeSeriesButton() {
+        let timeSeriesButton = new TimeSeriesButton();
+        const timeSeriesMenu = this.querySelector('#timeseries-menu');
+        timeSeriesMenu.appendChild(timeSeriesButton);
+        return timeSeriesButton;
     }
 
     connectedCallback() {
@@ -41,7 +49,7 @@ export class TimeSeriesMarker extends HTMLElement {
     }
 
     initializeTimeseriesMenu() {
-        const generateTimeseries = this.querySelector('#generate-timeseries-marker');
+        const generateTimeseries = this.querySelector('#open-timeseries-menu');
         const markerMenu = this.querySelector('#marker-menu');
         const timeseriesMenu = this.querySelector('#timeseries-menu');
         const closeTimeseriesMenu = this.querySelector('#close-timeseries-menu');
@@ -93,11 +101,26 @@ export class TimeSeriesMarker extends HTMLElement {
         rgbP.innerHTML = 'No layer with colorbar to show values of';
         rgbP.style.color = 'black';
         if (clrbarLocation != null) {
+            this.enableTimeSeriesButtons();
             clrbarP.style.display = 'block';
             clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
             rgbP.style.color = `rgb(${r},${g},${b})`;
             rgbP.innerHTML = `pixel value: R${r} G${g} B${b}`;
+        } else { 
+            this.disableTimeSeriesButtons();
         }
+    }
+
+    disableTimeSeriesButtons() {
+        const openTimeSeriesButton = this.querySelector('#open-timeseries-menu');
+        openTimeSeriesButton.disabled = true;
+        this.timeSeriesButton.getButton().disabled = true;
+    }
+
+    enableTimeSeriesButtons() {
+        const openTimeSeriesButton = this.querySelector('#open-timeseries-menu');
+        openTimeSeriesButton.disabled = false;
+        this.timeSeriesButton.getButton().disabled = false;
     }
 }
 
