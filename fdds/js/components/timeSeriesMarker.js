@@ -8,17 +8,25 @@ export class TimeSeriesMarker extends HTMLElement {
         const roundLatLon = (num) => Math.round(num*100)/100; 
         this.innerHTML = `
             <div id='timeSeriesMarker'>
-                <span id='hideMenu' class='interactive-button'>hide</span>
-                <div>
-                    <label style='display: inline-block; width: 100px' for='timeseries-custom-name'>Add name: </label>
-                    <input id='timeseries-custom-name'></input>
+                <div id='marker-menu'>
+                    <span id='hideMenu' class='hideMenu interactive-button'>hide</span>
+                    <div>
+                        <label style='display: inline-block; width: 100px' for='timeseries-custom-name'>Add name: </label>
+                        <input id='timeseries-custom-name'></input>
+                    </div>
+
+                    <div>
+                        <span style='margin: 1px; margin-right: 10px'>lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
+                        <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
+                    </div>
+                    <p id='colorbar-location' style='margin: 0'></p>
+                    <button class='timeSeriesButton' id='generate-timeseries-marker'>generate timeseries</button>
                 </div>
 
-                <div>
-                    <span style='margin: 1px; margin-right: 10px'>lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
-                    <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
+                <div id='timeseries-menu' class='hidden'>
+                    <span id='close-timeseries-menu' class='hideMenu interactive-button'>cancel</span>
+                    <timeseries-button></timeseries-button>
                 </div>
-                <p id='colorbar-location' style='margin: 0'></p>
             </div>
         `;
         this.chartColor = null;
@@ -26,6 +34,25 @@ export class TimeSeriesMarker extends HTMLElement {
         this.clrbarLocation = null;
         this.hideOnChart = false;
         this.infoOpen = false;
+    }
+
+    connectedCallback() {
+        this.initializeTimeseriesMenu();
+    }
+
+    initializeTimeseriesMenu() {
+        const generateTimeseries = this.querySelector('#generate-timeseries-marker');
+        const markerMenu = this.querySelector('#marker-menu');
+        const timeseriesMenu = this.querySelector('#timeseries-menu');
+        const closeTimeseriesMenu = this.querySelector('#close-timeseries-menu');
+        generateTimeseries.onpointerdown = () => {
+            markerMenu.classList.add('hidden');
+            timeseriesMenu.classList.remove('hidden');
+        }
+        closeTimeseriesMenu.onpointerdown = () => {
+            markerMenu.classList.remove('hidden');
+            timeseriesMenu.classList.add('hidden');
+        }
     }
 
     getChartColor() {
