@@ -1,16 +1,18 @@
 /* app css stylesheet */
 
 /* ====== Table of Contents ======
-          * Body block
-          * ColorbarPanel block
-          * CatalogMenu block
-          * CatalogItems block
-          * DomainSelector block
-          * LayerController block
-          * InfoPanel block
-          * SimulationController block
-          * Slider block 
-          * TimeSeriesChart block
+        - Body block
+        - ColorbarPanel block
+        - CatalogMenu block
+        - CatalogItems block
+        - InfoPanel block
+        - DomainSelector block
+        - LayerController block
+        - TimeSeriesButton block
+        - TimeSeriesMarker block
+        - TimeSeriesChart block
+        - SimulationController block
+        - Slider block 
 
   mobile style follows the form: component-mobile, for example: CatalogMenu-mobile
 */
@@ -28,12 +30,6 @@ h4 {
 
 .body {
   font-family: helvetica;
-}
-
-#hideMenu {
-    position: absolute;
-    top: 3px;
-    left: 5px;
 }
 
 .feature-controller {
@@ -389,61 +385,6 @@ html, body {
   text-decoration: underline;
 }
 
-/* ===== DomainSelector block ===== */
-#domain-selector {
-  position: fixed;
-  left: 20px;
-  top: 70px;
-  padding: 7px;
-  font-weight: bold;
-  line-height: 12px;
-  font-size: 1rem;
-}
-
-#domain-selector-label {
-    padding: 10px 0px;
-    text-align: center;
-}
-
-#domain-checkboxes {
-    height: 20px;
-    padding: 0px 5px;
-}
-
-.domain-checkbox {
-    display: inline-block;
-}
-
-.domain-checkbox input {
-    cursor: pointer;
-}
-
-.domain-checkbox label {
-    margin-left: 10px;
-    margin-right: 20px;
-}
-
-/* ===== LayerController block ===== */
-#layer-controller-container {
-    position: absolute;
-    right: 20px;
-    top: 5%;
-    width: 300px;
-    max-height: 85%;
-    background: white;
-    font-size: 1.15rem;
-    padding: 8px;
-    overflow-y: auto;
-}
-
-#layers-button {
-    left: 70px;
-}
-
-.layer-list {
-    margin-left: 50px;
-}
-
 /* ===== InfoPanel block ===== */
 .close-panel {
   position: absolute;
@@ -519,6 +460,234 @@ html, body {
 
 .infoSectionHeader:hover {
   cursor: pointer;
+}
+
+/* ===== DomainSelector block ===== */
+#domain-selector {
+  position: fixed;
+  left: 20px;
+  top: 70px;
+  padding: 7px;
+  font-weight: bold;
+  line-height: 12px;
+  font-size: 1rem;
+}
+
+#domain-selector-label {
+    padding: 10px 0px;
+    text-align: center;
+}
+
+#domain-checkboxes {
+    height: 20px;
+    padding: 0px 5px;
+}
+
+.domain-checkbox {
+    display: inline-block;
+}
+
+.domain-checkbox input {
+    cursor: pointer;
+}
+
+.domain-checkbox label {
+    margin-left: 10px;
+    margin-right: 20px;
+}
+
+/* ===== LayerController block ===== */
+#layer-controller-container {
+    position: absolute;
+    right: 20px;
+    top: 5%;
+    width: 300px;
+    max-height: 85%;
+    background: white;
+    font-size: 1.15rem;
+    padding: 8px;
+    overflow-y: auto;
+}
+
+#layers-button {
+    left: 70px;
+}
+
+.layer-list {
+    margin-left: 50px;
+}
+
+/* ===== TimeSeriesButton block ===== */ 
+.timeSeriesButton {
+    border-radius: .2rem;
+    padding: 5px;
+    margin-bottom: 5px;
+    background: #b6e2f0;
+    text-align: center;
+    color: #6a6a6a;
+    font-weight: bold;
+    width: 100%;
+    border: none;
+}
+
+.timeSeriesButton:disabled {
+  background:#d6d6d6;
+}
+
+.timeSeriesButton:hover:not([disabled]) {
+    cursor: pointer;
+    background: #e5e5e5;
+}
+
+.timeseries-select {
+    display: inline-block;
+    width: 55%;
+    margin-bottom: 2px;
+}
+
+.timeseries-select-label {
+    display: inline-block;
+    width: 40%;
+}
+
+/* ===== TimeSeriesMarker block ===== */
+.hideMenu {
+    position: absolute;
+    top: 3px;
+    left: 20px;
+}
+
+/* ===== TimeSeriesChart block ===== */
+#fullContainer {
+  z-index: 9000;
+  position: absolute;
+  width: 580px;
+  height: 560px;
+  left: 330px;
+  right: 0;
+  top: 5px;
+  bottom: 0;
+}
+
+#timeSeriesChartContainer {
+  position: absolute;
+  display: block;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 85px;
+  left: 0;
+  top: 5px;
+  bottom: 0;
+  height: 550px;
+  width: 560px;
+  background: white;
+  border-radius: .4rem;
+  border: 1px solid #5d5d5d;
+  cursor: pointer;
+}
+
+#drag-container {
+  display: inline-block;
+  position: absolute;
+  top: 8px;
+  left: 15px;
+  cursor: grab;
+  margin-right: 5px;
+}
+
+#undo-zoom {
+  position: absolute;
+  top: 8px;
+  left: 40px;
+}
+
+.layerCheckbox {
+  margin-left: 15px;
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+.popout-layer-box {
+  border-top: 1px solid #5d5d5d;
+  border-left: 1px solid #5d5d5d;
+  background: #e8e8e8;
+}
+
+#addLayers{
+  padding: 10px;
+  position: absolute;
+  z-index: 9001;
+  width: 100px;
+  top:130px;
+  left: -80px;
+  border-right: 1px solid #5d5d5d;
+  border-radius: .4rem .4rem 0 0;
+  text-align: center;
+  font-weight: bold;
+  transform: rotate(-90deg);
+}
+
+#layers-to-add {
+  position: absolute;
+  z-index: 9000;
+  width: 250px;
+  left: -251px;
+  height: 400px;
+  top: 39px;
+  border-bottom: 1px solid #5d5d5d;
+  border-radius: .4rem 0 0 .4rem;
+}
+
+#zoomBox {
+  position: fixed; 
+  display:none; 
+  height: 0px; 
+  width: 0px; 
+  background-color: #b6e2f0;
+  opacity: 50%;
+  border-radius: .2rem;
+  border: 1px solid #b6e2f0;
+}
+
+#legendOptions {
+  position: absolute;
+  padding: 10px;
+  top: 80px;
+  left: 200px;
+  width: 220px;
+  background: #e8e8e8;
+  border-radius: .2rem;
+  border: 1px solid darkgray;
+}
+
+.legendItem {
+  display: inline-block;
+  width: 100px;
+}
+
+.legendInput {
+  width: 150px;
+  margin-right: 10px;
+}
+
+.legendSelect {
+  width: 160px;
+  margin-right: 10px;
+}
+
+#timeSeriesChartContainer button {
+  background-color: transparent;
+  border: none;
+}
+
+#timeSeriesChart {
+  margin-left:10px;
+  cursor: pointer;
+}
+
+#add-threshold {
+  margin-top: 10px;
 }
 
 /* ===== SimulationController block ===== */
@@ -685,18 +854,6 @@ html, body {
   left: 340px;
 }
 
-.timeSeriesButton {
-    border-radius: .2rem;
-    padding: 5px;
-    margin-bottom: 5px;
-    background: #b6e2f0;
-    text-align: center;
-    color: #6a6a6a;
-    font-weight: bold;
-    width: 100%;
-    border: none;
-}
-
 #progressBar {
     border-radius: .2rem;
     margin-top: 5px;
@@ -706,155 +863,7 @@ html, body {
     border: none;
 }
 
-.timeSeriesButton:hover:not([disabled]) {
-    cursor: pointer;
-    background: #e5e5e5;
-}
 
-.timeseries-select {
-    display: inline-block;
-    width: 55%;
-    margin-bottom: 2px;
-}
-
-.timeseries-select-label {
-    display: inline-block;
-    width: 40%;
-}
-
-/* ===== TimeSeriesChart block ===== */
-#fullContainer {
-  z-index: 9000;
-  position: absolute;
-  width: 580px;
-  height: 560px;
-  left: 330px;
-  right: 0;
-  top: 5px;
-  bottom: 0;
-}
-
-#timeSeriesChartContainer {
-  position: absolute;
-  display: block;
-  padding-right: 20px;
-  padding-top: 10px;
-  padding-left: 10px;
-  padding-bottom: 85px;
-  left: 0;
-  /* right: 0; */
-  top: 5px;
-  bottom: 0;
-  height: 550px;
-  width: 560px;
-  background: white;
-  border-radius: .4rem;
-  border: 1px solid #5d5d5d;
-  cursor: pointer;
-}
-
-#drag-container {
-  display: inline-block;
-  position: absolute;
-  top: 8px;
-  left: 15px;
-  cursor: grab;
-  margin-right: 5px;
-}
-
-#undo-zoom {
-  position: absolute;
-  top: 8px;
-  left: 40px;
-}
-
-.layerCheckbox {
-  margin-left: 15px;
-  margin-top: 5px;
-  font-size: 1rem;
-}
-
-.popout-layer-box {
-  border-top: 1px solid #5d5d5d;
-  border-left: 1px solid #5d5d5d;
-  background: #e8e8e8;
-}
-
-#addLayers{
-  padding: 10px;
-  position: absolute;
-  z-index: 9001;
-  width: 100px;
-  top:130px;
-  left: -80px;
-  border-right: 1px solid #5d5d5d;
-  border-radius: .4rem .4rem 0 0;
-  text-align: center;
-  font-weight: bold;
-  transform: rotate(-90deg);
-}
-
-#layers-to-add {
-  position: absolute;
-  z-index: 9000;
-  width: 250px;
-  left: -251px;
-  height: 400px;
-  top: 39px;
-  border-bottom: 1px solid #5d5d5d;
-  border-radius: .4rem 0 0 .4rem;
-}
-
-#zoomBox {
-  position: fixed; 
-  display:none; 
-  height: 0px; 
-  width: 0px; 
-  background-color: #b6e2f0;
-  opacity: 50%;
-  border-radius: .2rem;
-  border: 1px solid #b6e2f0;
-}
-
-#legendOptions {
-  position: absolute;
-  padding: 10px;
-  top: 80px;
-  left: 200px;
-  width: 220px;
-  background: #e8e8e8;
-  border-radius: .2rem;
-  border: 1px solid darkgray;
-}
-
-.legendItem {
-  display: inline-block;
-  width: 100px;
-}
-
-.legendInput {
-  width: 150px;
-  margin-right: 10px;
-}
-
-.legendSelect {
-  width: 160px;
-  margin-right: 10px;
-}
-
-#timeSeriesChartContainer button {
-  background-color: transparent;
-  border: none;
-}
-
-#timeSeriesChart {
-  margin-left:10px;
-  cursor: pointer;
-}
-
-#add-threshold {
-  margin-top: 10px;
-}
 
 @media (max-width: 769px) {
   /* ===== Body-mobile block ===== */

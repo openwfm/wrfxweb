@@ -16,7 +16,7 @@ const TIMEOUT_MS = 80;
  * generate a timeseries.
  * 
  *          Contents
- *  1. Iintialization block
+ *  1. Initialization block
  *  2. DomainSwitch block
  *  3. AddAndRemoveLayers block
  *  4. TimeSeriesGeneration block
@@ -58,7 +58,6 @@ export class TimeSeriesController extends LayerController {
 
     initializeTimeSeriesButton() {
         const generateTimeSeriesCallback = async () => {
-        // this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
             this.loadingTimeSeries = true;
             let startDate = this.timeSeriesButton.getStartDate();
@@ -66,12 +65,12 @@ export class TimeSeriesController extends LayerController {
             let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
             document.body.classList.remove('waiting');
         }
-        this.timeSeriesButton.setGenerateLoader(generateTimeSeriesCallback);
+        simVars.generateTimeSeriesCallback = generateTimeSeriesCallback;
 
         const cancelTimeSeriesCallback = () => {
             this.loadingTimeSeries = false;
         }
-        this.timeSeriesButton.setCancelLoader(cancelTimeSeriesCallback);
+        simVars.cancelTimeSeriesCallback = cancelTimeSeriesCallback;
     }
 
     subscribeToMarkerController() {
@@ -163,7 +162,7 @@ export class TimeSeriesController extends LayerController {
 
         document.body.classList.add('waiting');
         let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        this.timeSeriesButton.setProgress(0);
+        controllers.timeSeriesProgress.setValue(0);
         this.framesLoaded = 0;
 
         let timestampsToLoad = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
@@ -252,7 +251,8 @@ export class TimeSeriesController extends LayerController {
             }
             dataEntry.dataset[timestamp] = colorbarValue;
             this.framesLoaded += 1;
-            this.timeSeriesButton.setProgress(this.framesLoaded/this.totalFramesToLoad);
+            let progress = this.framesLoaded / this.totalFramesToLoad;
+            controllers.timeSeriesProgress.setValue(progress);
         }
 
         return dataEntry;

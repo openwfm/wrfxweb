@@ -84,6 +84,8 @@ export const simVars = (function createSimVars() {
     },
     presets: presetVars,
     clientWidth: document.body.clientWidth,
+    generateTimeSeriesCallback: () => {},
+    cancelTimeSeriesCallback: () => {},
   });
 
   return simVars;
