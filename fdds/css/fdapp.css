@@ -33,11 +33,11 @@ h4 {
 }
 
 .feature-controller {
-    background:#e8e8e8;
-    color: #5d5d5d;
-    border: none;
-    border-radius: .4rem;
-    z-index: 8000;
+  background:#e8e8e8;
+  color: #5d5d5d;
+  border: none;
+  border-radius: .4rem;
+  z-index: 8000;
 }
 
 .mobile-button {
@@ -474,60 +474,60 @@ html, body {
 }
 
 #domain-selector-label {
-    padding: 10px 0px;
-    text-align: center;
+  padding: 10px 0px;
+  text-align: center;
 }
 
 #domain-checkboxes {
-    height: 20px;
-    padding: 0px 5px;
+  height: 20px;
+  padding: 0px 5px;
 }
 
 .domain-checkbox {
-    display: inline-block;
+  display: inline-block;
 }
 
 .domain-checkbox input {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .domain-checkbox label {
-    margin-left: 10px;
-    margin-right: 20px;
+  margin-left: 10px;
+  margin-right: 20px;
 }
 
 /* ===== LayerController block ===== */
 #layer-controller-container {
-    position: absolute;
-    right: 20px;
-    top: 5%;
-    width: 300px;
-    max-height: 85%;
-    background: white;
-    font-size: 1.15rem;
-    padding: 8px;
-    overflow-y: auto;
+  position: absolute;
+  right: 20px;
+  top: 5%;
+  width: 300px;
+  max-height: 85%;
+  background: white;
+  font-size: 1.15rem;
+  padding: 8px;
+  overflow-y: auto;
 }
 
 #layers-button {
-    left: 70px;
+  left: 70px;
 }
 
 .layer-list {
-    margin-left: 50px;
+  margin-left: 50px;
 }
 
 /* ===== TimeSeriesButton block ===== */ 
 .timeSeriesButton {
-    border-radius: .2rem;
-    padding: 5px;
-    margin-bottom: 5px;
-    background: #b6e2f0;
-    text-align: center;
-    color: #6a6a6a;
-    font-weight: bold;
-    width: 100%;
-    border: none;
+  border-radius: .2rem;
+  padding: 5px;
+  margin-bottom: 5px;
+  background: #b6e2f0;
+  text-align: center;
+  color: #6a6a6a;
+  font-weight: bold;
+  width: 100%;
+  border: none;
 }
 
 .timeSeriesButton:disabled {
@@ -535,26 +535,26 @@ html, body {
 }
 
 .timeSeriesButton:hover:not([disabled]) {
-    cursor: pointer;
-    background: #e5e5e5;
+  cursor: pointer;
+  background: #e5e5e5;
 }
 
 .timeseries-select {
-    display: inline-block;
-    width: 55%;
-    margin-bottom: 2px;
+  display: inline-block;
+  width: 55%;
+  margin-bottom: 2px;
 }
 
 .timeseries-select-label {
-    display: inline-block;
-    width: 40%;
+  display: inline-block;
+  width: 40%;
 }
 
 /* ===== TimeSeriesMarker block ===== */
 .hideMenu {
-    position: absolute;
-    top: 3px;
-    left: 20px;
+  position: absolute;
+  top: 3px;
+  left: 20px;
 }
 
 /* ===== TimeSeriesChart block ===== */
@@ -855,15 +855,13 @@ html, body {
 }
 
 #progressBar {
-    border-radius: .2rem;
-    margin-top: 5px;
-    background: black;
-    height: 10px;
-    width: 100%;
-    border: none;
+  border-radius: .2rem;
+  margin-top: 5px;
+  background: black;
+  height: 10px;
+  width: 100%;
+  border: none;
 }
-
-
 
 @media (max-width: 769px) {
   /* ===== Body-mobile block ===== */
@@ -922,44 +920,44 @@ html, body {
   /* ===== CatalogMenu-mobile block ===== */
   /* button style */
   .catalog-button > div:nth-child(2) {
-      visibility: hidden;
+    visibility: hidden;
   }
 
   .catalog-button {
-      width: 40px;
+    width: 40px;
   }
 
   #catalog-menu-icon-container {
-      border-radius: .4rem;
-      background:#e8e8e8;
+    border-radius: .4rem;
+    background:#e8e8e8;
   }
 
   /* menu style */
   .catalog-menu {
-      width: 300px;
-      top: 85px;
+    width: 300px;
+    top: 85px;
   }
 
   .search-header {
-      grid-template-columns: 1fr 1fr;
-      grid-row-gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 10px;
   }
 
   .menu-columns {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
 
   .column-header {
-      display: none;
+    display: none;
   }
 
   #mobile-selector {
-      display: inline-block;
-      height: 30px;
+    display: inline-block;
+    height: 30px;
   }
 
   .column {
-      width: 250px;
+    width: 250px;
   }
 
   /* ===== LayerController-mobile block ===== */
@@ -976,7 +974,7 @@ html, body {
 }
 
   #infoButton {
-      left: 230px;
+    left: 230px;
   }
 
   /* ===== SimulationController-mobile block ===== */
@@ -985,23 +983,23 @@ html, body {
   }
 
   #slider-timestamp {
-      display: flex;
-      justify-content: space-around;
+    display: flex;
+    justify-content: space-around;
   }
 
   #slider-play-bar {
-      display: flex;
-      padding-left: 10px;
-      padding-right: 10px;
-      justify-content: space-between;
+    display: flex;
+    padding-left: 10px;
+    padding-right: 10px;
+    justify-content: space-between;
   }
 
   #slider-header {
-      height:60px;
+    height:60px;
   }
 
   .slider-container button:hover:not([disabled]) {
-      background: #d6d6d6;
+    background: #d6d6d6;
   }
 
   /* ===== Slider-mobile block ===== */

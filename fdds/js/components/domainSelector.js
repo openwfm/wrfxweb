@@ -102,7 +102,6 @@ export class DomainSelector extends HTMLElement {
             this.querySelector('#domain-selector').classList.remove('hidden');
         }
         this.querySelector('#domain-selector-button').classList.remove('hidden');
-        document.querySelector('#layers-button').classList.remove('hidden');
     }
 
     /** ===== GetPresets block ===== */
