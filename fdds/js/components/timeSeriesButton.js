@@ -55,12 +55,8 @@ export class TimeSeriesButton extends HTMLElement {
         this.initializeEndDateSelector();
 
         this.subscribeToTimeSeriesProgress();
+        this.subscribeToDataType();
 
-        const dataTypeSelector = this.querySelector('#dataType');
-        dataTypeSelector.addEventListener('change', () => {
-            let dataType = dataTypeSelector.value;
-            controllers.timeSeriesDataType.setValue(dataType);
-        });
         this.updateTimestamps();
     }
 
@@ -86,11 +82,18 @@ export class TimeSeriesButton extends HTMLElement {
         const endDate = this.querySelector('#endDate');
         startDate.addEventListener('change', () => {
             let simulationStartDate = controllers.startDate.getValue();
-            if (startDate.value < simulationStartDate) {
-                controllers.startDate.setValue(startDate.value);
+            let startValue = startDate.value;
+            if (startValue < simulationStartDate) {
+                controllers.startDate.setValue(startValue);
                 controllers.startDate.broadcastEvent(controllerEvents.VALUE_SET)
             }
             linkSelects(startDate, endDate);
+            controllers.timeSeriesStart.setValue(startValue);
+        });
+
+        controllers.timeSeriesStart.subscribe(() => {
+            let startValue = controllers.timeSeriesStart.getValue();
+            startDate.value = startValue;
         });
     }
 
@@ -112,6 +115,19 @@ export class TimeSeriesButton extends HTMLElement {
             let progress = controllers.timeSeriesProgress.getValue();
             this.setProgress(progress);
         });
+    }
+
+    subscribeToDataType() {
+        const dataTypeSelector = this.querySelector('#dataType');
+        dataTypeSelector.addEventListener('change', () => {
+            let dataType = dataTypeSelector.value;
+            controllers.timeSeriesDataType.setValue(dataType);
+        });
+        controllers.timeSeriesDataType.subscribe(() => { 
+            let dataType = controllers.timeSeriesDataType.getValue();
+            dataTypeSelector.value = dataType;
+        });
+        dataTypeSelector.value = controllers.timeSeriesDataType.getValue();
     }
 
     /** ===== Getters block ===== */
@@ -146,8 +162,8 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        startDate.value = controllers.startDate.getValue();
-        endDate.value = controllers.endDate.getValue();
+        startDate.value = controllers.timeSeriesStart.getValue();
+        endDate.value = controllers.timeSeriesEnd.getValue();
     }
 
     setProgress(progress) {
