@@ -4,6 +4,7 @@ import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { Marker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
+import { doubleClick } from '../util.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;
@@ -15,7 +16,7 @@ const TIMEOUT_MS = 80;
  * generate a timeseries.
  * 
  *          Contents
- *  1. Iintialization block
+ *  1. Initialization block
  *  2. DomainSwitch block
  *  3. AddAndRemoveLayers block
  *  4. TimeSeriesGeneration block
@@ -57,7 +58,6 @@ export class TimeSeriesController extends LayerController {
 
     initializeTimeSeriesButton() {
         const generateTimeSeriesCallback = async () => {
-        // this.timeSeriesButton.getButton().onclick = async () => {
             document.body.classList.add('waiting');
             this.loadingTimeSeries = true;
             let startDate = this.timeSeriesButton.getStartDate();
@@ -65,12 +65,12 @@ export class TimeSeriesController extends LayerController {
             let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
             document.body.classList.remove('waiting');
         }
-        this.timeSeriesButton.setGenerateLoader(generateTimeSeriesCallback);
+        simVars.generateTimeSeriesCallback = generateTimeSeriesCallback;
 
         const cancelTimeSeriesCallback = () => {
             this.loadingTimeSeries = false;
         }
-        this.timeSeriesButton.setCancelLoader(cancelTimeSeriesCallback);
+        simVars.cancelTimeSeriesCallback = cancelTimeSeriesCallback;
     }
 
     subscribeToMarkerController() {
@@ -120,7 +120,7 @@ export class TimeSeriesController extends LayerController {
         let layer = this.getLayer(currentDomain, layerName);
         let img = layer.imageOverlay._image;
         if (layer.hasColorbar) {
-            img.ondblclick = (e) => {
+            let doubleClickCallback = (e) => {
                 let latLon = map.mouseEventToLatLng(e);
                 e.stopPropagation(); // needed because otherwise immediately closes the popup
                 let xCoord = e.offsetX / img.width;
@@ -128,6 +128,7 @@ export class TimeSeriesController extends LayerController {
                 this.createNewMarker(latLon, xCoord, yCoord);
                 this.timeSeriesButton.getButton().disabled = false;
             }
+            doubleClick(img, doubleClickCallback);
             let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
             if (timeSeriesMarkers.length > 0) {
                 this.timeSeriesButton.getButton().disabled = false;
@@ -161,7 +162,7 @@ export class TimeSeriesController extends LayerController {
 
         document.body.classList.add('waiting');
         let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        this.timeSeriesButton.setProgress(0);
+        controllers.timeSeriesProgress.setValue(0);
         this.framesLoaded = 0;
 
         let timestampsToLoad = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
@@ -250,7 +251,8 @@ export class TimeSeriesController extends LayerController {
             }
             dataEntry.dataset[timestamp] = colorbarValue;
             this.framesLoaded += 1;
-            this.timeSeriesButton.setProgress(this.framesLoaded/this.totalFramesToLoad);
+            let progress = this.framesLoaded / this.totalFramesToLoad;
+            controllers.timeSeriesProgress.setValue(progress);
         }
 
         return dataEntry;

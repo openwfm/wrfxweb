@@ -56,8 +56,9 @@ export class SimulationLayer {
         this.imageOverlay.setOpacity(opacity);
         if (this.hasColorbar) {
             let cbURL = simVars.rasterBase + rasterInfo.colorbar;
-            simVars.setColorbarURL(cbURL);
-            simVars.showColorbar();
+            controllers.colorbarURL.setValue(cbURL);
+            // simVars.setColorbarURL(cbURL);
+            // simVars.showColorbar();
             simVars.displayedColorbar = this.layerName;
         }
     }
@@ -123,7 +124,8 @@ export class SimulationLayer {
         if (this.layerName == simVars.displayedColorbar) {
             let colorbarURL = this.getColorbarURLAtTimestamp(timestamp);
             if (colorbarURL != null) {
-                simVars.setColorbarURL(colorbarURL);
+                controllers.colorbarURL.setValue(colorbarURL);
+                // simVars.setColorbarURL(colorbarURL);
             }
         }
     }

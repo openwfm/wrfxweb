@@ -1,4 +1,4 @@
-import { dragElement, setURL, buildCheckBox } from '../util.js';
+import { dragElement, setURL, buildCheckBox, IS_MOBILE } from '../util.js';
 import { controllerEvents, controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
@@ -24,7 +24,7 @@ export class LayerController extends HTMLElement {
         super();
         this.innerHTML = `
             <div id='layer-controller-mobile-wrapper'>
-                <div id='layers-button' class='mobile-button feature-controller hidden'>
+                <div id='layers-button' class='mobile-button feature-controller'>
                     layers
                 </div>
                 <div id='layer-controller-wrapper' class='hidden'>
@@ -83,8 +83,10 @@ export class LayerController extends HTMLElement {
         layersButton.onpointerdown = (e) => {
             const layersSelector = document.querySelector('#layer-controller-container');
             if (layersSelector.classList.contains('hidden')) {
-                document.querySelector('.catalog-menu').classList.add('hidden');
-                document.querySelector('#domain-selector').classList.add('hidden');
+                if (IS_MOBILE) {
+                    document.querySelector('.catalog-menu').classList.add('hidden');
+                    document.querySelector('#domain-selector').classList.add('hidden');
+                }
                 layersSelector.classList.remove('hidden');
             } else {
                 layersSelector.classList.add('hidden');
@@ -136,7 +138,7 @@ export class LayerController extends HTMLElement {
     createOpacitySlider() {
         const opacitySliderContainer = this.querySelector('#opacity-slider-container');
 
-        const opacitySlider = new OpacitySlider();
+        const opacitySlider = new OpacitySlider(null, controllers.opacity);
         opacitySliderContainer.appendChild(opacitySlider);
     }
 
@@ -191,7 +193,7 @@ export class LayerController extends HTMLElement {
             delete this.activeLayers[currentlyAddedLayerName];
         }
         simVars.displayedColorbar = null;
-        simVars.hideColorbar();
+        controllers.colorbarURL.setValue(null);
     }
 
     resetLayerController() {

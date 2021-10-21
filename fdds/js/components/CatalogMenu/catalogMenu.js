@@ -1,4 +1,4 @@
-import { dragElement, utcToLocal } from '../../util.js';
+import { CLIENT_WIDTH, dragElement, IS_MOBILE, utcToLocal } from '../../util.js';
 import { getCatalogEntries } from '../../services.js';
 import { CatalogItem } from './catalogItem.js';
 import { controllerEvents, controllers } from '../Controller.js';
@@ -115,17 +115,16 @@ export class CatalogMenu extends HTMLElement {
     }
 
     responsiveUI() {
-        const clientWidth = document.body.clientWidth;
 
         const catalogMenu = this.querySelector('.catalog-menu');
         const reverseLabel = this.querySelector('#reverse-label');
         const menuSearch = this.querySelector('#search-for');
 
-        reverseLabel.innerText = (clientWidth < 769) ? 'Reverse' : 'Reverse Order';
-        catalogMenu.style.right = ((clientWidth - catalogMenu.clientWidth)/ 2) + 'px';
-        let searchDescription = (clientWidth < 769) ? 'Search...' : 'Search for Simulation...';
+        reverseLabel.innerText = IS_MOBILE ? 'Reverse' : 'Reverse Order';
+        catalogMenu.style.right = ((CLIENT_WIDTH - catalogMenu.clientWidth)/ 2) + 'px';
+        let searchDescription = IS_MOBILE ? 'Search...' : 'Search for Simulation...';
         menuSearch.placeholder = searchDescription;
-        if (clientWidth < 769) {
+        if (IS_MOBILE) {
             this.selectCategory('Fires');
         } else {
             const firesListDOM = this.querySelector('#fires-column');

@@ -4,16 +4,20 @@ import { map } from './map.js';
 
 /** Utility functions that can be imported and used in components from anywhere. 
  * 
- *      Contents
- * 1. SetURL block
- * 2. ChangeSimulation block
- * 3. Debounce block
- * 4. TimeConversion block
- * 5. CreateDomElements block
- * 6. Color block
- * 7. Drag Elements block
+ *        Contents
+ *    - Constants block
+ *    - SetURL block
+ *    - Debounce block
+ *    - TimeConversion block
+ *    - CreateDomElements block
+ *    - Color block
+ *    - Drag Elements block
  * 
  */
+
+/** ===== Constants block */
+export const CLIENT_WIDTH = document.body.clientWidth;
+export const IS_MOBILE = CLIENT_WIDTH < 769; 
 
 /** ===== SetURL block ===== */
 export function setURL() {
@@ -288,12 +292,41 @@ export function darkenHex(hex) {
 }
 
 /** ===== DragElements block ===== */
+/** A custom double click implementation needed to handle double clicking on ios. */
+export function doubleClick(elmnt, doubleClickFunction) {
+  const DOUBLE_CLICK_MS = 200;
+  const MAX_DOUBLE_CLICK_DIST = 30;
+  let timeout = null;
+  let previousE;
+  elmnt.addEventListener('pointerdown', (e) => {
+    if (timeout != null) {
+      let xDiff = Math.abs(e.clientX - previousE.clientX);
+      let yDiff = Math.abs(e.clientY - previousE.clientY);
+      if ((xDiff + yDiff) > MAX_DOUBLE_CLICK_DIST) {
+        timeout = null;
+        previousE = null;
+        return;
+      }
+      e.stopPropagation();
+      clearTimeout(timeout);
+      timeout = null;
+      previousE = null;
+      doubleClickFunction(e);
+    } else {
+      previousE = e;
+      timeout = setTimeout(() => {
+        timeout = null;
+      }, DOUBLE_CLICK_MS);
+    }
+  });
+}
+
 /** Makes given element draggable from sub element with id 'subID' */
-export function dragElement(elmnt, subID) {
+export function dragElement(elmnt, subID='', mobileEnabled=false) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   let elmntLeft = 0, elmntTop = 0;
   let clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
-  if (clientWidth < 769) {
+  if (IS_MOBILE && !mobileEnabled) {
     return;
   }
   let draggableElement = document.getElementById(elmnt.id);
@@ -301,7 +334,8 @@ export function dragElement(elmnt, subID) {
     draggableElement = document.getElementById(subID);
   }
   // document.getElementById(elmnt.id + subID).onpointerdown = dragMouseDown;
-  draggableElement.onpointerdown = dragMouseDown;
+  // draggableElement.onpointerdown = dragMouseDown;
+  draggableElement.addEventListener('pointerdown', dragMouseDown);
   window.addEventListener('resize', () => {
     let offsetLeft = clientWidth - document.body.clientWidth;
     if (elmntLeft != 0 && elmnt.offsetLeft + (elmnt.clientWidth / 2) > (document.body.clientWidth / 2) && (elmntLeft - offsetLeft) > 0) {

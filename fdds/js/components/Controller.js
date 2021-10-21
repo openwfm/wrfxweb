@@ -150,4 +150,6 @@ export const controllers = {
 
         return endDateController;
     })(),
+    colorbarURL: new Controller(''),
+    timeSeriesProgress: new Controller(0),
 };

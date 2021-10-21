@@ -83,7 +83,10 @@ export const simVars = (function createSimVars() {
       'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
     },
-    presets: presetVars
+    presets: presetVars,
+    clientWidth: document.body.clientWidth,
+    generateTimeSeriesCallback: () => {},
+    cancelTimeSeriesCallback: () => {},
   });
 
   return simVars;

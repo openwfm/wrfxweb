@@ -1,5 +1,5 @@
 import { createOption, linkSelects } from '../util.js';
-import { controllers } from './Controller.js';
+import { controllers, controllerEvents } from './Controller.js';
 import { simVars } from '../simVars.js';
 
 /**      Contents 
@@ -44,18 +44,31 @@ export class TimeSeriesButton extends HTMLElement {
             </div>
         `;
         this.querySelector('#dataType').value = dataType;
-        this.generateLoader = null;
-        this.cancelLoader = null;
         this.loading = false;
     }
 
     connectedCallback() {
         this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
 
+        this.initializeTimeSeriesButton();
+        this.initializeStartDateSelector();
+        this.initializeEndDateSelector();
+
+        this.subscribeToTimeSeriesProgress();
+
+        const dataTypeSelector = this.querySelector('#dataType');
+        dataTypeSelector.addEventListener('change', () => {
+            let dataType = dataTypeSelector.value;
+            controllers.timeSeriesDataType.setValue(dataType);
+        });
+        this.updateTimestamps();
+    }
+
+    initializeTimeSeriesButton() {
         const timeSeriesButton = this.querySelector('#timeSeriesButton');
         timeSeriesButton.onpointerdown = () => {
             if (this.loading) {
-                this.cancelLoader();
+                simVars.cancelTimeSeriesCallback();
                 this.setProgress(1);
                 this.loading = false;
             } else {
@@ -63,17 +76,9 @@ export class TimeSeriesButton extends HTMLElement {
                 this.setProgress(0);
                 this.querySelector('#generate-button-label').classList.add('hidden');
                 this.querySelector('#cancel-button-label').classList.remove('hidden');
-                this.generateLoader();
+                simVars.generateTimeSeriesCallback();
             }
         }
-        this.initializeStartDateSelector();
-        this.initializeEndDateSelector();
-
-        const dataTypeSelector = this.querySelector('#dataType');
-        dataTypeSelector.addEventListener('change', () => {
-            let dataType = dataTypeSelector.value;
-            controllers.timeSeriesDataType.setValue(dataType);
-        });
     }
 
     initializeStartDateSelector() {
@@ -83,6 +88,7 @@ export class TimeSeriesButton extends HTMLElement {
             let simulationStartDate = controllers.startDate.getValue();
             if (startDate.value < simulationStartDate) {
                 controllers.startDate.setValue(startDate.value);
+                controllers.startDate.broadcastEvent(controllerEvents.VALUE_SET)
             }
             linkSelects(startDate, endDate);
         });
@@ -95,8 +101,16 @@ export class TimeSeriesButton extends HTMLElement {
             let simulationEndDate = controllers.endDate.getValue();
             if (endDate.value > simulationEndDate) {
                 controllers.endDate.setValue(endDate.value);
+                controllers.endDate.broadcastEvent(controllerEvents.VALUE_SET)
             }
             linkSelects(startDate, endDate);
+        });
+    }
+
+    subscribeToTimeSeriesProgress() {
+        controllers.timeSeriesProgress.subscribe(() => {
+            let progress = controllers.timeSeriesProgress.getValue();
+            this.setProgress(progress);
         });
     }
 
@@ -132,7 +146,6 @@ export class TimeSeriesButton extends HTMLElement {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        // endDate.value = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
         startDate.value = controllers.startDate.getValue();
         endDate.value = controllers.endDate.getValue();
     }
@@ -187,14 +200,6 @@ export class TimeSeriesButton extends HTMLElement {
         endDate.value = newEndDate;
 
         linkSelects(startDate, endDate);
-    }
-
-    setGenerateLoader(loader) {
-        this.generateLoader = loader;
-    }
-
-    setCancelLoader(cancelLoader) {
-        this.cancelLoader = cancelLoader;
     }
 }
 
