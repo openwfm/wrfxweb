@@ -151,5 +151,9 @@ export const controllers = {
         return endDateController;
     })(),
     colorbarURL: new Controller(''),
+    // TimeseriesControllers
+    timeSeriesDataType: new Controller('continuous'),
     timeSeriesProgress: new Controller(0),
+    timeSeriesStart: new Controller(''),
+    timeSeriesEnd: new Controller(''),
 };

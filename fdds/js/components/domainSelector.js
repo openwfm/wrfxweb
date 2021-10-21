@@ -145,6 +145,7 @@ export class DomainSelector extends HTMLElement {
             }
         }
         controllers.startDate.setValue(startDate, controllerEvents.QUIET);
+        controllers.timeSeriesStart.setValue(startDate, controllerEvents.QUIET);
     }
 
     presetEndDate(nextTimestamps) {
@@ -155,6 +156,7 @@ export class DomainSelector extends HTMLElement {
         }
         simVars.presets.endDate = null;
         controllers.endDate.setValue(endDate, controllerEvents.QUIET);
+        controllers.timeSeriesEnd.setValue(endDate, controllerEvents.QUIET);
     }
 
     presetCurrentTimestamp(nextTimestamps) {
@@ -201,12 +203,14 @@ export class DomainSelector extends HTMLElement {
         let startDate = controllers.startDate.getValue();
         startDate = this.convertPrevTimestampToCurrentTimestamp(startDate, prevTimestamps);
         controllers.startDate.setValue(startDate, controllerEvents.QUIET);
+        controllers.timeSeriesStart.setValue(startDate);
     }
 
     updateEndDate(prevTimestamps) {
         let endDate = controllers.endDate.getValue();
         endDate = this.convertPrevTimestampToCurrentTimestamp(endDate, prevTimestamps);
         controllers.endDate.setValue(endDate, controllerEvents.QUIET);
+        controllers.timeSeriesEnd.setValue(endDate);
     }
 
     updateCurrentTimestamp(prevTimestamps) {
