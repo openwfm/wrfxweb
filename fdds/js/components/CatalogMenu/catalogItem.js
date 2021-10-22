@@ -75,7 +75,6 @@ export class CatalogItem extends HTMLElement {
 
         if (controllers.addSimulation.getValue()) {
             if (!controllers.addedSimulations.getValue().includes(description)) {
-                // controllers.addedSimulations.add(description);
                 controllers.addSimulation.setValue(false, controllerEvents.setFalse);
                 this.updateCurrentSimulation(entryID, description);
                 this.hideCatalogMenu();
@@ -84,8 +83,7 @@ export class CatalogItem extends HTMLElement {
             return;
         }
         
-        // controllers.addedSimulations.setValue([]);
-        // controllers.addedSimulations.add(description);
+        controllers.addedSimulations.setValue([]);
 
         this.updateCurrentSimulation(entryID, description);
         this.hideCatalogMenu();

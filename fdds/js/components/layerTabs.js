@@ -98,6 +98,14 @@ export class LayerTabs extends HTMLElement {
         this.activeTab = newTab;
     }
 
+    show() {
+        this.classList.remove('hidden');
+    }
+
+    hide() {
+        this.classList.add('hidden');
+    }
+
 }
 
 window.customElements.define('layer-tabs', LayerTabs);

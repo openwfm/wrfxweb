@@ -28,6 +28,9 @@ export class LayerController extends HTMLElement {
                     layers
                 </div>
                 <div id='layer-controller-wrapper' class='hidden'>
+                    <div id='layers-button-desktop' class='feature-controller desktop-feature'>
+                        layers
+                    </div>
                     <div id='layer-controller-container' class='feature-controller'>
                         <div id='base-maps'>
                             <h4>Base Maps</h4>
@@ -60,9 +63,10 @@ export class LayerController extends HTMLElement {
 
     connectedCallback() {
         const layerController = this.querySelector('#layer-controller-wrapper');
-        dragElement(layerController, '');
-        L.DomEvent.disableClickPropagation(layerController);
-        L.DomEvent.disableScrollPropagation(layerController);
+        const layerControllerContainer = this.querySelector('#layer-controller-container');
+        dragElement(layerController, 'layer-controller-container');
+        L.DomEvent.disableClickPropagation(layerControllerContainer);
+        L.DomEvent.disableScrollPropagation(layerControllerContainer);
 
         this.initializeLayerButton();
 
@@ -78,15 +82,25 @@ export class LayerController extends HTMLElement {
 
     initializeLayerButton() {
         const layersButton = this.querySelector('#layers-button');
+        const layersSelector = this.querySelector('#layer-controller-container');
+        const desktopLayersButton = this.querySelector('#layers-button-desktop');
 
         L.DomEvent.disableClickPropagation(layersButton);
         layersButton.onpointerdown = (e) => {
-            const layersSelector = document.querySelector('#layer-controller-container');
             if (layersSelector.classList.contains('hidden')) {
                 if (IS_MOBILE) {
                     document.querySelector('.catalog-menu').classList.add('hidden');
                     document.querySelector('#domain-selector').classList.add('hidden');
                 }
+                layersSelector.classList.remove('hidden');
+            } else {
+                layersSelector.classList.add('hidden');
+            }
+        }
+
+        L.DomEvent.disableClickPropagation(desktopLayersButton);
+        desktopLayersButton.onpointerdown = () => {
+            if(layersSelector.classList.contains('hidden')) {
                 layersSelector.classList.remove('hidden');
             } else {
                 layersSelector.classList.add('hidden');

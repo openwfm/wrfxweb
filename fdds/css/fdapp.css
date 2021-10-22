@@ -19,12 +19,18 @@
 */
 
 /* ===== Body block ===== */
-html, body {
-  height: 100vh;
+html {
+  margin-top:0;
+  height: 100%;
+  overflow-y: hidden;
 }
 
 h4 {
   margin: 0;
+}
+
+body { 
+  font-family: helvetica;
 }
 
 .feature-controller {
@@ -49,10 +55,10 @@ h4 {
 }
 
 .svgIcon {
-    margin: 0;
-    padding: 0;
-    height: 24px;
-    width: 24px;
+  margin: 0;
+  padding: 0;
+  height: 24px;
+  width: 24px;
 }
 
 .splash {
@@ -127,7 +133,6 @@ body.grabbing * {cursor: grabbing !important;}
   width: 500px;
   margin-left: auto;
   margin-right: auto;
-
 }
 
 #map-patch-springs {
@@ -147,10 +152,6 @@ div.control-column {
   max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
-}
-
-html, body {
-  height: 100vh;
 }
 
 #copyLink {
@@ -226,7 +227,7 @@ html, body {
   padding: 5px;
   z-index: 1999;
   left: 60px;
-  bottom: 103px;
+  bottom: 108px;
   width: 150px;
   height: 350px;
   background-color: rgba(255, 255, 255, 1);
@@ -493,37 +494,44 @@ html, body {
 
 /* ===== LayerController ===== */
 #layer-controller-container {
-    position: absolute;
-    right: 0px;
-    /* top: 30px; */
-    width: 300px;
-    max-height: 100%;
-    background: white;
-    font-size: 1.15rem;
-    padding: 8px;
-    overflow-y: auto;
+  position: absolute;
+  right: 0px;
+  /* top: 30px; */
+  width: 300px;
+  max-height: 100%;
+  background: white;
+  font-size: 1.15rem;
+  padding: 8px;
+  overflow-y: auto;
 }
 
 #layer-controller-wrapper {
   position: absolute;
   right: 20px;
-  top: 5%;
+  top: 8%;
   height: 85%;
   width: 316px;
 }
 
-
 #layer-controller-container.multi-layer {
   z-index: 9000;
-  /* border-radius: 0px 4px 4px 4px; */
 }
 
 #layers-button {
-    left: 70px;
+  left: 70px;
 }
 
 .layer-list {
-    margin-left: 50px;
+  margin-left: 50px;
+}
+
+#layers-button-desktop {
+  position: absolute;
+  top: -33px;
+  right: 20px;
+  font-size: 1.2rem;
+  padding: 5px 15px;
+  font-weight: bold;
 }
 
 /* ====== MultiLayerController ====== */
@@ -532,7 +540,7 @@ html, body {
   width: 400px;
   height: 30px;
   right: 131px;
-  top: 200px;
+  top: 220px;
   z-index: 9000;
   transform: rotate(-90deg);
 }
@@ -577,7 +585,6 @@ html, body {
 #add-simulation.tab {
   width: 60px;
 }
-
 
 /* ===== TimeSeriesButton block ===== */ 
 .timeSeriesButton {
@@ -969,6 +976,10 @@ html, body {
 
   .mobile-button {
     display: block;
+  }
+
+  .desktop-feature {
+    display: none;
   }
 
   /* ===== ColorbarPanel-mobile block ===== */
