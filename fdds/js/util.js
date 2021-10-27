@@ -31,14 +31,14 @@ export function setURL() {
     }
   }
 
-  zoomToURL(addData);
-  panToURL(addData);
+  addedLayersToURL(addData);
   jobIdToURL(addData);
   domainToURL(addData);
+  timestampToURL(addData);
   startDateToURL(addData);
   endDateToURL(addData);
-  timestampToURL(addData);
-  addedLayersToURL(addData);
+  zoomToURL(addData);
+  panToURL(addData);
   opacityToURL(addData);
 
   if (urlVars != '') {

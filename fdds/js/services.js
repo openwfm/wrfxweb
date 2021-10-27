@@ -55,6 +55,8 @@ export function getSimulation(path) {
             rasterBase: rasterBase,
             rasters: selectedSimulation,
             addedLayers: [],
+            overlayDict: {},
+            rasterDict: {},
         };
 
         controllers.addedSimulations.add(simVars.currentDescription);

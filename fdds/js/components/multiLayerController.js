@@ -42,9 +42,13 @@ export class MultiLayerController extends TimeSeriesController {
 
     resetLayerController() {
         this.simInfo = simVars.simInfos[simVars.currentDescription];
+
         let multipleSimsAreActive = controllers.addedSimulations.getValue().length > 1;
         if (multipleSimsAreActive) {
             simVars.overlayOrder = this.simInfo.addedLayers;
+            let startDate = controllers.startDate.value;
+            let endDate = controllers.endDate.value;
+            this.loadWithPriority(startDate, endDate, simVars.overlayOrder);
         } else {
             super.resetLayerController();
         }
@@ -53,7 +57,18 @@ export class MultiLayerController extends TimeSeriesController {
     addLayerToMap(layerName) {
         super.addLayerToMap(layerName);
 
-        this.simInfo.addedLayers.push(layerName);
+        if (!this.simInfo.addedLayers.includes(layerName)) {
+            this.simInfo.addedLayers.push(layerName);
+        }
+    }
+    
+    removeLayerFromMap(layerName) {
+        super.removeLayerFromMap(layerName);
+
+        if (this.simInfo.addedLayers.includes(layerName)) {
+            let index = this.simInfo.addedLayers.indexOf(layerName);
+            this.simInfo.addedLayers.splice(index, 1);
+        }
     }
 }
 
