@@ -13,11 +13,12 @@ import { utcToLocal } from '../util.js';
 */
 export class SimulationLayer {
     /** ===== Initialization block ===== */
-    constructor(layerName, domain, rasterInfo) {
+    constructor(layerName, domain, rasterInfo, simDescription) {
         let cs = rasterInfo.coords;
         let layerURL = simVars.rasterBase + rasterInfo.raster;
         let hasColorbar = ('colorbar' in rasterInfo);
 
+        this.simDescription = simDescription;
         this.layerName = layerName;
         this.domain = domain;
         this.hasColorbar = hasColorbar;

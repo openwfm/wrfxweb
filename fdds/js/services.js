@@ -54,6 +54,7 @@ export function getSimulation(path) {
             domainInstance: domainInstances,
             rasterBase: rasterBase,
             rasters: selectedSimulation,
+            addedLayers: [],
         };
 
         controllers.addedSimulations.add(simVars.currentDescription);

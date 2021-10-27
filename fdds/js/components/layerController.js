@@ -244,7 +244,7 @@ export class LayerController extends HTMLElement {
         this.initDomainToLayerDictionary(currentDomain, this.rasterDict);
         this.initDomainToLayerDictionary(currentDomain, this.overlayDict);
         let firstRasters = simVars.rasters[currentDomain][timestamp];
-        this.makeLayersForDomainAndRasters(currentDomain, firstRasters);
+        this.makeLayers(currentDomain, firstRasters);
 
         let previouslyAddedLayerNames = simVars.overlayOrder.filter(overlay => {
             return (overlay in this.overlayDict[currentDomain]) || (overlay in this.rasterDict[currentDomain]);
@@ -264,12 +264,12 @@ export class LayerController extends HTMLElement {
         }
     }
 
-    makeLayersForDomainAndRasters(domain, rasters) {
+    makeLayers(domain, rasters) {
         for (let layerName in rasters) {
             let rasterInfo = rasters[layerName];
             let layer = this.getLayer(domain, layerName);
             if (layer == null) {
-                layer = new SimulationLayer(layerName, domain, rasterInfo);
+                layer = new SimulationLayer(layerName, domain, rasterInfo, simVars.currentDescription);
                 if(simVars.overlayList.indexOf(layerName) >= 0) {
                     this.overlayDict[domain][layerName] = layer;
                 } else {

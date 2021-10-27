@@ -1,3 +1,5 @@
+import { simVars } from '../simVars.js';
+import { controllers } from './Controller.js';
 import { LayerTabs } from './layerTabs.js';
 import { TimeSeriesController } from './timeSeriesController.js';
 
@@ -10,6 +12,7 @@ export class MultiLayerController extends TimeSeriesController {
         layerController.classList.add('multi-layer');
         layerControllerWrapper.insertBefore(layerTabs, layerControllerWrapper.firstChild);
         this.layerTabs = layerTabs;
+        this.simInfo = {};
     }
 
     connectedCallback() {
@@ -35,6 +38,22 @@ export class MultiLayerController extends TimeSeriesController {
                 this.layerTabs.hide();
             }
         });
+    }
+
+    resetLayerController() {
+        this.simInfo = simVars.simInfos[simVars.currentDescription];
+        let multipleSimsAreActive = controllers.addedSimulations.getValue().length > 1;
+        if (multipleSimsAreActive) {
+            simVars.overlayOrder = this.simInfo.addedLayers;
+        } else {
+            super.resetLayerController();
+        }
+    }
+    
+    addLayerToMap(layerName) {
+        super.addLayerToMap(layerName);
+
+        this.simInfo.addedLayers.push(layerName);
     }
 }
 
