@@ -35,7 +35,7 @@ export class ColorbarPanel extends HTMLElement {
         const colorbarImg = this.querySelector('#raster-colorbar');
         controllers.colorbarURL.subscribe(() => {
             let colorbarURL = controllers.colorbarURL.getValue();
-            if (colorbarURL == null) {
+            if (colorbarURL == null || colorbarURL == '') {
                 this.hidePanel();
             } else {
                 this.showPanel();
