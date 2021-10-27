@@ -32,18 +32,6 @@ export const simVars = (function createSimVars() {
     rasters: [],
     rasterBase: '',
     sortedTimestamps: [],
-    showColorbar: () => {
-      const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
-      rasterColorbarContainer.classList.remove('hidden');
-    },
-    hideColorbar: () => {
-      const rasterColorbarContainer = document.querySelector('#raster-colorbar-bg');
-      rasterColorbarContainer.classList.add('hidden');
-    },
-    setColorbarURL: (url) => {
-      const rasterColorbar = document.querySelector('#raster-colorbar');
-      rasterColorbar.src = url;
-    },
     noLevels: (function makeNoLevels() {
       const noLevels = new Set();
       const makeKey = (layerName, domain, timestamp) => {

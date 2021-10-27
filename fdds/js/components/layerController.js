@@ -390,7 +390,7 @@ export class LayerController extends HTMLElement {
             lastLayer.setOpacity(topOpacity);
         }
 
-        this.bringMostRecentLayerWithColorbarToFront();
+        this.bringMostRecentColorbarLayerToFront();
 
         let startDate = controllers.currentTimestamp.getValue();
         let endDate = simVars.sortedTimestamps[simVars.sortedTimestamps.length - 1];
@@ -399,7 +399,7 @@ export class LayerController extends HTMLElement {
         setURL();
     }
 
-    bringMostRecentLayerWithColorbarToFront() {
+    bringMostRecentColorbarLayerToFront() {
         let currentTimestamp = controllers.currentTimestamp.getValue();
         let currentDomain = controllers.currentDomain.getValue();
         let rasters_now = simVars.rasters[currentDomain][currentTimestamp];
@@ -414,14 +414,8 @@ export class LayerController extends HTMLElement {
             }
         }
         
-        if (colorbarSrc != '') {
-            simVars.setColorbarURL(colorbarSrc);
-            simVars.showColorbar();
-        } else {
-            simVars.hideColorbar();
-        }
-
         simVars.displayedColorbar = mostRecentColorbar;
+        controllers.colorbarURL.setValue(colorbarSrc);
     }
 
     async loadWithPriority(startTime, endTime, layerNames) {
