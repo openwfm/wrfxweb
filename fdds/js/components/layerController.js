@@ -71,13 +71,22 @@ export class LayerController extends HTMLElement {
         this.initializeLayerButton();
 
         this.subscribeToCurrentDomain();
-        controllers.currentTimestamp.subscribe(() => this.updateToCurrentTimestamp());
+        this.subscribeToCurrentTimestamp();
         this.subscribeToTopLayerOpacity();
         this.subscribeToSimulationStartAndEndDates();
 
         this.createOpacitySlider();
         this.createMapBaseCheckBoxes();
         this.createThreadManager();
+    }
+
+    subscribeToCurrentTimestamp() {
+        controllers.currentTimestamp.subscribe(() => {
+            let simInfo = simVars.simInfos[simVars.currentDescription];
+            simInfo.currentTimestamp = controllers.currentTimestamp.getValue();
+
+            this.updateToCurrentTimestamp();
+        });
     }
 
     initializeLayerButton() {
@@ -146,6 +155,7 @@ export class LayerController extends HTMLElement {
                 let topLayer = this.getLayer(currentDomain, topLayerName);
                 topLayer.setOpacity(newOpacity);
             }
+            simVars.simInfos[simVars.currentDescription].opacity = newOpacity;
         });
     }
 

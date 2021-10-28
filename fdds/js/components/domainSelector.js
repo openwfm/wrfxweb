@@ -162,27 +162,37 @@ export class DomainSelector extends HTMLElement {
     presetCurrentTimestamp(nextTimestamps) {
         let startDate = controllers.startDate.getValue();
         let endDate = controllers.endDate.getValue();
+        let multipleSimsAreActive = controllers.addedSimulations.getValue().length > 1;
+        let simInfo = simVars.simInfos[simVars.currentDescription];
 
         let currentTimestamp = startDate;
         let presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
             currentTimestamp = presetTimestamp;
+        } else if (multipleSimsAreActive && simInfo.currentTimestamp != '') {
+            currentTimestamp = simInfo.currentTimestamp;
         }
         simVars.presets.timestamp = null;
         controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
+        simInfo.currentTimestamp = currentTimestamp;
     }
 
     presetOpacity() {
         let opacity = 0.5;
         let presetOpacity = simVars.presets.opacity;
+        let multipleSimsAreActive = controllers.addedSimulations.getValue().length > 1;
+        let simInfo = simVars.simInfos[simVars.currentDescription];
         if (presetOpacity && !isNaN(presetOpacity)) {
             presetOpacity = Number(presetOpacity);
             if (presetOpacity >= 0 && presetOpacity <= 1) {
                 opacity = presetOpacity;
             }
-        }
+        } else if (multipleSimsAreActive) {
+            opacity = simInfo.opacity;
+        } 
         simVars.presets.opacity = null;
         controllers.opacity.setValue(opacity, controllerEvents.QUIET);
+        simInfo.opacity = opacity;
     }
 
     /** ===== DomainSwitch block ===== */

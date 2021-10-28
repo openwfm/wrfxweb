@@ -57,6 +57,8 @@ export function getSimulation(path) {
             addedLayers: [],
             overlayDict: {},
             rasterDict: {},
+            opacity: 0.5,
+            currentTimestamp: '',
         };
 
         controllers.addedSimulations.add(simVars.currentDescription);
