@@ -532,7 +532,8 @@ export class TimeSeriesChart extends HTMLElement {
             let yCheck = datapoint.y >= zoomTop - boundingRect.top && datapoint.y <= zoomBottom - boundingRect.top;
             return xCheck && yCheck;
         }).map(datapoint => {
-            return [datapoint.parsed.x, datapoint.parsed.y];
+            let pointContext = datapoint.$context;
+            return [pointContext.parsed.x, pointContext.parsed.y];
         }));
 
         return zoomData;
