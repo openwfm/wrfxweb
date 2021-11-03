@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox, IS_MOBILE } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox, IS_MOBILE, isolateFocus } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -109,6 +109,10 @@ export class TimeSeriesChart extends HTMLElement {
             this.thresholdValues = {};
             fullContainer.classList.add('hidden');
         }
+
+        isolateFocus(this.querySelector('#threshold-setter'));
+        isolateFocus(this.querySelector('#threshold-label'));
+        isolateFocus(this.querySelector('#addChangeName'));
     }
 
     setThresholdOptions() {
@@ -141,7 +145,7 @@ export class TimeSeriesChart extends HTMLElement {
         zoomStart.onchange = zoomChange;
         zoomEnd.onchange = zoomChange;
         undoZoom.onclick = () => {
-            undoZoom.classList.add('none');
+            undoZoom.classList.add('hidden');
             this.populateChart(this.allData, '', '', this.activeLayer);
         }
     }

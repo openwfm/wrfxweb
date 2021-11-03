@@ -18,6 +18,7 @@ import { map } from './map.js';
 /** ===== Constants block */
 export const CLIENT_WIDTH = document.body.clientWidth;
 export const IS_MOBILE = CLIENT_WIDTH < 769; 
+export var ELEMENT_FOCUSED = false;
 
 /** ===== SetURL block ===== */
 export function setURL() {
@@ -269,6 +270,15 @@ export function darkenHex(hex) {
 }
 
 /** ===== DragElements block ===== */
+export function isolateFocus(element) {
+  element.onfocus = () => {
+    ELEMENT_FOCUSED = true;
+  }
+  element.onblur = () => {
+    ELEMENT_FOCUSED = false;
+  }
+}
+
 /** A custom double click implementation needed to handle double clicking on ios. */
 export function doubleClick(elmnt, doubleClickFunction) {
   const DOUBLE_CLICK_MS = 200;

@@ -1,4 +1,4 @@
-import { rgbToHex } from '../util.js';
+import { isolateFocus, rgbToHex } from '../util.js';
 import { map } from '../map.js';
 import { controllers } from './Controller.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
@@ -46,6 +46,7 @@ export class TimeSeriesMarker extends HTMLElement {
 
     connectedCallback() {
         this.initializeTimeseriesMenu();
+        isolateFocus(this.querySelector('#timeseries-custom-name'));
     }
 
     initializeTimeseriesMenu() {

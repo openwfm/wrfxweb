@@ -1,5 +1,5 @@
 import { controllerEvents, controllers } from './Controller.js';
-import { IS_MOBILE, setURL, utcToLocal } from '../util.js';
+import { ELEMENT_FOCUSED, IS_MOBILE, setURL, utcToLocal } from '../util.js';
 import { SimulationSlider } from './simulationSlider.js';
 import { simVars } from '../simVars.js';
 
@@ -98,6 +98,10 @@ export class SimulationController extends HTMLElement {
     initializeFrameNavigation() {
         document.addEventListener('keydown', (e) => {
             e = e || window.event;
+            if (ELEMENT_FOCUSED) {
+                return;
+            }
+
             if (e.key == 'ArrowRight') {
                 this.nextFrame();
             }
