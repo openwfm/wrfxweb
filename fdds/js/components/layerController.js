@@ -141,32 +141,30 @@ export class LayerController extends HTMLElement {
     }
 
     createMapBaseCheckBoxes() {
-       const baseMapDiv = this.querySelector('#map-checkboxes');
-       const mapCheckCallback = ([layerName, layer]) => {
-           if (layerName != this.currentMapType) {
-               layer.addTo(map);
-               this.currentMapType = layerName; 
-               layer.bringToFront();
-           } else {
-               layer.remove(map);
-           }
-       }
-       for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
-           let checked = layerName == this.currentMapType;
-           let checkBoxParams = {
-               id: layerName,
-               text: layerName,
-               type: 'radio',
-               name: 'base',
-               checked: checked,
-               callback: mapCheckCallback,
-               args: [layerName, layer],
-           }
-        //    let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
-        //                                     checked, mapCheckCallback, [layerName, layer]);
-        let mapCheckBox = buildCheckBox(checkBoxParams);
-           baseMapDiv.appendChild(mapCheckBox);
-       }
+        const baseMapDiv = this.querySelector('#map-checkboxes');
+        const mapCheckCallback = ([layerName, layer]) => {
+            if (layerName != this.currentMapType) {
+                layer.addTo(map);
+                this.currentMapType = layerName; 
+                layer.bringToFront();
+            } else {
+                layer.remove(map);
+            }
+        }
+        for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
+            let checked = layerName == this.currentMapType;
+            let checkBoxParams = {
+                id: layerName,
+                text: layerName,
+                type: 'radio',
+                name: 'base',
+                checked: checked,
+                callback: mapCheckCallback,
+                args: [layerName, layer],
+            }
+            let mapCheckBox = buildCheckBox(checkBoxParams);
+            baseMapDiv.appendChild(mapCheckBox);
+        }
     }
 
     createThreadManager() {
@@ -351,8 +349,6 @@ export class LayerController extends HTMLElement {
                 callback: layerClick,
                 args: layerName,
             }
-            // let layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
-            //                                 isChecked, layerClick, layerName);
             let layerBox = buildCheckBox(layerBoxParams);
             layerDiv.appendChild(layerBox);
         }

@@ -247,8 +247,16 @@ export class TimeSeriesChart extends HTMLElement {
         }
         for (let layerName in this.allData) {
             let checked = layerName == this.activeLayer;
-            let checkbox = buildCheckBox(layerName, 'checkbox', 'chartLayer',
-                                         checked, selectCallback, layerName);
+            let checkboxParams = {
+                id: layerName,
+                type: 'checkbox',
+                name: 'chartLayer',
+                checked: checked,
+                callback: selectCallback,
+                args: layerName,
+                text: layerName
+            }
+            let checkbox = buildCheckBox(checkboxParams);
             checkbox.className = 'layerCheckbox';
             selectLayers.appendChild(checkbox);
         }
