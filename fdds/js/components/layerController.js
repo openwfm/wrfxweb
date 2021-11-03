@@ -153,8 +153,18 @@ export class LayerController extends HTMLElement {
        }
        for (const [layerName, layer] of Object.entries(simVars.baseLayerDict)) {
            let checked = layerName == this.currentMapType;
-           let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
-                                            checked, mapCheckCallback, [layerName, layer]);
+           let checkBoxParams = {
+               id: layerName,
+               text: layerName,
+               type: 'radio',
+               name: 'base',
+               checked: checked,
+               callback: mapCheckCallback,
+               args: [layerName, layer],
+           }
+        //    let mapCheckBox = buildCheckBox(layerName, 'radio', 'base', 
+        //                                     checked, mapCheckCallback, [layerName, layer]);
+        let mapCheckBox = buildCheckBox(checkBoxParams);
            baseMapDiv.appendChild(mapCheckBox);
        }
     }
@@ -332,8 +342,18 @@ export class LayerController extends HTMLElement {
         }
         for (let layerName in layerDict) {
             let isChecked = simVars.overlayOrder.includes(layerName);
-            let layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
-                                            isChecked, layerClick, layerName);
+            let layerBoxParams = {
+                id: layerName,
+                text: layerName,
+                type: 'checkbox',
+                name: 'layers',
+                checked: isChecked,
+                callback: layerClick,
+                args: layerName,
+            }
+            // let layerBox = buildCheckBox(layerName, 'checkbox', 'layers',
+            //                                 isChecked, layerClick, layerName);
+            let layerBox = buildCheckBox(layerBoxParams);
             layerDiv.appendChild(layerBox);
         }
     }

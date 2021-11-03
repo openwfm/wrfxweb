@@ -47,7 +47,14 @@ export class TimeSeriesController extends LayerController {
         const showMarkersCallback = () => {
             simVars.showMarkers = !simVars.showMarkers;
         }
-        const checkbox = buildCheckBox('show-markers', 'checkbox', 'show-markers', true, showMarkersCallback);
+        const checkBoxParams = {
+            id: 'show-markers',
+            text: 'Default Show Marker Labels',
+            type: 'checkbox',
+            callback: showMarkersCallback,
+            checked: true,
+        }
+        const checkbox = buildCheckBox(checkBoxParams);
         timeSeriesDiv.appendChild(h4);
         timeSeriesDiv.appendChild(checkbox);
         timeSeriesDiv.appendChild(this.timeSeriesButton);
