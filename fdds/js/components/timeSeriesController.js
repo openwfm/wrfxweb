@@ -4,7 +4,7 @@ import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { Marker } from './timeSeriesMarker.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
-import { doubleClick } from '../util.js';
+import { buildCheckBox, doubleClick } from '../util.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;
@@ -44,7 +44,12 @@ export class TimeSeriesController extends LayerController {
         timeSeriesDiv.id = 'timeseries-layer-group';
         const h4 = document.createElement('h4');
         h4.innerText = 'Timeseries over all Markers';
+        const showMarkersCallback = () => {
+            simVars.showMarkers = !simVars.showMarkers;
+        }
+        const checkbox = buildCheckBox('show-markers', 'checkbox', 'show-markers', true, showMarkersCallback);
         timeSeriesDiv.appendChild(h4);
+        timeSeriesDiv.appendChild(checkbox);
         timeSeriesDiv.appendChild(this.timeSeriesButton);
         container.appendChild(timeSeriesDiv);
     }

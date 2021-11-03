@@ -2,6 +2,7 @@ import { isolateFocus, rgbToHex } from '../util.js';
 import { map } from '../map.js';
 import { controllers } from './Controller.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
+import { simVars } from '../simVars.js';
 
 export class TimeSeriesMarker extends HTMLElement {
     constructor(latLon) {
@@ -134,7 +135,8 @@ export class Marker {
         this.timeSeriesMarker = new TimeSeriesMarker(latLon, coords);
         this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
         this.popup.setContent(this.timeSeriesMarker);
-        this.popup.getElement().style.display = 'none';
+        let display = simVars.showMarkers ? 'block' : 'none';
+        this.popup.getElement().style.display = display;
 
         let svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
                                 <path d="M0 0h24v24H0V0z" fill="none"></path>
