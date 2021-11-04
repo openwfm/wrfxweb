@@ -2,6 +2,7 @@ import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
 import { simVars } from '../../simVars.js';
 import { controllers } from '../Controller.js';
+import { simState } from '../../simState.js';
 
 export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {
@@ -80,6 +81,13 @@ export class CatalogItem extends HTMLElement {
 
         document.querySelector('#simulation-flags').classList.remove('hidden');
         getSimulation(path);
+        let simulationMetaData = {
+            simId: entryID,
+            description: description,
+            path: path,
+            manifestPath: manifestPath
+        };
+        simState.changeSimulation(simulationMetaData);
     }
 }
 
