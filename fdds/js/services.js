@@ -51,3 +51,15 @@ export function getSimulation(path) {
         console.log(error);
     });
 }
+
+export async function getSimulationRasters(path) {
+    let simulationRasters;
+    // await fetch(path).then(response => response.json()).then(function(selectedSimulation) { 
+    await fetch(path.replaceAll(':', '_')).then(response => response.json()).then(function(selectedSimulation) {
+        simulationRasters = selectedSimulation;
+    }).catch(error => {
+        console.error('Error fetching simulation at ' + path);
+        console.log(error);
+    });
+    return simulationRasters;
+}

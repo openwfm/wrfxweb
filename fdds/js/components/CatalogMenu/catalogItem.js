@@ -80,12 +80,14 @@ export class CatalogItem extends HTMLElement {
         document.querySelector('.catalog-menu').classList.add('hidden');
 
         document.querySelector('#simulation-flags').classList.remove('hidden');
-        getSimulation(path);
+        // getSimulation(path);
         let simulationMetaData = {
             simId: entryID,
             description: description,
             path: path,
-            manifestPath: manifestPath
+            manifestPath: manifestPath,
+            // simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
+            rasterBase: path.replaceAll(':', '_').substring(0, path.lastIndexOf('/') + 1),
         };
         simState.changeSimulation(simulationMetaData);
     }

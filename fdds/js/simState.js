@@ -1,4 +1,5 @@
-import { getSimulation } from "./services";
+import { getSimulationRasters } from './services.js';
+import { localToUTC, daysBetween } from './util.js';
 
 export const simState = (function makeSimState() {
     class SimState {
@@ -6,15 +7,15 @@ export const simState = (function makeSimState() {
             const urlParams = new URLSearchParams(window.location.search);
 
             let presets = {
-                presetZoom: urlParams.get('zoom'),
-                presetPan: urlParams.get('pan'),
-                presetSimId: urlParams.get('job_id'),
-                presetDomain: urlParams.get('domain'),
-                presetTimestamp: urlParams.get('timestamp'),
-                presetRasters: null,
-                presetStartDate: urlParams.get('startDate'),
-                presetEndDate: urlParams.get('endDate'),
-                presetOpacity: urlParams.get('opacity'),
+                domain: urlParams.get('domain'),
+                endDate: urlParams.get('endDate'),
+                opacity: urlParams.get('opacity'),
+                pan: urlParams.get('pan'),
+                rasters: null,
+                simId: urlParams.get('job_id'),
+                startDate: urlParams.get('startDate'),
+                timestamp: urlParams.get('timestamp'),
+                zoom: urlParams.get('zoom'),
             }
             return presets;
         }
@@ -24,11 +25,14 @@ export const simState = (function makeSimState() {
             this.domainSubscriptions = [];
             this.simulationSubscriptions = [];
             this.simulationParameters = {
-                currentSimulationId: null,
-                currentTimestamp: null,
-                currentDomain: null,
-                rasters: [],
+                simId: null,
+                metaData: {},
+                rasters: {},
+                domains: [],
+                sortedTimestamps: [],
                 overlayOrder: [],
+                domain: null,
+                timestamp: null,
                 startDate: null,
                 endDate: null,
             };
@@ -46,7 +50,7 @@ export const simState = (function makeSimState() {
         }
 
         changeDomain(domId) {
-            this.simulationParameters.currentDomain = domId;
+            this.simulationParameters.domain = domId;
 
             for (let domainSub of this.domainSubscriptions) {
                 domainSub.changeDomain(this.simulationParameters);
@@ -61,16 +65,82 @@ export const simState = (function makeSimState() {
             }
         }
 
-        changeSimulation(simulationMetaData) { 
+        async changeSimulation(simulationMetaData) { 
             let { simId, description, path, manifestPath } = simulationMetaData;
-            this.currentSimulationId = simId;
-            this.simulationParameters.simulationMetaData = simulationMetaData;
+            let simParams = this.simulationParameters;
 
-            await getSimulation(path);
+            simParams.simId = simId;
+            simParams.metaData = simulationMetaData;
+
+            let simRasters = await getSimulationRasters(path);
+            simParams.rasters = simRasters;
+            simParams.domains = Object.keys(simRasters);
+            let domain = this.presetDomain();
+            simParams.sortedTimestamps = Object.keys(simRasters[domain]).sort();
+
+            this.presetStartDate();
+            this.presetEndDate();
+            this.presetCurrentTimestamp();
+            this.presetOpacity();
+            this.presetOverlayOrder();
 
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }
+        }
+
+        presetDomain() {
+            let domains = this.simulationParameters.domains;
+            let presetDomain = this.presetParameters.domain;
+            let domain = (domains.includes(presetDomain)) ? presetDomain : domains[0];
+
+            this.presetParameters.domain = null;
+            this.simulationParameters.domain = domain;
+            return domain;
+        }
+
+        presetStartDate() {
+            let simParams = this.simulationParameters;
+            let sortedTimestamps = simParams.sortedTimestamps;
+            let startDate = sortedTimestamps[0];
+            let presetStartDate = localToUTC(this.presetParameters.startDate);
+            let desc = simParams.metaData.description;
+            if (sortedTimestamps.includes(presetStartDate)) {
+                startDate = presetStartDate;
+                this.presetParameters.startDate = null;
+            } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
+                let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
+                for (let i = 2; i <= nextTimestamps.length; i++) {
+                    startDate = nextTimestamps[nextTimestamps.length - i];
+                    if (daysBetween(startDate, lastTimestamp) >= 15) {
+                        startDate = nextTimestamps[nextTimestamps.length - i + 1];
+                        break;
+                    }
+                }
+            }
+            return startDate;
+        }
+
+        presetEndDate() {
+            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+            let endDate = sortedTimestamps[sortedTimestamps.length - 1];
+            let presetEndDate = localToUTC(this.presetParameters.endDate);
+            if (sortedTimestamps.includes(presetEndDate)) {
+                endDate = presetEndDate;
+            }
+            this.presetParameters.endDate = null;
+        }
+
+        presetCurrentTimestamp() {
+            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+        }
+
+        presetOpacity() {
+            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+        }
+
+        presetOverlayOrder() {
+            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
         }
     }
 
