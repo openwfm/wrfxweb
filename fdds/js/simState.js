@@ -10,13 +10,24 @@ export const simState = (function makeSimState() {
                 domain: urlParams.get('domain'),
                 endDate: urlParams.get('endDate'),
                 opacity: urlParams.get('opacity'),
-                pan: urlParams.get('pan'),
+                pan: null,
                 rasters: null,
                 simId: urlParams.get('job_id'),
                 startDate: urlParams.get('startDate'),
                 timestamp: urlParams.get('timestamp'),
                 zoom: urlParams.get('zoom'),
             }
+            let pan = urlParams.get('pan');
+            if (pan) {
+                pan = pan.split(',').map(coord => Number(coord));
+                presets.pan = pan;
+            }
+            let rasters = urlParams.get('rasters');
+            if (rasters) {
+                rasters = rasters.split(',');
+                presets.rasters = rasters;
+            }
+
             return presets;
         }
 
@@ -107,7 +118,6 @@ export const simState = (function makeSimState() {
             let desc = simParams.metaData.description;
             if (sortedTimestamps.includes(presetStartDate)) {
                 startDate = presetStartDate;
-                this.presetParameters.startDate = null;
             } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
                 let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
                 for (let i = 2; i <= nextTimestamps.length; i++) {
@@ -118,6 +128,9 @@ export const simState = (function makeSimState() {
                     }
                 }
             }
+            this.presetParameters.startDate = null;
+            this.simulationParameters.startDate = startDate;
+
             return startDate;
         }
 
@@ -129,18 +142,52 @@ export const simState = (function makeSimState() {
                 endDate = presetEndDate;
             }
             this.presetParameters.endDate = null;
+            this.simulationParameters.endDate = endDate;
+
+            return endDate;
         }
 
         presetCurrentTimestamp() {
             let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+            let startDate = this.simulationParameters.startDate;
+            let endDate = this.simulationParameters.endDate;
+    
+            let timestamp = startDate;
+            let presetTimestamp = localToUTC(this.presetParameters.timestamp);
+            if (sortedTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
+                timestamp = presetTimestamp;
+            }
+            this.presetParameters.timestamp = null;
+            this.simulationParameters.timestamp = timestamp;
+
+            return timestamp;
         }
 
         presetOpacity() {
-            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+            let opacity = 0.5;
+            let presetOpacity = this.presetParameters.opacity;
+            if (presetOpacity && !isNaN(presetOpacity)) {
+                presetOpacity = Number(presetOpacity);
+                if (presetOpacity >= 0 && presetOpacity <= 1) {
+                    opacity = presetOpacity;
+                }
+            }
+            this.presetParameters.opacity = null;
+            this.simulationParameters.opacity = opacity;
+
+            return opacity;
         }
 
         presetOverlayOrder() {
-            let sortedTimestamps = this.simulationParameters.sortedTimestamps;
+            let overlayOrder = [];
+            let presetRasters = this.presetParameters.overlayOrder;
+            if (presetRasters && presets.length > 0) {
+                overlayOrder = presetRasters;
+            }
+            this.presetParameters.rasters = null;
+            this.simulationParameters.overlayOrder = overlayOrder;
+
+            return overlayOrder;
         }
     }
 
