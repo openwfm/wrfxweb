@@ -1,5 +1,6 @@
+import { configData } from './app.js';
 import { getSimulationRasters } from './services.js';
-import { localToUTC, daysBetween } from './util.js';
+import { localToUTC, daysBetween, setURL } from './util.js';
 
 export const simState = (function makeSimState() {
     class SimState {
@@ -31,6 +32,45 @@ export const simState = (function makeSimState() {
             return presets;
         }
 
+        createMap() {
+            let center = [39.7392, -104.9903];
+            let presetCenter = this.presetParameters.pan;
+            if (presetCenter && presetCenter.length == 2) {
+                center = presetCenter
+            } else if (configData.organization.includes('SJSU')) {
+                center = [37.34, -121.89];
+            }
+            let zoom = 7;
+            let presetZoom = this.presetParameters.zoom;
+            if (presetZoom && !isNaN(presetZoom)) {
+                zoom = presetZoom;
+            }
+            let leafletMap = L.map('map-fd', {
+                keyboard: false,
+                layers: [this.baseLayerDict['OSM']],
+                zoomControl: true,
+                minZoom: 3,
+                center: center,
+                zoom: zoom
+            });
+            
+            leafletMap.doubleClickZoom.disable();
+            leafletMap.scrollWheelZoom.disable();
+            
+            // add scale & zoom controls to the map
+            L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
+            
+            leafletMap.on('zoomend', function() {
+                setURL();
+            });
+
+            leafletMap.on('moveend', function() {
+                setURL();
+            });
+
+            return leafletMap;
+        }
+
         constructor() {
             this.timestampSubscriptions = [];
             this.domainSubscriptions = [];
@@ -48,6 +88,21 @@ export const simState = (function makeSimState() {
                 endDate: null,
             };
             this.presetParameters = this.getPresets();
+            this.overlayList = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
+            this.baseLayerDict = {
+                /*
+                'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
+                                        attribution: 'Data and imagery by MapQuest',
+                                        subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),
+                */
+                'MapQuest' : MQ.mapLayer(),
+                /*	'MQ Satellite': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+                                            attribution: 'Data and imagery by MapQuest',
+                                            subdomains: ['otile1', 'otile2', 'otile3', 'otile4']}),*/
+                'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                                    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
+            }
+            this.map = this.createMap();
         }
 
         subscribeComponent(component) {

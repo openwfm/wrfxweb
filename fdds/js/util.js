@@ -106,14 +106,6 @@ function opacityToURL(addData) {
   }
 }
 
-map.on('zoomend', function() {
-  setURL();
-});
-
-map.on('moveend', function() {
-  setURL();
-});
-
 /** ===== Debounce block ===== */
 /** Executes function with a maximum rate of delay. */
 export function debounceInIntervals(callback, delay) {

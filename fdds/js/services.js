@@ -3,25 +3,28 @@ import { simVars } from './simVars.js';
 
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
+    let configurationData; 
     await fetch('conf.json').then(response => response.json()).then(function(configData) {
-        if (configData.organization) {
-            simVars.organization = configData.organization;
-        }
-        document.title = simVars.organization;
+        // if (configData.organization) {
+        //     simVars.organization = configData.organization;
+        // }
+        // document.title = simVars.organization;
     
-        if (configData.flags) {
-            const simulationFlags = document.querySelector('#simulation-flags');
-            let flags = configData.flags;
-            flags.map(flag => {
-                let spanElement = document.createElement('span');
-                spanElement.className = 'displayTest';
-                spanElement.innerText = flag;
-                simulationFlags.appendChild(spanElement);
-            });
-        }
+        // if (configData.flags) {
+        //     const simulationFlags = document.querySelector('#simulation-flags');
+        //     let flags = configData.flags;
+        //     flags.map(flag => {
+        //         let spanElement = document.createElement('span');
+        //         spanElement.className = 'displayTest';
+        //         spanElement.innerText = flag;
+        //         simulationFlags.appendChild(spanElement);
+        //     });
+        // }
+        configurationData = configData;
     }).catch(error => {
         console.error('Error fetching conf.json : ' + error);
     });
+    return configurationData;
 }
 
 /** Service request for building the initial catalogMenu */
