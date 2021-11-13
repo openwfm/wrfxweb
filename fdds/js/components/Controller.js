@@ -89,6 +89,7 @@ export const controllers = {
     timeSeriesMarkers: (function createTimeSeriesMarkers() {
         let timeSeriesMarkers = new Controller([]);
         timeSeriesMarkers.removeEvent = 'REMOVE_EVENT';
+        timeSeriesMarkers.UPDATE_EVENT = 'UPDATE_EVENT';
         timeSeriesMarkers.add = (newMarker) => {
             timeSeriesMarkers.value.push(newMarker);
         }

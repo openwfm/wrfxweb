@@ -87,6 +87,13 @@ export class TimeSeriesMarker extends HTMLElement {
         hideButton.onclick = fun;
     }
 
+    bindName(fun) {
+        const nameMarker = this.querySelector('#timeseries-custom-name');
+        nameMarker.oninput = () => {
+            fun();
+        }
+    }
+
     setRGBValues(rgb, clrbarLocation) {
         let [r, g, b] = rgb;
         if ((r + g + b) > 745) {
@@ -134,6 +141,11 @@ export class Marker {
         this.popup = L.popup({closeOnClick: false, autoClose: false, autoPan: false}).setLatLng(latLon).addTo(map);
         this.timeSeriesMarker = new TimeSeriesMarker(latLon, coords);
         this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
+        this.timeSeriesMarker.bindName(() => {
+            let markerController = controllers.timeSeriesMarkers;
+            let markers = markerController.getValue();
+            markerController.broadcastEvent(markerController.UPDATE_EVENT, markers.indexOf(this));
+        });
         this.popup.setContent(this.timeSeriesMarker);
         let display = simVars.showMarkers ? 'block' : 'none';
         this.popup.getElement().style.display = display;
@@ -173,6 +185,14 @@ export class Marker {
 
     getContent() {
         return this.timeSeriesMarker;
+    }
+
+    setName(name) { 
+        this.timeSeriesMarker.setName(name);
+    }
+
+    getName() {
+        return this.timeSeriesMarker.getName();
     }
 }
 

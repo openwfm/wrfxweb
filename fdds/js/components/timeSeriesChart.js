@@ -185,7 +185,7 @@ export class TimeSeriesChart extends HTMLElement {
     updateDataOnRemove() {
         const legendOptions = this.querySelector('#legendOptions');
         const chart = this.querySelector('#fullContainer');
-        const updateData = (index) => {
+        const removeData = (index) => {
             if (chart.classList.contains('hidden')) {
                 return;
             }
@@ -197,10 +197,28 @@ export class TimeSeriesChart extends HTMLElement {
             this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
         }
         let markerController = controllers.timeSeriesMarkers;
-        markerController.subscribe(updateData, markerController.removeEvent);
+        markerController.subscribe(removeData, markerController.removeEvent);
+
+        const updateData = (index) => {
+            if (chart.classList.contains('hidden')) {
+                return;
+            }
+            let newLabel = controllers.timeSeriesMarkers.getValue()[index].getName();
+            for (let layerName in this.allData) {
+                let data = this.allData[layerName];
+                data[index].label = newLabel;
+            }
+            this.repopulateChart();
+        }
+
+        markerController.subscribe(updateData, markerController.UPDATE_EVENT);
     }
 
     /** ===== CreateChart block ===== */
+    repopulateChart() {
+        this.populateChart(this.allData, this.startDate, this.endDate, this.activeLayer);
+    }
+
     populateChart(data, startDate='', endDate='', activeLayer=simVars.displayedColorbar) {
         this.debouncedPopulateChart([data, startDate, endDate, activeLayer]);
     }
@@ -385,7 +403,7 @@ export class TimeSeriesChart extends HTMLElement {
         this.setOpeningMarker(index, timeSeriesMarker);
         this.setHidingDataOnChart(index, timeSeriesMarker);
         this.setDataColor(index, timeSeriesMarker);
-        this.setAddingName(index, timeSeriesMarker);
+        this.setAddingName(index, timeSeriesMarkers[index]);
 
         const legendOptions = this.querySelector('#legendOptions');
         const closeLegendOptions = this.querySelector('#closeLegendOptions');
