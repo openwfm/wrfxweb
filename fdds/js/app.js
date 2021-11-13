@@ -1,6 +1,10 @@
 'use strict';
 import { getConfigurations } from './services.js';
 
+export var CLIENT_WIDTH = document.body.clientWidth;
+export var IS_MOBILE = CLIENT_WIDTH < 769; 
+// export var ELEMENT_FOCUSED = false;
+
 window.onload = () => {
     const copyLink = document.querySelector('#copyLink');
     copyLink.onclick = () => {
@@ -20,9 +24,10 @@ window.onload = () => {
     }, 500);
 }
 
-export const CLIENT_WIDTH = document.body.clientWidth;
-export const IS_MOBILE = CLIENT_WIDTH < 769; 
-// export var ELEMENT_FOCUSED = false;
+window.addEventListener('resize', () => {
+    CLIENT_WIDTH = document.body.clientWidth;
+    IS_MOBILE = CLIENT_WIDTH < 769;
+});
 
 export const configData = (async function getConfigData() {
     let configData = await getConfigurations();

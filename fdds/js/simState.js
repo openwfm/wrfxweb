@@ -1,6 +1,6 @@
 import { configData } from './app.js';
 import { getSimulationRasters } from './services.js';
-import { localToUTC, daysBetween, setURL } from './util.js';
+import { localToUTC, daysBetween } from './util.js';
 
 export const simState = (function makeSimState() {
     class SimState {
@@ -61,14 +61,35 @@ export const simState = (function makeSimState() {
             L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
             
             leafletMap.on('zoomend', function() {
-                setURL();
+                // setURLParams();
             });
 
             leafletMap.on('moveend', function() {
-                setURL();
+                // setURLParams();
             });
 
             return leafletMap;
+        }
+
+        makeNoLevels() {
+            const noLevels = new Set();
+            const makeKey = (layerName, domain, timestamp) => {
+              return layerName + ',' + domain + ',' + timestamp;
+            }
+            const addNoLevels = (layerName, domain, timestamp) => {
+              let key = makeKey(layerName, domain, timestamp);
+              noLevels.add(key);
+            }
+            const hasNoLevels = (layerName, domain, timestamp) => {
+              let key = makeKey(layerName, domain, timestamp);
+              return noLevels.has(key);
+            }
+      
+            return ({
+              add: addNoLevels,
+              has: hasNoLevels,
+              clear: () => noLevels.clear()
+            });
         }
 
         constructor() {
@@ -82,6 +103,7 @@ export const simState = (function makeSimState() {
                 domains: [],
                 sortedTimestamps: [],
                 overlayOrder: [],
+                noLevels: this.makeNoLevels(),
                 domain: null,
                 timestamp: null,
                 startDate: null,
@@ -137,6 +159,7 @@ export const simState = (function makeSimState() {
 
             simParams.simId = simId;
             simParams.metaData = simulationMetaData;
+            simParams.noLevels.clear();
 
             let simRasters = await getSimulationRasters(path);
             simParams.rasters = simRasters;
@@ -153,6 +176,8 @@ export const simState = (function makeSimState() {
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }
+
+            // setURLParams();
         }
 
         presetDomain() {
