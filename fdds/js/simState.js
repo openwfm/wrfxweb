@@ -5,8 +5,7 @@ import { configData } from './app.js';
 
 export const simState = (function makeSimState() {
     class SimState {
-        createMap(mapParams) {
-            let { presetCenter, presetZoom, mapLayer } = mapParams;
+        createMap({ presetCenter, presetZoom, mapLayer }) {
             let center = [39.7392, -104.9903];
             if (presetCenter && presetCenter.length == 2) {
                 center = presetCenter
@@ -32,12 +31,12 @@ export const simState = (function makeSimState() {
             // add scale & zoom controls to the map
             L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
             
-            leafletMap.on('zoomend', function() {
-                setURL(this.simParams, leafletMap);
+            leafletMap.on('zoomend', () => {
+                setURL(this.simulationParameters, leafletMap);
             });
 
-            leafletMap.on('moveend', function() {
-                setURL(this.simParams, leafletMap);
+            leafletMap.on('moveend', () => {
+                setURL(this.simulationParameters, leafletMap);
             });
 
             return leafletMap;
@@ -99,6 +98,8 @@ export const simState = (function makeSimState() {
             for (let domainSub of this.domainSubscriptions) {
                 domainSub.changeDomain(this.simulationParameters);
             }
+
+            setURL(this.simulationParameters , this.map)
         }
 
         changeTimestamp(timestamp) {
@@ -128,9 +129,15 @@ export const simState = (function makeSimState() {
             this.presetOpacity();
             this.presetOverlayOrder();
 
+            document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
+            document.querySelector('.catalog-menu').classList.add('hidden');
+
+            document.querySelector('#simulation-flags').classList.remove('hidden');
+
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }
+
 
             setURL(this.simulationParameters, this.map);
         }

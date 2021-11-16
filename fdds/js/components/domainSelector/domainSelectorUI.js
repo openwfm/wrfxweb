@@ -1,5 +1,6 @@
 import { SimComponentModel } from '../../models/simComponentModel.js';
 import { IS_MOBILE } from '../../app.js';
+import { simState } from '../../simState.js';
 
 export class DomainSelectorUI extends SimComponentModel {
     constructor() {
@@ -18,11 +19,23 @@ export class DomainSelectorUI extends SimComponentModel {
     }
 
     connectedCallback() {
-
+        this.initializeDomainSelectorButton();
+        super.connectedCallback();
     }
 
-    changeSimulation(simParameters) {
-        this.createDomainCheckboxes(simParameters);
+    initializeDomainSelectorButton() {
+        const domainButton = this.querySelector('#domain-selector-button');
+        L.DomEvent.disableClickPropagation(domainButton);
+        domainButton.onpointerdown = () => {
+            const domainSelector = this.querySelector('#domain-selector');
+            if (domainSelector.classList.contains('hidden')) {
+                domainSelector.classList.remove('hidden');
+                document.querySelector('.catalog-menu').classList.add('hidden');
+                document.querySelector('#layer-controller-container').classList.add('hidden');
+            } else {
+                domainSelector.classList.add('hidden');
+            }
+        }
     }
 
     responsiveUI() {
@@ -32,8 +45,47 @@ export class DomainSelectorUI extends SimComponentModel {
         this.querySelector('#domain-selector-button').classList.remove('hidden');
     }
 
-    createDomainCheckboxes({ domains, domain }) {
+    changeSimulation(simParameters) {
+        this.createDomainCheckboxes(simParameters);
 
+        const domainSelector = this.querySelector('#domain-selector');
+        if (domainSelector.classList.contains('hidden')) {
+            domainSelector.classList.remove('hidden');
+        }
+    }
+    
+    createDomainCheckboxes({ domains, domain }) {
+        const domainCheckboxes = this.querySelector('#domain-checkboxes');
+        domainCheckboxes.innerHTML = '';
+        for(let dom in domains) {
+            let domId = domains[dom];
+            let domainCheckbox = this.createDomainCheckbox(domId, domain);
+            domainCheckboxes.appendChild(domainCheckbox);
+        }
+    }
+
+    createDomainCheckbox(domId, presetDomain) {
+        let div = document.createElement('div');
+        div.className = 'domain-checkbox';
+
+        let input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'domains';
+        input.id = domId;
+        if (domId == presetDomain) {
+            input.checked = 'yes';
+        }
+        input.onclick = () => {
+            simState.changeDomain(domId);
+        }
+
+        let label = document.createElement('label');
+        label.for = domId;
+        label.innerText = domId;
+
+        div.appendChild(input);
+        div.appendChild(label);
+        return div;
     }
 }
 

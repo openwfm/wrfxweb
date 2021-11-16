@@ -40,15 +40,15 @@ export function setURL(simulationParameters, map) {
     }
   }
 
-  zoomToURL(map, addData);
-  panToURL(map, addData);
   jobIdToURL(simulationParameters, addData);
   domainToURL(simulationParameters, addData);
-  startDateToURL(simulationParameters, addData);
-  endDateToURL(simulationParameters, addData);
   timestampToURL(simulationParameters, addData);
   addedLayersToURL(simulationParameters, addData);
+  startDateToURL(simulationParameters, addData);
+  endDateToURL(simulationParameters, addData);
   opacityToURL(simulationParameters, addData);
+  zoomToURL(map, addData);
+  panToURL(map, addData);
 
   if (urlVars != '') {
     urlVars = '?' + urlVars.substr(1);

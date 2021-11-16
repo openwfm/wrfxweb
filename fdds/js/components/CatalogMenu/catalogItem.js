@@ -76,10 +76,10 @@ export class CatalogItem extends HTMLElement {
 
         simVars.currentSimulation = entryID;
         simVars.currentDescription = description;
-        document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        document.querySelector('.catalog-menu').classList.add('hidden');
+        // document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
+        // document.querySelector('.catalog-menu').classList.add('hidden');
 
-        document.querySelector('#simulation-flags').classList.remove('hidden');
+        // document.querySelector('#simulation-flags').classList.remove('hidden');
         // getSimulation(path);
         let simulationMetaData = {
             simId: entryID,
