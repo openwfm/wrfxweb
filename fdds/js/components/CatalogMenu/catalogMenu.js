@@ -1,6 +1,7 @@
 import { CLIENT_WIDTH, dragElement, IS_MOBILE, utcToLocal } from '../../util.js';
 import { getCatalogEntries } from '../../services.js';
 import { CatalogItem } from './catalogItem.js';
+import { SimComponentModel } from '../../models/simComponentModel.js';
 
 /** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data. 
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
@@ -11,7 +12,7 @@ import { CatalogItem } from './catalogItem.js';
  *  2. Searching block
  * 
  */
-export class CatalogMenu extends HTMLElement {
+export class CatalogMenu extends SimComponentModel {
     /** ===== Initialization block ===== */
     constructor() {
         super();
@@ -86,6 +87,11 @@ export class CatalogMenu extends HTMLElement {
         });
         this.initializeMenuSearching();
         this.createMenuEntries();
+    }
+
+    changeSimulation() {
+        const catalogMenu = this.querySelector('.catalog-menu');
+        catalogMenu.classList.add('hidden');
     }
 
     hideShowMenu() {

@@ -130,7 +130,6 @@ export const simState = (function makeSimState() {
             this.presetOverlayOrder();
 
             document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-            document.querySelector('.catalog-menu').classList.add('hidden');
 
             document.querySelector('#simulation-flags').classList.remove('hidden');
 
