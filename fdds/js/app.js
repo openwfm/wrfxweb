@@ -29,7 +29,7 @@ window.addEventListener('resize', () => {
     IS_MOBILE = CLIENT_WIDTH < 769;
 });
 
-export const configData = (async function getConfigData() {
+export const configData = await (async function getConfigData() {
     let configData = await getConfigurations();
 
     document.title = configData.organization;

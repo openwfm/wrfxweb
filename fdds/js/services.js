@@ -3,7 +3,10 @@ import { simVars } from './simVars.js';
 
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
-    let configurationData; 
+    let configurationData = {
+        organization: '',
+        flags: [],
+    }; 
     await fetch('conf.json').then(response => response.json()).then(function(configData) {
         // if (configData.organization) {
         //     simVars.organization = configData.organization;

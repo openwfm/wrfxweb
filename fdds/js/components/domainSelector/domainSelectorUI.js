@@ -22,13 +22,7 @@ export class DomainSelectorUI extends SimComponentModel {
     }
 
     changeSimulation(simParameters) {
-        let domains = controllers.domainInstance.getValue();
-        controllers.loadingProgress.setValue(0);
-
-        let presetDomain = this.presetSimValues(domains);
-        this.createDomainCheckboxes(domains, presetDomain);
-
-        controllers.currentDomain.setValue(presetDomain, controllerEvents.SIM_RESET);
+        this.createDomainCheckboxes(simParameters);
     }
 
     responsiveUI() {
@@ -36,6 +30,10 @@ export class DomainSelectorUI extends SimComponentModel {
             this.querySelector('#domain-selector').classList.remove('hidden');
         }
         this.querySelector('#domain-selector-button').classList.remove('hidden');
+    }
+
+    createDomainCheckboxes({ domains, domain }) {
+
     }
 }
 

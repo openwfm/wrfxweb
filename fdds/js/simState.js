@@ -1,53 +1,25 @@
-import { configData } from './app.js';
 import { getSimulationRasters } from './services.js';
 import { localToUTC, daysBetween } from './util.js';
+import { getPresetParams, setURL } from './urlUtils.js';
+import { configData } from './app.js';
 
 export const simState = (function makeSimState() {
     class SimState {
-        getPresets() {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            let presets = {
-                domain: urlParams.get('domain'),
-                endDate: urlParams.get('endDate'),
-                opacity: urlParams.get('opacity'),
-                pan: null,
-                rasters: null,
-                simId: urlParams.get('job_id'),
-                startDate: urlParams.get('startDate'),
-                timestamp: urlParams.get('timestamp'),
-                zoom: urlParams.get('zoom'),
-            }
-            let pan = urlParams.get('pan');
-            if (pan) {
-                pan = pan.split(',').map(coord => Number(coord));
-                presets.pan = pan;
-            }
-            let rasters = urlParams.get('rasters');
-            if (rasters) {
-                rasters = rasters.split(',');
-                presets.rasters = rasters;
-            }
-
-            return presets;
-        }
-
-        createMap() {
+        createMap(mapParams) {
+            let { presetCenter, presetZoom, mapLayer } = mapParams;
             let center = [39.7392, -104.9903];
-            let presetCenter = this.presetParameters.pan;
             if (presetCenter && presetCenter.length == 2) {
                 center = presetCenter
             } else if (configData.organization.includes('SJSU')) {
                 center = [37.34, -121.89];
             }
             let zoom = 7;
-            let presetZoom = this.presetParameters.zoom;
             if (presetZoom && !isNaN(presetZoom)) {
                 zoom = presetZoom;
             }
             let leafletMap = L.map('map-fd', {
                 keyboard: false,
-                layers: [this.baseLayerDict['OSM']],
+                layers: [mapLayer],
                 zoomControl: true,
                 minZoom: 3,
                 center: center,
@@ -61,35 +33,14 @@ export const simState = (function makeSimState() {
             L.control.scale({ position: 'bottomright' }).addTo(leafletMap);
             
             leafletMap.on('zoomend', function() {
-                // setURLParams();
+                setURL(this.simParams, leafletMap);
             });
 
             leafletMap.on('moveend', function() {
-                // setURLParams();
+                setURL(this.simParams, leafletMap);
             });
 
             return leafletMap;
-        }
-
-        makeNoLevels() {
-            const noLevels = new Set();
-            const makeKey = (layerName, domain, timestamp) => {
-              return layerName + ',' + domain + ',' + timestamp;
-            }
-            const addNoLevels = (layerName, domain, timestamp) => {
-              let key = makeKey(layerName, domain, timestamp);
-              noLevels.add(key);
-            }
-            const hasNoLevels = (layerName, domain, timestamp) => {
-              let key = makeKey(layerName, domain, timestamp);
-              return noLevels.has(key);
-            }
-      
-            return ({
-              add: addNoLevels,
-              has: hasNoLevels,
-              clear: () => noLevels.clear()
-            });
         }
 
         constructor() {
@@ -103,13 +54,13 @@ export const simState = (function makeSimState() {
                 domains: [],
                 sortedTimestamps: [],
                 overlayOrder: [],
-                noLevels: this.makeNoLevels(),
-                domain: null,
+                opacity: null,
+                domain: 0.5,
                 timestamp: null,
                 startDate: null,
                 endDate: null,
             };
-            this.presetParameters = this.getPresets();
+            this.presetParameters = getPresetParams();
             this.overlayList = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
             this.baseLayerDict = {
                 /*
@@ -124,7 +75,12 @@ export const simState = (function makeSimState() {
                 'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                                     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
             }
-            this.map = this.createMap();
+            let mapParams = {
+                presetCenter: this.presetParameters.pan,
+                presetZoom: this.presetParameters.zoom,
+                mapLayer: this.baseLayerDict['OSM'],
+            }
+            this.map = this.createMap(mapParams);
         }
 
         subscribeComponent(component) {
@@ -159,7 +115,6 @@ export const simState = (function makeSimState() {
 
             simParams.simId = simId;
             simParams.metaData = simulationMetaData;
-            simParams.noLevels.clear();
 
             let simRasters = await getSimulationRasters(path);
             simParams.rasters = simRasters;
@@ -177,7 +132,7 @@ export const simState = (function makeSimState() {
                 simulationSub.changeSimulation(this.simulationParameters);
             }
 
-            // setURLParams();
+            setURL(this.simulationParameters, this.map);
         }
 
         presetDomain() {
