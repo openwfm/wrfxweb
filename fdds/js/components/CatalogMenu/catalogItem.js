@@ -74,8 +74,8 @@ export class CatalogItem extends HTMLElement {
         let path = 'simulations/' + manifestPath;
         let description = this.catEntry.description;
 
-        simVars.currentSimulation = entryID;
-        simVars.currentDescription = description;
+        // simVars.currentSimulation = entryID;
+        // simVars.currentDescription = description;
         // document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
         // document.querySelector('.catalog-menu').classList.add('hidden');
 

@@ -1,6 +1,7 @@
 import { controllers } from './components/Controller.js';
 import { simVars } from './simVars.js';
 import { map } from './map.js';
+import { ISMOBILE } from './app.js';
 
 /** Utility functions that can be imported and used in components from anywhere. 
  * 
@@ -305,9 +306,7 @@ export function dragElement(elmnt, subID='', mobileEnabled=false) {
   let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   let elmntLeft = 0, elmntTop = 0;
   let clientWidth = document.body.clientWidth, clientHeight = document.body.clientHeight;
-  if (IS_MOBILE && !mobileEnabled) {
-    return;
-  }
+
   let draggableElement = document.getElementById(elmnt.id);
   if (subID != '') {
     draggableElement = document.getElementById(subID);
@@ -331,6 +330,9 @@ export function dragElement(elmnt, subID='', mobileEnabled=false) {
   })
 
   function dragMouseDown(e) {
+    if (ISMOBILE && !mobileEnabled) {
+      return;
+    }
     document.body.classList.add('grabbing');
     e = e || window.event;
     e.preventDefault();

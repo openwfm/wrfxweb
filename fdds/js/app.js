@@ -2,7 +2,7 @@
 import { getConfigurations } from './services.js';
 
 export var CLIENT_WIDTH = document.body.clientWidth;
-export var IS_MOBILE = CLIENT_WIDTH < 769; 
+export var ISMOBILE = CLIENT_WIDTH < 769; 
 // export var ELEMENT_FOCUSED = false;
 
 window.onload = () => {
@@ -26,7 +26,7 @@ window.onload = () => {
 
 window.addEventListener('resize', () => {
     CLIENT_WIDTH = document.body.clientWidth;
-    IS_MOBILE = CLIENT_WIDTH < 769;
+    ISMOBILE = CLIENT_WIDTH < 769;
 });
 
 export const configData = await (async function getConfigData() {

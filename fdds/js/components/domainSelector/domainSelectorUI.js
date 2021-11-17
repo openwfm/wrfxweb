@@ -1,5 +1,5 @@
 import { SimComponentModel } from '../../models/simComponentModel.js';
-import { IS_MOBILE } from '../../app.js';
+import { ISMOBILE } from '../../app.js';
 import { simState } from '../../simState.js';
 
 export class DomainSelectorUI extends SimComponentModel {
@@ -38,11 +38,15 @@ export class DomainSelectorUI extends SimComponentModel {
         }
     }
 
-    responsiveUI() {
-        if (!IS_MOBILE) {
-            this.querySelector('#domain-selector').classList.remove('hidden');
+    windowResize() {
+        if (!ISMOBILE) {
+            this.querySelector('#domain-selector-button').classList.add('hidden');
+            if (simState.simulationParameters.simId != null) {
+                this.querySelector('#domain-selector').classList.remove('hidden');
+            }
+        } else {
+            this.querySelector('#domain-selector-button').classList.remove('hidden');
         }
-        this.querySelector('#domain-selector-button').classList.remove('hidden');
     }
 
     changeSimulation(simParameters) {

@@ -13,7 +13,7 @@ export class SimComponentModel extends HTMLElement {
     }
 
     changeSimulation(simParameters) {
-        console.warn(`Changing simulation to ${simulationMetaData.simId}. Implement changeSimulation function for this component`);
+        console.warn(`Changing simulation to ${simParameters.simId}. Implement changeSimulation function for this component`);
     }
 
     windowResize() {
