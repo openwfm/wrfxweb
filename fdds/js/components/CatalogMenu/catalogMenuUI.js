@@ -15,10 +15,6 @@ export class CatalogMenu extends SimComponentModel {
     /** ===== Initialization block ===== */
     constructor() {
         super();
-        this.firesList = [];
-        this.fuelMoistureList = [];
-        this.satelliteList = [];
-        this.addOrder = [];
         this.innerHTML = `
             <div>
                 <div id='catalog-button' class='feature-controller catalog-button'>
@@ -143,5 +139,3 @@ export class CatalogMenu extends SimComponentModel {
         }
     }
 }
-
-window.customElements.define('catalog-menu', CatalogMenu);
