@@ -46,6 +46,9 @@ export const simState = (function makeSimState() {
             this.timestampSubscriptions = [];
             this.domainSubscriptions = [];
             this.simulationSubscriptions = [];
+            this.loadingProgressSubscriptions = [];
+            this.startDateSubscriptions = [];
+            this.endDateSubscriptions = [];
             this.simulationParameters = {
                 simId: null,
                 metaData: {},
@@ -58,6 +61,7 @@ export const simState = (function makeSimState() {
                 timestamp: null,
                 startDate: null,
                 endDate: null,
+                loadingProgress: 0,
             };
             this.presetParameters = getPresetParams();
             this.overlayList = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
@@ -89,6 +93,15 @@ export const simState = (function makeSimState() {
             if (component.changeDomain) {
                 this.domainSubscriptions.push(component);
             }
+            if (component.changeLoadingProgress) {
+                this.loadingProgressSubscriptions.push(component);
+            }
+            if (component.changeStartDate) {
+                this.startDateSubscriptions.push(component);
+            }
+            if (component.changeEndDate) {
+                this.endDateSubscriptions.push(component);
+            }
             this.simulationSubscriptions.push(component);
         }
 
@@ -103,10 +116,35 @@ export const simState = (function makeSimState() {
         }
 
         changeTimestamp(timestamp) {
-            this.simulationParameters.currentTimestamp = timestamp;
+            this.simulationParameters.timestamp = timestamp;
 
             for (let timestampSub of this.timestampSubscriptions) {
                 timestampSub.changeTimestamp(this.simulationParameters);
+            }
+        }
+
+        loadFrame() {
+            let progress = 0;
+            this.simulationParameters.loadingProgress = progress;
+
+            for (let loadingProgressSub of this.loadingProgressSubscriptions) {
+                loadingProgressSub.changeLoadingProgress(this.simulationParameters);
+            }
+        }
+
+        changeStartDate(startDate) {
+            this.simulationParameters.startDate = startDate;
+
+            for (let startDateSub of this.startDateSubscriptions) {
+                startDateSub.changeStartDate(this.simulationParameters);
+            }
+        }
+
+        changeEndDate(endDate) {
+            this.simulationParameters.endDate = endDate;
+
+            for (let endDateSub of this.endDateSubscriptions) {
+                endDateSub.changeEndDate(this.simulationParameters);
             }
         }
 

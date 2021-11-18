@@ -1,5 +1,8 @@
-export class Slider extends HTMLElement {
-    constructor(sliderWidth, nFrames) {
+import { ISMOBILE } from '../app.js';
+import { SimComponentModel } from '../models/simComponentModel.js';
+
+export class Slider extends SimComponentModel {
+    constructor(sliderWidth, nFrames, mobileWidth = sliderWidth) {
         super();
         this.innerHTML = `
             <div id='slider' class='slider'>
@@ -8,27 +11,45 @@ export class Slider extends HTMLElement {
             </div>
         `;
         this.sliderWidth = sliderWidth;
+        this.mobileWidth = mobileWidth;
+        this.desktopWidth = sliderWidth;
         this.nFrames = nFrames;
         this.frame = 0;
+
+        this.uiElements = {
+            slider: this.querySelector('#slider'),
+            sliderBar: this.querySelector('#slider-bar'),
+            sliderHead: this.querySelector('#slider-head'),
+        }
     }
 
     connectedCallback() {
-        const sliderHead = this.querySelector('#slider-head');
+        let { slider, sliderHead, sliderBar } = this.uiElements;
         sliderHead.onpointerdown = (e) => {
             this.dragSliderHead(e);
         }
-
-        const sliderBar = this.querySelector('#slider-bar');
         sliderBar.onclick = (e) => {
             this.clickBar(e);
         }
 
-        this.querySelector('#slider').style.width = this.sliderWidth + 'px';
+        slider.style.width = this.sliderWidth + 'px';
+        window.addEventListener('resize', () => {
+            this.windowResize();
+        });
+    }
+
+    windowResize() {
+        if (ISMOBILE && this.sliderWidth == this.desktopWidth) {
+            this.sliderWidth = this.mobileWidth;
+            slider.style.width = this.mobileWidth + 'px';
+        } else if (!ISMOBILE && this.sliderWidth == this.mobileWidth) {
+            this.sliderWidth = this.desktopWidth;
+            slider.style.width = this.desktopWidth + 'px';
+        }
     }
 
     dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {
-        const sliderHead = this.querySelector('#slider-head');
-        const sliderBar = this.querySelector('#slider-bar');
+        let { sliderHead, sliderBar } = this.uiElements;
 
         document.body.classList.add('grabbing');
         sliderHead.style.cursor = 'grabbing';
@@ -45,8 +66,7 @@ export class Slider extends HTMLElement {
     }
 
     setEndOfSliderHeadDrag(finishedCallback = null) {
-        const sliderHead = this.querySelector('#slider-head');
-        const sliderBar = this.querySelector('#slider-bar');
+        let { sliderHead, sliderBar } = this.uiElements;
 
         document.onpointerup = () => {
             if (finishedCallback) {
@@ -84,16 +104,17 @@ export class Slider extends HTMLElement {
     updateHeadPosition(newFrame) {
         this.frame = newFrame;
 
-        const sliderHead = this.querySelector('#slider-head');
+        let { sliderHead } = this.uiElements;
         let percentage = newFrame / this.nFrames;
         let left = Math.floor(percentage * this.sliderWidth *.95);
         sliderHead.style.left = left + 'px';
     }
 
     clickBar(e, updateCallback = null) {
-        const head = this.querySelector('#slider-head').getBoundingClientRect();
+        let { sliderHead } = this.uiElements;
+        const head = sliderHead.getBoundingClientRect();
         let diff = Math.floor((e.clientX - head.left) / this.sliderWidth * this.nFrames);
-
+        
         let newFrame = this.frame + diff;
 
         if (updateCallback == null) {
