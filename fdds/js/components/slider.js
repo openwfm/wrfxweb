@@ -2,6 +2,25 @@ import { ISMOBILE } from '../app.js';
 import { SimComponentModel } from '../models/simComponentModel.js';
 
 export class Slider extends SimComponentModel {
+    windowResize() {
+        if (ISMOBILE && (this.sliderWidth == this.desktopWidth)) {
+            this.sliderWidth = this.mobileWidth;
+            slider.style.width = this.mobileWidth + 'px';
+        } else if (!ISMOBILE && (this.sliderWidth == this.mobileWidth)) {
+
+            // BUG PRINT
+            // let print = {
+            //     sliderWidth: this.sliderWidth,
+            //     desktopWidth: this.desktopWidth,
+            //     mobileWidth: this.mobileWidth,
+            // };
+            // console.log(print);
+
+            this.sliderWidth = this.desktopWidth;
+            slider.style.width = this.desktopWidth + 'px';
+        }
+    }
+
     constructor(sliderWidth, nFrames, mobileWidth = sliderWidth) {
         super();
         this.innerHTML = `
@@ -46,25 +65,6 @@ export class Slider extends SimComponentModel {
         window.addEventListener('resize', () => {
             this.windowResize();
         });
-    }
-
-    windowResize() {
-        if (ISMOBILE && (this.sliderWidth == this.desktopWidth)) {
-            this.sliderWidth = this.mobileWidth;
-            slider.style.width = this.mobileWidth + 'px';
-        } else if (!ISMOBILE && (this.sliderWidth == this.mobileWidth)) {
-
-            // BUG PRINT
-            // let print = {
-            //     sliderWidth: this.sliderWidth,
-            //     desktopWidth: this.desktopWidth,
-            //     mobileWidth: this.mobileWidth,
-            // };
-            // console.log(print);
-
-            this.sliderWidth = this.desktopWidth;
-            slider.style.width = this.desktopWidth + 'px';
-        }
     }
 
     dragSliderHead(e, originalFrame = this.frame, updateCallback = null, finishedCallback = null) {

@@ -116,6 +116,10 @@ export const simState = (function makeSimState() {
         }
 
         changeTimestamp(timestamp) {
+            let { startDate, endDate } = this.simulationParameters;
+            if ((timestamp > endDate) || (timestamp < startDate)) {
+                return;
+            }
             this.simulationParameters.timestamp = timestamp;
 
             for (let timestampSub of this.timestampSubscriptions) {
@@ -133,6 +137,14 @@ export const simState = (function makeSimState() {
         }
 
         changeStartDate(startDate) {
+            let { endDate, timestamp } = this.simulationParameters;
+            if (startDate >= endDate) {
+                return;
+            }
+            if (startDate > timestamp) {
+                this.changeTimestamp(startDate);
+            }
+
             this.simulationParameters.startDate = startDate;
 
             for (let startDateSub of this.startDateSubscriptions) {
@@ -141,6 +153,13 @@ export const simState = (function makeSimState() {
         }
 
         changeEndDate(endDate) {
+            let { startDate, timestamp } = this.simulationParameters;
+            if (endDate <= startDate) {
+                return;
+            }
+            if (endDate < timestamp) {
+                this.changeTimestamp(endDate);
+            }
             this.simulationParameters.endDate = endDate;
 
             for (let endDateSub of this.endDateSubscriptions) {

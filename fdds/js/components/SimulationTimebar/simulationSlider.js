@@ -168,7 +168,6 @@ export class SimulationSlider extends Slider {
         }
     }
 
-    /** ===== BoundingDateInitialization block ===== */
     initializeBoundingDate(boundingDate) {
         let { sliderStart } = this.uiElements;
         const updateCallback = (timeIndex) => {
@@ -200,6 +199,7 @@ export class SimulationSlider extends Slider {
         }
     }
 
+    /** ===== Util block ===== */
     setSliderMarkerInfo(timestamp) {
         let { sliderMarkerInfo } = this.uiElements;
         if (timestamp == null) {
@@ -211,15 +211,20 @@ export class SimulationSlider extends Slider {
         sliderMarkerInfo.classList.add('hovered');
     }
 
-    /** ===== Util block ===== */
     nextFrame() {
-        return ((this.frame + 1) % (this.nFrames + 1));
+        let { startDate, endDate, sortedTimestamps } = simState.simulationParameters;
+        let nextFrame = ((this.frame + 1) % (this.nFrames + 1));
+        if (nextFrame > sortedTimestamps.indexOf(endDate) || nextFrame == 0) {
+            nextFrame = sortedTimestamps.indexOf(startDate);
+        }
+        return nextFrame;
     }
 
     prevFrame() {
+        let { startDate, endDate, sortedTimestamps } = simState.simulationParameters;
         let prevFrame = (this.frame - 1) % (this.nFrames + 1);
-        if (prevFrame < 0) {
-            prevFrame = this.nFrames;
+        if (prevFrame < sortedTimestamps.indexOf(startDate)) {
+            prevFrame = sortedTimestamps.indexOf(endDate);
         }
         return prevFrame;
     }

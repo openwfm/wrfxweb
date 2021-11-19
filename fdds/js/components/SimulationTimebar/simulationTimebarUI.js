@@ -18,7 +18,15 @@ const NORMAL_RATE = 330;
  *      3. FrameNavigation block
  */
 export class SimulationTimebarUI extends SimComponentModel {
-    /** ===== Initialization block ===== */
+    windowResize() {
+        let { timestampDisplay, buttonDisplay } = this.uiElements;
+        if (ISMOBILE) {
+            timestampDisplay.parentNode.insertBefore(timestampDisplay, buttonDisplay);
+        } else { 
+            timestampDisplay.parentNode.insertBefore(buttonDisplay, timestampDisplay);
+        }
+    }
+    
     constructor() {
         super();
         this.innerHTML = `
@@ -129,10 +137,10 @@ export class SimulationTimebarUI extends SimComponentModel {
         let { fastForward, slowDown } = this.uiElements;
 
         fastForward.onpointerdown = () => {
-            this.toggleRate(FAST_RATE, speedUp, slowDown);
+            this.toggleRate(FAST_RATE, fastForward, slowDown);
         }
         slowDown.onpointerdown = () => {
-            this.toggleRate(SLOW_RATE, slowDown, speedUp);
+            this.toggleRate(SLOW_RATE, slowDown, fastForward);
         }
     }
 
@@ -176,16 +184,6 @@ export class SimulationTimebarUI extends SimComponentModel {
         this.updateDisplayedTimestamp(timestamp);
     }
 
-    /** ===== UI block ===== */
-    windowResize() {
-        let { timestampDisplay, buttonDisplay } = this.uiElements;
-        if (ISMOBILE) {
-            timestampDisplay.parentNode.insertBefore(timestampDisplay, buttonDisplay);
-        } else { 
-            timestampDisplay.parentNode.insertBefore(buttonDisplay, timestampDisplay);
-        }
-    }
-
     updateDisplayedTimestamp(timestamp) {
         let { timestampDisplay } = this.uiElements;
         timestampDisplay.innerText = utcToLocal(timestamp);
@@ -215,7 +213,13 @@ export class SimulationTimebarUI extends SimComponentModel {
 
     /** ===== FrameNavigation block ===== */
     playPause() {
-
+        this.playing = !this.playing;
+        if (this.playing) {
+            this.setPlayingUI();
+            this.play();
+        } else { 
+            this.setPausedUI();
+        }
     }
 
     play() {
@@ -230,5 +234,3 @@ export class SimulationTimebarUI extends SimComponentModel {
 
     }
 }
-
-window.customElements.define('simulation-timebar', SimulationTimebarUI);
