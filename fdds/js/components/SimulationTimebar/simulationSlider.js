@@ -37,10 +37,11 @@ export class SimulationSlider extends Slider {
 
     connectedCallback() {
         super.connectedCallback();
-        this.initializeSlider();
 
-        this.initializeStartSetter();
-        this.initializeEndSetter();
+        let { sliderStart, sliderEnd } = this.uiElements;
+        this.initializeSlider();
+        this.initializeBoundingDate(sliderStart);
+        this.initializeBoundingDate(sliderEnd);
     }
 
     /** ===== Simulation Update Block ===== */
@@ -94,13 +95,15 @@ export class SimulationSlider extends Slider {
         this.updateHeadPosition(newFrame);
     }
 
-    changeStartDate() {
+    changeStartDate({ startDate }) {
         this.updateStartLocation();
+        this.setSliderMarkerInfo(startDate);
         this.updateProgressWidth();
     }
 
-    changeEndDate() {
+    changeEndDate({ endDate }) {
         this.updateEndLocation();
+        this.setSliderMarkerInfo(endDate);
         this.updateProgressWidth();
     }
 
@@ -112,14 +115,14 @@ export class SimulationSlider extends Slider {
     }
 
     updateStartLocation() {
-        const sliderStart = this.querySelector('#slider-start');
+        let { sliderStart } = this.uiElements;
         let left = this.getStartLeft();
 
         sliderStart.style.left = left + 'px';
     }
 
     updateEndLocation() {
-        const sliderEnd = this.querySelector('#slider-end');
+        let { sliderEnd } = this.uiElements;
         let left = this.getEndLeft();
 
         sliderEnd.style.left = left + 'px';
@@ -166,92 +169,46 @@ export class SimulationSlider extends Slider {
     }
 
     /** ===== BoundingDateInitialization block ===== */
-    initializeStartSetter() {
+    initializeBoundingDate(boundingDate) {
         let { sliderStart } = this.uiElements;
         const updateCallback = (timeIndex) => {
-            let endDate = controllers.endDate.getValue();
-            const dateComparator = (newTimestamp) => newTimestamp >= endDate;
-            let boundingIndex = simVars.sortedTimestamps.indexOf(endDate) - 1;
-            this.boundingDateDragUpdate(timeIndex, controllers.startDate, dateComparator, boundingIndex);
+            let { sortedTimestamps } = simState.simulationParameters;
+            let newTimestamp = sortedTimestamps[timeIndex];
+            if (boundingDate == sliderStart) {
+                simState.changeStartDate(newTimestamp);
+            } else {
+                simState.changeEndDate(newTimestamp);
+            }
         }
         const finishedCallback = () => {
-            this.boundingDateDragComplete(controllers.startDate);
+            this.setSliderMarkerInfo(null);
         }
-
-        this.setBoundingDateMouseOver(controllers.startDate, sliderStart);
-        this.setBoundingDateMouseOut(sliderStart);
-        this.setBoundingDatePointerDown(controllers.startDate, sliderStart, updateCallback, finishedCallback);
-    }
-
-    initializeEndSetter() {
-        const sliderEnd = this.querySelector('#slider-end');
-        const updateCallback = (timeIndex) => {
-            let startDate = controllers.startDate.getValue();
-            const dateComparator = (newTimestamp) => newTimestamp < startDate;
-            let boundingIndex = simVars.sortedTimestamps.indexOf(startDate) + 1;
-            this.boundingDateDragUpdate(timeIndex, controllers.endDate, dateComparator, boundingIndex);
+        boundingDate.onmouseover = () => {
+            let { startDate, endDate } = simState.simulationParameters;
+            let markerDate = (boundingDate == sliderStart) ? startDate : endDate;
+            this.setSliderMarkerInfo(markerDate);
+        }    
+        boundingDate.onmouseout = () => {
+            this.setSliderMarkerInfo(null);
         }
-        const finishedCallback = () => {
-            this.boundingDateDragComplete(controllers.endDate);
-        }
+        boundingDate.onpointerdown = (e) => {
+            let { startDate, endDate, sortedTimestamps } = simState.simulationParameters;
+            let originalTimestamp = (boundingDate == sliderStart) ? startDate : endDate;
+            let originalFrame = sortedTimestamps.indexOf(originalTimestamp);
 
-        this.setBoundingDateMouseOver(controllers.endDate, sliderEnd);
-        this.setBoundingDateMouseOut(sliderEnd);
-        this.setBoundingDatePointerDown(controllers.endDate, sliderEnd, updateCallback, finishedCallback);
-    }
-
-    setBoundingDateMouseOver(boundingDateController, sliderMarker) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-        sliderMarker.onmouseover = () => {
-            let boundingDate = boundingDateController.getValue();
-
-            this.setSliderMarkerInfo(boundingDate);
-            sliderMarkerInfo.classList.add('hovered');
-        }
-    }
-
-    setBoundingDateMouseOut(sliderMarker) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-        sliderMarker.onmouseout = () => {
-            sliderMarkerInfo.classList.remove('hovered');
-        };
-    }
-
-    setBoundingDatePointerDown(boundingDateController, sliderMarker, updateCallback, finishedCallback) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-
-        sliderMarker.onpointerdown = (e) => {
-            sliderMarkerInfo.classList.add('clicked');
-            let boundingDate = boundingDateController.getValue();
-            let originalFrame = simVars.sortedTimestamps.indexOf(boundingDate);
-
-            this.setSliderMarkerInfo(boundingDate);
-            simState.changeLoadingProgress(0);
             this.dragSliderHead(e, originalFrame, updateCallback, finishedCallback);
         }
     }
 
-    boundingDateDragUpdate(timeIndex, updatingController, dateComparator, boundingIndex) {
-        let newTimestamp = simVars.sortedTimestamps[timeIndex];
-        if (dateComparator(newTimestamp)) {
-            newTimestamp = simVars.sortedTimestamps[boundingIndex];
+    setSliderMarkerInfo(timestamp) {
+        let { sliderMarkerInfo } = this.uiElements;
+        if (timestamp == null) {
+            sliderMarkerInfo.classList.remove('hovered');
+            return;
         }
-
-        updatingController.setValue(newTimestamp, controllerEvents.SLIDING_VALUE);
-        this.setSliderMarkerInfo(newTimestamp);
-    }
-
-    boundingDateDragComplete(dateController) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-
-        sliderMarkerInfo.classList.remove('clicked');
-        dateController.broadcastEvent(controllerEvents.VALUE_SET);
-    }
-    
-    setSliderMarkerInfo(timeStamp) {
-        const sliderMarkerInfo = this.querySelector('#slider-marker-info');
-        let localTime = utcToLocal(timeStamp);
+        let localTime = utcToLocal(timestamp);
         sliderMarkerInfo.innerHTML = localTime;
+        sliderMarkerInfo.classList.add('hovered');
     }
 
     /** ===== Util block ===== */

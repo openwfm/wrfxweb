@@ -16,6 +16,16 @@ export class Slider extends SimComponentModel {
         this.nFrames = nFrames;
         this.frame = 0;
 
+        // BUG: Seems to be called for other elements? static variables? 
+        //      not sure what's going on, but breaks when there are multipl
+        //      sliders on the page. this is a helpfu print statement.
+        // let print = {
+        //     sliderWidth: sliderWidth,
+        //     mobileWidth: mobileWidth,
+        //     desktopWidth: this.desktopWidth,
+        // }
+        // console.log(print);
+
         this.uiElements = {
             slider: this.querySelector('#slider'),
             sliderBar: this.querySelector('#slider-bar'),
@@ -39,10 +49,19 @@ export class Slider extends SimComponentModel {
     }
 
     windowResize() {
-        if (ISMOBILE && this.sliderWidth == this.desktopWidth) {
+        if (ISMOBILE && (this.sliderWidth == this.desktopWidth)) {
             this.sliderWidth = this.mobileWidth;
             slider.style.width = this.mobileWidth + 'px';
-        } else if (!ISMOBILE && this.sliderWidth == this.mobileWidth) {
+        } else if (!ISMOBILE && (this.sliderWidth == this.mobileWidth)) {
+
+            // BUG PRINT
+            // let print = {
+            //     sliderWidth: this.sliderWidth,
+            //     desktopWidth: this.desktopWidth,
+            //     mobileWidth: this.mobileWidth,
+            // };
+            // console.log(print);
+
             this.sliderWidth = this.desktopWidth;
             slider.style.width = this.desktopWidth + 'px';
         }
