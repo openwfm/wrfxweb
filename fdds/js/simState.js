@@ -250,11 +250,11 @@ export const simState = (function makeSimState() {
             if (sortedTimestamps.includes(presetStartDate)) {
                 startDate = presetStartDate;
             } else if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0 || desc.indexOf('SAT') >= 0) {
-                let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
-                for (let i = 2; i <= nextTimestamps.length; i++) {
-                    startDate = nextTimestamps[nextTimestamps.length - i];
+                let lastTimestamp = sortedTimestamps[sortedTimestamps.length - 1];
+                for (let i = 2; i <= sortedTimestamps.length; i++) {
+                    startDate = sortedTimestamps[sortedTimestamps.length - i];
                     if (daysBetween(startDate, lastTimestamp) >= 15) {
-                        startDate = nextTimestamps[nextTimestamps.length - i + 1];
+                        startDate = sortedTimestamps[sortedTimestamps.length - i + 1];
                         break;
                     }
                 }
