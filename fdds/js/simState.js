@@ -106,13 +106,46 @@ export const simState = (function makeSimState() {
         }
 
         changeDomain(domId) {
-            this.simulationParameters.domain = domId;
+            let { rasters, sortedTimestamps, timestamp, startDate, endDate } = this.simulationParameters;
+
+            let nextTimestamps = Object.keys(rasters[domId]).sort();
+            let nextTimestamp = this.getNewTimestamp(sortedTimestamps, nextTimestamps, timestamp);
+            let nextStartDate = this.getNewTimestamp(sortedTimestamps, nextTimestamps, startDate);
+            let nextEndDate = this.getNewTimestamp(sortedTimestamps, nextTimestamps, endDate);
+
+            this.simulationParameters = {
+                ...this.simulationParameters,
+                domain: domId,
+                sortedTimestamps: nextTimestamps,
+                timestamp: nextTimestamp,
+                startDate: nextStartDate,
+                endDate: nextEndDate
+            };
 
             for (let domainSub of this.domainSubscriptions) {
                 domainSub.changeDomain(this.simulationParameters);
             }
 
             setURL(this.simulationParameters , this.map)
+        }
+
+        getNewTimestamp(prevTimestamps, nextTimestamps, timestamp) {
+            if (nextTimestamps.includes(timestamp)) {
+                return timestamp;
+            }
+            let prevIndex = prevTimestamps.indexOf(timestamp);
+            let percentage = prevIndex / prevTimestamps.length;
+            let newIndex = Math.floor(nextTimestamps.length * percentage);
+    
+            return nextTimestamps[newIndex];
+        }
+
+        getNewStartDate() {
+
+        }
+
+        getNewEndDate() {
+
         }
 
         changeTimestamp(timestamp) {
