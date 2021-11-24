@@ -240,10 +240,14 @@ export class LayerControllerUI extends SimComponentModel {
 
     makeLayersForDomainAndRasters(domain, rasters, overlayList) {
         for (let layerName in rasters) {
-            let rasterInfo = rasters[layerName];
             let layer = this.getLayer(domain, layerName);
             if (layer == null) {
-                layer = new SimulationLayer(layerName, domain, rasterInfo);
+                let layerParams = {
+                    layerName: layerName,
+                    domain: domain,
+                    rasterInfo: rasters[layerName],
+                }
+                layer = new SimulationLayer(layerParams);
                 if(overlayList.indexOf(layerName) >= 0) {
                     this.overlayDict[domain][layerName] = layer;
                 } else {

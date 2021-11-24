@@ -2,6 +2,7 @@ import { simVars } from '../simVars.js';
 import { controllers } from './Controller.js';
 import { map } from '../map.js';
 import { utcToLocal } from '../util.js';
+import { simState } from '../../simState.js';
 
 /** Layer for a specific domain. 
  *      Contents
@@ -13,9 +14,10 @@ import { utcToLocal } from '../util.js';
 */
 export class SimulationLayer {
     /** ===== Initialization block ===== */
-    constructor(layerName, domain, rasterInfo) {
+    constructor({ layerName, domain, rasterInfo }) {
         let cs = rasterInfo.coords;
-        let layerURL = simVars.rasterBase + rasterInfo.raster;
+        let { rasterBase } = simState.simulationParameters;
+        let layerURL = rasterBase + rasterInfo.raster;
         let hasColorbar = ('colorbar' in rasterInfo);
 
         this.layerName = layerName;
@@ -42,24 +44,24 @@ export class SimulationLayer {
 
     /** ===== AddToAndRemoveFromMap block ===== */
     addLayerToMap() {
+        let { rasters, overlayOrder } = simState.simulationParameters;
+
         let currentTimestamp = controllers.currentTimestamp.getValue();
-        let rastersNow = simVars.rasters[this.domain][currentTimestamp];
+        let rastersNow = rasters[this.domain][currentTimestamp];
         let rasterInfo = rastersNow[this.layerName];
         let opacity = controllers.opacity.getValue();
 
         this.imageOverlay.addTo(map);
-        if (!(simVars.overlayOrder.includes(this.layerName))) {
-            simVars.overlayOrder.push(this.layerName);
+        if (!(overlayOrder.includes(this.layerName))) {
+            overlayOrder.push(this.layerName);
         }
         this.imageOverlay.bringToFront();
         this.imageOverlay.setUrl(simVars.rasterBase + rasterInfo.raster);
         this.imageOverlay.setOpacity(opacity);
         if (this.hasColorbar) {
             let cbURL = simVars.rasterBase + rasterInfo.colorbar;
-            controllers.colorbarURL.setValue(cbURL);
-            // simVars.setColorbarURL(cbURL);
-            // simVars.showColorbar();
-            simVars.displayedColorbar = this.layerName;
+            simState.changeColorbarURL(cbURL);
+            simState.changeColorbarLayer(this.layerName);
         }
     }
 
@@ -70,8 +72,9 @@ export class SimulationLayer {
     }
     
     removeLayer() {
+        let { overlayOrder } = simState.simulationParameters;
         this.imageOverlay.remove(map);
-        simVars.overlayOrder.splice(simVars.overlayOrder.indexOf(this.layerName), 1);
+        overlayOrder.splice(overlayOrder.indexOf(this.layerName), 1);
     }
 
     setOpacity(opacity) {
@@ -82,13 +85,14 @@ export class SimulationLayer {
 
     /** ===== LoadingTimestamp block ===== */
     dataArrayToLoadForTimestamp(timestamp) {
+        let { rasters, rasterBase } = simState.simulationParameters;
         if (this.timestampIsPreloaded(timestamp)) {
             return null;
         }
         let toLoad = [];
-        let raster = simVars.rasters[this.domain][timestamp];
+        let raster = rasters[this.domain][timestamp];
         let rasterInfo = raster[this.layerName];
-        let imgURL = simVars.rasterBase + rasterInfo.raster;
+        let imgURL = rasterBase + rasterInfo.raster;
         toLoad.push({
             imageURL: imgURL,
             timeStamp: timestamp,
@@ -97,7 +101,7 @@ export class SimulationLayer {
             colorbar: false
         });
         if (this.hasColorbar) {
-            let colorbarURL = simVars.rasterBase + rasterInfo.colorbar;
+            let colorbarURL = rasterBase + rasterInfo.colorbar;
             toLoad.push({
                 imageURL: colorbarURL,
                 timeStamp: timestamp,
@@ -119,19 +123,20 @@ export class SimulationLayer {
     }
 
     setLayerImagesToTimestamp(timestamp) {
+        let { colorbarLayer } = simState.simulationParameters;
         let imageURL = this.getURLAtTimestamp(timestamp);
         this.imageOverlay.setUrl(imageURL);
-        if (this.layerName == simVars.displayedColorbar) {
+        if (this.layerName == colorbarLayer) {
             let colorbarURL = this.getColorbarURLAtTimestamp(timestamp);
             if (colorbarURL != null) {
                 controllers.colorbarURL.setValue(colorbarURL);
-                // simVars.setColorbarURL(colorbarURL);
             }
         }
     }
 
     getURLAtTimestamp(timestamp) {
-        let rastersNow = simVars.rasters[this.domain][timestamp];
+        let { rasters } = simState.simulationParameters;
+        let rastersNow = rasters[this.domain][timestamp];
         let rasterInfo = rastersNow[this.layerName];
         let imageURL = simVars.rasterBase + rasterInfo.raster;
         if (timestamp in this.preloadedRasters) {
