@@ -1,6 +1,5 @@
 import { SimComponentModel } from '../models/simComponentModel.js';
 import { doubleClick, dragElement } from '../util.js';
-import { controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 
 export class ColorbarPanel extends SimComponentModel {

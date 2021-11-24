@@ -1,14 +1,17 @@
 import { Slider } from './slider.js';
-import { controllerEvents, controllers } from './Controller.js';
-import { setURL, createElement } from '../util.js';
+import { createElement } from '../util.js';
 
 /**         Contents
  *  1. Initialization block
  *  2. Update block
  */
+const DEFAULT_WIDTH = 284;
+const DEFAULT_MOBILE_WIDTH = 284;
+const DEFAULT_OPACITY = 0.5;
+
 export class OpacitySlider extends Slider {
     /** ===== Initialization block ===== */
-    constructor({ updateCallback, initialOpacity = 0.5, sliderWidth = 284, mobileWidth = sliderWidth }) {
+    constructor({ updateCallback, initialOpacity = DEFAULT_OPACITY, sliderWidth = DEFAULT_WIDTH, mobileWidth = DEFAULT_MOBILE_WIDTH }) {
         super(sliderWidth, 20, mobileWidth);
         this.updateCallback = updateCallback;
         this.opacity = initialOpacity; 
@@ -20,36 +23,32 @@ export class OpacitySlider extends Slider {
         this.createOpacityDisplay();
         this.initializeSliderHead();
         this.initializeSliderBar();
-
-        controllers.currentDomain.subscribe(() => {
-            this.updateOpacity();
-        }, controllerEvents.ALL);
     }
 
     createOpacityDisplay() {
-        const slider = this.querySelector('#slider');
+        let { slider } = this.uiElements;
         const opacityDisplay = createElement('opacity-display');
         let opacity = this.opacity;
         opacityDisplay.innerHTML = opacity;
 
         slider.insertBefore(opacityDisplay, slider.firstChild);
         slider.classList.add('opacity-slider')
+        this.uiElements.opacityDisplay = opacityDisplay;
     }
 
     initializeSliderHead() {
-        const sliderHead = this.querySelector('#slider-head');
+        let { sliderHead } = this.uiElements;
         sliderHead.onpointerdown = (e) => {
             const updateCallback = (newFrame) => this.updateHeadPosition(newFrame);
-            this.dragSliderHead(e, this.frame, updateCallback, setURL);
+            this.dragSliderHead(e, this.frame, updateCallback);
         }
     }
 
     initializeSliderBar() {
-        const sliderBar = this.querySelector('#slider-bar');
+        let { sliderBar } = this.uiElements;
         sliderBar.onclick = (e) => {
             const updateCallback = (newFrame) => {
                 this.updateHeadPosition(newFrame);
-                setURL();
             }
             this.clickBar(e, updateCallback);
         }
@@ -73,11 +72,10 @@ export class OpacitySlider extends Slider {
 
     updateOpacity() {
         let opacity = this.opacity;
+        let { opacityDisplay, sliderHead } = this.uiElements;
 
-        const opacityDisplay = this.querySelector('#opacity-display');
         opacityDisplay.innerHTML = opacity;
 
-        const sliderHead = this.querySelector('#slider-head');
         let left = Math.floor(opacity * this.sliderWidth *.95);
         sliderHead.style.left = left + 'px';
 

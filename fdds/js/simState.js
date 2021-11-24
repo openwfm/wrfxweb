@@ -50,6 +50,7 @@ export const simState = (function makeSimState() {
             this.startDateSubscriptions = [];
             this.endDateSubscriptions = [];
             this.colorbarUrlSubscriptions = [];
+            this.layerOpacitySubscriptions = [];
             this.simulationParameters = {
                 simId: null,
                 metaData: {},
@@ -61,6 +62,7 @@ export const simState = (function makeSimState() {
                 domain: 0.5,
                 timestamp: null,
                 colorbarURL: null,
+                colorbarLayer: null,
                 startDate: null,
                 endDate: null,
                 loadingProgress: 0,
@@ -107,6 +109,9 @@ export const simState = (function makeSimState() {
             if (component.changeColorbarURL) {
                 this.colorbarUrlSubscriptions.push(component);
             }
+            if (component.changeLayerOpacity) {
+                this.layerOpacitySubscriptions.push(component);
+            }
 
             this.simulationSubscriptions.push(component);
         }
@@ -133,6 +138,7 @@ export const simState = (function makeSimState() {
             }
 
             setURL(this.simulationParameters , this.map)
+            // NEED TO SET MAP VIEW HERE TOO
         }
 
         getNewTimestamp(prevTimestamps, nextTimestamps, timestamp) {
@@ -144,14 +150,6 @@ export const simState = (function makeSimState() {
             let newIndex = Math.floor(nextTimestamps.length * percentage);
     
             return nextTimestamps[newIndex];
-        }
-
-        getNewStartDate() {
-
-        }
-
-        getNewEndDate() {
-
         }
 
         changeTimestamp(timestamp) {
@@ -166,6 +164,14 @@ export const simState = (function makeSimState() {
             }
         }
 
+        changeLayerOpacity(layerOpacity) {
+            this.simulationParameters.opacity = layerOpacity;
+
+            for (let opacitySub of this.layerOpacitySubscriptions) {
+                opacitySub.changeLayerOpacity(this.simulationParameters);
+            }
+        }
+
         changeColorbarURL(colorbarURL) {
             this.simulationParameters.colorbarURL = colorbarURL;
             for (let colorbarSub of this.colorbarUrlSubscriptions) {
@@ -173,13 +179,20 @@ export const simState = (function makeSimState() {
             }
         }
 
-        loadFrame() {
+        changeColorbarLayer(layerName) {
+            this.simulationParameters.colorbarLayer = layerName;
+        }
+        
+        changeLoadingProgress(nFrames) {
             let progress = 0;
             this.simulationParameters.loadingProgress = progress;
-
-            for (let loadingProgressSub of this.loadingProgressSubscriptions) {
-                loadingProgressSub.changeLoadingProgress(this.simulationParameters);
+            for (let progressSub of this.loadingProgressSubscriptions) {
+                progressSub.changeLoadingProgress(this.simulationParameters);
             }
+        }
+
+        loadFrames(nFrames = 0) {
+            this.changeLoadingProgress(nFrames);
         }
 
         changeStartDate(startDate) {
@@ -233,7 +246,7 @@ export const simState = (function makeSimState() {
             this.presetOverlayOrder();
 
             document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-
+            document.querySelector('#copyLink').classList.remove('hidden');
             document.querySelector('#simulation-flags').classList.remove('hidden');
 
             for (let simulationSub of this.simulationSubscriptions) { 
@@ -242,6 +255,7 @@ export const simState = (function makeSimState() {
 
 
             setURL(this.simulationParameters, this.map);
+            // NEED TO SET THE MAP VIEW HERE TOO
         }
 
         presetDomain() {
@@ -337,3 +351,5 @@ export const simState = (function makeSimState() {
 
     return new SimState();
 })();
+
+export const map = simState.map;
