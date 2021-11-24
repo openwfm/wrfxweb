@@ -42,6 +42,27 @@ export const simState = (function makeSimState() {
             return leafletMap;
         }
 
+        createNoLevels() {
+            const noLevels = new Set();
+            const makeKey = (layerName, domain, timestamp) => {
+                return layerName + ',' + domain + ',' + timestamp;
+            }
+            const addNoLevels = (layerName, domain, timestamp) => {
+                let key = makeKey(layerName, domain, timestamp);
+                noLevels.add(key);
+            }
+            const hasNoLevels = (layerName, domain, timestamp) => {
+                let key = makeKey(layerName, domain, timestamp);
+                return noLevels.has(key);
+            }
+
+            return ({
+                add: addNoLevels,
+                has: hasNoLevels,
+                clear: () => noLevels.clear()
+            });
+        }
+
         constructor() {
             this.timestampSubscriptions = [];
             this.domainSubscriptions = [];
@@ -58,6 +79,7 @@ export const simState = (function makeSimState() {
                 domains: [],
                 sortedTimestamps: [],
                 overlayOrder: [],
+                noLevels: this.createNoLevels(),
                 opacity: null,
                 domain: 0.5,
                 timestamp: null,
@@ -66,9 +88,8 @@ export const simState = (function makeSimState() {
                 startDate: null,
                 endDate: null,
                 loadingProgress: 0,
+                overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
             };
-            this.presetParameters = getPresetParams();
-            this.overlayList = ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
             this.baseLayerDict = {
                 /*
                 'MapQuest': L.tileLayer('http://{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png', {
@@ -82,6 +103,7 @@ export const simState = (function makeSimState() {
                 'OSM': L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                                     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'})
             }
+            this.presetParameters = getPresetParams();
             let mapParams = {
                 presetCenter: this.presetParameters.pan,
                 presetZoom: this.presetParameters.zoom,
