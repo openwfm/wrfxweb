@@ -49,6 +49,7 @@ export const simState = (function makeSimState() {
             this.loadingProgressSubscriptions = [];
             this.startDateSubscriptions = [];
             this.endDateSubscriptions = [];
+            this.colorbarUrlSubscriptions = [];
             this.simulationParameters = {
                 simId: null,
                 metaData: {},
@@ -59,6 +60,7 @@ export const simState = (function makeSimState() {
                 opacity: null,
                 domain: 0.5,
                 timestamp: null,
+                colorbarURL: null,
                 startDate: null,
                 endDate: null,
                 loadingProgress: 0,
@@ -102,6 +104,10 @@ export const simState = (function makeSimState() {
             if (component.changeEndDate) {
                 this.endDateSubscriptions.push(component);
             }
+            if (component.changeColorbarURL) {
+                this.colorbarUrlSubscriptions.push(component);
+            }
+
             this.simulationSubscriptions.push(component);
         }
 
@@ -157,6 +163,13 @@ export const simState = (function makeSimState() {
 
             for (let timestampSub of this.timestampSubscriptions) {
                 timestampSub.changeTimestamp(this.simulationParameters);
+            }
+        }
+
+        changeColorbarURL(colorbarURL) {
+            this.simulationParameters.colorbarURL = colorbarURL;
+            for (let colorbarSub of this.colorbarUrlSubscriptions) {
+                colorbarSub.changeColorbarURL(this.simulationParameters);
             }
         }
 

@@ -1,8 +1,9 @@
-import { doubleClick, dragElement, IS_MOBILE } from '../util.js';
+import { SimComponentModel } from '../models/simComponentModel.js';
+import { doubleClick, dragElement } from '../util.js';
 import { controllers } from './Controller.js';
 import { OpacitySlider } from './opacitySlider.js';
 
-export class ColorbarPanel extends HTMLElement {
+export class ColorbarPanel extends SimComponentModel {
     constructor() {
         super();
         this.innerHTML = `
@@ -19,34 +20,41 @@ export class ColorbarPanel extends HTMLElement {
                 </div>
             </div>
         `;
+        this.uiElements = {
+            colorbarImgContainer: this.querySelector('#colorbar-panel'),
+            colorbarBgImg: this.querySelector('#raster-colorbar-bg'),
+            colorbarImg: this.querySelector('#raster-colorbar'),
+            colorbarTab: this.querySelector('#colorbar-tab'),
+            doneButton: this.querySelector('#colorbar-opacity-done'),
+            colorbarOpacity: this.querySelector('#colorbar-opacity'),
+        };
     }
 
     connectedCallback() {
-        const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
-        dragElement(colorbarBgImg, '', true);
+        let { colorbarBgImg } = this.uiElements;
 
-        this.subscribeToColorbarURL();
+        dragElement(colorbarBgImg, '', true);
 
         this.initializeColorbarTab();
         this.intializeOpacitySlider();
-   }
+    }
+   
+    changeSimulation() {
+       this.hidePanel();
+    }
 
-   subscribeToColorbarURL() {
-        const colorbarImg = this.querySelector('#raster-colorbar');
-        controllers.colorbarURL.subscribe(() => {
-            let colorbarURL = controllers.colorbarURL.getValue();
-            if (colorbarURL == null || colorbarURL == '') {
-                this.hidePanel();
-            } else {
-                this.showPanel();
-                colorbarImg.src = colorbarURL;
-            }
-        });
-   }
+    changeColorbarURL({ colorbarURL }) {
+        let { colorbarImg } = this.uiElements;
+        if (colorbarURL == null || colorbarURL == '') {
+            this.hidePanel();
+        } else {
+            this.showPanel();
+            colorbarImg.src = colorbarURL;
+        }
+    }
 
-   initializeColorbarTab() {
-        const colorbarTab = this.querySelector('#colorbar-tab');
-        const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
+    initializeColorbarTab() {
+        let { colorbarTab, colorbarBgImg } = this.uiElements;
         colorbarTab.onpointerdown = () => {
             if (colorbarBgImg.classList.contains('hidden')) {
                 this.showColorbar();
@@ -54,19 +62,21 @@ export class ColorbarPanel extends HTMLElement {
                 this.hideColorbar();
             }
         }
-   }
+    }
 
-   intializeOpacitySlider() {
-        const colorbarBgImg = this.querySelector('#raster-colorbar-bg');
-        const colorbarImg = this.querySelector('#raster-colorbar');
-        const doneButton = this.querySelector('#colorbar-opacity-done');
-        const colorbarOpacity = this.querySelector('#colorbar-opacity');
+    intializeOpacitySlider() {
+        let { colorbarBgImg, colorbarImg, doneButton, colorbarOpacity } = this.uiElements;
 
         const opacityUpdateCallback = (opacity) => {
             colorbarBgImg.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
         }
-        const sliderWidth = IS_MOBILE ? 70 : 140;
-        const opacitySlider = new OpacitySlider(opacityUpdateCallback, null, 1, sliderWidth);
+        const opacitySliderParams = {
+            sliderWidth: 140,
+            mobileWidth: 70,
+            initialOpacity: 1,
+            updateCallback: opacityUpdateCallback,
+        }
+        const opacitySlider = new OpacitySlider(opacitySliderParams);
         colorbarOpacity.insertBefore(opacitySlider, doneButton);
         let doubleClickCallback = () => {
             if (colorbarImg.classList.contains('hidden')) {
@@ -82,26 +92,26 @@ export class ColorbarPanel extends HTMLElement {
             colorbarOpacity.classList.add('hidden');
        }
        doubleClick(colorbarBgImg, doubleClickCallback);
-   }
+    }
 
     hidePanel() {
-        const colorbarImgContainer = this.querySelector('#colorbar-panel');
+        let { colorbarImgContainer } = this.uiElements;
         colorbarImgContainer.classList.add('hidden');
     }
 
     showPanel() {
-        const colorbarImgContainer = this.querySelector('#colorbar-panel');
+        let { colorbarImgContainer } = this.uiElements;
         colorbarImgContainer.classList.remove('hidden');
     }
 
     showColorbar() {
-        const colorbarImg = this.querySelector('#raster-colorbar-bg');
-        colorbarImg.classList.remove('hidden');
+        let { colorbarBgImg } = this.uiElements;
+        colorbarBgImg.classList.remove('hidden');
     }
 
     hideColorbar() {
-        const colorbarImg = this.querySelector('#raster-colorbar-bg');
-        colorbarImg.classList.add('hidden');
+        let { colorbarBgImg } = this.uiElements;
+        colorbarBgImg.classList.add('hidden');
     }
 }
 

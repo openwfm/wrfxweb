@@ -8,9 +8,8 @@ import { setURL, createElement } from '../util.js';
  */
 export class OpacitySlider extends Slider {
     /** ===== Initialization block ===== */
-    constructor(updateCallback, subscribeTo, initialOpacity = 0.5, sliderWidth = 284) {
-        super(sliderWidth, 20);
-        this.subscribeTo = subscribeTo;
+    constructor({ updateCallback, initialOpacity = 0.5, sliderWidth = 284, mobileWidth = sliderWidth }) {
+        super(sliderWidth, 20, mobileWidth);
         this.updateCallback = updateCallback;
         this.opacity = initialOpacity; 
     }
@@ -22,12 +21,6 @@ export class OpacitySlider extends Slider {
         this.initializeSliderHead();
         this.initializeSliderBar();
 
-        if (this.subscribeTo != null) {
-            this.subscribeTo.subscribe(() => {
-                this.updateOpacity();
-            });
-        }
-
         controllers.currentDomain.subscribe(() => {
             this.updateOpacity();
         }, controllerEvents.ALL);
@@ -36,7 +29,7 @@ export class OpacitySlider extends Slider {
     createOpacityDisplay() {
         const slider = this.querySelector('#slider');
         const opacityDisplay = createElement('opacity-display');
-        let opacity = this.subscribeTo ? this.subscribeTo.getValue() : this.opacity;
+        let opacity = this.opacity;
         opacityDisplay.innerHTML = opacity;
 
         slider.insertBefore(opacityDisplay, slider.firstChild);
@@ -71,19 +64,15 @@ export class OpacitySlider extends Slider {
         }
 
         let opacity = Math.floor(newFrame / this.nFrames * 100) / 100;
-        if (this.subscribeTo != null) {
-            controllers.opacity.setValue(opacity);
-        } else { 
-            this.opacity = opacity;
-            if (this.updateCallback != null) {
-                this.updateCallback(opacity);
-            }
-            this.updateOpacity();
+        this.opacity = opacity;
+        if (this.updateCallback != null) {
+            this.updateCallback(opacity);
         }
+        this.updateOpacity();
     }
 
     updateOpacity() {
-        let opacity = this.subscribeTo ? this.subscribeTo.getValue() : this.opacity;
+        let opacity = this.opacity;
 
         const opacityDisplay = this.querySelector('#opacity-display');
         opacityDisplay.innerHTML = opacity;
