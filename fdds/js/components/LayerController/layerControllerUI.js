@@ -9,15 +9,11 @@ import { SimComponentModel } from '../../models/simComponentModel.js';
  * to choose different layers available to add. 
  * 
  *              Contents
- *  1. Initialization block
- *  2. Reset block
- *  3. DomainSwitch block 
- *  4. AddAndRemoveLayers block
- *  5. Util block
- * 
+ *  1. Initialization Block
+ *  2. SimulationParameters Updated Block
  */
 export class LayerControllerUI extends SimComponentModel {
-    /**  ===== Initialization block ===== */
+    /**  ===== Initialization Block ===== */
     constructor() {
         super();
         this.innerHTML = `
@@ -87,6 +83,7 @@ export class LayerControllerUI extends SimComponentModel {
         }
     }
     
+    /** ===== SimulationParameters Updated Block ===== */
     changeSimulation(simParams) {
         let { layerControllerContainer } = this.uiElements;
         layerControllerContainer.classList.remove('hidden');
@@ -97,6 +94,26 @@ export class LayerControllerUI extends SimComponentModel {
     changeDomain(simParams) {
         this.switchDomain(simParams);
         this.createLayerCheckboxes(simParams);
+    }
+
+    switchDomain(simParams) {
+        let { domain, sortedTimestamps, overlayOrder, rasters, overlayList } = simParams;
+        let timestamp = sortedTimestamps[0];
+        this.initDomainToLayerDictionary(domain, this.rasterDict);
+        this.initDomainToLayerDictionary(domain, this.overlayDict);
+        let firstRasters = rasters[domain][timestamp];
+        this.createSimulationLayers(domain, firstRasters, overlayList);
+
+        let previouslyAddedLayerNames = overlayOrder.filter(overlay => {
+            return (overlay in this.overlayDict[domain]) || (overlay in this.rasterDict[domain]);
+        })
+        simState.overlayOrder = previouslyAddedLayerNames;
+    }
+
+    initDomainToLayerDictionary(domain, domainToLayerDict) {
+        if (domainToLayerDict[domain] == null) {
+            domainToLayerDict[domain] = {};
+        }
     }
 
     createOpacitySlider() {
@@ -136,28 +153,7 @@ export class LayerControllerUI extends SimComponentModel {
         }
     }
 
-    /** ===== DomainSwitch block ===== */
-    switchDomain(simParams) {
-        let { domain, sortedTimestamps, overlayOrder, rasters, overlayList } = simParams;
-        let timestamp = sortedTimestamps[0];
-        this.initDomainToLayerDictionary(domain, this.rasterDict);
-        this.initDomainToLayerDictionary(domain, this.overlayDict);
-        let firstRasters = rasters[domain][timestamp];
-        this.makeLayersForDomainAndRasters(domain, firstRasters, overlayList);
-
-        let previouslyAddedLayerNames = overlayOrder.filter(overlay => {
-            return (overlay in this.overlayDict[domain]) || (overlay in this.rasterDict[domain]);
-        })
-        simState.overlayOrder = previouslyAddedLayerNames;
-    }
-
-    initDomainToLayerDictionary(domain, domainToLayerDict) {
-        if (domainToLayerDict[domain] == null) {
-            domainToLayerDict[domain] = {};
-        }
-    }
-
-    makeLayersForDomainAndRasters(domain, rasters, overlayList) {
+    createSimulationLayers(domain, rasters, overlayList) {
         for (let layerName in rasters) {
             let layer = this.getLayer(domain, layerName);
             if (layer == null) {
@@ -236,5 +232,3 @@ export class LayerControllerUI extends SimComponentModel {
         return this.rasterDict[domain][name];
     }
 }
-
-window.customElements.define('layer-controller', LayerControllerUI);

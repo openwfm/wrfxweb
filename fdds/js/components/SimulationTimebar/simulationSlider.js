@@ -68,7 +68,7 @@ export class SimulationSlider extends Slider {
             let progressWidth = loadingProgress*this.progressWidth + 2;
             sliderProgress.classList.remove('hidden');
             sliderProgress.style.width = progressWidth + 'px';
-            if (progress == 0) {
+            if (loadingProgress == 0) {
                 sliderProgress.classList.add('hidden');
                 return;
             }

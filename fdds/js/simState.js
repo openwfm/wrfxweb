@@ -76,6 +76,7 @@ export const simState = (function makeSimState() {
                 simId: null,
                 metaData: {},
                 rasters: {},
+                rasterBase: '',
                 domains: [],
                 sortedTimestamps: [],
                 overlayOrder: [],
@@ -254,6 +255,9 @@ export const simState = (function makeSimState() {
 
             simParams.simId = simId;
             simParams.metaData = simulationMetaData;
+
+            // simParams.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
+            simParams.rasterBase = path.replaceAll(':', '_').substring(0, path.lastIndexOf('/') + 1);
 
             let simRasters = await getSimulationRasters(path);
             simParams.rasters = simRasters;

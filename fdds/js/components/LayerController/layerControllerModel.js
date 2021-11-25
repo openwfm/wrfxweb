@@ -1,6 +1,3 @@
-import { dragElement, buildCheckBox } from '../../util.js';
-import { OpacitySlider } from '../opacitySlider.js';
-import { SimulationLayer } from './simulationLayer.js';
 import { simState, map } from '../../simState.js';
 import { ThreadManager } from '../../../threadManager.js';
 import { LayerControllerUI } from './layerControllerUI.js';
@@ -21,9 +18,6 @@ export class LayerControllerModel extends LayerControllerUI {
     /**  ===== Initialization block ===== */
     constructor() {
         super();
-        this.overlayDict = {};
-        this.rasterDict = {};
-        this.activeLayers = {};
         this.threadManager;
     }
 
@@ -55,8 +49,17 @@ export class LayerControllerModel extends LayerControllerUI {
     
     changeSimulation(simParams) {
         this.resetLayers(simParams);
-        this.resetLayerController();
-        this.switchDomain(simParams);
+        this.rasterDict = this.clearCache(this.rasterDict);
+        this.overlayDict = this.clearCache(this.overlayDict);
+        super.changeSimulation(simParams);
+        this.changeTimestamp(simParams);
+    }
+
+    changeDomain(simParams) {
+        let { startDate, endDate, overlayOrder } = simParams;
+        this.resetLayers(simParams);
+        super.changeDomain();
+        this.loadWithPriority(startDate, endDate, overlayOrder);
         this.changeTimestamp(simParams);
     }
 
@@ -64,7 +67,7 @@ export class LayerControllerModel extends LayerControllerUI {
         let shouldLoadAtEnd = false;
         for (let addedLayerName of overlayOrder) {
             let addedLayer = this.getLayer(domain, addedLayerName);
-            if (!shouldLoadAtEnd && !addedLayer.timestampIsPreloaded(currentTimestamp)) {
+            if (!shouldLoadAtEnd && !addedLayer.timestampIsPreloaded(timestamp)) {
                 shouldLoadAtEnd = true;
                 this.threadManager.cancelCurrentLoad();
             }
@@ -74,14 +77,6 @@ export class LayerControllerModel extends LayerControllerUI {
             let endTime = sortedTimestamps[sortedTimestamps.length - 1];
             this.loadWithPriority(timestamp, endTime, overlayOrder);
         }
-    }
-
-    changeDomain(simParams) {
-        let { startDate, endDate, overlayOrder } = simParams;
-        this.resetLayers(simParams);
-        this.switchDomain(simParams);
-        this.loadWithPriority(startDate, endDate, overlayOrder);
-        this.changeTimestamp(simParams);
     }
 
     changeStartDate({ startDate, endDate, overlayOrder }) {
@@ -100,9 +95,6 @@ export class LayerControllerModel extends LayerControllerUI {
         }
     }
 
-    
-
-    /** ====== Reset block ====== */
     resetLayers({ overlayOrder }) {
         this.threadManager.cancelCurrentLoad();
         for (let currentlyAddedLayerName of overlayOrder) {
@@ -116,14 +108,6 @@ export class LayerControllerModel extends LayerControllerUI {
         simState.changeColorbarURL(null);
     }
 
-    resetLayerController() {
-        let { layerControllerContainer } = this.uiElements;
-        this.rasterDict = this.clearCache(this.rasterDict);
-        this.overlayDict = this.clearCache(this.overlayDict);
-
-        layerControllerContainer.classList.remove('hidden');
-    }
-
     clearCache(domainsToLayersDict) {
         for (let domain in domainsToLayersDict) {
             let layersDict = domainsToLayersDict[domain];
@@ -133,48 +117,6 @@ export class LayerControllerModel extends LayerControllerUI {
             }
         }
         return {};
-    }
-
-    /** ===== DomainSwitch block ===== */
-    switchDomain(simParams) {
-        let { domain, sortedTimestamps, overlayOrder, rasters, overlayList } = simParams;
-        let timestamp = sortedTimestamps[0];
-        this.initDomainToLayerDictionary(domain, this.rasterDict);
-        this.initDomainToLayerDictionary(domain, this.overlayDict);
-        let firstRasters = rasters[domain][timestamp];
-        this.makeLayersForDomainAndRasters(domain, firstRasters, overlayList);
-
-        let previouslyAddedLayerNames = overlayOrder.filter(overlay => {
-            return (overlay in this.overlayDict[domain]) || (overlay in this.rasterDict[domain]);
-        })
-        simState.overlayOrder = previouslyAddedLayerNames;
-
-        this.createLayerCheckboxes(simParams);
-    }
-
-    initDomainToLayerDictionary(domain, domainToLayerDict) {
-        if (domainToLayerDict[domain] == null) {
-            domainToLayerDict[domain] = {};
-        }
-    }
-
-    makeLayersForDomainAndRasters(domain, rasters, overlayList) {
-        for (let layerName in rasters) {
-            let layer = this.getLayer(domain, layerName);
-            if (layer == null) {
-                let layerParams = {
-                    layerName: layerName,
-                    domain: domain,
-                    rasterInfo: rasters[layerName],
-                }
-                layer = new SimulationLayer(layerParams);
-                if(overlayList.indexOf(layerName) >= 0) {
-                    this.overlayDict[domain][layerName] = layer;
-                } else {
-                    this.rasterDict[domain][layerName] = layer;
-                }
-            }
-        }
     }
 
     /** ===== AddAndRemoveLayers block ===== */
