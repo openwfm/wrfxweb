@@ -1,7 +1,7 @@
 import { SimulationTimebarUI } from './simulationTimebarUI.js';
 import { simState } from '../../simState.js';
 
-export class SimulationTimebarModel extends SimulationTimebarUI {
+export class SimulationTimebar extends SimulationTimebarUI {
     constructor() {
         super();
     }
@@ -19,7 +19,7 @@ export class SimulationTimebarModel extends SimulationTimebarUI {
     }
 
     nextFrame() {
-        let { sortedTimestamps, endDate } = simState.simulationParameters;
+        let { sortedTimestamps } = simState.simulationParameters;
         let nextFrame = this.simulationSlider.nextFrame();
         let nextTimestamp = sortedTimestamps[nextFrame];
 
@@ -38,4 +38,4 @@ export class SimulationTimebarModel extends SimulationTimebarUI {
     }
 }
 
-window.customElements.define('simulation-timebar', SimulationTimebarModel);
+window.customElements.define('simulation-timebar', SimulationTimebar);

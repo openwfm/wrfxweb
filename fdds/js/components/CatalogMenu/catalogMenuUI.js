@@ -11,7 +11,7 @@ import { CLIENT_WIDTH, ISMOBILE } from '../../app.js';
  *  2. Searching block
  * 
  */
-export class CatalogMenu extends SimComponentModel {
+export class CatalogMenuUI extends SimComponentModel {
     /** ===== Initialization block ===== */
     constructor() {
         super();

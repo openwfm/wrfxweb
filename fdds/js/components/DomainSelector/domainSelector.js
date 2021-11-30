@@ -2,7 +2,7 @@ import { SimComponentModel } from '../../models/simComponentModel.js';
 import { ISMOBILE } from '../../app.js';
 import { simState } from '../../simState.js';
 
-export class DomainSelectorUI extends SimComponentModel {
+export class DomainSelector extends SimComponentModel {
     constructor() {
         super();
         this.innerHTML = `
@@ -93,4 +93,4 @@ export class DomainSelectorUI extends SimComponentModel {
     }
 }
 
-window.customElements.define('domain-selector', DomainSelectorUI);
+window.customElements.define('domain-selector', DomainSelector);

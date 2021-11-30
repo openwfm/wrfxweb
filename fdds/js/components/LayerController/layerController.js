@@ -14,7 +14,7 @@ import { LayerControllerUI } from './layerControllerUI.js';
  *  5. Util block
  * 
  */
-export class LayerControllerModel extends LayerControllerUI {
+export class LayerController extends LayerControllerUI {
     /**  ===== Initialization block ===== */
     constructor() {
         super();
@@ -237,4 +237,4 @@ export class LayerControllerModel extends LayerControllerUI {
     }
 }
 
-window.customElements.define('layer-controller', LayerControllerModel);
+window.customElements.define('layer-controller', LayerController);
