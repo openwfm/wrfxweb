@@ -1,21 +1,17 @@
 import { SimComponentModel } from '../../models/simComponentModel.js';
 import { ISMOBILE } from '../../app.js';
 import { simState } from '../../simState.js';
+import { domainSelectorHTML } from './domainSelectorHTML.js';
 
 export class DomainSelector extends SimComponentModel {
     constructor() {
         super();
-        this.innerHTML = `
-            <div id='domain-mobile-wrapper'>
-                <div id='domain-selector-button' class='mobile-button feature-controller hidden'>
-                    domains
-                </div>
-                <div id='domain-selector' class='feature-controller hidden'>
-                    <div id='domain-selector-label'>Active domain</div>
-                    <div id='domain-checkboxes'></div>
-                </div>
-            </div>
-        `;
+        this.innerHTML = domainSelectorHTML;
+        this.uiElements = {
+            domainButton: this.querySelector('#domain-selector-button'),
+            domainSelector: this.querySelector('#domain-selector'),
+            domainCheckboxes: this.querySelector('#domain-checkboxes'),
+        }
     }
 
     connectedCallback() {
@@ -24,14 +20,11 @@ export class DomainSelector extends SimComponentModel {
     }
 
     initializeDomainSelectorButton() {
-        const domainButton = this.querySelector('#domain-selector-button');
+        let { domainButton, domainSelector } = this.uiElements;
         L.DomEvent.disableClickPropagation(domainButton);
         domainButton.onpointerdown = () => {
-            const domainSelector = this.querySelector('#domain-selector');
             if (domainSelector.classList.contains('hidden')) {
                 domainSelector.classList.remove('hidden');
-                document.querySelector('.catalog-menu').classList.add('hidden');
-                document.querySelector('#layer-controller-container').classList.add('hidden');
             } else {
                 domainSelector.classList.add('hidden');
             }
@@ -39,27 +32,28 @@ export class DomainSelector extends SimComponentModel {
     }
 
     windowResize() {
+        let { domainButton, domainSelector } = this.uiElements;
         if (!ISMOBILE) {
-            this.querySelector('#domain-selector-button').classList.add('hidden');
+            domainButton.classList.add('hidden');
             if (simState.simulationParameters.simId != null) {
-                this.querySelector('#domain-selector').classList.remove('hidden');
+                domainSelector.classList.remove('hidden');
             }
         } else {
-            this.querySelector('#domain-selector-button').classList.remove('hidden');
+            domainButton.classList.remove('hidden');
         }
     }
 
     changeSimulation(simParameters) {
+        let { domainSelector } = this.uiElements;
         this.createDomainCheckboxes(simParameters);
 
-        const domainSelector = this.querySelector('#domain-selector');
         if (domainSelector.classList.contains('hidden')) {
             domainSelector.classList.remove('hidden');
         }
     }
     
     createDomainCheckboxes({ domains, domain }) {
-        const domainCheckboxes = this.querySelector('#domain-checkboxes');
+        let { domainCheckboxes } = this.uiElements;
         domainCheckboxes.innerHTML = '';
         for(let dom in domains) {
             let domId = domains[dom];
