@@ -1,4 +1,4 @@
-import { Slider } from '../slider.js';
+import { Slider } from '../Slider/slider.js';
 import { utcToLocal, createElement } from '../../util.js';
 import { simState } from '../../simState.js';
 
@@ -30,9 +30,28 @@ export class SimulationSlider extends Slider {
         let { sortedTimestamps } = simState.simulationParameters;
         let nFrames = sortedTimestamps.length - 1;
         super(SLIDER_WIDTH, nFrames, MOBILE_WIDTH);
+        
+        let print = {
+            sliderWidth: this.sliderWidth,
+            mobileWidth: this.mobileWidth,
+            desktopWidth: this.desktopWidth,
+        }
+        console.log(print);
+
         this.createProgressBar();
         this.progressWidth = 0;
         this.progressCheck = 0;
+    }
+
+    windowResize() {
+        super.windowResize();
+
+        let print = {
+            sliderWidth: this.sliderWidth,
+            mobileWidth: this.mobileWidth,
+            desktopWidth: this.desktopWidth,
+        }
+        console.log(print);
     }
 
     connectedCallback() {

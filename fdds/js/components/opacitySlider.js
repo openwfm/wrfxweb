@@ -1,4 +1,4 @@
-import { Slider } from './slider.js';
+import { Slider } from './Slider/slider.js';
 import { createElement } from '../util.js';
 
 /**         Contents
