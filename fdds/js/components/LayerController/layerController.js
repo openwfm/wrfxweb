@@ -58,7 +58,7 @@ export class LayerController extends LayerControllerUI {
     changeDomain(simParams) {
         let { startDate, endDate, overlayOrder } = simParams;
         this.resetLayers(simParams);
-        super.changeDomain();
+        super.changeDomain(simParams);
         this.loadWithPriority(startDate, endDate, overlayOrder);
         this.changeTimestamp(simParams);
     }

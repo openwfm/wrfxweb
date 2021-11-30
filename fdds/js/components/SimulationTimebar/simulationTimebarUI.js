@@ -18,16 +18,7 @@ const NORMAL_RATE = 330;
  *      3. FrameNavigation block
  */
 export class SimulationTimebarUI extends SimComponentModel {
-    windowResize() {
-        let { timestampDisplay, buttonDisplay } = this.uiElements;
-        if (ISMOBILE) {
-            timestampDisplay.parentNode.insertBefore(timestampDisplay, buttonDisplay);
-        } else { 
-            timestampDisplay.parentNode.insertBefore(buttonDisplay, timestampDisplay);
-        }
-    }
-    
-    constructor() {
+        constructor() {
         super();
         this.innerHTML = `
             <div id='sim-controller' class='slider-container hidden'>
@@ -95,6 +86,15 @@ export class SimulationTimebarUI extends SimComponentModel {
         this.createSimulationSlider();
         this.initializeFrameNavigation();
         this.initializeFrameRates();
+    }
+
+    windowResize() {
+        let { timestampDisplay, buttonDisplay } = this.uiElements;
+        if (ISMOBILE) {
+            timestampDisplay.parentNode.insertBefore(timestampDisplay, buttonDisplay);
+        } else { 
+            timestampDisplay.parentNode.insertBefore(buttonDisplay, timestampDisplay);
+        }
     }
 
     createSimulationSlider() {

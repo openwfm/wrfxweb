@@ -12,11 +12,11 @@ export class SimComponentModel extends HTMLElement {
         });
     }
 
-    changeSimulation(simParameters) {
-        console.warn(`Changing simulation to ${simParameters.simId}. Implement changeSimulation function for this component`);
-    }
-
     windowResize() {
 
+    }
+
+    changeSimulation(simParameters) {
+        console.warn(`Changing simulation to ${simParameters.simId}. Implement changeSimulation function for this component`);
     }
 }

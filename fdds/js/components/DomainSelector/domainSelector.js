@@ -19,6 +19,18 @@ export class DomainSelector extends SimComponentModel {
         super.connectedCallback();
     }
 
+    windowResize() {
+            let { domainButton, domainSelector } = this.uiElements;
+            if (!ISMOBILE) {
+                domainButton.classList.add('hidden');
+                if (simState.simulationParameters.simId != null) {
+                    domainSelector.classList.remove('hidden');
+                }
+            } else {
+                domainButton.classList.remove('hidden');
+            }
+    }
+
     initializeDomainSelectorButton() {
         let { domainButton, domainSelector } = this.uiElements;
         L.DomEvent.disableClickPropagation(domainButton);
@@ -28,18 +40,6 @@ export class DomainSelector extends SimComponentModel {
             } else {
                 domainSelector.classList.add('hidden');
             }
-        }
-    }
-
-    windowResize() {
-        let { domainButton, domainSelector } = this.uiElements;
-        if (!ISMOBILE) {
-            domainButton.classList.add('hidden');
-            if (simState.simulationParameters.simId != null) {
-                domainSelector.classList.remove('hidden');
-            }
-        } else {
-            domainButton.classList.remove('hidden');
         }
     }
 
