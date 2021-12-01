@@ -160,8 +160,8 @@ export const simState = (function makeSimState() {
                 domainSub.changeDomain(this.simulationParameters);
             }
 
-            setURL(this.simulationParameters , this.map)
-            // NEED TO SET MAP VIEW HERE TOO
+            setURL(this.simulationParameters, this.map);
+            this.setMapView();
         }
 
         getNewTimestamp(prevTimestamps, nextTimestamps, timestamp) {
@@ -275,6 +275,8 @@ export const simState = (function makeSimState() {
             document.querySelector('#copyLink').classList.remove('hidden');
             document.querySelector('#simulation-flags').classList.remove('hidden');
 
+            this.setMapView();
+
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }
@@ -282,6 +284,19 @@ export const simState = (function makeSimState() {
 
             setURL(this.simulationParameters, this.map);
             // NEED TO SET THE MAP VIEW HERE TOO
+        }
+
+        setMapView() {
+            let { timestamp, domain, rasters } = this.simulationParameters;
+            let firstRasters = rasters[domain][timestamp];
+            let layerNames = Object.keys(firstRasters);
+            let coords = firstRasters[layerNames[0]].coords;
+            if (this.presetParameters.pan || this.presetParameters.zoom) {
+                this.presetParameters.pan = null;
+                this.presetParameters.zoom = null;
+            } else { 
+                this.map.fitBounds([ [coords[0][1], coords[0][0]], [coords[2][1], coords[2][0]] ]);
+            }
         }
 
         presetDomain() {
