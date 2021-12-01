@@ -26,7 +26,7 @@ export class LayerController extends LayerControllerUI {
             let layer = this.getLayer(layerDomain, layerName);
             layer.setImageLoadedAtTimestamp(timestamp, objectURL, colorbar);
 
-            simState.loadFrames(0);
+            simState.loadFrames();
         }
 
         this.threadManager = new ThreadManager(imageLoadedCallback);
@@ -209,7 +209,7 @@ export class LayerController extends LayerControllerUI {
             nFrames += layerFrames * timestampsToLoad;
             layers.push(layer);
         }
-        simState.loadFrames(nFrames);
+        simState.setFrames(nFrames);
         
         return layers;
     }

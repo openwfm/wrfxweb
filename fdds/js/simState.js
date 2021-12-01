@@ -72,6 +72,8 @@ export const simState = (function makeSimState() {
             this.endDateSubscriptions = [];
             this.colorbarUrlSubscriptions = [];
             this.layerOpacitySubscriptions = [];
+            this.nFrames = 0;
+            this.framesLoaded = 0;
             this.simulationParameters = {
                 simId: null,
                 metaData: {},
@@ -206,16 +208,25 @@ export const simState = (function makeSimState() {
             this.simulationParameters.colorbarLayer = layerName;
         }
         
-        changeLoadingProgress(nFrames) {
-            let progress = 0;
+        setFrames(nFrames) {
+            this.nFrames = nFrames;
+            this.framesLoaded = 0;
+            let progress = (this.Frames == 0) ? 0 : (this.loadedFrames / this.nFrames);
+            this.changeLoadingProgress(progress);
+        }
+
+        changeLoadingProgress(progress) {
+            progress = Math.floor(progress*100) / 100;
             this.simulationParameters.loadingProgress = progress;
             for (let progressSub of this.loadingProgressSubscriptions) {
                 progressSub.changeLoadingProgress(this.simulationParameters);
             }
         }
 
-        loadFrames(nFrames = 0) {
-            this.changeLoadingProgress(nFrames);
+        loadFrames(framesToLoad = 1) {
+            this.framesLoaded = this.framesLoaded + framesToLoad;
+
+            this.changeLoadingProgress(this.framesLoaded / this.nFrames);
         }
 
         changeStartDate(startDate) {
