@@ -1,8 +1,12 @@
 import { CatalogMenuUI } from './CatalogMenuUI/catalogMenuUI.js';
-import { catalogEntries } from '../../app.js';
 import { CatalogItem } from './catalogItem.js';
+import { catalogEntries } from '../../app.js';
 import { simState } from '../../simState.js';
 
+/** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data. 
+ * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
+ * supports searching columns for data that matches a description.
+ */
 export class CatalogMenu extends CatalogMenuUI {
     constructor() {
         super();

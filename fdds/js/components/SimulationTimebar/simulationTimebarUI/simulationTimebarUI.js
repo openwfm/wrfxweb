@@ -1,65 +1,17 @@
-import { ELEMENT_FOCUSED, utcToLocal } from '../../util.js';
-import { SimulationSlider } from './simulationSlider.js';
-import { SimComponentModel } from '../../models/simComponentModel.js';
-import { ISMOBILE } from '../../app.js';
+import { SimComponentModel } from '../../../models/simComponentModel.js';
+import { simulationTimebarHTML } from './simulationTimebarHTML.js';
+import { SimulationSlider } from '../simulationSlider.js';
+import { ISMOBILE } from '../../../app.js';
+import { ELEMENT_FOCUSED, utcToLocal } from '../../../util.js';
 
 const FAST_RATE = 150;
 const SLOW_RATE = 500; 
 const NORMAL_RATE = 330;
 
-/** Creates a UI component that includes a play / pause / prev / next buttons to iterate through 
- *  the simulation. Also includes a slider bar with a head that indicates relative position in 
- *  simulation that can be dragged to a specific location. Bar can also be clicked to seek 
- *  to a specific position.
- * 
- *                  Contents
- *      1. Initialization block
- *      2. UI block
- *      3. FrameNavigation block
- */
 export class SimulationTimebarUI extends SimComponentModel {
         constructor() {
         super();
-        this.innerHTML = `
-            <div id='sim-controller' class='slider-container hidden'>
-                <div id='slider-header'>
-                    <div id='slider-play-bar'>
-                        <button class='slider-button' id='slider-slow-down'>
-                            <svg class='svgIcon slider-icon'>
-                                <use href="#fast_rewind_black_24dp"></use>
-                            </svg>
-                        </button>
-                        <button class='slider-button' id='slider-prev'>
-                            <svg class='svgIcon slider-icon'>
-                                <use href="#arrow_left-24px"></use>
-                            </svg>
-                        </button>
-                        <button class='slider-button' id='slider-play-pause'>
-                            <svg id='play-button' class='svgIcon slider-icon'>
-                                <use href="#play_arrow-24px"></use>
-                            </svg>
-                            <svg id='pause-button' class='svgIcon slider-icon hidden'>
-                                <use href="#pause-24px"></use>
-                            </svg>
-                        </button>
-                        <button class='slider-button' id='slider-next'>
-                            <svg class='svgIcon slider-icon'>
-                                <use href="#arrow_right-24px"></use>
-                            </svg>
-                        </button>
-                        <button class='slider-button' id='slider-fast-forward'>
-                            <svg class='svgIcon slider-icon'>
-                                <use href="#fast_forward_black_24dp"></use>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id='slider-timestamp'>
-                        <span id='timestamp'></span>
-                    </div>
-                </div>
-            </div>
-        `;
-        
+        this.innerHTML = simulationTimebarHTML;
         this.playing = false;
         this.frameRate = NORMAL_RATE;
         this.simulationSlider;

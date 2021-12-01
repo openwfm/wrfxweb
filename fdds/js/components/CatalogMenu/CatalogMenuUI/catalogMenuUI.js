@@ -3,17 +3,7 @@ import { dragElement } from '../../../util.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { CLIENT_WIDTH, ISMOBILE } from '../../../app.js';
 
-/** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data. 
- * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and 
- * supports searching columns for data that matches a description.
- * 
- *                  Contents
- *  1. Initialization block
- *  2. Searching block
- * 
- */
 export class CatalogMenuUI extends SimComponentModel {
-    /** ===== Initialization block ===== */
     constructor() {
         super();
         this.innerHTML = catalogMenuHTML;

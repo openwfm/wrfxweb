@@ -1,5 +1,5 @@
-import { domainSelectorHTML } from './domainSelectorHTML.js';
 import { SimComponentModel } from '../../models/simComponentModel.js';
+import { domainSelectorHTML } from './domainSelectorHTML.js';
 import { ISMOBILE } from '../../app.js';
 import { simState } from '../../simState.js';
 

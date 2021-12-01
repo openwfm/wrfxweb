@@ -1,18 +1,10 @@
+import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { layerControllerHTML } from './layerControllerHTML.js';
-import { dragElement, buildCheckBox } from '../../util.js';
-import { OpacitySlider } from '../opacitySlider.js';
-import { SimulationLayer } from './simulationLayer.js';
-import { simState, map } from '../../simState.js';
-import { SimComponentModel } from '../../models/simComponentModel.js';
+import { simState, map } from '../../../simState.js';
+import { OpacitySlider } from '../../opacitySlider.js';
+import { SimulationLayer } from '../simulationLayer.js';
+import { dragElement, buildCheckBox } from '../../../util.js';
 
-/**
- * Component that handles adding and removing layers to the map. Provides user with a window
- * to choose different layers available to add. 
- * 
- *              Contents
- *  1. Initialization Block
- *  2. SimulationParameters Updated Block
- */
 export class LayerControllerUI extends SimComponentModel {
     /**  ===== Initialization Block ===== */
     constructor() {

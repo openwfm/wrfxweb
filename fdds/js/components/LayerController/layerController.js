@@ -1,21 +1,11 @@
-import { simState, map } from '../../simState.js';
+import { LayerControllerUI } from './layerControllerUI/layerControllerUI.js';
 import { ThreadManager } from '../../../threadManager.js';
-import { LayerControllerUI } from './layerControllerUI.js';
+import { simState, map } from '../../simState.js';
 
-/**
- * Component that handles adding and removing layers to the map. Provides user with a window
- * to choose different layers available to add. 
- * 
- *              Contents
- *  1. Initialization block
- *  2. Reset block
- *  3. DomainSwitch block 
- *  4. AddAndRemoveLayers block
- *  5. Util block
- * 
+/** Component that handles adding and removing layers to the map. Provides user with a window
+ *  to choose different layers available to add. 
  */
 export class LayerController extends LayerControllerUI {
-    /**  ===== Initialization block ===== */
     constructor() {
         super();
         this.threadManager;
