@@ -1,5 +1,5 @@
-import { Slider } from './Slider/slider.js';
-import { createElement } from '../util.js';
+import { Slider } from './slider.js';
+import { createElement } from '../../util.js';
 
 /**         Contents
  *  1. Initialization block

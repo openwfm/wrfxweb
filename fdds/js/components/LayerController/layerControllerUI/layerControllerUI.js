@@ -1,7 +1,7 @@
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { layerControllerHTML } from './layerControllerHTML.js';
 import { simState, map } from '../../../simState.js';
-import { OpacitySlider } from '../../opacitySlider.js';
+import { OpacitySlider } from '../../Slider/opacitySlider.js';
 import { SimulationLayer } from '../simulationLayer.js';
 import { dragElement, buildCheckBox } from '../../../util.js';
 

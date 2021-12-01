@@ -1,7 +1,4 @@
-import { getConfigurations } from './services.js';
-import { simVars } from './simVars.js';
 import { configData } from './app.js';
-import { setURL } from './urlUtils.js';
 
 // construct map with the base layers
 // export const map = (function buildMap() {
