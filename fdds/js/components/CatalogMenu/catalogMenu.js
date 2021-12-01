@@ -1,6 +1,7 @@
-import { CatalogMenuUI } from './catalogMenuUI.js';
-import { getCatalogEntries } from '../../services.js';
+import { CatalogMenuUI } from './CatalogMenuUI/catalogMenuUI.js';
+import { catalogEntries } from '../../app.js';
 import { CatalogItem } from './catalogItem.js';
+import { simState } from '../../simState.js';
 
 export class CatalogMenu extends CatalogMenuUI {
     constructor() {
@@ -17,18 +18,14 @@ export class CatalogMenu extends CatalogMenuUI {
         this.createMenuEntries();
     }
 
-    async createMenuEntries() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const navJobId = urlParams.get('job_id');
-        const firesListDOM = this.querySelector('#catalog-fires');
-        const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
-        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
-        const catalogEntries = await getCatalogEntries();
+    createMenuEntries() {
+        let { simId } = simState.presetParameters;
+        let { firesListDOM, fuelMoistureListDOM, satelliteListDOM } = this.uiElements;
         for (let catName in catalogEntries) {
             let catEntry = catalogEntries[catName];
             this.addOrder.push(catEntry.job_id);
             let desc = catEntry.description;
-            let newLI = new CatalogItem(catEntry, navJobId);
+            let newLI = new CatalogItem(catEntry, simId);
             if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
                 this.fuelMoistureList.push(catEntry);
                 fuelMoistureListDOM.appendChild(newLI);
@@ -41,11 +38,11 @@ export class CatalogMenu extends CatalogMenuUI {
             }
         }
         this.sortMenu('original-order', false);
-        this.clickMostRecent(navJobId);
+        this.clickMostRecent(simId);
     }
 
     clickMostRecent(navJobId) {
-        const firesListDOM = this.querySelector('#catalog-fires');
+        let { firesListDOM } = this.uiElements;
         if (!navJobId || !navJobId.includes('recent')) {
             return;
         }
@@ -74,10 +71,7 @@ export class CatalogMenu extends CatalogMenuUI {
     }
 
     initializeMenuSearching() {
-        const sortBy = this.querySelector('#sort-by');
-        const reverseOrder = this.querySelector('#reverse-order');
-        const menuSearch = this.querySelector('#search-for');
-        const menuSelect = this.querySelector('#mobile-selector');
+        let { menuSearch, menuSelect, reverseOrder, sortBy } = this.uiElements;
 
         menuSearch.onpointerdown = (e) => {
             e.stopPropagation();
@@ -120,8 +114,8 @@ export class CatalogMenu extends CatalogMenuUI {
     }
 
     sortMenu(sortBy, reverseOrder) {
-        const catalogSearch = this.querySelector('#search-for');
-        catalogSearch.value = '';
+        let { menuSearch } = this.uiElements;
+        menuSearch.value = '';
         const sortingFunction = (listElem1, listElem2) => {
             let result;
             switch(sortBy) {
@@ -181,9 +175,7 @@ export class CatalogMenu extends CatalogMenuUI {
     }
 
     filterColumns(listCreator) {
-        const firesListDOM = this.querySelector('#catalog-fires');
-        const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
-        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        let { firesListDOM, fuelMoistureListDOM, satelliteListDOM } = this.uiElements;
 
         this.filterColumn(firesListDOM, this.firesList, listCreator);
         this.filterColumn(fuelMoistureListDOM, this.fuelMoistureList, listCreator);
@@ -198,7 +190,6 @@ export class CatalogMenu extends CatalogMenuUI {
             categoryDOM.append(newLI);
         }
     }
-
 }
 
 window.customElements.define('catalog-menu', CatalogMenu);

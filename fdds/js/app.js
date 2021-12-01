@@ -1,5 +1,5 @@
 'use strict';
-import { getConfigurations } from './services.js';
+import { getConfigurations, getCatalogEntries } from './services.js';
 
 export var CLIENT_WIDTH = document.body.clientWidth;
 export var ISMOBILE = CLIENT_WIDTH < 769; 
@@ -44,4 +44,10 @@ export const configData = await (async function getConfigData() {
         });
     }
     return configData;
+})();
+
+export const catalogEntries = await (async function getEntries() {
+    const catalogEntries = await getCatalogEntries();
+
+    return catalogEntries;
 })();

@@ -1,9 +1,9 @@
+import { layerControllerHTML } from './layerControllerHTML.js';
 import { dragElement, buildCheckBox } from '../../util.js';
 import { OpacitySlider } from '../opacitySlider.js';
 import { SimulationLayer } from './simulationLayer.js';
 import { simState, map } from '../../simState.js';
 import { SimComponentModel } from '../../models/simComponentModel.js';
-import { layerControllerHTML } from './layerControllerHTML.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window

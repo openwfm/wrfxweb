@@ -365,6 +365,7 @@ html, body {
 .catalog-entry {
   list-style-type: none;
   margin-bottom: 10px;
+  word-wrap: break-word;
 }
 
 .catalog-entry:hover {

@@ -1,7 +1,4 @@
-import { getSimulation } from '../../services.js';
 import { utcToLocal } from '../../util.js';
-import { simVars } from '../../simVars.js';
-import { controllers } from '../Controller.js';
 import { simState } from '../../simState.js';
 
 export class CatalogItem extends HTMLElement {
@@ -23,20 +20,28 @@ export class CatalogItem extends HTMLElement {
         `;
         this.catEntry = catEntry;
         this.navJobId = navJobId;
+        this.uiElements = {
+            entry: this.querySelector('#entry'),
+            title: this.querySelector('h3'),
+            jobIdLabel: this.querySelector('#jobID'),
+            fromLabel: this.querySelector('#from'),
+            toLabel: this.querySelector('#to'),
+        };
     }
 
     connectedCallback() {
         let  { description, job_id, to_utc, from_utc } = this.catEntry;
+        let { entry, title, jobIdLabel, fromLabel, toLabel } = this.uiElements;
 
-        this.querySelector('h3').innerText = description;
-        this.querySelector('#jobID').innerText += ' ' + job_id;
-        this.querySelector('#from').innerText += ' ' + utcToLocal(from_utc);
-        this.querySelector('#to').innerText += ' ' + utcToLocal(to_utc);
+        title.innerText = description;
+        jobIdLabel.innerText += ' ' + job_id;
+        fromLabel.innerText += ' ' + utcToLocal(from_utc);
+        toLabel.innerText += ' ' + utcToLocal(to_utc);
 
         this.initializeKMLURL();
         this.initializeZipURL();
 
-        this.querySelector('#entry').onclick = () => {
+        entry.onclick = () => {
             this.clickItem();
         }
         if (this.navJobId == job_id) {
@@ -74,19 +79,12 @@ export class CatalogItem extends HTMLElement {
         let path = 'simulations/' + manifestPath;
         let description = this.catEntry.description;
 
-        // simVars.currentSimulation = entryID;
-        // simVars.currentDescription = description;
-        // document.querySelector('#current-sim-label').innerText = 'Shown simulation: ' + description;
-        // document.querySelector('.catalog-menu').classList.add('hidden');
-
-        // document.querySelector('#simulation-flags').classList.remove('hidden');
-        // getSimulation(path);
         let simulationMetaData = {
             simId: entryID,
             description: description,
             path: path,
             manifestPath: manifestPath,
-            // simVars.rasterBase = path.substring(0, path.lastIndexOf('/') + 1);
+            // rasterBase: path.substring(0, path.lastIndexOf('/') + 1),
             rasterBase: path.replaceAll(':', '_').substring(0, path.lastIndexOf('/') + 1),
         };
         simState.changeSimulation(simulationMetaData);
