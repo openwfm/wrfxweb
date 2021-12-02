@@ -1,8 +1,9 @@
 import { getSimulationRasters } from './services.js';
-import { localToUTC, daysBetween } from './util.js';
+import { localToUTC, daysBetween, debounceInIntervals } from './util.js';
 import { getPresetParams, setURL } from './urlUtils.js';
 import { configData } from './app.js';
 
+const DEBOUNCE_INTERVAL = 100;
 export const simState = (function makeSimState() {
     class SimState {
         createMap({ presetCenter, presetZoom, mapLayer }) {
@@ -113,6 +114,16 @@ export const simState = (function makeSimState() {
                 mapLayer: this.baseLayerDict['OSM'],
             }
             this.map = this.createMap(mapParams);
+
+            this.changeTimestamp = debounceInIntervals((timestamp) => {
+                this.changeTimestampCallback(timestamp);
+            }, DEBOUNCE_INTERVAL);
+            this.changeStartDate = debounceInIntervals((timestamp) => {
+                this.changeStartDateCallback(timestamp);
+            }, DEBOUNCE_INTERVAL);
+            this.changeEndDate = debounceInIntervals((timestamp) => {
+                this.changeEndDateCallback(timestamp);
+            }, DEBOUNCE_INTERVAL);
         }
 
         subscribeComponent(component) {
@@ -177,16 +188,53 @@ export const simState = (function makeSimState() {
             return nextTimestamps[newIndex];
         }
 
-        changeTimestamp(timestamp) {
+        changeTimestampCallback(timestamp) {
             let { startDate, endDate } = this.simulationParameters;
-            if ((timestamp > endDate) || (timestamp < startDate)) {
-                return;
+            if (timestamp > endDate) {
+                timestamp = endDate;
+            }
+            if (timestamp < startDate) {
+                timestamp = startDate;
             }
             this.simulationParameters.timestamp = timestamp;
 
             for (let timestampSub of this.timestampSubscriptions) {
                 timestampSub.changeTimestamp(this.simulationParameters);
             }
+            setURL(this.simulationParameters, this.map);
+        }
+
+        changeStartDateCallback(startDate) {
+            let { endDate, timestamp } = this.simulationParameters;
+            if (startDate >= endDate) {
+                return;
+            }
+            if (startDate > timestamp) {
+                this.changeTimestamp(startDate);
+            }
+
+            this.simulationParameters.startDate = startDate;
+
+            for (let startDateSub of this.startDateSubscriptions) {
+                startDateSub.changeStartDate(this.simulationParameters);
+            }
+            setURL(this.simulationParameters, this.map);
+        }
+
+        changeEndDateCallback(endDate) {
+            let { startDate, timestamp } = this.simulationParameters;
+            if (endDate <= startDate) {
+                return;
+            }
+            if (endDate < timestamp) {
+                this.changeTimestamp(endDate);
+            }
+            this.simulationParameters.endDate = endDate;
+
+            for (let endDateSub of this.endDateSubscriptions) {
+                endDateSub.changeEndDate(this.simulationParameters);
+            }
+            setURL(this.simulationParameters, this.map);
         }
 
         changeLayerOpacity(layerOpacity) {
@@ -229,36 +277,7 @@ export const simState = (function makeSimState() {
             this.changeLoadingProgress(this.framesLoaded / this.nFrames);
         }
 
-        changeStartDate(startDate) {
-            let { endDate, timestamp } = this.simulationParameters;
-            if (startDate >= endDate) {
-                return;
-            }
-            if (startDate > timestamp) {
-                this.changeTimestamp(startDate);
-            }
 
-            this.simulationParameters.startDate = startDate;
-
-            for (let startDateSub of this.startDateSubscriptions) {
-                startDateSub.changeStartDate(this.simulationParameters);
-            }
-        }
-
-        changeEndDate(endDate) {
-            let { startDate, timestamp } = this.simulationParameters;
-            if (endDate <= startDate) {
-                return;
-            }
-            if (endDate < timestamp) {
-                this.changeTimestamp(endDate);
-            }
-            this.simulationParameters.endDate = endDate;
-
-            for (let endDateSub of this.endDateSubscriptions) {
-                endDateSub.changeEndDate(this.simulationParameters);
-            }
-        }
 
         async changeSimulation(simulationMetaData) { 
             let { simId, description, path, manifestPath } = simulationMetaData;
@@ -294,7 +313,6 @@ export const simState = (function makeSimState() {
 
 
             setURL(this.simulationParameters, this.map);
-            // NEED TO SET THE MAP VIEW HERE TOO
         }
 
         setMapView() {

@@ -9,7 +9,7 @@ const SLOW_RATE = 500;
 const NORMAL_RATE = 330;
 
 export class SimulationTimebarUI extends SimComponentModel {
-        constructor() {
+    constructor() {
         super();
         this.innerHTML = simulationTimebarHTML;
         this.playing = false;

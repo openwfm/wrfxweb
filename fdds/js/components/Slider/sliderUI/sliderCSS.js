@@ -100,5 +100,8 @@ export const sliderCSS = `
                 width: 100%;
                 border: none;
             }
+            .hidden { 
+                display: none;
+            }
     </style>
 `;
