@@ -40,15 +40,6 @@ export class SimulationTimebarUI extends SimComponentModel {
         this.initializeFrameRates();
     }
 
-    windowResize() {
-        let { timestampDisplay, buttonDisplay } = this.uiElements;
-        if (ISMOBILE) {
-            timestampDisplay.parentNode.insertBefore(timestampDisplay, buttonDisplay);
-        } else { 
-            timestampDisplay.parentNode.insertBefore(buttonDisplay, timestampDisplay);
-        }
-    }
-
     createSimulationSlider() {
         let { container } = this.uiElements;
 

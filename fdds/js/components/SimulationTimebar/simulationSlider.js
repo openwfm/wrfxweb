@@ -49,6 +49,13 @@ export class SimulationSlider extends Slider {
         this.initializeBoundingDate(sliderEnd);
     }
 
+    windowResize() {
+        super.windowResize();
+        this.updateEndLocation();
+        this.updateProgressWidth();
+        this.changeLoadingProgress(simState.simulationParameters);
+    }
+
     /** ===== Simulation Update Block ===== */
     changeSimulation(simParams)  {
         this.resetSlider(simParams);
