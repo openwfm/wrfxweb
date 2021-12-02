@@ -7,7 +7,6 @@ export function getPresetParams() {
     let presets = {
         domain: urlParams.get('domain'),
         endDate: urlParams.get('endDate'),
-        opacity: urlParams.get('opacity'),
         pan: null,
         rasters: null,
         simId: urlParams.get('job_id'),
@@ -25,6 +24,13 @@ export function getPresetParams() {
         rasters = rasters.split(',');
         presets.rasters = rasters;
     }
+    let opacity = urlParams.get('opacity');
+    if (opacity && !isNaN(opacity)) {
+      opacity = Number(opacity);
+    } else {
+      opacity = 0.5;
+    }
+    presets.opacity = opacity;
 
     return presets;
 }

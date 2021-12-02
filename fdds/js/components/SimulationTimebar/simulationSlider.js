@@ -29,7 +29,11 @@ export class SimulationSlider extends Slider {
     constructor() {
         let { sortedTimestamps } = simState.simulationParameters;
         let nFrames = sortedTimestamps.length - 1;
-        super(SLIDER_WIDTH, nFrames, MOBILE_WIDTH);
+        super({
+            sliderWidth: SLIDER_WIDTH, 
+            nFrames: nFrames, 
+            mobileWidth: MOBILE_WIDTH,
+        });
 
         this.createProgressBar();
         this.progressWidth = 0;

@@ -85,9 +85,11 @@ export class LayerControllerUI extends SimComponentModel {
 
     createOpacitySlider() {
         let { opacitySliderContainer } = this.uiElements;
+        let { opacity } = simState.presetParameters;
 
         let sliderParams = {
             updateCallback: (opacity) => simState.changeLayerOpacity(opacity),
+            initialOpacity: opacity,
         }
         const opacitySlider = new OpacitySlider(sliderParams);
         opacitySliderContainer.appendChild(opacitySlider);

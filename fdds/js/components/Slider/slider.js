@@ -14,7 +14,7 @@ export class Slider extends SimComponentModel {
       }
     }
 
-    constructor(sliderWidth, nFrames, mobileWidth = sliderWidth) {
+    constructor({ sliderWidth, nFrames, mobileWidth = sliderWidth }) {
         super();
         const shadow = this.attachShadow({ mode: 'open'});
         shadow.appendChild(sliderTemplate.content.cloneNode(true));

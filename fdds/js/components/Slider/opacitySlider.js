@@ -8,13 +8,19 @@ import { createElement } from '../../util.js';
 const DEFAULT_WIDTH = 284;
 const DEFAULT_MOBILE_WIDTH = 284;
 const DEFAULT_OPACITY = 0.5;
+const N_FRAMES = 20;
 
 export class OpacitySlider extends Slider {
     /** ===== Initialization block ===== */
     constructor({ updateCallback, initialOpacity = DEFAULT_OPACITY, sliderWidth = DEFAULT_WIDTH, mobileWidth = DEFAULT_MOBILE_WIDTH }) {
-        super(sliderWidth, 20, mobileWidth);
+        super({
+            sliderWidth: sliderWidth, 
+            nFrames: N_FRAMES, 
+            mobileWidth: mobileWidth,
+        });
         this.updateCallback = updateCallback;
         this.opacity = initialOpacity; 
+        this.frame = Math.floor(initialOpacity*N_FRAMES);
     }
 
     connectedCallback() {
@@ -23,13 +29,13 @@ export class OpacitySlider extends Slider {
         this.createOpacityDisplay();
         this.initializeSliderHead();
         this.initializeSliderBar();
+        this.updateOpacity();
     }
 
     createOpacityDisplay() {
         let { slider } = this.uiElements;
         const opacityDisplay = createElement('opacity-display');
-        let opacity = this.opacity;
-        opacityDisplay.innerHTML = opacity;
+        opacityDisplay.innerHTML = this.opacity;
 
         slider.insertBefore(opacityDisplay, slider.firstChild);
         slider.classList.add('opacity-slider')

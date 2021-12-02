@@ -243,6 +243,7 @@ export const simState = (function makeSimState() {
             for (let opacitySub of this.layerOpacitySubscriptions) {
                 opacitySub.changeLayerOpacity(this.simulationParameters);
             }
+            setURL(this.simulationParameters, this.map);
         }
 
         changeColorbarURL(colorbarURL) {
