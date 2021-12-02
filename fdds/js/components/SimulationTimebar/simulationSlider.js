@@ -56,6 +56,8 @@ export class SimulationSlider extends Slider {
 
     resetSlider(simParams) {
         let { sortedTimestamps } = simParams;
+        let { sliderProgress } = this.uiElements;
+        sliderProgress.classList.add('hidden');
         this.nFrames = sortedTimestamps.length - 1;
         this.updateStartLocation();
         this.updateEndLocation();

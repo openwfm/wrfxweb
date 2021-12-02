@@ -38,17 +38,24 @@ export class LayerController extends LayerControllerUI {
     }
     
     changeSimulation(simParams) {
-        this.resetLayers(simParams);
+        let { overlayOrder } = simParams;
+        this.resetLayers();
         this.rasterDict = this.clearCache(this.rasterDict);
         this.overlayDict = this.clearCache(this.overlayDict);
         super.changeSimulation(simParams);
+        for (let layerName of overlayOrder) {
+            this.addLayerToMap(layerName);
+        }
         this.changeTimestamp(simParams);
     }
 
     changeDomain(simParams) {
         let { startDate, endDate, overlayOrder } = simParams;
-        this.resetLayers(simParams);
+        this.resetLayers();
         super.changeDomain(simParams);
+        for (let layerName of overlayOrder) {
+            this.addLayerToMap(layerName);
+        }
         this.loadWithPriority(startDate, endDate, overlayOrder);
         this.changeTimestamp(simParams);
     }
@@ -85,9 +92,10 @@ export class LayerController extends LayerControllerUI {
         }
     }
 
-    resetLayers({ overlayOrder }) {
+    resetLayers() {
         this.threadManager.cancelCurrentLoad();
-        for (let currentlyAddedLayerName of overlayOrder) {
+        let activeLayers = Object.keys(this.activeLayers); 
+        for (let currentlyAddedLayerName of activeLayers) {
             let currentlyAddedLayer = this.activeLayers[currentlyAddedLayerName];
             if (currentlyAddedLayer != null) {
                 currentlyAddedLayer.imageOverlay.remove(map);
@@ -168,6 +176,9 @@ export class LayerController extends LayerControllerUI {
     }
 
     async loadWithPriority(startTime, endTime, layerNames) {
+        if (!layerNames || (layerNames.length == 0)) {
+            return;
+        }
         let { startDate, endDate, sortedTimestamps } = simState.simulationParameters;
         let timestampsToLoad = sortedTimestamps.filter((timestamp) => {
             return (timestamp >= startDate && timestamp <= endDate);

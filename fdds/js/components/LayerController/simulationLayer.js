@@ -49,7 +49,8 @@ export class SimulationLayer {
 
         this.imageOverlay.addTo(map);
         if (!(overlayOrder.includes(this.layerName))) {
-            overlayOrder.push(this.layerName);
+            simState.addLayer(this.layerName);
+            // overlayOrder.push(this.layerName);
         }
         this.imageOverlay.bringToFront();
         this.imageOverlay.setUrl(rasterBase + rasterInfo.raster);
@@ -68,9 +69,8 @@ export class SimulationLayer {
     }
     
     removeLayer() {
-        let { overlayOrder } = simState.simulationParameters;
         this.imageOverlay.remove(map);
-        overlayOrder.splice(overlayOrder.indexOf(this.layerName), 1);
+        simState.removeLayer(this.layerName);
     }
 
     setOpacity(opacity) {

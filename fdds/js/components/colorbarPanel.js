@@ -38,8 +38,10 @@ export class ColorbarPanel extends SimComponentModel {
         this.intializeOpacitySlider();
     }
    
-    changeSimulation() {
-       this.hidePanel();
+    changeSimulation({ overlayOrder }) {
+        if (!overlayOrder || overlayOrder.length == 0) {
+            this.hidePanel();
+        }
     }
 
     changeColorbarURL({ colorbarURL }) {

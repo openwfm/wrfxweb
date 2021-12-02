@@ -277,7 +277,16 @@ export const simState = (function makeSimState() {
             this.changeLoadingProgress(this.framesLoaded / this.nFrames);
         }
 
+        addLayer(layerName) {
+            this.simulationParameters.overlayOrder.push(layerName);
+            setURL(this.simulationParameters, this.map);
+        }
 
+        removeLayer(layerName) {
+            let { overlayOrder } = this.simulationParameters;
+            overlayOrder.splice(overlayOrder.indexOf(layerName), 1);
+            setURL(this.simulationParameters, this.map);
+        }
 
         async changeSimulation(simulationMetaData) { 
             let { simId, description, path, manifestPath } = simulationMetaData;
@@ -310,7 +319,6 @@ export const simState = (function makeSimState() {
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }
-
 
             setURL(this.simulationParameters, this.map);
         }
@@ -408,8 +416,8 @@ export const simState = (function makeSimState() {
 
         presetOverlayOrder() {
             let overlayOrder = [];
-            let presetRasters = this.presetParameters.overlayOrder;
-            if (presetRasters && presets.length > 0) {
+            let presetRasters = this.presetParameters.rasters;
+            if (presetRasters && presetRasters.length > 0) {
                 overlayOrder = presetRasters;
             }
             this.presetParameters.rasters = null;
