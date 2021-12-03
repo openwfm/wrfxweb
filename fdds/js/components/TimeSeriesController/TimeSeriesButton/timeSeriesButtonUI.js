@@ -1,6 +1,8 @@
-import { createOption, linkSelects } from '../util.js';
-import { controllers, controllerEvents } from './Controller.js';
-import { simVars } from '../simVars.js';
+import { timeSeriesButtonHTML } from './timeSeriesButtonHTML.js';
+import { createOption, linkSelects } from '../../util.js';
+import { SimComponentModel } from '../../../models/simComponentModel.js';
+// import { controllers, controllerEvents } from './Controller.js';
+// import { simVars } from '../simVars.js';
 
 /**      Contents 
  *  1. Initialization block
@@ -8,47 +10,31 @@ import { simVars } from '../simVars.js';
  *  3. Setters block 
  *      
  */
-export class TimeSeriesButton extends HTMLElement {
+export class TimeSeriesButtonUI extends SimComponentModel {
     /** ===== Initialization block ===== */
     constructor(dataType = 'continuous') {
         super();
-        this.innerHTML = `
-            <div id='timeseries-button'>
-                <div>
-                    <label class='timeseries-select-label' for='startDate'>start time:</label>
-                    <select class='timeseries-select' id='startDate'></select>
-                </div>
-                <div>
-                    <label class='timeseries-select-label' for='endDate'>end time: </label>
-                    <select class='timeseries-select' id='endDate'></select>
-                </div>
-                <div>
-                    <label class='timeseries-select-label' for='dataType'>data type: </label>
-                    <select class='timeseries-select' id='dataType'>
-                        <option value='continuous'>continuous</option>
-                        <option value='discrete'>discrete</option>
-                    </select>
-                </div>
-                <div>
-                    <label class='timeseries-select-label' for='layer-specification'>for layers: </label>
-                    <select class='timeseries-select' id='layer-specification'>
-                        <option value='all-added-layers'>all added layers</option>
-                        <option value='top-layer'>top layer</option>
-                    </select>
-                </div>
-                <button class='timeSeriesButton' id='timeSeriesButton'>
-                    <span id='generate-button-label'>generate timeseries</span>
-                    <span class='hidden' id='cancel-button-label'>cancel timeseries</span>
-                    <div id='progressBar' class='hidden'></div>
-                </button>
-            </div>
-        `;
-        this.querySelector('#dataType').value = dataType;
+        this.innerHTML = timeSeriesButtonHTML;
         this.loading = false;
+        this.uiElements = {
+            container: this.querySelector('#timeseries-button'),
+            dataType: this.querySelector('#dataType'),
+            timeSeriesButton: this.querySelector('#timeSeriesButton'),
+            generateButtonLabel: this.querySelector('#generate-button-label'),
+            cancelButtonLabel: this.querySelector('#cancel-button-label'),
+            startDate: this.querySelector('#startDate'),
+            endDate: this.querySelector('#endDate'),
+            progressBar: this.querySelector('#progressBar'),
+            layerSpecification: this.querySelector('#layer-specification'),
+        }
+        let { dataType } = this.uiElements;
+        dataType.value = dataType;
     }
 
     connectedCallback() {
-        this.querySelector('#timeseries-button').onpointerdown = (e) => e.stopPropagation();
+        super.connectedCallback();
+        let { container } = this.uiElements;
+        container.onpointerdown = (e) => e.stopPropagation();
 
         this.initializeTimeSeriesButton();
         this.initializeStartDateSelector();
@@ -56,12 +42,46 @@ export class TimeSeriesButton extends HTMLElement {
 
         this.subscribeToTimeSeriesProgress();
         this.subscribeToDataType();
+    }
 
-        this.updateTimestamps();
+    changeTimeSeriesMarkers({ timeSeriesMarkers }) {
+        if (timeSeriesMarkers.length == 0) {
+            this.getButton().disabled = true;
+        } else {
+            this.getButton().disabled = false;
+        }
+    }
+    
+    changeTimeSeriesProgress({ timeSeriesProgress }) {
+        this.setProgress(progress);
+    }
+
+    changeSimulation(simulationParameters) {
+        let { startDate, endDate } = simulationParameters;
+        this.setStartDate(startDate);
+        this.setEndDate(endDate);
+        this.updateTimestamps(simulationParameters);
+        this.getButton().disabled = true;
+    }
+
+    changeDomain(simulationParameters) {
+        let { startDate, endDate } = simulationParameters;
+        this.setStartDate(startDate);
+        this.setEndDate(endDate);
+        this.updateTimestamps(simulationParameters);
+        this.getButton().disabled = true;
+    }
+
+    changeColorbarURL({ colorbarURL, timeSeriesMarkers }) {
+        if (colorbarURL == null) {
+            this.timeSeriesButton.getButton().disabled = true;
+        } else if (timeSeriesMarkers.length > 0) {
+            this.timeSeriesButton.getButton().disabled = false;
+        }
     }
 
     initializeTimeSeriesButton() {
-        const timeSeriesButton = this.querySelector('#timeSeriesButton');
+        let { timeSeriesButton, generateButtonLabel, cancelButtonLabel } = this.uiElements;
         timeSeriesButton.onpointerdown = () => {
             if (this.loading) {
                 simVars.cancelTimeSeriesCallback();
@@ -70,16 +90,15 @@ export class TimeSeriesButton extends HTMLElement {
             } else {
                 this.loading = true;
                 this.setProgress(0);
-                this.querySelector('#generate-button-label').classList.add('hidden');
-                this.querySelector('#cancel-button-label').classList.remove('hidden');
+                generateButtonLabel.classList.add('hidden');
+                cancelButtonLabel.classList.remove('hidden');
                 simVars.generateTimeSeriesCallback();
             }
         }
     }
 
     initializeStartDateSelector() {
-        const startDate = this.querySelector('#startDate');
-        const endDate = this.querySelector('#endDate');
+        let { startDate, endDate } = this.uiElements;
         startDate.addEventListener('change', () => {
             let simulationStartDate = controllers.startDate.getValue();
             let startValue = startDate.value;
@@ -98,8 +117,7 @@ export class TimeSeriesButton extends HTMLElement {
     }
 
     initializeEndDateSelector() {
-        const startDate = this.querySelector('#startDate');
-        const endDate = this.querySelector('#endDate');
+        let { startDate, endDate } = this.uiElements;
         endDate.addEventListener('change', () => {
             let simulationEndDate = controllers.endDate.getValue();
             let endValue = endDate.value;
@@ -117,18 +135,12 @@ export class TimeSeriesButton extends HTMLElement {
         });
     }
 
-    subscribeToTimeSeriesProgress() {
-        controllers.timeSeriesProgress.subscribe(() => {
-            let progress = controllers.timeSeriesProgress.getValue();
-            this.setProgress(progress);
-        });
-    }
 
     subscribeToDataType() {
-        const dataTypeSelector = this.querySelector('#dataType');
-        dataTypeSelector.addEventListener('change', () => {
-            let dataType = dataTypeSelector.value;
-            controllers.timeSeriesDataType.setValue(dataType);
+        let { dataType } = this.uiElements;
+        dataType.addEventListener('change', () => {
+            let val = dataTypeS.value;
+            controllers.timeSeriesDataType.setValue(val);
         });
         controllers.timeSeriesDataType.subscribe(() => { 
             let dataType = controllers.timeSeriesDataType.getValue();
@@ -139,52 +151,55 @@ export class TimeSeriesButton extends HTMLElement {
 
     /** ===== Getters block ===== */
     getButton() {
-        return this.querySelector('#timeSeriesButton');
+        let { timeSeriesButton } = this.uiElements;
+        return timeSeriesButton;
     }
 
     getStartDate() {
-        return this.querySelector('#startDate').value;
+        let { startDate } = this.uiElements;
+        return startDate.value;
     }
 
     getEndDate() {
-        return this.querySelector('#endDate').value;
+        let { endDate } = this.uiElements;
+        return endDate.value;
     }
 
     getDataType() {
-        return this.querySelector('#dataType').value;
+        let { dataType } = this.uiElements;
+        return dataType.value;
     }
 
     getLayerSpecification() {
-        return this.querySelector('#layer-specification').value;
+        let { layerSpecification } = this.uiElements;
+        return layerSpecification.value;
     }
 
-
     /** ===== Setters block ===== */
-    updateTimestamps() {
-        const startDate = this.querySelector('#startDate');
-        const endDate = this.querySelector('#endDate');
+    updateTimestamps({ sortedTimestamps, timeSeriesStart, timeSeriesEnd }) {
+        let { startDate, endDate } = this.uiElements;
         startDate.innerHTML = '';
         endDate.innerHTML = '';
-        for (let timestamp of simVars.sortedTimestamps) {
+        for (let timestamp of sortedTimestamps) {
             startDate.appendChild(createOption(timestamp, true));
             endDate.appendChild(createOption(timestamp, true));
         }
-        startDate.value = controllers.timeSeriesStart.getValue();
-        endDate.value = controllers.timeSeriesEnd.getValue();
+        startDate.value = timeSeriesStart;
+        endDate.value = timeSeriesEnd;
     }
 
     setProgress(progress) {
         if (!this.loading) {
             return;
         }
-        const progressBar = this.querySelector('#progressBar');
+        let { progressBar, generateButtonLabel, cancelButtonLabel } = this.uiElements;
         if (progress < 1) {
             progressBar.classList.remove('hidden');
             progressBar.style.width = Math.floor(progress*100) + '%';
         } else {
             this.loading = false;
-            this.querySelector('#generate-button-label').classList.remove('hidden');
-            this.querySelector('#cancel-button-label').classList.add('hidden');
+            generateButtonLabel.classList.remove('hidden');
+            cancelButtonLabel.classList.add('hidden');
             progressBar.classList.add('hidden');
         }
     }
@@ -195,8 +210,7 @@ export class TimeSeriesButton extends HTMLElement {
             return;
         }
 
-        const startDate = this.querySelector('#startDate');
-        const endDate = this.querySelector('#endDate');
+        let { startDate, endDate } = this.uiElements;
 
         let oldEndDate = endDate.value;
         if (newStartDate >= oldEndDate) {
@@ -213,8 +227,7 @@ export class TimeSeriesButton extends HTMLElement {
             return;
         }
 
-        const endDate = this.querySelector('#endDate');
-        const startDate = this.querySelector('#startDate');
+        let { startDate, endDate } = this.uiElements;
 
         let oldStartDate = startDate.value;
         if (newEndDate <= oldStartDate) {
@@ -226,4 +239,4 @@ export class TimeSeriesButton extends HTMLElement {
     }
 }
 
-window.customElements.define('timeseries-button', TimeSeriesButton);
+window.customElements.define('timeseries-button', TimeSeriesButtonUI);

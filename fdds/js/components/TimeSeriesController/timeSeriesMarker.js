@@ -1,10 +1,11 @@
 import { isolateFocus, rgbToHex } from '../util.js';
-import { map } from '../map.js';
 import { controllers } from './Controller.js';
 import { TimeSeriesButton } from './timeSeriesButton.js';
 import { simVars } from '../simVars.js';
+import { SimComponentModel } from '../../models/simComponentModel.js';
+import { simState, map } from '../../simState.js';
 
-export class TimeSeriesMarker extends HTMLElement {
+export class TimeSeriesMarker extends SimComponentModel {
     constructor(latLon) {
         super();
         const roundLatLon = (num) => Math.round(num*100)/100; 
@@ -169,6 +170,16 @@ export class Marker {
                 this.showMarkerInfo();
             }
         });
+    }
+
+    changeSimulation(simulationParameters) {
+        this.hideMarkerInfo();
+        this.marker.removeFrom(map);
+    }
+
+    changeDomain(simulationParameters) {
+        this.hideMarkerInfo();
+        this.marker.removeFrom(map);
     }
 
     hideMarkerInfo() {

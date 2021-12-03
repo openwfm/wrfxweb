@@ -3,6 +3,7 @@ import { localToUTC, daysBetween, debounceInIntervals } from './util.js';
 import { getPresetParams, setURL } from './urlUtils.js';
 import { configData } from './app.js';
 
+// divide this into two? one for timeseries stuff and one for simulation stuff?
 const DEBOUNCE_INTERVAL = 100;
 export const simState = (function makeSimState() {
     class SimState {
@@ -73,6 +74,7 @@ export const simState = (function makeSimState() {
             this.endDateSubscriptions = [];
             this.colorbarUrlSubscriptions = [];
             this.layerOpacitySubscriptions = [];
+            this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
             this.simulationParameters = {
@@ -93,6 +95,11 @@ export const simState = (function makeSimState() {
                 endDate: null,
                 loadingProgress: 0,
                 overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
+                timeSeriesMarkers: [],
+                timeSeriesStart: '',
+                timeSeriesEnd: '',
+                timeSeriesProgress: 0,
+                timeSeriesData: null,
             };
             this.baseLayerDict = {
                 /*
@@ -148,6 +155,9 @@ export const simState = (function makeSimState() {
             if (component.changeLayerOpacity) {
                 this.layerOpacitySubscriptions.push(component);
             }
+            if (component.generateTimeSeries) {
+                this.timeSeriesController = component;
+            }
 
             this.simulationSubscriptions.push(component);
         }
@@ -166,7 +176,8 @@ export const simState = (function makeSimState() {
                 sortedTimestamps: nextTimestamps,
                 timestamp: nextTimestamp,
                 startDate: nextStartDate,
-                endDate: nextEndDate
+                endDate: nextEndDate,
+                timeSeriesMarkers: [],
             };
 
             for (let domainSub of this.domainSubscriptions) {
@@ -278,6 +289,18 @@ export const simState = (function makeSimState() {
             this.changeLoadingProgress(this.framesLoaded / this.nFrames);
         }
 
+        generateTimeSeries() {
+            this.timeSeriesController.generateTimeSeries();
+        }
+
+        cancelTimeSeries() {
+            this.timeSeriesController.cancelTimeSeries();
+        }
+
+        setTimeSeriesData(timeSeriesData) {
+
+        }
+
         addLayer(layerName) {
             this.simulationParameters.overlayOrder.push(layerName);
             setURL(this.simulationParameters, this.map);
@@ -316,6 +339,7 @@ export const simState = (function makeSimState() {
             document.querySelector('#simulation-flags').classList.remove('hidden');
 
             this.setMapView();
+            simParams.timeSeriesMarkers = [];
 
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);

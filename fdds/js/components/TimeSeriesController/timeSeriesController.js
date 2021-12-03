@@ -1,10 +1,11 @@
-import { LayerController } from './layerController.js';
-import { controllers } from './Controller.js';
-import { simVars } from '../simVars.js';
-import { map } from '../map.js';
-import { Marker } from './timeSeriesMarker.js';
-import { TimeSeriesButton } from './timeSeriesButton.js';
-import { buildCheckBox, doubleClick } from '../util.js';
+import { LayerController } from '../LayerController/layerController.js';
+// import { controllers } from './Controller.js';
+// import { simVars } from '../simVars.js';
+// import { map } from '../map.js';
+// import { Marker } from './timeSeriesMarker.js';
+import { TimeSeriesButtonUI } from './TimeSeriesButton/timeSeriesButtonUI.js';
+import { buildCheckBox, doubleClick } from '../../util.js';
+import { simState } from '../../simState.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;
@@ -61,63 +62,23 @@ export class TimeSeriesController extends LayerController {
         container.appendChild(timeSeriesDiv);
     }
 
-    connectedCallback() {
-        super.connectedCallback();
-
-        this.initializeTimeSeriesButton();
-        this.subscribeToMarkerController();
+    changeTimestamp({simulationParameters}) {
+        super.updateToCurrentTimestamp(simulationParameters);
+        this.updateMarkers();
     }
 
-    initializeTimeSeriesButton() {
-        const generateTimeSeriesCallback = async () => {
-            document.body.classList.add('waiting');
-            this.loadingTimeSeries = true;
-            let startDate = this.timeSeriesButton.getStartDate();
-            let endDate = this.timeSeriesButton.getEndDate();
-            let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
-            document.body.classList.remove('waiting');
-        }
-        simVars.generateTimeSeriesCallback = generateTimeSeriesCallback;
-
-        const cancelTimeSeriesCallback = () => {
-            this.loadingTimeSeries = false;
-        }
-        simVars.cancelTimeSeriesCallback = cancelTimeSeriesCallback;
+    generateTimeSeries() {
+        document.body.classList.add('waiting');
+        this.loadingTimeSeries = true;
+        let startDate = this.timeSeriesButton.getStartDate();
+        let endDate = this.timeSeriesButton.getEndDate();
+        let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
+        simState.setTimeSeriesData(timeSeriesData);
+        document.body.classList.remove('waiting');
     }
 
-    subscribeToMarkerController() {
-        let markerController = controllers.timeSeriesMarkers;
-        markerController.subscribe(() => {
-            if (markerController.getValue().length == 0) {
-                this.timeSeriesButton.getButton().disabled = true;
-            }
-        }, markerController.removeEvent);
-    }
-
-    /** ===== DomainSwitch block ===== */
-    switchDomain() {
-        this.timeSeriesButton.updateTimestamps();
-        super.switchDomain();
-        this.removeAllTimeSeriesMarkers();
-        this.resetTimeSeriesButtonDates();
-    }
-
-    removeAllTimeSeriesMarkers() {
-        let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        for (let marker of timeSeriesMarkers) {
-            marker.hideMarkerInfo();
-            marker.marker.removeFrom(map);
-        }
-        controllers.timeSeriesMarkers.value = [];
-        this.timeSeriesButton.getButton().disabled = true;
-    }
-
-    resetTimeSeriesButtonDates() {
-        let startDate = controllers.startDate.getValue();
-        this.timeSeriesButton.setStartDate(startDate);
-
-        let endDate = controllers.endDate.getValue();
-        this.timeSeriesButton.setEndDate(endDate);
+    cancelTimeSeries() {
+        this.loadingTimeSeries = false;
     }
 
     /** ===== AddAndRemoveLayers block ===== */
@@ -138,14 +99,9 @@ export class TimeSeriesController extends LayerController {
                 let xCoord = e.offsetX / img.width;
                 let yCoord = e.offsetY / img.height;
                 this.createNewMarker(latLon, xCoord, yCoord);
-                this.timeSeriesButton.getButton().disabled = false;
             }
             doubleClick(img, doubleClickCallback);
-            let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-            if (timeSeriesMarkers.length > 0) {
-                this.timeSeriesButton.getButton().disabled = false;
-                this.updateMarkers();
-            }
+            this.updateMarkers();
         } else {
             img.style.pointerEvents = 'none';
         }
@@ -153,10 +109,6 @@ export class TimeSeriesController extends LayerController {
 
     removeLayerFromMap(layerName) {
         super.removeLayerFromMap(layerName);
-
-        if (!simVars.displayedColorbar) {
-            this.timeSeriesButton.getButton().disabled = true;
-        }
         this.updateMarkers();
     }
 
@@ -270,29 +222,21 @@ export class TimeSeriesController extends LayerController {
         return dataEntry;
     }
 
-    /** ===== Util block ===== */
-    updateToCurrentTimestamp() {
-        super.updateToCurrentTimestamp();
-        this.updateMarkers();
-    }
-
     updateMarkers() {
-        let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
+        let { timeSeriesMarkers } = simState.simulationParameters;
         for (let marker of timeSeriesMarkers) {
             this.updateMarker(marker);
         }
     }
 
     async updateMarker(marker) {
+        let { domain, timestamp, colorbarLayer } = simState.simulationParameters;
         let rgb = [0, 0, 0];
         let clrbarLocation = null;
-        if (simVars.displayedColorbar != null) {
-            let currentDomain = controllers.currentDomain.value;
-            let currentTimestamp = controllers.currentTimestamp.value;
-            let layer = this.getLayer(currentDomain, simVars.displayedColorbar);
-
-            rgb = await layer.rgbValueAtLocation(currentTimestamp, marker.imageCoords);
-            clrbarLocation = await layer.rgbValueToColorbarValue(currentTimestamp, rgb);
+        if (colorbarLayer != null) {
+            let layer = this.getLayer(domain, colorbarLayer);
+            rgb = await layer.rgbValueAtLocation(timestamp, marker.imageCoords);
+            clrbarLocation = await layer.rgbValueToColorbarValue(timestamp, rgb);
         }
         marker.getContent().setRGBValues(rgb, clrbarLocation);
     }

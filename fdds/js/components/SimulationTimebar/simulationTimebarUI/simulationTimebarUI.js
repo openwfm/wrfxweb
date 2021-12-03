@@ -1,7 +1,6 @@
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { simulationTimebarHTML } from './simulationTimebarHTML.js';
 import { SimulationSlider } from '../simulationSlider.js';
-import { ISMOBILE } from '../../../app.js';
 import { ELEMENT_FOCUSED, utcToLocal } from '../../../util.js';
 
 const FAST_RATE = 150;
