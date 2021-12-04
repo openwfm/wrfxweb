@@ -3,7 +3,6 @@ import { localToUTC, daysBetween, debounceInIntervals } from './util.js';
 import { getPresetParams, setURL } from './urlUtils.js';
 import { configData } from './app.js';
 
-// divide this into two? one for timeseries stuff and one for simulation stuff?
 const DEBOUNCE_INTERVAL = 100;
 export const simState = (function makeSimState() {
     class SimState {
@@ -44,27 +43,6 @@ export const simState = (function makeSimState() {
             return leafletMap;
         }
 
-        createNoLevels() {
-            const noLevels = new Set();
-            const makeKey = (layerName, domain, timestamp) => {
-                return layerName + ',' + domain + ',' + timestamp;
-            }
-            const addNoLevels = (layerName, domain, timestamp) => {
-                let key = makeKey(layerName, domain, timestamp);
-                noLevels.add(key);
-            }
-            const hasNoLevels = (layerName, domain, timestamp) => {
-                let key = makeKey(layerName, domain, timestamp);
-                return noLevels.has(key);
-            }
-
-            return ({
-                add: addNoLevels,
-                has: hasNoLevels,
-                clear: () => noLevels.clear()
-            });
-        }
-
         constructor() {
             this.timestampSubscriptions = [];
             this.domainSubscriptions = [];
@@ -85,7 +63,6 @@ export const simState = (function makeSimState() {
                 domains: [],
                 sortedTimestamps: [],
                 overlayOrder: [],
-                noLevels: this.createNoLevels(),
                 opacity: null,
                 domain: 0.5,
                 timestamp: null,
@@ -95,11 +72,6 @@ export const simState = (function makeSimState() {
                 endDate: null,
                 loadingProgress: 0,
                 overlayList: ['WINDVEC', 'WINDVEC1000FT', 'WINDVEC4000FT', 'WINDVEC6000FT', 'SMOKE1000FT', 'SMOKE4000FT', 'SMOKE6000FT', 'FIRE_AREA', 'SMOKE_INT', 'FGRNHFX', 'FLINEINT'],
-                timeSeriesMarkers: [],
-                timeSeriesStart: '',
-                timeSeriesEnd: '',
-                timeSeriesProgress: 0,
-                timeSeriesData: null,
             };
             this.baseLayerDict = {
                 /*
@@ -154,9 +126,6 @@ export const simState = (function makeSimState() {
             }
             if (component.changeLayerOpacity) {
                 this.layerOpacitySubscriptions.push(component);
-            }
-            if (component.generateTimeSeries) {
-                this.timeSeriesController = component;
             }
 
             this.simulationSubscriptions.push(component);
@@ -287,18 +256,6 @@ export const simState = (function makeSimState() {
             this.framesLoaded = this.framesLoaded + framesToLoad;
 
             this.changeLoadingProgress(this.framesLoaded / this.nFrames);
-        }
-
-        generateTimeSeries() {
-            this.timeSeriesController.generateTimeSeries();
-        }
-
-        cancelTimeSeries() {
-            this.timeSeriesController.cancelTimeSeries();
-        }
-
-        setTimeSeriesData(timeSeriesData) {
-
         }
 
         addLayer(layerName) {

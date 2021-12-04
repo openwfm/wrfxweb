@@ -1,9 +1,11 @@
 import { simState } from '../simState.js';
+import { timeSeriesState } from '../timeSeriesState.js';
 
 export class SimComponentModel extends HTMLElement {
     constructor() {
         super();
         simState.subscribeComponent(this);
+        timeSeriesState.subscribeComponent(this);
     }
 
     connectedCallback() {

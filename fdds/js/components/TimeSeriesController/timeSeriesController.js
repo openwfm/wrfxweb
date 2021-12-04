@@ -34,9 +34,13 @@ export class TimeSeriesController extends LayerController {
         this.framesLoaded = 0;
     }
 
+    connectedCallback() {
+        super.connectedCallback();
+    }
+
     createTimeSeriesLayerGroup() {
-        this.timeSeriesButton = new TimeSeriesButton();
-        this.timeSeriesButton.getButton().disabled = true;
+        // this.timeSeriesButton = new TimeSeriesButton();
+        // this.timeSeriesButton.getButton().disabled = true;
         this.loadingTimeSeries = false;
 
         const container = this.querySelector('#layer-controller-container');
@@ -67,7 +71,7 @@ export class TimeSeriesController extends LayerController {
         this.updateMarkers();
     }
 
-    generateTimeSeries() {
+    async generateTimeSeries() {
         document.body.classList.add('waiting');
         this.loadingTimeSeries = true;
         let startDate = this.timeSeriesButton.getStartDate();
