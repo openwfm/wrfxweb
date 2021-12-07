@@ -39,8 +39,7 @@ export class TimeSeriesController extends LayerController {
     }
 
     createTimeSeriesLayerGroup() {
-        // this.timeSeriesButton = new TimeSeriesButton();
-        // this.timeSeriesButton.getButton().disabled = true;
+        this.timeSeriesButton = new TimeSeriesButtonUI();
         this.loadingTimeSeries = false;
 
         const container = this.querySelector('#layer-controller-container');
@@ -66,8 +65,8 @@ export class TimeSeriesController extends LayerController {
         container.appendChild(timeSeriesDiv);
     }
 
-    changeTimestamp({simulationParameters}) {
-        super.updateToCurrentTimestamp(simulationParameters);
+    changeTimestamp(simulationParameters) {
+        super.changeTimestamp(simulationParameters);
         this.updateMarkers();
     }
 

@@ -1,19 +1,10 @@
 import { timeSeriesButtonHTML } from './timeSeriesButtonHTML.js';
-import { createOption, linkSelects } from '../../util.js';
+import { createOption, linkSelects } from '../../../util.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../timeSeriesState.js';
 import { simState } from '../../../simState.js';
-import { controllers, controllerEvents } from './Controller.js';
-// import { simVars } from '../simVars.js';
 
-/**      Contents 
- *  1. Initialization block
- *  2. Getters block
- *  3. Setters block 
- *      
- */
 export class TimeSeriesButtonUI extends SimComponentModel {
-    /** ===== Initialization block ===== */
     constructor(dataType = 'continuous') {
         super();
         this.innerHTML = timeSeriesButtonHTML;
@@ -41,51 +32,6 @@ export class TimeSeriesButtonUI extends SimComponentModel {
         this.initializeStartDateSelector();
         this.initializeEndDateSelector();
         this.initializeDataType();
-    }
-
-    changeTimeSeriesMarkers({ timeSeriesMarkers }) {
-        if (timeSeriesMarkers.length == 0) {
-            this.getButton().disabled = true;
-        } else {
-            this.getButton().disabled = false;
-        }
-    }
-    
-    changeTimeSeriesProgress({ timeSeriesProgress }) {
-        this.setProgress(timeSeriesProgress);
-    }
-
-    changeSimulation(simulationParameters) {
-        let { startDate, endDate } = simulationParameters;
-        this.setStartDate(startDate);
-        this.setEndDate(endDate);
-        this.updateTimestamps(simulationParameters);
-        this.getButton().disabled = true;
-    }
-
-    changeDomain(simulationParameters) {
-        let { startDate, endDate } = simulationParameters;
-        this.setStartDate(startDate);
-        this.setEndDate(endDate);
-        this.updateTimestamps(simulationParameters);
-        this.getButton().disabled = true;
-    }
-
-    changeColorbarURL({ colorbarURL, timeSeriesMarkers }) {
-        if (colorbarURL == null) {
-            this.timeSeriesButton.getButton().disabled = true;
-        } else if (timeSeriesMarkers.length > 0) {
-            this.timeSeriesButton.getButton().disabled = false;
-        }
-    }
-    changeTimeSeriesStart({ timeSeriesStart }) {
-        let { seriesStartDate } = this.uiElements;
-        seriesStartDate.value = timeSeriesStart;
-    }
-    
-    changeTimeSeriesEnd({ timeSeriesEnd }) {
-        let { endDate } = this.uiElements;
-        endDate.value = timeSeriesEnd;
     }
 
     initializeTimeSeriesButton() {
@@ -127,58 +73,80 @@ export class TimeSeriesButtonUI extends SimComponentModel {
         });
     }
 
-    changeTimeSeriesDataType({ timeSeriesDataType }) {
-        let { dataType } = this.uiElements;
-        dataType.value = timeSeriesDataType;
-    }
-
     initializeDataType() {
         let { dataType } = this.uiElements;
         let { timeSeriesDataType } = timeSeriesState.timeSeriesParameters;
         dataType.addEventListener('change', () => {
             let val = dataType.value;
-            timeSeriesState.changeDataType(val);
+            timeSeriesState.changeTimeSeriesDataType(val);
         });
         dataType.value = timeSeriesDataType;
     }
 
-    /** ===== Getters block ===== */
-    getButton() {
+    changeTimeSeriesMarkers({ timeSeriesMarkers }) {
         let { timeSeriesButton } = this.uiElements;
-        return timeSeriesButton;
+        if (timeSeriesMarkers.length == 0) {
+            timeSeriesButton.disabled = true;
+        } else {
+            timeSeriesButton.disabled = false;
+        }
+    }
+    
+    changeTimeSeriesProgress({ timeSeriesProgress }) {
+        this.setProgress(timeSeriesProgress);
     }
 
-    getStartDate() {
+    changeSimulation(simulationParameters) {
+        let { startDate, endDate } = simulationParameters;
+        let { timeSeriesButton } = this.uiElements;
+        this.setStartDate(startDate);
+        this.setEndDate(endDate);
+        this.updateTimestamps(simulationParameters);
+        timeSeriesButton.disabled = true;
+    }
+
+    changeDomain(simulationParameters) {
+        let { startDate, endDate } = simulationParameters;
+        let { timeSeriesButton } = this.uiElements;
+        this.setStartDate(startDate);
+        this.setEndDate(endDate);
+        this.updateTimestamps(simulationParameters);
+        timeSeriesButton.disabled = true;
+    }
+
+    changeColorbarURL({ colorbarURL, timeSeriesMarkers }) {
+        let { timeSeriesButton } = this.uiElements;
+        if (colorbarURL == null) {
+            timeSeriesButton.disabled = true;
+        } else if (timeSeriesMarkers.length > 0) {
+            timeSeriesButton.disabled = false;
+        }
+    }
+    changeTimeSeriesStart({ timeSeriesStart }) {
         let { seriesStartDate } = this.uiElements;
-        return seriesStartDate.value;
+        seriesStartDate.value = timeSeriesStart;
     }
-
-    getEndDate() {
+    
+    changeTimeSeriesEnd({ timeSeriesEnd }) {
         let { seriesEndDate } = this.uiElements;
-        return seriesEndDate.value;
+        seriesEndDate.value = timeSeriesEnd;
     }
 
-    getDataType() {
+    changeTimeSeriesDataType({ timeSeriesDataType }) {
         let { dataType } = this.uiElements;
-        return dataType.value;
+        dataType.value = timeSeriesDataType;
     }
 
-    getLayerSpecification() {
-        let { layerSpecification } = this.uiElements;
-        return layerSpecification.value;
-    }
-
-    /** ===== Setters block ===== */
-    updateTimestamps({ sortedTimestamps, timeSeriesStart, timeSeriesEnd }) {
-        let { seriesStartDate, endDate } = this.uiElements;
+    updateTimestamps({ sortedTimestamps, startDate, endDate }) {
+        let { seriesStartDate, seriesEndDate } = this.uiElements;
         seriesStartDate.innerHTML = '';
-        endDate.innerHTML = '';
+        seriesEndDate.innerHTML = '';
         for (let timestamp of sortedTimestamps) {
             seriesStartDate.appendChild(createOption(timestamp, true));
-            endDate.appendChild(createOption(timestamp, true));
+            seriesEndDate.appendChild(createOption(timestamp, true));
         }
-        seriesStartDate.value = timeSeriesStart;
-        endDate.value = timeSeriesEnd;
+        seriesStartDate.value = startDate;
+        seriesEndDate.value = endDate;
     }
 
     setProgress(progress) {

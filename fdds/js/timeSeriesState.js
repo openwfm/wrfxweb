@@ -25,6 +25,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             this.loadingProgressSubscriptions = [];
             this.timeSeriesStartSubscriptions = [];
             this.timeSeriesEndSubscriptions = [];
+            this.dataTypeSubscriptions = [];
             this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
@@ -33,7 +34,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
                 noLevels: this.createNoLevels(),
                 timeSeriesStart: '',
                 timeSeriesEnd: '',
-                timeSeriesDataType: '',
+                timeSeriesDataType: 'continuous',
                 timeSeriesProgress: 0,
                 timeSeriesData: null,
             };
@@ -51,6 +52,10 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             }
             if (component.changeTimeSeriesProgress) {
                 this.loadingProgressSubscriptions.push(component);
+            }
+            if (component.changeDataType) {
+                this.dataTypeSubscriptions.push(component);
+
             }
         }
 
@@ -100,6 +105,14 @@ export const timeSeriesState = (function makeTimeSeriesState() {
 
             for (let endSub of this.timeSeriesEndSubscriptions) {
                 endSub.changeTimeSeriesEnd(this.timeSeriesParameters);
+            }
+        }
+
+        changeTimeSeriesDataType(dataType) {
+            this.timeSeriesParameters.timeSeriesDataType = dataType;
+
+            for (let dataTypeSub of this.dataTypeSubscriptions) {
+                dataTypeSub.changeTimeSeriesDataType(this.timeSeriesParameters);
             }
         }
     }
