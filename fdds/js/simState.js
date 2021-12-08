@@ -1,7 +1,8 @@
 import { getSimulationRasters } from './services.js';
-import { localToUTC, daysBetween, debounceInIntervals } from './util.js';
+import { localToUTC, daysBetween, debounceInIntervals, getNewTimestamp } from './util.js';
 import { getPresetParams, setURL } from './urlUtils.js';
 import { configData } from './app.js';
+import { timeSeriesState } from './timeSeriesState.js';
 
 const DEBOUNCE_INTERVAL = 100;
 export const simState = (function makeSimState() {
@@ -134,9 +135,9 @@ export const simState = (function makeSimState() {
             let { rasters, sortedTimestamps, timestamp, startDate, endDate } = this.simulationParameters;
 
             let nextTimestamps = Object.keys(rasters[domId]).sort();
-            let nextTimestamp = this.getNewTimestamp(sortedTimestamps, nextTimestamps, timestamp);
-            let nextStartDate = this.getNewTimestamp(sortedTimestamps, nextTimestamps, startDate);
-            let nextEndDate = this.getNewTimestamp(sortedTimestamps, nextTimestamps, endDate);
+            let nextTimestamp = getNewTimestamp(sortedTimestamps, nextTimestamps, timestamp);
+            let nextStartDate = getNewTimestamp(sortedTimestamps, nextTimestamps, startDate);
+            let nextEndDate = getNewTimestamp(sortedTimestamps, nextTimestamps, endDate);
 
             this.simulationParameters = {
                 ...this.simulationParameters,
@@ -147,23 +148,13 @@ export const simState = (function makeSimState() {
                 endDate: nextEndDate,
             };
 
+            timeSeriesState.changeDomain(this.simulationParameters, sortedTimestamps);
             for (let domainSub of this.domainSubscriptions) {
                 domainSub.changeDomain(this.simulationParameters);
             }
 
             setURL(this.simulationParameters, this.map);
             this.setMapView();
-        }
-
-        getNewTimestamp(prevTimestamps, nextTimestamps, timestamp) {
-            if (nextTimestamps.includes(timestamp)) {
-                return timestamp;
-            }
-            let prevIndex = prevTimestamps.indexOf(timestamp);
-            let percentage = prevIndex / prevTimestamps.length;
-            let newIndex = Math.floor(nextTimestamps.length * percentage);
-    
-            return nextTimestamps[newIndex];
         }
 
         changeTimestampCallback(timestamp) {
@@ -295,6 +286,7 @@ export const simState = (function makeSimState() {
 
             this.setMapView();
 
+            timeSeriesState.changeSimulation(this.simulationParameters);
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);
             }

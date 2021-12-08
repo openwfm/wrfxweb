@@ -33,6 +33,7 @@ export class TimeSeriesButton extends SimComponentModel {
         this.initializeEndDateSelector();
         this.initializeDataType();
         this.initializeLayerSelector();
+        this.updateTimestamps(simState.simulationParameters);
     }
 
     initializeTimeSeriesButton() {
@@ -149,14 +150,15 @@ export class TimeSeriesButton extends SimComponentModel {
 
     updateTimestamps({ sortedTimestamps, startDate, endDate }) {
         let { seriesStartDate, seriesEndDate } = this.uiElements;
+        let { timeSeriesStart, timeSeriesEnd } = timeSeriesState.timeSeriesParameters;
         seriesStartDate.innerHTML = '';
         seriesEndDate.innerHTML = '';
         for (let timestamp of sortedTimestamps) {
             seriesStartDate.appendChild(createOption(timestamp, true));
             seriesEndDate.appendChild(createOption(timestamp, true));
         }
-        seriesStartDate.value = startDate;
-        seriesEndDate.value = endDate;
+        seriesStartDate.value = timeSeriesStart;
+        seriesEndDate.value = timeSeriesEnd;
     }
 
     setProgress(progress) {

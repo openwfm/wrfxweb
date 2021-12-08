@@ -4,6 +4,7 @@ import { TimeSeriesButton } from '../TimeSeriesButton/timeSeriesButton.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { map } from '../../../simState.js';
 import { timeSeriesState } from '../../../timeSeriesState.js';
+import { simState } from '../../../simState.js';
 
 export class TimeSeriesMarker extends SimComponentModel {
     constructor(latLon) {
@@ -156,6 +157,9 @@ export class Marker {
                 this.showMarkerInfo();
             }
         });
+
+        simState.subscribeComponent(this);
+        timeSeriesState.subscribeComponent(this);
     }
 
     changeSimulation(simulationParameters) {

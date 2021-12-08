@@ -164,6 +164,17 @@ export function daysBetween(timestamp1, timestamp2) {
   return Math.abs(diff);
 }
 
+export function getNewTimestamp(prevTimestamps, nextTimestamps, timestamp) {
+    if (nextTimestamps.includes(timestamp)) {
+        return timestamp;
+    }
+    let prevIndex = prevTimestamps.indexOf(timestamp);
+    let percentage = prevIndex / prevTimestamps.length;
+    let newIndex = Math.floor(nextTimestamps.length * percentage);
+
+    return nextTimestamps[newIndex];
+}
+
 /** ===== CreateDomElements block ===== */
 export function createOption(timeStamp, utcValue) {
   let option = document.createElement('option');

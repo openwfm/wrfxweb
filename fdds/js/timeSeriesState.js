@@ -1,3 +1,5 @@
+import { getNewTimestamp } from './util.js';
+
 export const timeSeriesState = (function makeTimeSeriesState() {
     class TimeSeriesState {
         createNoLevels() {
@@ -70,6 +72,23 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             if (component.updateTimeSeriesMarker) {
                 this.markerUpdateSubscriptions.push(component);
             }
+        }
+
+        changeSimulation({ startDate, endDate }) {
+            this.timeSeriesParameters.timeSeriesStart = startDate;
+            this.timeSeriesParameters.timeSeriesEnd = endDate;
+            this.timeSeriesParameters.noLevels.clear();
+            this.timeSeriesParameters.timeSeriesMarkers = [];
+        }
+
+        changeDomain(simulationParameters, prevTimestamps) {
+            let { sortedTimestamps } = simulationParameters;
+            let { timeSeriesStart, timeSeriesEnd } = this.timeSeriesParameters;
+            let nextStartDate = getNewTimestamp(prevTimestamps, sortedTimestamps, timeSeriesStart);
+            let nextEndDate = getNewTimestamp(prevTimestamps, sortedTimestamps, timeSeriesEnd);
+            this.timeSeriesParameters.timeSeriesStart = nextStartDate;
+            this.timeSeriesParameters.timeSeriesEnd = nextEndDate;
+            this.timeSeriesParameters.timeSeriesMarkers = [];
         }
 
         generateTimeSeries() {
