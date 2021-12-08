@@ -1,24 +1,12 @@
-import { SimComponentModel } from '../models/simComponentModel.js';
-import { OpacitySlider } from './Slider/opacitySlider.js';
-import { doubleClick, dragElement } from '../util.js';
+import { SimComponentModel } from '../../models/simComponentModel.js';
+import { OpacitySlider } from '../Slider/opacitySlider.js';
+import { doubleClick, dragElement } from '../../util.js';
+import { colorbarPanelHTML } from './colorbarPanelHTML.js';
 
 export class ColorbarPanel extends SimComponentModel {
     constructor() {
         super();
-        this.innerHTML = `
-            <div id='colorbar-panel' class='hidden'>
-                <div id='colorbar-tab' class='feature-controller'>
-                    <span id='tab-text'>colorbar</span>
-                </div>
-                <div id='raster-colorbar-bg' class='colorbar-bg'>
-                    <img id='raster-colorbar'/>
-                    <div id='colorbar-opacity' class='hidden'>
-                        <span id='colorbar-opacity-label'>Adjust Opacity</span>
-                        <button id='colorbar-opacity-done'>done</button>
-                    </div>
-                </div>
-            </div>
-        `;
+        this.innerHTML = colorbarPanelHTML;
         this.uiElements = {
             colorbarImgContainer: this.querySelector('#colorbar-panel'),
             colorbarBgImg: this.querySelector('#raster-colorbar-bg'),

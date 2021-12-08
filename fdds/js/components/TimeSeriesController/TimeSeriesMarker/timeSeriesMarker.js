@@ -1,68 +1,54 @@
+import { createTimeSeriesMarkerHTML } from './timeSeriesMarkerHTML.js';
 import { isolateFocus, rgbToHex } from '../../../util.js';
-import { controllers } from '../../Controller.js';
 import { TimeSeriesButton } from '../TimeSeriesButton/timeSeriesButton.js';
-import { simVars } from '../../../simVars.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
-import { simState, map } from '../../../simState.js';
+import { map } from '../../../simState.js';
+import { timeSeriesState } from '../../../timeSeriesState.js';
 
 export class TimeSeriesMarker extends SimComponentModel {
     constructor(latLon) {
         super();
-        const roundLatLon = (num) => Math.round(num*100)/100; 
-        this.innerHTML = `
-            <div id='timeSeriesMarker'>
-                <div id='marker-menu'>
-                    <span id='hideMenu' class='hideMenu interactive-button'>hide</span>
-                    <div>
-                        <label style='display: inline-block; width: 100px' for='timeseries-custom-name'>Add name: </label>
-                        <input id='timeseries-custom-name'></input>
-                    </div>
-
-                    <div>
-                        <span style='margin: 1px; margin-right: 10px'>lat: ${roundLatLon(latLon.lat)} lon: ${roundLatLon(latLon.lng)}</span>
-                        <span id='rgb-value' style='margin:0'>No layer with colorbar to show values</span>
-                    </div>
-                    <p id='colorbar-location' style='margin: 0'></p>
-                    <button class='timeSeriesButton' id='open-timeseries-menu'>generate timeseries</button>
-                </div>
-
-                <div id='timeseries-menu' class='hidden'>
-                    <span id='close-timeseries-menu' class='hideMenu interactive-button'>cancel</span>
-                </div>
-            </div>
-        `;
+        this.innerHTML = createTimeSeriesMarkerHTML(latLon);
         this.chartColor = null;
         this.colorInputted = false;
         this.clrbarLocation = null;
         this.hideOnChart = false;
         this.infoOpen = false;
+        this.uiElements = {
+            timeSeriesMenu: this.querySelector('#timeseries-menu'),
+            customName: this.querySelector('#timeseries-custom-name'),
+            generateTimeSeries: this.querySelector('#open-timeseries-menu'),
+            markerMenu: this.querySelector('#marker-menu'),
+            closeTimeSeriesMenu: this.querySelector('#close-timeseries-menu'),
+            hideButton: this.querySelector('#hideMenu'),
+            colorbarLabel: this.querySelector('#colorbar-location'),
+            rgbLabel: this.querySelector('#rgb-value'),
+        }
         this.timeSeriesButton = this.createTimeSeriesButton();
     }
 
     createTimeSeriesButton() {
+        let { timeSeriesMenu } = this.uiElements;
         let timeSeriesButton = new TimeSeriesButton();
-        const timeSeriesMenu = this.querySelector('#timeseries-menu');
         timeSeriesMenu.appendChild(timeSeriesButton);
         return timeSeriesButton;
     }
 
     connectedCallback() {
+        let { customName } = this.uiElements
         this.initializeTimeseriesMenu();
-        isolateFocus(this.querySelector('#timeseries-custom-name'));
+        isolateFocus(customName);
     }
 
     initializeTimeseriesMenu() {
-        const generateTimeseries = this.querySelector('#open-timeseries-menu');
-        const markerMenu = this.querySelector('#marker-menu');
-        const timeseriesMenu = this.querySelector('#timeseries-menu');
-        const closeTimeseriesMenu = this.querySelector('#close-timeseries-menu');
-        generateTimeseries.onpointerdown = () => {
+        let { generateTimeSeries, markerMenu, timeSeriesMenu, closeTimeSeriesMenu } = this.uiElements;
+        generateTimeSeries.onpointerdown = () => {
             markerMenu.classList.add('hidden');
-            timeseriesMenu.classList.remove('hidden');
+            timeSeriesMenu.classList.remove('hidden');
         }
-        closeTimeseriesMenu.onpointerdown = () => {
+        closeTimeSeriesMenu.onpointerdown = () => {
             markerMenu.classList.remove('hidden');
-            timeseriesMenu.classList.add('hidden');
+            timeSeriesMenu.classList.add('hidden');
         }
     }
 
@@ -76,26 +62,29 @@ export class TimeSeriesMarker extends SimComponentModel {
     }
 
     setName(name) {
-        this.querySelector('#timeseries-custom-name').value = name;
+        let { customName } = this.uiElements;
+        customName.value = name;
     }
 
     getName() {
-        return this.querySelector('#timeseries-custom-name').value;
+        let { customName } = this.uiElements;
+        return customName.value;
     }
 
     bindHide(fun) {
-        const hideButton = this.querySelector('#hideMenu');
+        let { hideButton } = this.uiElements;
         hideButton.onclick = fun;
     }
 
     bindName(fun) {
-        const nameMarker = this.querySelector('#timeseries-custom-name');
-        nameMarker.oninput = () => {
+        let { customName } = this.uiElements;
+        customName.oninput = () => {
             fun();
         }
     }
 
     setRGBValues(rgb, clrbarLocation) {
+        let { colorbarLabel, rgbLabel } = this.uiElements;
         let [r, g, b] = rgb;
         if ((r + g + b) > 745) {
             [r, g, b] = [0, 0, 0];
@@ -105,37 +94,36 @@ export class TimeSeriesMarker extends SimComponentModel {
             this.chartColor = hexValue;
         }
         this.clrbarLocation = clrbarLocation;
-        const clrbarP = this.querySelector('#colorbar-location');
-        const rgbP = this.querySelector('#rgb-value');
-        clrbarP.style.display = 'none';
-        rgbP.innerHTML = 'No layer with colorbar to show values of';
-        rgbP.style.color = 'black';
+        colorbarLabel.classList.add('hidden');
+        rgbLabel.innerHTML = 'No layer with colorbar to show values of';
+        rgbLabel.style.color = 'black';
         if (clrbarLocation != null) {
             this.enableTimeSeriesButtons();
-            clrbarP.style.display = 'block';
-            clrbarP.innerHTML = 'colorbar location: ' + clrbarLocation;
-            rgbP.style.color = `rgb(${r},${g},${b})`;
-            rgbP.innerHTML = `pixel value: R${r} G${g} B${b}`;
+            colorbarLabel.classList.remove('hidden');
+            colorbarLabel.innerHTML = 'colorbar location: ' + clrbarLocation;
+            rgbLabel.style.color = `rgb(${r},${g},${b})`;
+            rgbLabel.innerHTML = `pixel value: R${r} G${g} B${b}`;
         } else { 
             this.disableTimeSeriesButtons();
         }
     }
 
     disableTimeSeriesButtons() {
-        const openTimeSeriesButton = this.querySelector('#open-timeseries-menu');
-        openTimeSeriesButton.disabled = true;
+        let { generateTimeSeries } = this.uiElements;
+        generateTimeSeries.disabled = true;
         this.timeSeriesButton.getButton().disabled = true;
     }
 
     enableTimeSeriesButtons() {
-        const openTimeSeriesButton = this.querySelector('#open-timeseries-menu');
-        openTimeSeriesButton.disabled = false;
+        let { generateTimeSeries } = this.uiElements;
+        generateTimeSeries.disabled = false;
         this.timeSeriesButton.getButton().disabled = false;
     }
 }
 
 export class Marker {
     constructor(latLon, coords) {
+        let { showMarkers } = timeSeriesState.timeSeriesParameters;
         this._latlng = latLon;
         this.imageCoords = coords;
 
@@ -143,12 +131,10 @@ export class Marker {
         this.timeSeriesMarker = new TimeSeriesMarker(latLon, coords);
         this.timeSeriesMarker.bindHide(() => this.hideMarkerInfo());
         this.timeSeriesMarker.bindName(() => {
-            let markerController = controllers.timeSeriesMarkers;
-            let markers = markerController.getValue();
-            markerController.broadcastEvent(markerController.UPDATE_EVENT, markers.indexOf(this));
+            timeSeriesState.updateTimeSeriesMarker(this);
         });
         this.popup.setContent(this.timeSeriesMarker);
-        let display = simVars.showMarkers ? 'block' : 'none';
+        let display = showMarkers ? 'block' : 'none';
         this.popup.getElement().style.display = display;
 
         let svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
@@ -160,7 +146,7 @@ export class Marker {
 
         this.marker = L.marker(latLon, {icon: markerIcon, autoPan: false}).addTo(map);
         this.popup.on('remove', () => {
-            controllers.timeSeriesMarkers.remove(this);
+            timeSeriesState.removeTimeSeriesMarker(this);
             this.marker.removeFrom(map);
         });
         this.marker.on('mousedown', () => {

@@ -28,6 +28,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             this.timeSeriesLayerSubscriptions = [];
             this.dataTypeSubscriptions = [];
             this.timeSeriesMarkersSubscriptions = [];
+            this.markerUpdateSubscriptions = [];
             this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
@@ -65,6 +66,9 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             }
             if (component.changeTimeSeriesLayer) {
                 this.timeSeriesLayerSubscriptions.push(component);
+            }
+            if (component.updateTimeSeriesMarker) {
+                this.markerUpdateSubscriptions.push(component);
             }
         }
 
@@ -135,11 +139,17 @@ export const timeSeriesState = (function makeTimeSeriesState() {
 
         removeTimeSeriesMarker(marker) {
             let { timeSeriesMarkers } = this.timeSeriesParameters;
-            let index = timeSeriesMarkes.indexOf(marker);
+            let index = timeSeriesMarkers.indexOf(marker);
             timeSeriesMarkers.splice(index, 1);
 
             for (let timeSeriesMarkerSub of this.timeSeriesMarkersSubscriptions) {
                 timeSeriesMarkerSub.changeTimeSeriesMarkes(this.timeSeriesParameters);
+            }
+        }
+
+        updateTimeSeriesMarker(marker) {
+            for (let timeSeriesMarkerSub of this.markerUpdateSubscriptions) {
+                timeSeriesMarkerSub.updateTimeSeriesMarker(marker);
             }
         }
 
