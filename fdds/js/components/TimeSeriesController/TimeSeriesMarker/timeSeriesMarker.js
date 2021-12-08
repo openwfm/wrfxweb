@@ -1,9 +1,9 @@
-import { isolateFocus, rgbToHex } from '../util.js';
-import { controllers } from './Controller.js';
-import { TimeSeriesButton } from './timeSeriesButton.js';
-import { simVars } from '../simVars.js';
-import { SimComponentModel } from '../../models/simComponentModel.js';
-import { simState, map } from '../../simState.js';
+import { isolateFocus, rgbToHex } from '../../../util.js';
+import { controllers } from '../../Controller.js';
+import { TimeSeriesButton } from '../TimeSeriesButton/timeSeriesButton.js';
+import { simVars } from '../../../simVars.js';
+import { SimComponentModel } from '../../../models/simComponentModel.js';
+import { simState, map } from '../../../simState.js';
 
 export class TimeSeriesMarker extends SimComponentModel {
     constructor(latLon) {

@@ -52,7 +52,6 @@ export const simState = (function makeSimState() {
             this.endDateSubscriptions = [];
             this.colorbarUrlSubscriptions = [];
             this.layerOpacitySubscriptions = [];
-            this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
             this.simulationParameters = {
@@ -146,7 +145,6 @@ export const simState = (function makeSimState() {
                 timestamp: nextTimestamp,
                 startDate: nextStartDate,
                 endDate: nextEndDate,
-                timeSeriesMarkers: [],
             };
 
             for (let domainSub of this.domainSubscriptions) {
@@ -296,7 +294,6 @@ export const simState = (function makeSimState() {
             document.querySelector('#simulation-flags').classList.remove('hidden');
 
             this.setMapView();
-            simParams.timeSeriesMarkers = [];
 
             for (let simulationSub of this.simulationSubscriptions) { 
                 simulationSub.changeSimulation(this.simulationParameters);

@@ -25,7 +25,9 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             this.loadingProgressSubscriptions = [];
             this.timeSeriesStartSubscriptions = [];
             this.timeSeriesEndSubscriptions = [];
+            this.timeSeriesLayerSubscriptions = [];
             this.dataTypeSubscriptions = [];
+            this.timeSeriesMarkersSubscriptions = [];
             this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
@@ -37,6 +39,8 @@ export const timeSeriesState = (function makeTimeSeriesState() {
                 timeSeriesDataType: 'continuous',
                 timeSeriesProgress: 0,
                 timeSeriesData: null,
+                timeSeriesLayer: '',
+                showMarkers: true,
             };
         }
 
@@ -55,7 +59,12 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             }
             if (component.changeDataType) {
                 this.dataTypeSubscriptions.push(component);
-
+            }
+            if (component.changeTimeSeriesMarkers) {
+                this.timeSeriesMarkersSubscriptions.push(component);
+            }
+            if (component.changeTimeSeriesLayer) {
+                this.timeSeriesLayerSubscriptions.push(component);
             }
         }
 
@@ -114,6 +123,36 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             for (let dataTypeSub of this.dataTypeSubscriptions) {
                 dataTypeSub.changeTimeSeriesDataType(this.timeSeriesParameters);
             }
+        }
+
+        addTimeSeriesMarker(marker) {
+            this.timeSeriesParameters.timeSeriesMarkers.push(marker);
+
+            for (let timeSeriesMarkerSub of this.timeSeriesMarkersSubscriptions) {
+                timeSeriesMarkerSub.changeTimeSeriesMarkers(this.timeSeriesParameters);
+            }
+        }
+
+        removeTimeSeriesMarker(marker) {
+            let { timeSeriesMarkers } = this.timeSeriesParameters;
+            let index = timeSeriesMarkes.indexOf(marker);
+            timeSeriesMarkers.splice(index, 1);
+
+            for (let timeSeriesMarkerSub of this.timeSeriesMarkersSubscriptions) {
+                timeSeriesMarkerSub.changeTimeSeriesMarkes(this.timeSeriesParameters);
+            }
+        }
+
+        changeTimeSeriesLayer(timeSeriesLayer) {
+            this.timeSeriesParameters.timeSeriesLayer = timeSeriesLayer;
+
+            for (let timeSeriesLayerSub of this.timeSeriesLayerSubscriptions) {
+                timeSeriesLayerSub.changeTimeSeriesLayer(this.timeSeriesParameters);
+            }
+        }
+
+        toggleShowMarkers() {
+            this.timeSeriesParameters.showMarkers = !this.timeSeriesParameters.showMarkers;
         }
     }
 

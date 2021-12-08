@@ -1,11 +1,9 @@
 import { LayerController } from '../LayerController/layerController.js';
-// import { controllers } from './Controller.js';
-// import { simVars } from '../simVars.js';
-// import { map } from '../map.js';
-// import { Marker } from './timeSeriesMarker.js';
-import { TimeSeriesButtonUI } from './TimeSeriesButton/timeSeriesButtonUI.js';
+import { Marker } from './TimeSeriesMarker/timeSeriesMarker.js';
+import { TimeSeriesButton } from './TimeSeriesButton/timeSeriesButton.js';
 import { buildCheckBox, doubleClick } from '../../util.js';
-import { simState } from '../../simState.js';
+import { simState, map } from '../../simState.js';
+import { timeSeriesState } from '../../timeSeriesState.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;
@@ -29,17 +27,15 @@ export class TimeSeriesController extends LayerController {
     constructor() {
         super();
         this.createTimeSeriesLayerGroup();
-
-        this.totalFramesToLoad = 0;
-        this.framesLoaded = 0;
     }
 
     connectedCallback() {
         super.connectedCallback();
     }
 
+    // put this into html file
     createTimeSeriesLayerGroup() {
-        this.timeSeriesButton = new TimeSeriesButtonUI();
+        this.timeSeriesButton = new TimeSeriesButton();
         this.loadingTimeSeries = false;
 
         const container = this.querySelector('#layer-controller-container');
@@ -49,7 +45,7 @@ export class TimeSeriesController extends LayerController {
         const h4 = document.createElement('h4');
         h4.innerText = 'Timeseries over all Markers';
         const showMarkersCallback = () => {
-            simVars.showMarkers = !simVars.showMarkers;
+            timeSeriesState.toggleShowMarkers();
         }
         const checkBoxParams = {
             id: 'show-markers',
@@ -73,9 +69,7 @@ export class TimeSeriesController extends LayerController {
     async generateTimeSeries() {
         document.body.classList.add('waiting');
         this.loadingTimeSeries = true;
-        let startDate = this.timeSeriesButton.getStartDate();
-        let endDate = this.timeSeriesButton.getEndDate();
-        let timeSeriesData = await this.generateTimeSeriesData(startDate, endDate);
+        let timeSeriesData = await this.generateTimeSeriesData();
         simState.setTimeSeriesData(timeSeriesData);
         document.body.classList.remove('waiting');
     }
@@ -92,8 +86,8 @@ export class TimeSeriesController extends LayerController {
     }
 
     setUpLayerForTimeSeries(layerName) {
-        let currentDomain = controllers.currentDomain.value;
-        let layer = this.getLayer(currentDomain, layerName);
+        let { domain } = simState.simulationParameters;
+        let layer = this.getLayer(domain, layerName);
         let img = layer.imageOverlay._image;
         if (layer.hasColorbar) {
             let doubleClickCallback = (e) => {
@@ -118,23 +112,26 @@ export class TimeSeriesController extends LayerController {
     /** ===== TimeSeriesGeneration block ===== */
     createNewMarker(latLon, xCoord, yCoord) {
         let marker = new Marker(latLon, [xCoord, yCoord]);
-        controllers.timeSeriesMarkers.add(marker);
+        timeSeriesState.addTimeSeriesMarker(marker);
         this.updateMarker(marker);
     }
 
-    generateTimeSeriesData(startDate, endDate) {
-        if (simVars.displayedColorbar == null) {
+    generateTimeSeriesData() {
+        let { timeSeriesStart, 
+              timeSeriesEnd, 
+              timeSeriesMarkers } = timeSeriesState.timeSeriesParameters
+        let { sortedTimestamps, colorbarLayer } = simState.simulationParameters;
+        if (colorbarLayer == null) {
             return;
         }
 
         document.body.classList.add('waiting');
-        let timeSeriesMarkers = controllers.timeSeriesMarkers.getValue();
-        controllers.timeSeriesProgress.setValue(0);
-        this.framesLoaded = 0;
 
-        let timestampsToLoad = simVars.sortedTimestamps.filter(timestamp => timestamp >= startDate && timestamp <= endDate);
-        let layersForTimeSeries = this.getLayersToGenerateTimeSeriesOver();
-        this.totalFramesToLoad = timestampsToLoad.length * timeSeriesMarkers.length * layersForTimeSeries.length;
+        let timestampsToLoad = sortedTimestamps.filter(timestamp => timeSeriesStart >= startDate && timestamp <= timeSeriesEnd);
+        let layersForTimeSeries = this.getLayersOfTimeSeries();
+
+        let totalFramesToLoad = timestampsToLoad.length * timeSeriesMarkers.length * layersForTimeSeries.length;
+        timeSeriesState.setFrames(totalFramesToLoad);
 
         let layerData = {};
         let timeSeriesGenerationInfo = {
@@ -145,15 +142,15 @@ export class TimeSeriesController extends LayerController {
         this.batchLoadTimeSeries(layerData, timeSeriesGenerationInfo);
     }
 
-    getLayersToGenerateTimeSeriesOver() {
-        let layerSpecification = this.timeSeriesButton.getLayerSpecification();
-        let currentDomain = controllers.currentDomain.getValue();
+    getLayersOfTimeSeries() {
+        let { timeSeriesLayer } = timeSeriesState.timeSeriesParameters;
+        let { domain, overlayOrder, colorbarLayer } = simState.simulationParameters;
 
-        let colorbarLayers = simVars.overlayOrder.map(layerName => {
-            return this.getLayer(currentDomain, layerName)
+        let colorbarLayers = overlayOrder.map(layerName => {
+            return this.getLayer(domain, layerName)
         }).filter(layer => {
-            if (layerSpecification == 'top-layer') {
-                return layer.layerName == simVars.displayedColorbar;
+            if (timeSeriesLayer == 'top-layer') {
+                return layer.layerName == colorbarLayer;
             }
             return layer.hasColorbar;
         });
@@ -217,16 +214,14 @@ export class TimeSeriesController extends LayerController {
                 colorbarValue = 0;
             }
             dataEntry.dataset[timestamp] = colorbarValue;
-            this.framesLoaded += 1;
-            let progress = this.framesLoaded / this.totalFramesToLoad;
-            controllers.timeSeriesProgress.setValue(progress);
+            timeSeriesState.loadFrames();
         }
 
         return dataEntry;
     }
 
     updateMarkers() {
-        let { timeSeriesMarkers } = simState.simulationParameters;
+        let { timeSeriesMarkers } = timeSeriesState.timeSeriesParameters;
         for (let marker of timeSeriesMarkers) {
             this.updateMarker(marker);
         }

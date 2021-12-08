@@ -1,6 +1,7 @@
 import { utcToLocal } from '../../util.js';
 import { simState, map } from '../../simState.js';
 import { configData } from '../../app.js';
+import { timeSeriesState } from '../../timeSeriesState.js';
 
 /** Layer for a specific domain. 
  *      Contents
@@ -394,7 +395,8 @@ export class SimulationLayer {
     }
 
     getColorbarLevelsAtTimestamp(timestamp) {
-        let { rasters, sortedTimestamps, noLevels } = simState.simulationParameters;
+        let { rasters, sortedTimestamps } = simState.simulationParameters;
+        let { noLevels } = timeSeriesState.timeSeriesParameters;
         let rastersAtTimestamp = rasters[this.domain][timestamp];
         let rasterInfo = rastersAtTimestamp[this.layerName];
         let levels = rasterInfo.levels;
