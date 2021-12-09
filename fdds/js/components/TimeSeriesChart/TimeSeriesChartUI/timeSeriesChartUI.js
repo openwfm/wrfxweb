@@ -1,10 +1,9 @@
-import { utcToLocal, createOption, linkSelects, dragElement, darkenHex, IS_MOBILE, isolateFocus } from '../../../util.js';
+import { utcToLocal, createOption, linkSelects, dragElement, IS_MOBILE, isolateFocus } from '../../../util.js';
 import { timeSeriesChartHTML } from './timeSeriesChartHTML.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../timeSeriesState.js';
 
 export class TimeSeriesChartUI extends SimComponentModel {
-    /** ===== Constructor block ===== */
     constructor() {
         super();
         this.innerHTML = timeSeriesChartHTML;
@@ -65,6 +64,16 @@ export class TimeSeriesChartUI extends SimComponentModel {
         isolateFocus(thresholdSetter);
         isolateFocus(thresholdLabel);
         isolateFocus(nameUpdater);
+    }
+
+    changeSimulation() {
+        let { fullContainer } = this.uiElements;
+        fullContainer.classList.add('hidden');
+    }
+
+    changeDomain() {
+        let { fullContainer } = this.uiElements;
+        fullContainer.classList.add('hidden');
     }
 
     setThresholdOptions() {

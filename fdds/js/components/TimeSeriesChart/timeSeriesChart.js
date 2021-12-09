@@ -1,4 +1,4 @@
-import { localToUTC, setURL, darkenHex, debounce, buildCheckBox } from '../../util.js';
+import { localToUTC, utcToLocal, setURL, darkenHex, debounce, buildCheckBox } from '../../util.js';
 import { TimeSeriesChartUI } from './TimeSeriesChartUI/timeSeriesChartUI.js';
 import { simState } from '../../simState.js';
 import { timeSeriesState } from '../../timeSeriesState.js';
@@ -6,12 +6,10 @@ import { timeSeriesState } from '../../timeSeriesState.js';
 const DEBOUNCE_INTERVAL = 100;
 
 export class TimeSeriesChart extends TimeSeriesChartUI {
-    /** ===== Constructor block ===== */
     constructor() {
         super();
     }
 
-    /** ===== Initialization block ===== */
     connectedCallback() {
         super.connectedCallback();
         
@@ -77,8 +75,8 @@ export class TimeSeriesChart extends TimeSeriesChartUI {
         let { colorbarLayer } = simState.simulationParameters;
         this.debouncedPopulateChart({
             allData: timeSeriesData,
-            startDate: timeSeriesStart,
-            endDate: timeSeriesEnd,
+            startDate: utcToLocal(timeSeriesStart),
+            endDate: utcToLocal(timeSeriesEnd),
             activeLayer: colorbarLayer,
         });
     }
@@ -97,13 +95,10 @@ export class TimeSeriesChart extends TimeSeriesChartUI {
             fullContainer.classList.add('hidden');
             return;
         }
-
         let labels = this.createLabels(data, startDate, endDate);
-
         if (this.chart) {
             this.chart.destroy();
         }
-
         let dataset = this.createChartDataset(data);
         this.chart = new Chart(this.ctx, {
             type: 'line',
@@ -234,7 +229,6 @@ export class TimeSeriesChart extends TimeSeriesChartUI {
         let yAxisCheck = isNaN(yMin);
         if (startCheck && endCheck && yAxisCheck) {
             undoZoom.classList.add('hidden');
-            undoZoomDisplay = 'none';
         } else { 
             undoZoom.classList.remove('hidden');
         }
