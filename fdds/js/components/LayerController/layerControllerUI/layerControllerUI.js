@@ -3,7 +3,7 @@ import { layerControllerHTML } from './layerControllerHTML.js';
 import { simState, map } from '../../../state/simState.js';
 import { OpacitySlider } from '../../Slider/opacitySlider.js';
 import { SimulationLayer } from '../simulationLayer.js';
-import { dragElement, buildCheckBox } from '../../../util.js';
+import { dragElement, buildCheckBox } from '../../../utils/util.js';
 
 export class LayerControllerUI extends SimComponentModel {
     /**  ===== Initialization Block ===== */

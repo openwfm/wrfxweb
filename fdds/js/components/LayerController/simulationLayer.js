@@ -1,4 +1,4 @@
-import { utcToLocal } from '../../util.js';
+import { utcToLocal } from '../../utils/util.js';
 import { simState, map } from '../../state/simState.js';
 import { configData } from '../../app.js';
 import { timeSeriesState } from '../../state/timeSeriesState.js';

@@ -1,5 +1,5 @@
 import { catalogMenuHTML } from './catalogMenuHTML.js';
-import { dragElement } from '../../../util.js';
+import { dragElement } from '../../../utils/util.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { CLIENT_WIDTH, ISMOBILE } from '../../../app.js';
 

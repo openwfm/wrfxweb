@@ -1,5 +1,5 @@
 import { createTimeSeriesMarkerHTML } from './timeSeriesMarkerHTML.js';
-import { isolateFocus, rgbToHex } from '../../../util.js';
+import { isolateFocus, rgbToHex } from '../../../utils/util.js';
 import { TimeSeriesButton } from '../TimeSeriesButton/timeSeriesButton.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../state/timeSeriesState.js';

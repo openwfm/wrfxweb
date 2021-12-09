@@ -1,5 +1,5 @@
 import { timeSeriesButtonHTML } from './timeSeriesButtonHTML.js';
-import { createOption, linkSelects } from '../../../util.js';
+import { createOption, linkSelects } from '../../../utils/util.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../state/timeSeriesState.js';
 import { simState } from '../../../state/simState.js';

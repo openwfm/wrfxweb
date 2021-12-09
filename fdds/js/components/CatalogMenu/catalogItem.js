@@ -1,4 +1,4 @@
-import { utcToLocal } from '../../util.js';
+import { utcToLocal } from '../../utils/util.js';
 import { simState } from '../../state/simState.js';
 
 export class CatalogItem extends HTMLElement {

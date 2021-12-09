@@ -1,4 +1,4 @@
-import { ISMOBILE } from './app.js';
+import { ISMOBILE } from '../app.js';
 
 /** Utility functions that can be imported and used in components from anywhere. 
  * 

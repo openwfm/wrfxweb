@@ -1,7 +1,7 @@
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { simulationTimebarHTML } from './simulationTimebarHTML.js';
 import { SimulationSlider } from '../simulationSlider.js';
-import { ELEMENT_FOCUSED, utcToLocal } from '../../../util.js';
+import { ELEMENT_FOCUSED, utcToLocal } from '../../../utils/util.js';
 
 const FAST_RATE = 150;
 const SLOW_RATE = 500; 

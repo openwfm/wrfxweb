@@ -1,6 +1,6 @@
 import { getSimulationRasters } from '../services.js';
-import { localToUTC, daysBetween, debounceInIntervals, getNewTimestamp } from '../util.js';
-import { getPresetParams, setURL } from '../urlUtils.js';
+import { localToUTC, daysBetween, debounceInIntervals, getNewTimestamp } from '../utils/util.js';
+import { getPresetParams, setURL } from '../utils/urlUtils.js';
 import { configData } from '../app.js';
 import { timeSeriesState } from './timeSeriesState.js';
 

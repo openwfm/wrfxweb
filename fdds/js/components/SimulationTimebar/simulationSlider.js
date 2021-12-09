@@ -1,5 +1,5 @@
 import { Slider } from '../Slider/slider.js';
-import { utcToLocal, createElement } from '../../util.js';
+import { utcToLocal, createElement } from '../../utils/util.js';
 import { simState } from '../../state/simState.js';
 
 const SLIDER_WIDTH = 340;

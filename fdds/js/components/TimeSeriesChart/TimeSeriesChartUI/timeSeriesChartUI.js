@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, dragElement, isolateFocus } from '../../../util.js';
+import { utcToLocal, createOption, linkSelects, dragElement, isolateFocus } from '../../../utils/util.js';
 import { timeSeriesChartHTML } from './timeSeriesChartHTML.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../state/timeSeriesState.js';
