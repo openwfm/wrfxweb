@@ -37,11 +37,14 @@ export class TimeSeriesButton extends SimComponentModel {
     }
 
     initializeTimeSeriesButton() {
-        let { timeSeriesButton } = this.uiElements;
+        let { timeSeriesButton, progressBar, generateButtonLabel, cancelButtonLabel } = this.uiElements;
         timeSeriesButton.onpointerdown = () => {
             if (this.loading) {
                 timeSeriesState.cancelTimeSeries();
                 this.loading = false;
+                generateButtonLabel.classList.remove('hidden');
+                cancelButtonLabel.classList.add('hidden');
+                progressBar.classList.add('hidden');
             } else {
                 this.loading = true;
                 timeSeriesState.generateTimeSeries();
@@ -102,8 +105,8 @@ export class TimeSeriesButton extends SimComponentModel {
         }
     }
     
-    changeTimeSeriesProgress({ timeSeriesProgress }) {
-        this.setProgress(timeSeriesProgress);
+    changeTimeSeriesProgress({ loadingProgress }) {
+        this.setProgress(loadingProgress);
     }
 
     changeSimulation(simulationParameters) {
@@ -148,7 +151,7 @@ export class TimeSeriesButton extends SimComponentModel {
         dataType.value = timeSeriesDataType;
     }
 
-    updateTimestamps({ sortedTimestamps, startDate, endDate }) {
+    updateTimestamps({ sortedTimestamps }) {
         let { seriesStartDate, seriesEndDate } = this.uiElements;
         let { timeSeriesStart, timeSeriesEnd } = timeSeriesState.timeSeriesParameters;
         seriesStartDate.innerHTML = '';
@@ -167,6 +170,8 @@ export class TimeSeriesButton extends SimComponentModel {
         }
         let { progressBar, generateButtonLabel, cancelButtonLabel } = this.uiElements;
         if (progress < 1) {
+            generateButtonLabel.classList.add('hidden');
+            cancelButtonLabel.classList.remove('hidden');
             progressBar.classList.remove('hidden');
             progressBar.style.width = Math.floor(progress*100) + '%';
         } else {

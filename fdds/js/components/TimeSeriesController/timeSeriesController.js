@@ -66,14 +66,6 @@ export class TimeSeriesController extends LayerController {
         this.updateMarkers();
     }
 
-    async generateTimeSeries() {
-        document.body.classList.add('waiting');
-        this.loadingTimeSeries = true;
-        let timeSeriesData = await this.generateTimeSeriesData();
-        simState.setTimeSeriesData(timeSeriesData);
-        document.body.classList.remove('waiting');
-    }
-
     cancelTimeSeries() {
         this.loadingTimeSeries = false;
     }
@@ -116,7 +108,7 @@ export class TimeSeriesController extends LayerController {
         this.updateMarker(marker);
     }
 
-    generateTimeSeriesData() {
+    async generateTimeSeries() {
         let { timeSeriesStart, 
               timeSeriesEnd, 
               timeSeriesMarkers } = timeSeriesState.timeSeriesParameters
@@ -126,8 +118,9 @@ export class TimeSeriesController extends LayerController {
         }
 
         document.body.classList.add('waiting');
+        this.loadingTimeSeries = true;
 
-        let timestampsToLoad = sortedTimestamps.filter(timestamp => timeSeriesStart >= startDate && timestamp <= timeSeriesEnd);
+        let timestampsToLoad = sortedTimestamps.filter(timestamp => timeSeriesStart >= timeSeriesStart && timestamp <= timeSeriesEnd);
         let layersForTimeSeries = this.getLayersOfTimeSeries();
 
         let totalFramesToLoad = timestampsToLoad.length * timeSeriesMarkers.length * layersForTimeSeries.length;
@@ -163,7 +156,7 @@ export class TimeSeriesController extends LayerController {
             document.body.classList.remove('waiting');
             return;
         }
-        let {timestampsToLoad} = timeSeriesGenerationInfo;
+        let { timestampsToLoad } = timeSeriesGenerationInfo;
         let batchEnd = Math.min(index + batchSize, timestampsToLoad.length);
         await this.loadTimeSeriesBatch(layerData, timeSeriesGenerationInfo, index, batchEnd);
 
@@ -172,18 +165,17 @@ export class TimeSeriesController extends LayerController {
                 this.batchLoadTimeSeries(layerData, timeSeriesGenerationInfo, batchEnd);
             }
             setTimeout(batchLoadAfterTimeout, TIMEOUT_MS);
-
         } else {
             document.body.classList.remove('waiting');
-
-            const timeSeriesChart = document.querySelector('timeseries-chart');
-            timeSeriesChart.populateChart(layerData);
-            return layerData;
+            timeSeriesState.setTimeSeriesData(layerData);
+            // const timeSeriesChart = document.querySelector('timeseries-chart');
+            // timeSeriesChart.populateChart(layerData);
+            // return layerData;
         }
     }
 
     async loadTimeSeriesBatch(layerData, timeSeriesGenerationInfo, index, batchEnd) {
-        let {layersForTimeSeries, timeSeriesMarkers, timestampsToLoad } = timeSeriesGenerationInfo;
+        let { layersForTimeSeries, timeSeriesMarkers, timestampsToLoad } = timeSeriesGenerationInfo;
         let timestampBatch = timestampsToLoad.slice(index, batchEnd);
 
         for (let colorbarLayer of layersForTimeSeries) {
@@ -204,13 +196,13 @@ export class TimeSeriesController extends LayerController {
 
     async generateTimeSeriesDataForLayerAndMarker(colorbarLayer, marker, filteredTimestamps) {
         let timeSeriesMarker = marker.getContent();
-        let dataType = this.timeSeriesButton.getDataType();
+        let { timeSeriesDataType } = timeSeriesState.timeSeriesParameters;
         let dataEntry = ({label: timeSeriesMarker.getName(), latLon: marker._latlng, color: timeSeriesMarker.getChartColor(), 
                                 dataset: {}, hidden: timeSeriesMarker.hideOnChart});
         for (let timestamp of filteredTimestamps) {
             let coords = marker.imageCoords;
             let colorbarValue = await colorbarLayer.colorValueAtLocation(timestamp, coords);
-            if (colorbarValue == null && dataType == 'continuous') {
+            if (colorbarValue == null && timeSeriesDataType == 'continuous') {
                 colorbarValue = 0;
             }
             dataEntry.dataset[timestamp] = colorbarValue;

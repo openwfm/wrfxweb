@@ -24,6 +24,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
         }
 
         constructor() {
+            this.timeSeriesDataSubscriptions = [];
             this.loadingProgressSubscriptions = [];
             this.timeSeriesStartSubscriptions = [];
             this.timeSeriesEndSubscriptions = [];
@@ -40,7 +41,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
                 timeSeriesStart: '',
                 timeSeriesEnd: '',
                 timeSeriesDataType: 'continuous',
-                timeSeriesProgress: 0,
+                loadingProgress: 0,
                 timeSeriesData: null,
                 timeSeriesLayer: '',
                 showMarkers: true,
@@ -72,6 +73,9 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             if (component.updateTimeSeriesMarker) {
                 this.markerUpdateSubscriptions.push(component);
             }
+            if (component.updateTimeSeriesData) {
+                this.timeSeriesDataSubscriptions.push(component);
+            }
         }
 
         changeSimulation({ startDate, endDate }) {
@@ -97,17 +101,21 @@ export const timeSeriesState = (function makeTimeSeriesState() {
 
         cancelTimeSeries() {
             this.timeSeriesController.cancelTimeSeries();
+            this.timeSeriesParameters.loadingProgress = 0;
         }
 
         setTimeSeriesData(timeSeriesData) {
-
+            this.timeSeriesParameters.timeSeriesData = timeSeriesData;
+            
+            for (let timeSeriesDataSub of this.timeSeriesDataSubscriptions) {
+                timeSeriesDataSub.updateTimeSeriesData(this.timeSeriesParameters);
+            }
         }
 
         setFrames(nFrames) {
             this.nFrames = nFrames;
             this.framesLoaded = 0;
-            let progress = (this.Frames == 0) ? 0 : (this.loadedFrames / this.nFrames);
-            this.changeLoadingProgress(progress);
+            this.changeLoadingProgress(0);
         }
 
         changeLoadingProgress(progress) {
