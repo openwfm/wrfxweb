@@ -32,6 +32,8 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             this.dataTypeSubscriptions = [];
             this.timeSeriesMarkersSubscriptions = [];
             this.markerUpdateSubscriptions = [];
+            this.addMarkerSubscriptions = [];
+            this.removeMarkerSubscriptions = [];
             this.timeSeriesController = null;
             this.nFrames = 0;
             this.framesLoaded = 0;
@@ -66,6 +68,12 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             }
             if (component.changeTimeSeriesMarkers) {
                 this.timeSeriesMarkersSubscriptions.push(component);
+            }
+            if (component.addTimeSeriesMarker) {
+                this.addMarkerSubscriptions.push(component);
+            }
+            if (component.removeTimeSeriesMarker) {
+                this.removeMarkerSubscriptions.push(component);
             }
             if (component.changeTimeSeriesLayer) {
                 this.timeSeriesLayerSubscriptions.push(component);
@@ -108,7 +116,7 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             this.timeSeriesParameters.timeSeriesData = timeSeriesData;
             
             for (let timeSeriesDataSub of this.timeSeriesDataSubscriptions) {
-                timeSeriesDataSub.updateTimeSeriesData(this.timeSeriesParameters);
+                timeSeriesDataSub.updateTimeSeriesData(timeSeriesData);
             }
         }
 
@@ -162,6 +170,9 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             for (let timeSeriesMarkerSub of this.timeSeriesMarkersSubscriptions) {
                 timeSeriesMarkerSub.changeTimeSeriesMarkers(this.timeSeriesParameters);
             }
+            for (let addMarkerSub of this.addMarkerSubscriptions) {
+                addMarkerSub.addTimeSeriesMarker(this.timeSeriesParameters);
+            }
         }
 
         removeTimeSeriesMarker(marker) {
@@ -170,13 +181,18 @@ export const timeSeriesState = (function makeTimeSeriesState() {
             timeSeriesMarkers.splice(index, 1);
 
             for (let timeSeriesMarkerSub of this.timeSeriesMarkersSubscriptions) {
-                timeSeriesMarkerSub.changeTimeSeriesMarkes(this.timeSeriesParameters);
+                timeSeriesMarkerSub.changeTimeSeriesMarkers(this.timeSeriesParameters);
+            }
+
+            for (let removeMarkerSub of this.removeMarkerSubscriptions) {
+                removeMarkerSub.removeTimeSeriesMarker(this.timeSeriesParameters, index);
             }
         }
 
         updateTimeSeriesMarker(marker) {
+            let i = this.timeSeriesParameters.timeSeriesMarkers.indexOf(marker);
             for (let timeSeriesMarkerSub of this.markerUpdateSubscriptions) {
-                timeSeriesMarkerSub.updateTimeSeriesMarker(marker);
+                timeSeriesMarkerSub.updateTimeSeriesMarker(this.timeSeriesParameters, i);
             }
         }
 
