@@ -1,7 +1,7 @@
 import { localToUTC, utcToLocal, darkenHex, debounce, buildCheckBox } from '../../utils/util.js';
-import { TimeSeriesChartUI } from './TimeSeriesChartUI/timeSeriesChartUI.js';
-import { simState } from '../../state/simState.js';
 import { timeSeriesState } from '../../state/timeSeriesState.js';
+import { simState } from '../../state/simState.js';
+import { TimeSeriesChartUI } from './TimeSeriesChartUI/timeSeriesChartUI.js';
 
 const DEBOUNCE_INTERVAL = 100;
 

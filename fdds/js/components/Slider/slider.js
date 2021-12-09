@@ -1,6 +1,6 @@
+import { ISMOBILE } from '../../app.js';
 import { SimComponentModel } from '../../models/simComponentModel.js';
 import { sliderTemplate } from './sliderUI/sliderHTML.js';
-import { ISMOBILE } from '../../app.js';
 
 export class Slider extends SimComponentModel {
     windowResize() {

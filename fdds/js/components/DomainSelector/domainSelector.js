@@ -1,7 +1,7 @@
-import { SimComponentModel } from '../../models/simComponentModel.js';
-import { domainSelectorHTML } from './domainSelectorHTML.js';
 import { ISMOBILE } from '../../app.js';
 import { simState } from '../../state/simState.js';
+import { SimComponentModel } from '../../models/simComponentModel.js';
+import { domainSelectorHTML } from './domainSelectorHTML.js';
 
 export class DomainSelector extends SimComponentModel {
     constructor() {

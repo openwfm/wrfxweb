@@ -1,7 +1,7 @@
-import { catalogMenuHTML } from './catalogMenuHTML.js';
+import { CLIENT_WIDTH, ISMOBILE } from '../../../app.js';
 import { dragElement } from '../../../utils/util.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
-import { CLIENT_WIDTH, ISMOBILE } from '../../../app.js';
+import { catalogMenuHTML } from './catalogMenuHTML.js';
 
 export class CatalogMenuUI extends SimComponentModel {
     constructor() {

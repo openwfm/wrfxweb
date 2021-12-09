@@ -1,9 +1,9 @@
-import { SimComponentModel } from '../../../models/simComponentModel.js';
-import { layerControllerHTML } from './layerControllerHTML.js';
-import { simState, map } from '../../../state/simState.js';
-import { OpacitySlider } from '../../Slider/opacitySlider.js';
-import { SimulationLayer } from '../simulationLayer.js';
 import { dragElement, buildCheckBox } from '../../../utils/util.js';
+import { simState, map } from '../../../state/simState.js';
+import { SimComponentModel } from '../../../models/simComponentModel.js';
+import { SimulationLayer } from '../simulationLayer.js';
+import { OpacitySlider } from '../../Slider/opacitySlider.js';
+import { layerControllerHTML } from './layerControllerHTML.js';
 
 export class LayerControllerUI extends SimComponentModel {
     /**  ===== Initialization Block ===== */

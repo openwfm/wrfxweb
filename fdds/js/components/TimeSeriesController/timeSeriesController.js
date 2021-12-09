@@ -1,9 +1,9 @@
-import { LayerController } from '../LayerController/layerController.js';
-import { Marker } from './TimeSeriesMarker/timeSeriesMarker.js';
-import { TimeSeriesButton } from './TimeSeriesButton/timeSeriesButton.js';
 import { buildCheckBox, doubleClick } from '../../utils/util.js';
-import { simState, map } from '../../state/simState.js';
 import { timeSeriesState } from '../../state/timeSeriesState.js';
+import { simState, map } from '../../state/simState.js';
+import { LayerController } from '../LayerController/layerController.js';
+import { TimeSeriesButton } from './TimeSeriesButton/timeSeriesButton.js';
+import { Marker } from './TimeSeriesMarker/timeSeriesMarker.js';
 
 const TIMESERIES_BATCHSIZE = 10;
 const TIMEOUT_MS = 80;

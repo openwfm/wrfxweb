@@ -1,8 +1,8 @@
-import { timeSeriesButtonHTML } from './timeSeriesButtonHTML.js';
 import { createOption, linkSelects } from '../../../utils/util.js';
-import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../state/timeSeriesState.js';
 import { simState } from '../../../state/simState.js';
+import { SimComponentModel } from '../../../models/simComponentModel.js';
+import { timeSeriesButtonHTML } from './timeSeriesButtonHTML.js';
 
 export class TimeSeriesButton extends SimComponentModel {
     constructor(dataType = 'continuous') {
