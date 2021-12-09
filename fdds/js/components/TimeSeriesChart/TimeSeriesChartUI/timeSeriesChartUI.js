@@ -1,7 +1,8 @@
-import { utcToLocal, createOption, linkSelects, dragElement, IS_MOBILE, isolateFocus } from '../../../util.js';
+import { utcToLocal, createOption, linkSelects, dragElement, isolateFocus } from '../../../util.js';
 import { timeSeriesChartHTML } from './timeSeriesChartHTML.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
 import { timeSeriesState } from '../../../timeSeriesState.js';
+import { ISMOBILE } from '../../../app.js';
 
 export class TimeSeriesChartUI extends SimComponentModel {
     constructor() {
@@ -38,7 +39,6 @@ export class TimeSeriesChartUI extends SimComponentModel {
         this.ctx = timeSeriesChart.getContext('2d');
     }
 
-    /** ===== Initialization block ===== */
     connectedCallback() {
         super.connectedCallback();
         this.initializeChartUI();
@@ -116,12 +116,12 @@ export class TimeSeriesChartUI extends SimComponentModel {
             e.stopPropagation();
             if (layersToAdd.classList.contains('hidden')) {
                 layersToAdd.classList.remove('hidden');
-                if (!IS_MOBILE) {
+                if (!ISMOBILE) {
                     addLayers.style.left = '-330px';
                 }
             } else {
                 layersToAdd.classList.add('hidden');
-                if (!IS_MOBILE) {
+                if (!ISMOBILE) {
                     addLayers.style.left = '-80px';
                 }
             }

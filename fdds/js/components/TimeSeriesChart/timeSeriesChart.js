@@ -1,4 +1,4 @@
-import { localToUTC, utcToLocal, setURL, darkenHex, debounce, buildCheckBox } from '../../util.js';
+import { localToUTC, utcToLocal, darkenHex, debounce, buildCheckBox } from '../../util.js';
 import { TimeSeriesChartUI } from './TimeSeriesChartUI/timeSeriesChartUI.js';
 import { simState } from '../../simState.js';
 import { timeSeriesState } from '../../timeSeriesState.js';
@@ -28,7 +28,6 @@ export class TimeSeriesChart extends TimeSeriesChartUI {
                 let label = this.chart.data.labels[firstPoint.index];
                 let timestamp = localToUTC(label);
                 simState.changeTimestamp(timestamp);
-                setURL();
             }
         });
     }
