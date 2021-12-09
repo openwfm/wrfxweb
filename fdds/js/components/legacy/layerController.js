@@ -4,7 +4,7 @@ import { OpacitySlider } from './opacitySlider.js';
 import { simVars } from '../simVars.js';
 import { map } from '../map.js';
 import { SimulationLayer } from './simulationLayer.js';
-import { ThreadManager } from '../../threadManager.js';
+import { ThreadManager } from '../threadManager.js';
 
 /**
  * Component that handles adding and removing layers to the map. Provides user with a window

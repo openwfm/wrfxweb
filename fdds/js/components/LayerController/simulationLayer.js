@@ -1,7 +1,7 @@
 import { utcToLocal } from '../../util.js';
-import { simState, map } from '../../simState.js';
+import { simState, map } from '../../state/simState.js';
 import { configData } from '../../app.js';
-import { timeSeriesState } from '../../timeSeriesState.js';
+import { timeSeriesState } from '../../state/timeSeriesState.js';
 
 /** Layer for a specific domain. 
  *      Contents

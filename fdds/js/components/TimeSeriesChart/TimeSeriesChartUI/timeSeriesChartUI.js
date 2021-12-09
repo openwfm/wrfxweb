@@ -1,7 +1,7 @@
 import { utcToLocal, createOption, linkSelects, dragElement, isolateFocus } from '../../../util.js';
 import { timeSeriesChartHTML } from './timeSeriesChartHTML.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
-import { timeSeriesState } from '../../../timeSeriesState.js';
+import { timeSeriesState } from '../../../state/timeSeriesState.js';
 import { ISMOBILE } from '../../../app.js';
 
 export class TimeSeriesChartUI extends SimComponentModel {

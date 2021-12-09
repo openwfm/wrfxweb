@@ -1,5 +1,5 @@
-import { simState } from '../simState.js';
-import { timeSeriesState } from '../timeSeriesState.js';
+import { simState } from '../state/simState.js';
+import { timeSeriesState } from '../state/timeSeriesState.js';
 
 export class SimComponentModel extends HTMLElement {
     constructor() {

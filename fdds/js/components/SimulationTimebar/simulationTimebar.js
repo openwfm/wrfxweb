@@ -1,5 +1,5 @@
 import { SimulationTimebarUI } from './simulationTimebarUI/simulationTimebarUI.js';
-import { simState } from '../../simState.js';
+import { simState } from '../../state/simState.js';
 
 /** Creates a UI component that includes a play / pause / prev / next buttons to iterate through 
  *  the simulation. Also includes a slider bar with a head that indicates relative position in 

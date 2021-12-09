@@ -1,5 +1,5 @@
 import { utcToLocal } from '../../util.js';
-import { simState } from '../../simState.js';
+import { simState } from '../../state/simState.js';
 
 export class CatalogItem extends HTMLElement {
     constructor(catEntry, navJobId) {

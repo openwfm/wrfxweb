@@ -1,4 +1,4 @@
-import { getNewTimestamp } from './util.js';
+import { getNewTimestamp } from '../util.js';
 
 export const timeSeriesState = (function makeTimeSeriesState() {
     class TimeSeriesState {

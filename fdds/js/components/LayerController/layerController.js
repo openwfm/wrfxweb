@@ -1,6 +1,6 @@
 import { LayerControllerUI } from './layerControllerUI/layerControllerUI.js';
 import { ThreadManager } from '../../../threadManager.js';
-import { simState, map } from '../../simState.js';
+import { simState, map } from '../../state/simState.js';
 
 /** Component that handles adding and removing layers to the map. Provides user with a window
  *  to choose different layers available to add. 

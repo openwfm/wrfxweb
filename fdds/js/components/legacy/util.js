@@ -1,3 +1,6 @@
+import { controllers } from './components/Controller.js';
+import { simVars } from './simVars.js';
+import { map } from './map.js';
 import { ISMOBILE } from './app.js';
 
 /** Utility functions that can be imported and used in components from anywhere. 
@@ -14,7 +17,95 @@ import { ISMOBILE } from './app.js';
  */
 
 /** ===== Constants block */
+export const CLIENT_WIDTH = document.body.clientWidth;
+export const IS_MOBILE = CLIENT_WIDTH < 769; 
 export var ELEMENT_FOCUSED = false;
+
+/** ===== SetURL block ===== */
+export function setURL() {
+  let historyData = {};
+  let urlVars = '';
+
+  const addData = (key, data) => {
+    if (data) {
+      historyData[key] = data;
+      urlVars += '&' + key + '=' + data;
+    }
+  }
+
+  zoomToURL(addData);
+  panToURL(addData);
+  jobIdToURL(addData);
+  domainToURL(addData);
+  startDateToURL(addData);
+  endDateToURL(addData);
+  timestampToURL(addData);
+  addedLayersToURL(addData);
+  opacityToURL(addData);
+
+  if (urlVars != '') {
+    urlVars = '?' + urlVars.substr(1);
+    history.pushState(historyData, 'Data', urlVars);
+  }
+}
+
+function zoomToURL(addData) {
+  let zoom = map.getZoom();
+  addData('zoom', zoom);
+}
+
+function panToURL(addData) {
+  let center = map.getCenter();
+  let pan = center.lat.toFixed(2) + ',' + center.lng.toFixed(2);
+  addData('pan', pan);
+}
+
+function jobIdToURL(addData) {
+  let currentSimulation = simVars.currentSimulation;
+  addData('job_id', currentSimulation);
+}
+
+function domainToURL(addData) {
+  let currentDomain = controllers.currentDomain.getValue();
+  let domainInstances = controllers.domainInstance.getValue();
+  if (domainInstances != null && domainInstances.length > 0 && currentDomain != domainInstances[0]) {
+    addData('domain', currentDomain);
+  }
+}
+
+function startDateToURL(addData) {
+  let startDate = controllers.startDate.getValue();
+  if (startDate != simVars.sortedTimestamps[0]) {
+    addData('startDate', utcToLocal(startDate));
+  }
+}
+
+function endDateToURL(addData) {
+  let endDate = controllers.endDate.getValue();
+  let nTimestamps = simVars.sortedTimestamps.length;
+  if (endDate != simVars.sortedTimestamps[nTimestamps - 1]) {
+    addData('endDate', utcToLocal(endDate));
+  }
+}
+
+function timestampToURL(addData) {
+  let timestamp = controllers.currentTimestamp.getValue();
+  if (timestamp != startDate) {
+    addData('timestamp', utcToLocal(timestamp));
+  }
+}
+
+function addedLayersToURL(addData) {
+  let rasterURL = simVars.overlayOrder.join(',');
+  addData('rasters', rasterURL);
+}
+
+function opacityToURL(addData) {
+  let opacity = controllers.opacity.getValue();
+  if (opacity != 0.5) {
+    addData('opacity', opacity);
+  }
+}
 
 /** ===== Debounce block ===== */
 /** Executes function with a maximum rate of delay. */

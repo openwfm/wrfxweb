@@ -2,9 +2,8 @@ import { createTimeSeriesMarkerHTML } from './timeSeriesMarkerHTML.js';
 import { isolateFocus, rgbToHex } from '../../../util.js';
 import { TimeSeriesButton } from '../TimeSeriesButton/timeSeriesButton.js';
 import { SimComponentModel } from '../../../models/simComponentModel.js';
-import { map } from '../../../simState.js';
-import { timeSeriesState } from '../../../timeSeriesState.js';
-import { simState } from '../../../simState.js';
+import { timeSeriesState } from '../../../state/timeSeriesState.js';
+import { simState, map } from '../../../state/simState.js';
 
 export class TimeSeriesMarker extends SimComponentModel {
     constructor(latLon) {
