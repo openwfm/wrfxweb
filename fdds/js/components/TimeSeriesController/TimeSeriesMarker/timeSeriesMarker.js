@@ -52,6 +52,12 @@ export class TimeSeriesMarker extends SimComponentModel {
             timeSeriesMenu.classList.add('hidden');
         }
     }
+    
+    updateTimeSeriesData() {
+        let { markerMenu, timeSeriesMenu } = this.uiElements;
+        markerMenu.classList.remove('hidden');
+        timeSeriesMenu.classList.add('hidden');
+    }
 
     getChartColor() {
         return this.chartColor;
@@ -135,8 +141,11 @@ export class Marker {
             timeSeriesState.updateTimeSeriesMarker(this);
         });
         this.popup.setContent(this.timeSeriesMarker);
-        let display = showMarkers ? 'block' : 'none';
-        this.popup.getElement().style.display = display;
+        if (showMarkers) {
+            this.showMarkerInfo();
+        } else { 
+            this.hideMarkerInfo();
+        }
 
         let svgString = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'>
                                 <path d="M0 0h24v24H0V0z" fill="none"></path>
