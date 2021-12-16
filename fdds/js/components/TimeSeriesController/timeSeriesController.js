@@ -13,17 +13,10 @@ const TIMEOUT_MS = 80;
  * range. Uses the layer that is on top. To use, double click on image to bring up
  * a popup showing the value of the pixel at that particular time stamp and enable button to 
  * generate a timeseries.
- * 
  *          Contents
- *  1. Initialization block
- *  2. DomainSwitch block
- *  3. AddAndRemoveLayers block
- *  4. TimeSeriesGeneration block
- *  5. Util block
  * 
  */
 export class TimeSeriesController extends LayerController {
-    /** ===== Initialization block ===== */
     constructor() {
         super();
         this.createTimeSeriesLayerGroup();
@@ -33,7 +26,6 @@ export class TimeSeriesController extends LayerController {
         super.connectedCallback();
     }
 
-    // put this into html file
     createTimeSeriesLayerGroup() {
         this.timeSeriesButton = new TimeSeriesButton();
         this.loadingTimeSeries = false;
@@ -70,7 +62,6 @@ export class TimeSeriesController extends LayerController {
         this.loadingTimeSeries = false;
     }
 
-    /** ===== AddAndRemoveLayers block ===== */
     addLayerToMap(layerName) {
         super.addLayerToMap(layerName);
 
@@ -101,7 +92,6 @@ export class TimeSeriesController extends LayerController {
         this.updateMarkers();
     }
 
-    /** ===== TimeSeriesGeneration block ===== */
     createNewMarker(latLon, xCoord, yCoord) {
         let marker = new Marker(latLon, [xCoord, yCoord]);
         timeSeriesState.addTimeSeriesMarker(marker);
@@ -168,9 +158,6 @@ export class TimeSeriesController extends LayerController {
         } else {
             document.body.classList.remove('waiting');
             timeSeriesState.setTimeSeriesData(layerData);
-            // const timeSeriesChart = document.querySelector('timeseries-chart');
-            // timeSeriesChart.populateChart(layerData);
-            // return layerData;
         }
     }
 
