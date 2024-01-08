@@ -138,7 +138,7 @@ export class DomainSelector extends HTMLElement {
             let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
             for (let i = 2; i <= nextTimestamps.length; i++) {
                 startDate = nextTimestamps[nextTimestamps.length - i];
-                if (daysBetween(startDate, lastTimestamp) >= 15) {
+                if (daysBetween(startDate, lastTimestamp) >= 8) {
                     startDate = nextTimestamps[nextTimestamps.length - i + 1];
                     break;
                 }
