@@ -38,10 +38,10 @@ export class CatalogMenu extends HTMLElement {
                         <div>
                             <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
                             <select id='sort-by'>
-                                <option value='original-order'>original order</option>
-                                <option value='description'>description</option>
                                 <option value='start-date'>start date</option>
                                 <option value='end-date'>end date</option>
+                                <option value='original-order'>original order</option>
+                                <option value='description'>description</option>
                             </select>
                         </div>
                         <div class='sorting-column'>
@@ -172,7 +172,7 @@ export class CatalogMenu extends HTMLElement {
                 firesListDOM.appendChild(newLI);
             }
         }
-        this.sortMenu('original-order', false);
+        this.sortMenu('start-date', false);
         this.clickMostRecent(navJobId);
     }
 
@@ -277,7 +277,7 @@ export class CatalogMenu extends HTMLElement {
         if (listElem1.from_utc == listElem2.from_utc) {
             return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
         } else {
-            return listElem1.from_utc > listElem2.from_utc;
+            return listElem1.from_utc < listElem2.from_utc;
         }
     }
 
@@ -285,7 +285,7 @@ export class CatalogMenu extends HTMLElement {
         if (listElem1.to_utc == listElem2.to_utc) {
             return listElem1.description.toLowerCase() > listElem2.description.toLowerCase(); 
         } else {
-            return listElem1.to_utc > listElem2.to_utc;
+            return listElem1.to_utc < listElem2.to_utc;
         }
     }
 
