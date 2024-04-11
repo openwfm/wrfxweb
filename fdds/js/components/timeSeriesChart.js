@@ -359,13 +359,13 @@ export class TimeSeriesChart extends HTMLElement {
                         duration: 0
                     },
                     scales: {
-                        yAxes: {
+                        y: {
                             title: {
                                 display: true,
                                 text: this.activeLayer
                             }
                         },
-                        xAxes: xAxisOptions
+                        x: xAxisOptions
                     },
                     plugins: {
                         annotation: {
@@ -373,7 +373,7 @@ export class TimeSeriesChart extends HTMLElement {
                                 display: thresholdValue !== null && !isNaN(thresholdValue),
                                 type: 'line',
                                 mode: 'horizontal',
-                                scaleID: 'yAxes',
+                                scaleID: 'y',
                                 value: thresholdValue,
                                 borderColor: 'rgb(255, 99, 132)',
                                 borderWidth: 2,
@@ -616,13 +616,13 @@ export class TimeSeriesChart extends HTMLElement {
         } else { 
             undoZoom.classList.remove('hidden');
         }
-        this.chart.options.scales.xAxes.min = zoomStart.value;
-        this.chart.options.scales.xAxes.max = zoomEnd.value;
-        delete this.chart.options.scales.yAxes.min;
-        delete this.chart.options.scales.yAxes.max;
+        this.chart.options.scales.x.min = zoomStart.value;
+        this.chart.options.scales.x.max = zoomEnd.value;
+        delete this.chart.options.scales.y.min;
+        delete this.chart.options.scales.y.max;
         if (!isNaN(yMin)) {
-            this.chart.options.scales.yAxes.min = yMin;
-            this.chart.options.scales.yAxes.max = yMax;
+            this.chart.options.scales.y.min = yMin;
+            this.chart.options.scales.y.max = yMax;
         }
         this.chart.update(this.allData[this.activeLayer]);
     }
