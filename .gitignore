@@ -3,6 +3,8 @@ logs/*
 node_modules/
 bower_components/
 fdds/simulations/
+fdds/conf.json
+src/__pycache__/*
 package-lock.json
 *.gz
 tmp
