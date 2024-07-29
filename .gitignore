@@ -10,3 +10,12 @@ package-lock.json
 tmp
 .DS_Store
 .idea
+# remove the following lines when productionize the project
+.env
+notes.txt
+server/
+venv/
+
+
+
+
