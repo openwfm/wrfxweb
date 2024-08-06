@@ -6,7 +6,9 @@ fdds/simulations/
 fdds/conf.json
 src/__pycache__/*
 package-lock.json
+etc/conf.json
 *.gz
+*.swp
 tmp
 .DS_Store
 .idea
