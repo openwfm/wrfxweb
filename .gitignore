@@ -11,9 +11,10 @@ tmp
 .DS_Store
 .idea
 etc/conf.json
+notes.txt
+*.swp
 # remove the following lines when productionize the project
 .env
-notes.txt
 server/
 venv/
 
