@@ -64,9 +64,9 @@ export class CatalogMenu extends HTMLElement {
                             <div class='column-header'>Fuel moisture</div>
                             <ul id='catalog-fuel-moisture' class='catalog-list'> </ul>
                         </div>
-                        <div id='satellite-column' class='column'>
-                            <div class='column-header'>Satellite Data</div>
-                            <ul id='catalog-satellite-data' class='catalog-list'> </ul>
+                        <div id='lidar-profiles' class='column'>
+                            <div class='column-header'>Lidar Profiles</div>
+                            <ul id='catalog-lidar-data' class='catalog-list'> </ul>
                         </div>
                     </div>
                 </div>
@@ -119,10 +119,10 @@ export class CatalogMenu extends HTMLElement {
         } else {
             const firesListDOM = this.querySelector('#fires-column');
             const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-            const satelliteListDOM = this.querySelector('#satellite-column');
+            const lidarProfilesDOM = this.querySelector('#lidar-profiles');
             firesListDOM.classList.remove('hidden');
             fuelMoistureListDOM.classList.remove('hidden');
-            satelliteListDOM.classList.remove('hidden');
+            lidarProfilesDOM.classList.remove('hidden');
         }
     }
 
@@ -154,7 +154,7 @@ export class CatalogMenu extends HTMLElement {
         const navJobId = urlParams.get('job_id');
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
-        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        const lidarProfilesDOM = this.querySelector('#catalog-lidar-data');
         const catalogEntries = await getCatalogEntries();
         for (let catName in catalogEntries) {
             let catEntry = catalogEntries[catName];
@@ -164,9 +164,9 @@ export class CatalogMenu extends HTMLElement {
             if(desc.indexOf('GACC') >= 0 || desc.indexOf(' FM') >= 0) {
                 this.fuelMoistureList.push(catEntry);
                 fuelMoistureListDOM.appendChild(newLI);
-            } else if(desc.indexOf('SAT') >= 0) {
+            } else if(desc.indexOf('Lidar') >= 0) {
                 this.satelliteList.push(catEntry);
-                satelliteListDOM.appendChild(newLI);
+                lidarProfilesDOM.appendChild(newLI);
             } else {
                 this.firesList.push(catEntry);
                 firesListDOM.appendChild(newLI);
@@ -292,11 +292,11 @@ export class CatalogMenu extends HTMLElement {
     filterColumns(listCreator) {
         const firesListDOM = this.querySelector('#catalog-fires');
         const fuelMoistureListDOM = this.querySelector('#catalog-fuel-moisture');
-        const satelliteListDOM = this.querySelector('#catalog-satellite-data');
+        const lidarProfilesDOM = this.querySelector('#catalog-lidar-data');
 
         this.filterColumn(firesListDOM, this.firesList, listCreator);
         this.filterColumn(fuelMoistureListDOM, this.fuelMoistureList, listCreator);
-        this.filterColumn(satelliteListDOM, this.satelliteList, listCreator);
+        this.filterColumn(lidarProfilesDOM, this.satelliteList, listCreator);
     }
 
     filterColumn(categoryDOM, categoryList, listCreator) {
@@ -313,16 +313,16 @@ export class CatalogMenu extends HTMLElement {
     selectCategory(selection) {
         const firesListDOM = this.querySelector('#fires-column');
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
-        const satelliteListDOM = this.querySelector('#satellite-column');
+        const lidarProfilesDOM = this.querySelector('#lidar-profiles');
         firesListDOM.classList.add('hidden');
         fuelMoistureListDOM.classList.add('hidden');
-        satelliteListDOM.classList.add('hidden');
+        lidarProfilesDOM.classList.add('hidden');
         if (selection == 'Fires') {
             firesListDOM.classList.remove('hidden');
         } else if (selection == 'Fuel Moisture') {
             fuelMoistureListDOM.classList.remove('hidden');
         } else {
-            satelliteListDOM.classList.remove('hidden');
+            lidarProfilesDOM.classList.remove('hidden');
         }
     }
 }
