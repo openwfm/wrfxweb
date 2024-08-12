@@ -265,6 +265,19 @@ html, body {
   left: 18px;
 }
 
+/* Menu Style */
+#login-menu-container {
+  position:absolute;
+  padding: 5px;
+  z-index: 9990;
+  width: 600px;
+  height: 440px;
+  top: 15%;
+  background:#f2f2f2;
+  line-height: normal;
+  font-size: 1rem;
+}
+
 /* ===== CatalogMenu block ===== */
 /* button Style */
 .catalog-button {

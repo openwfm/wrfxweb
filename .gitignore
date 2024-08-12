@@ -20,6 +20,10 @@ notes.txt
 server/
 venv/
 
+# api
+api/venv/
+api/__pycache__/
+
 
 
 
