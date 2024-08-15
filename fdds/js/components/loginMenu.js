@@ -18,7 +18,8 @@ export class LoginMenu extends HTMLElement {
     }
 
     connectedCallback() {
-        
+      const { loginMenuContainer } = this.uiElements;
+        dragElement(loginMenuContainer);
     }
 
     hideShowMenu() {

@@ -20,7 +20,7 @@ export class CatalogMenu extends HTMLElement {
         this.satelliteList = [];
         this.addOrder = [];
         this.innerHTML = `
-            <div id='catalog-container' class='hidden'>
+            <div id='catalog-container'>
                 <div id='catalog-button' class='feature-controller catalog-button'>
                     <div id='catalog-menu-icon-container'>
                         <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
@@ -29,7 +29,7 @@ export class CatalogMenu extends HTMLElement {
                     </div>
                     <div id='menu-label'>Catalog</div>
                 </div>
-                <div class='catalog-menu round-border'>
+                <div class='catalog-menu round-border hidden'>
                     <div id='menu-title' class='menu-title round-border'>
                         <div>Select Simulation...</div>
                         <div id='menu-close' class='round-border'>x</div>

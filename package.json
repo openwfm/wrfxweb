@@ -16,7 +16,7 @@
   },
   "scripts": {
     "prestart": "npm install",
-    "start": "http-server -g -a localhost -p 8000 -c-1",
+    "start": "http-server -g -a localhost -p 8000 -c-1 -P http://localhost:5000",
     "start-api": "cd api && venv/bin/flask run --no-debugger", 
     "test": "jest --silent"
   }, 
