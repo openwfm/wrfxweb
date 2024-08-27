@@ -162,8 +162,10 @@ export class DomainSelector extends HTMLElement {
     presetCurrentTimestamp(nextTimestamps) {
         let startDate = controllers.startDate.getValue();
         let endDate = controllers.endDate.getValue();
+        let currentSim = simVars.currentSimulation;
 
-        let currentTimestamp = startDate;
+        // if currentSim has "lidar" in it, then set the currentTimestamp to the last timestamp
+        let currentTimestamp = currentSim.includes("lidar") ? endDate :  startDate;
         let presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
             currentTimestamp = presetTimestamp;
