@@ -30,12 +30,14 @@ export class SimulationController extends HTMLElement {
                                 <use href="#fast_rewind_black_24dp"></use>
                             </svg>
                         </button>
+                        <span class="tooltip hidden" id="reverse-tooltip">Rewind</span>
                         <button class='slider-button' id='slider-prev'>
                             <svg class='svgIcon slider-icon'>
                                 <use href="#arrow_left-24px"></use>
                             </svg>
                         </button>
-                        <button class='slider-button' id='slider-play-pause'>
+                        <span class="tooltip hidden" id="prev-tooltip">Previous</span>
+                        <button class='slider-button hidden' id='slider-play-pause'>
                             <svg id='play-button' class='svgIcon slider-icon'>
                                 <use href="#play_arrow-24px"></use>
                             </svg>
@@ -43,16 +45,19 @@ export class SimulationController extends HTMLElement {
                                 <use href="#pause-24px"></use>
                             </svg>
                         </button>
+                        <span class="tooltip hidden" id="play-tooltip">Play/Pause</span>
                         <button class='slider-button' id='slider-next'>
                             <svg class='svgIcon slider-icon'>
                                 <use href="#arrow_right-24px"></use>
                             </svg>
                         </button>
+                        <span class="tooltip hidden" id="next-tooltip">Next</span>
                         <button class='slider-button' id='slider-fast-forward'>
                             <svg class='svgIcon slider-icon'>
                                 <use href="#fast_forward_black_24dp"></use>
                             </svg>
                         </button>
+                        <span class="tooltip hidden" id="speed-up-tooltip">Speed Up</span>
                     </div>
                     <div id='slider-timestamp'>
                         <span id='timestamp'></span>
@@ -73,6 +78,7 @@ export class SimulationController extends HTMLElement {
         this.createSimulationSlider();
         this.initializeFrameNavigation();
         this.initializeFrameRates();
+        this.setTooltips();
 
         controllers.currentDomain.subscribe(() => {
             this.resetSlider();
@@ -80,6 +86,53 @@ export class SimulationController extends HTMLElement {
         controllers.currentTimestamp.subscribe(() => {
             this.updateDisplayedTimestamp();
         });
+    }
+  
+    setTooltips() {
+      const reverseButton = this.querySelector('#slider-slow-down');
+      const reverseTooltip = this.querySelector('#reverse-tooltip');
+      reverseButton.onmouseover = () => {
+        reverseTooltip.classList.remove('hidden');
+      }
+      reverseButton.onmouseout = () => {
+        reverseTooltip.classList.add('hidden');
+      }
+
+      const prevButton = this.querySelector('#slider-prev');
+      const prevTooltip = this.querySelector('#prev-tooltip');
+      prevButton.onmouseover = () => {
+        prevTooltip.classList.remove('hidden');
+      }
+      prevButton.onmouseout = () => {
+        prevTooltip.classList.add('hidden');
+      }
+
+      const playButton = this.querySelector('#slider-play-pause');
+      const playTooltip = this.querySelector('#play-tooltip');
+      playButton.onmouseover = () => {
+        playTooltip.classList.remove('hidden');
+      }
+      playButton.onmouseout = () => {
+        playTooltip.classList.add('hidden');
+      }
+
+      const nextButton = this.querySelector('#slider-next');
+      const nextTooltip = this.querySelector('#next-tooltip');
+      nextButton.onmouseover = () => {
+        nextTooltip.classList.remove('hidden');
+      }
+      nextButton.onmouseout = () => {
+        nextTooltip.classList.add('hidden');
+      }
+
+      const fastForwardButton = this.querySelector('#slider-fast-forward');
+      const fastForwardTooltip = this.querySelector('#speed-up-tooltip');
+      fastForwardButton.onmouseover = () => {
+        fastForwardTooltip.classList.remove('hidden');
+      }
+      fastForwardButton.onmouseout = () => {
+        fastForwardTooltip.classList.add('hidden');
+      }
     }
 
     initializeContainer() {

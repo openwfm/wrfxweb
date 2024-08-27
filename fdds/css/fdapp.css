@@ -751,6 +751,18 @@ html, body {
   background:#d6d6d6;
 }
 
+.tooltip {
+  position:absolute;
+  top: -25px;
+  left: -10px;
+  background: #f8f8f8;
+  border: 1px solid #5d5d5d;
+  opacity: .75;
+  padding: 3px;
+  font-size: .9rem;
+  border-radius: 4px;
+}
+
 /* ====== Slider ====== */
 .slider {
   position: relative;
