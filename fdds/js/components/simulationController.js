@@ -64,6 +64,7 @@ export class SimulationController extends HTMLElement {
         this.playing = false;
         this.frameRate = NORMAL_RATE;
         this.simulationSlider;
+        this.reverse = false;
     }
 
     connectedCallback() {
@@ -128,10 +129,10 @@ export class SimulationController extends HTMLElement {
         const slowDown = this.querySelector('#slider-slow-down');
 
         speedUp.onpointerdown = () => {
-            this.toggleRate(FAST_RATE, speedUp, slowDown);
+            this.toggleRate(FAST_RATE, speedUp, slowDown, false);
         }
         slowDown.onpointerdown = () => {
-            this.toggleRate(SLOW_RATE, slowDown, speedUp);
+            this.toggleRate(NORMAL_RATE, slowDown, speedUp, !this.reverse);
         }
     }
 
@@ -208,8 +209,9 @@ export class SimulationController extends HTMLElement {
     play() {
         if (this.playing) {
             let endDate = controllers.endDate.getValue();
-            let nextTimestamp = this.nextFrame();
-            if (nextTimestamp == endDate) {
+            let startDate = controllers.startDate.getValue(); 
+            let nextTimestamp = this.reverse? this.prevFrame() : this.nextFrame();
+            if ((!this.reverse && nextTimestamp == endDate) || (this.reverse && nextTimestamp == startDate)) { 
                 window.setTimeout(() => this.play(), 2*this.frameRate);
             } else {
                 window.setTimeout(() => this.play(), this.frameRate);
@@ -231,17 +233,18 @@ export class SimulationController extends HTMLElement {
         return prevTimestamp;
     }
 
-    toggleRate(rate, togglePrimary, toggleSecondary) {
+    toggleRate(rate, togglePrimary, toggleSecondary, reverse) {
         let unPressedColor = '#d6d6d6';
         togglePrimary.style.background = unPressedColor;
         toggleSecondary.style.background = unPressedColor;
 
-        if (this.frameRate == rate) {
+        if (this.frameRate == rate && !reverse ) {
             this.frameRate = NORMAL_RATE;
         } else {
             this.frameRate = rate;
             togglePrimary.style.background = '#e5e5e5';
         }
+        this.reverse = reverse;
     }
 }
 
