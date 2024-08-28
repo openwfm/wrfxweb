@@ -163,7 +163,8 @@ export class DomainSelector extends HTMLElement {
         let startDate = controllers.startDate.getValue();
         let endDate = controllers.endDate.getValue();
 
-        let currentTimestamp = startDate;
+        // if currentSim has "lidar" in it, then set the currentTimestamp to the last timestamp
+        let currentTimestamp = this.isLidarProfile() ? endDate :  startDate;
         let presetTimestamp = localToUTC(simVars.presets.timestamp);
         if (nextTimestamps.includes(presetTimestamp) && presetTimestamp >= startDate && presetTimestamp <= endDate) {
             currentTimestamp = presetTimestamp;
@@ -171,9 +172,15 @@ export class DomainSelector extends HTMLElement {
         simVars.presets.timestamp = null;
         controllers.currentTimestamp.setValue(currentTimestamp, controllerEvents.QUIET);
     }
+  
+    isLidarProfile() {
+        let currentSim = simVars.currentSimulation;
+        return currentSim.includes("lidar");
+    }
 
     presetOpacity() {
-        let opacity = 0.5;
+        // for lidar profiles, set initial opacity to 1
+        let opacity = this.isLidarProfile() ? 1.0 : 0.5;
         let presetOpacity = simVars.presets.opacity;
         if (presetOpacity && !isNaN(presetOpacity)) {
             presetOpacity = Number(presetOpacity);
