@@ -372,7 +372,10 @@ export class LayerController extends HTMLElement {
         if (simVars.overlayOrder.length > 1) {
             let lastLayerName = simVars.overlayOrder[simVars.overlayOrder.length - 2];
             let lastLayer = this.getLayer(currentDomain, lastLayerName);
-            lastLayer.setOpacity(.5);
+            let currentSim = simVars.currentSimulation;
+            if (!currentSim.includes("lidar")) {
+              lastLayer.setOpacity(.5);
+            }
         }
         setURL();
     }

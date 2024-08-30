@@ -143,6 +143,15 @@ export class DomainSelector extends HTMLElement {
                     break;
                 }
             }
+        } else if(this.isLidarProfile()) {
+            let lastTimestamp = nextTimestamps[nextTimestamps.length - 1];
+            for (let i = 2; i <= nextTimestamps.length; i++) {
+                startDate = nextTimestamps[nextTimestamps.length - i];
+                if (daysBetween(startDate, lastTimestamp) >= 1) {
+                    startDate = nextTimestamps[nextTimestamps.length - i + 1];
+                    break;
+                }
+            }
         }
         controllers.startDate.setValue(startDate, controllerEvents.QUIET);
         controllers.timeSeriesStart.setValue(startDate, controllerEvents.QUIET);
