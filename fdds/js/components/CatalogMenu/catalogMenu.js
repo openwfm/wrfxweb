@@ -68,6 +68,25 @@ export class CatalogMenu extends HTMLElement {
                             <div class='column-header'>Lidar Profiles</div>
                             <ul id='catalog-lidar-data' class='catalog-list'> </ul>
                         </div>
+                        <div id='nfmdb-links' class='column'>
+                            <div class='column-header'>NFMDB Links</div>
+                            <ul id='catalog-nfmdb-links' class='catalog-list'> 
+                              <li class='catalog-entry'>
+                                <div id='entry'>
+                                  <a href='https://nfmdb.org'>
+                                    <h3>FMDB Home Page</h3>
+                                  </a>
+                                </div>
+                              </li>
+                              <li class='catalog-entry'>
+                                <div id='entry'>
+                                  <a href='https://nfmdb.com/?usState=CA&zoom=6&coordinates=37.821_-120.724&startYear=2022&endYear=2024&liveOrDeadFuel=liveFuel&plotType=fmcClimo'>
+                                    <h3>FMDB California</h3>
+                                  </a>
+                                </div>
+                              </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

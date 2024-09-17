@@ -298,7 +298,7 @@ html, body {
   position:absolute;
   padding: 5px;
   z-index: 9990;
-  width: 600px;
+  width: 800px;
   height: 440px;
   top: 15%;
   background:#f2f2f2;
@@ -328,7 +328,7 @@ html, body {
 
 .menu-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   height: 330px;
   padding: 5px;
   margin-top:5px;
