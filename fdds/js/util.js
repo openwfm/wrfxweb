@@ -285,7 +285,7 @@ export function doubleClick(elmnt, doubleClickFunction) {
   const MAX_DOUBLE_CLICK_DIST = 30;
   let timeout = null;
   let previousE;
-  elmnt.addEventListener('pointerdown', (e) => {
+  elmnt.onpointerdown = (e) => {
     if (timeout != null) {
       let xDiff = Math.abs(e.clientX - previousE.clientX);
       let yDiff = Math.abs(e.clientY - previousE.clientY);
@@ -305,7 +305,7 @@ export function doubleClick(elmnt, doubleClickFunction) {
         timeout = null;
       }, DOUBLE_CLICK_MS);
     }
-  });
+  }
 }
 
 /** Makes given element draggable from sub element with id 'subID' */
