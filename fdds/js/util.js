@@ -20,6 +20,15 @@ export const CLIENT_WIDTH = document.body.clientWidth;
 export const IS_MOBILE = CLIENT_WIDTH < 769; 
 export var ELEMENT_FOCUSED = false;
 
+export const LAYER_UNITS = {
+  'SJ_CURTAIN': 'Wind Speed [m/s]',
+  'CT_CURTAIN': 'Wind Speed [m/s]',
+  'RD_CURTAIN': 'Wind Speed [m/s]',
+  'SJ_QUIVER': 'Wind Speed [m/s]',
+  'CT_QUIVER': 'Wind Speed [m/s]',
+  'RD_QUIVER': 'Wind Speed [m/s]',
+};
+
 /** ===== SetURL block ===== */
 export function setURL() {
   let historyData = {};

@@ -1,4 +1,4 @@
-import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox, IS_MOBILE, isolateFocus } from '../util.js';
+import { utcToLocal, createOption, linkSelects, localToUTC, setURL, dragElement, darkenHex, debounce, buildCheckBox, IS_MOBILE, isolateFocus, LAYER_UNITS } from '../util.js';
 import { controllers } from '../components/Controller.js';
 import { simVars } from '../simVars.js';
 
@@ -355,6 +355,7 @@ export class TimeSeriesChart extends HTMLElement {
         }
  
         return ({
+                    
                     animation: {
                         duration: 0
                     },
@@ -362,12 +363,16 @@ export class TimeSeriesChart extends HTMLElement {
                         y: {
                             title: {
                                 display: true,
-                                text: this.activeLayer
+                                text: LAYER_UNITS[this.activeLayer] || this.activeLayer
                             }
                         },
                         x: xAxisOptions
                     },
                     plugins: {
+                        title: {
+                          display: this.activeLayer in LAYER_UNITS,
+                          text: this.activeLayer
+                        },
                         annotation: {
                             annotations: [{
                                 display: thresholdValue !== null && !isNaN(thresholdValue),
