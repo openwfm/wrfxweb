@@ -36,7 +36,7 @@ export class CatalogMenu extends HTMLElement {
                     </div>
                     <div class='search-header'>
                         <div>
-                            <label for='sort-by' style='display: block; font-size:.75rem'>order/search by</label>
+                            <label for='sort-by' style='display: block; font-size:.75rem'>order by</label>
                             <select id='sort-by'>
                                 <option value='start-date'>start date</option>
                                 <option value='end-date'>end date</option>
@@ -227,15 +227,10 @@ export class CatalogMenu extends HTMLElement {
     /** ===== Searching block ===== */
     searchCatalog(searchText, sortBy, reverseOrder) {
         const filterFunction = (catalogEntry) => {
-            if (sortBy == 'original-order' || sortBy == 'description') {
-                return catalogEntry.description.toLowerCase().includes(searchText);
-            }
-            if (sortBy.includes('start-date')) {
-                return utcToLocal(catalogEntry.from_utc).toLowerCase().includes(searchText);
-            }
-            if (sortBy.includes('end-date')) {
-                return utcToLocal(catalogEntry.to_utc).toLowerCase().includes(searchText);
-            }
+            let descIncludes = catalogEntry.description.toLowerCase().includes(searchText);
+            let startIncludes = utcToLocal(catalogEntry.from_utc).toLowerCase().includes(searchText);
+            let endIncludes = utcToLocal(catalogEntry.to_utc).toLowerCase().includes(searchText);
+            return descIncludes || startIncludes || endIncludes;
         }
         const createList = (list) => {
             let filteredList = list.filter(filterFunction);
