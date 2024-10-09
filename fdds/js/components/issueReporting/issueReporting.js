@@ -1,10 +1,8 @@
 import { issueReportingHTML } from './issueReportingHTML.js';
-import { dragElement, IS_MOBILE } from '../util.js';
-import { AppStateSubscriber } from '../appState/appStateSubscriber.js';
-import { appState } from '../appState/appState.js';
-import { submitIssue } from '../services/services.js';
+import { dragElement, IS_MOBILE } from '../../util.js';
+import { submitIssue } from '../../services.js';
 
-export class IssueReporting extends AppStateSubscriber {
+export class IssueReporting extends HTMLElement {
 	constructor() {
 		super();
 		this.innerHTML = issueReportingHTML;

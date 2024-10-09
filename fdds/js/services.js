@@ -49,3 +49,27 @@ export function getSimulation(path) {
         console.log(error);
     });
 }
+
+export async function submitIssue(formData) {
+  const POST_URL = '/api/submit_issue';
+  let json = {};
+  try {
+      const response = await fetch(POST_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+      json = await response.json();
+      if (response.status == 429) {
+        throw new Error('We are currently experiencing a high volume of issue reports. Please try again tomorrow.');
+      } else if (!response.ok) {
+        throw new Error('An error occurred while submitting your issue. Please try again');
+      }
+  } catch(error) {
+    alert(`Error submitting issue: ${error.message}`);
+    return;
+  }
+  alert('Thank you for submitting your feedback!');
+}
