@@ -19,6 +19,7 @@ server/
 venv/
 api/venv/
 api/user_feedback.db
+api/__pycache__/
 
 
 
