@@ -18,6 +18,7 @@ notes.txt
 server/
 venv/
 api/venv/
+api/user_feedback.db
 
 
 
