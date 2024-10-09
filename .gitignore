@@ -17,7 +17,7 @@ tmp
 notes.txt
 server/
 venv/
-api/
+api/venv/
 
 
 
