@@ -394,28 +394,29 @@ html, body {
 #issue-reporting-button {
   position: absolute;
   width: 150px;
-  top: 80px;
-  right: 80px;
-  background: white;
-  color: gray;
+  height: 40px;
+  top: 20px;
+  right: 20px;
+  display: grid;
+  place-items: center;
   z-index: 10000;
+  font-size: 1.15rem;
+  font-weight: bold;
+  background:#e8e8e8;
+  color: #5d5d5d;
+  border-radius: .4rem;
 }
 
 #issue-reporting-modal {
-  /* position: relative; */
   position: absolute;
   width: 600px;
-  /* height: 670px; */
   height: auto;
-  /* margin-top: 200px; */
   top: 150px;
-  /* margin-right: auto; */
-  /* margin-left: auto; */
-  /* left: 0; */
   right: 50px;
   background: white;
+  font-size: 1rem;
   border: 1px solid #000000;
-  border-radius: 5px;
+  border-radius: .4rem;
   padding: 10px;
   z-index: 10000;
 }
@@ -424,9 +425,8 @@ html, body {
   margin-bottom: 20px;
 }
 
-#issue-reporting-modal-header h2 {
-  position: absolute;  
-  margin-left: 200px;
+#issue-reporting-modal h2 {
+  text-align: center;
 }
 
 #issue-reporting-submit {
@@ -448,6 +448,14 @@ html, body {
 #issue-reporting-submit {
   margin-left: auto;
   margin-right: auto;
+}
+
+.closeButton {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  width: 15px;
+  background: white;
 }
 
 .feature-or-bug {

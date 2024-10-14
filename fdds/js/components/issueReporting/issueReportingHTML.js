@@ -2,10 +2,8 @@ export const issueReportingHTML = `
   <div id="issue-reporting" class="issue-reporting">
     <div id="issue-reporting-button" class="issue-reporting-button">Report Issue</div>
     <div id="issue-reporting-modal" class="issue-reporting-modal hidden">
-      <div id="issue-reporting-modal-header" class="containerHeader">
-        <h2>Report Issue</h2>
-        <div id="issue-reporting-close-button" class="closeButton">x</div>
-      </div>
+      <h2 id="issue-reporting-modal-header">Report Issue</h2>
+      <div id="issue-reporting-close-button" class="interactive-button close-panel">x</div>
       <form id="issue-reporting-form" class="issue-reporting-form">
         <p>Please report any issues you encounter while using the app. 
         We appreciate your feedback!</p>
