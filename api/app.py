@@ -21,7 +21,7 @@ def submit_issue():
     date = datetime.now().strftime("%Y-%m-%d")
     if feedback_counts[date] >= 100:
         print ("Daily feedback limit reached.")
-        return jsonify({'message': 'Daily feedback limit reached. Please try again tomorrow.'}), 429
+        return {'message': 'Daily feedback limit reached. Please try again tomorrow.'}, 429
     try: 
         with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
             cursor = conn.cursor()
@@ -35,6 +35,6 @@ def submit_issue():
     finally:
         conn.close()
         feedback_counts[date] += 1
-        return jsonify({'message': msg})
+        return {'message': msg}
 
 
