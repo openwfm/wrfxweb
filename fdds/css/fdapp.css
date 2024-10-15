@@ -399,7 +399,7 @@ html, body {
   right: 20px;
   display: grid;
   place-items: center;
-  z-index: 10000;
+  z-index: 9000;
   font-size: 1.15rem;
   font-weight: bold;
   background:#e8e8e8;
@@ -953,6 +953,62 @@ html, body {
 }
 
 @media (max-width: 769px) {
+  #issue-reporting-button {
+    position: absolute;
+    height: 30px;
+    width: 20px;
+    right: 62px;
+    top: 24px;
+    font-weight: normal;
+    text-align: center;
+    background: none;
+    color: gray;
+  }
+
+  #issue-reporting-modal {
+    width: 300px;
+    height:75%;
+    right: 10px;
+    top: 70px;
+  }
+
+  .issue-reporting-title {
+    height: 90px;
+  }
+
+  .issue-reporting-contact {
+    width: 100%;
+  }
+
+  #page-navigation {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+  }
+
+  #next-button {
+    position: absolute;
+    display: inline-block;
+    right: 30px;
+    color: black;
+    width: 50px;
+  }
+
+  #next-button.disabled {
+    color: gray;
+  }
+
+  #previous-button {
+    display: inline-block;
+    color: black;
+    width: 50px;
+  }
+
+  #previous-button.disabled {
+    color: gray;
+  }
+
   /* ===== Body-mobile block ===== */
   .displayTest {
     left: 20px;

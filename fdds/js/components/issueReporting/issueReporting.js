@@ -19,7 +19,13 @@ export class IssueReporting extends HTMLElement {
       issueReportingFullName: this.querySelector('#issue-reporting-full-name'),
       issueReportingOrganization: this.querySelector('#issue-reporting-organization'),
       submitButton: this.querySelector('#issue-reporting-submit'),
-      featureOrBug: this.querySelector('#feature-or-bug')
+      featureOrBug: this.querySelector('#feature-or-bug'),
+      page1: this.querySelector('#page-1'),
+      page2: this.querySelector('#page-2'),
+      page3: this.querySelector('#page-3'),
+      pageNavigation: this.querySelector('#page-navigation'),
+      nextButton: this.querySelector('#next-button'),
+      previousButton: this.querySelector('#previous-button'),
     };
 	}
   
@@ -54,7 +60,61 @@ export class IssueReporting extends HTMLElement {
       this.clearModal();
       this.hideModal();
     }
+    if (IS_MOBILE) {
+      this.setupMobile();
+    }
 	}
+
+  setupMobile() {
+    const { issueReportingButton } = this.uiElements;
+    const { nextButton, previousButton } = this.uiElements;
+    const { page1, page2, page3, pageNavigation } = this.uiElements;
+    issueReportingButton.innerHTML = '!';
+    this.page = 1;
+    page1.classList.remove('hidden');
+    page2.classList.add('hidden');
+    page3.classList.add('hidden');
+    pageNavigation.classList.remove('hidden');
+    nextButton.onclick = () => {
+      if (this.page < 3) {
+        this.page += 1;
+        this.showPage(this.page);
+        if (this.page === 3) {
+          nextButton.classList.add('disabled');
+        }
+        previousButton.classList.remove('disabled');
+      }
+    }
+    previousButton.classList.add('disabled');
+    previousButton.onclick = () => {
+      if (this.page > 1) {
+        this.page -= 1;
+        this.showPage(this.page);
+        if (this.page === 1) {
+          previousButton.classList.add('disabled');
+        }
+        nextButton.classList.remove('disabled');
+      }
+    }
+  }
+
+  showPage(page) {
+    const { page1, page2, page3 } = this.uiElements;
+    page1.classList.add('hidden');
+    page2.classList.add('hidden');
+    page3.classList.add('hidden');
+    switch (page) {
+      case 1:
+        page1.classList.remove('hidden');
+        break;
+      case 2:
+        page2.classList.remove('hidden');
+        break;
+      case 3:
+        page3.classList.remove('hidden');
+        break;
+    }
+  }
 
   modalShown() {
     const { issueReportingModal } = this.uiElements;
