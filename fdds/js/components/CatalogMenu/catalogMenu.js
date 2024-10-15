@@ -54,7 +54,8 @@ export class CatalogMenu extends HTMLElement {
                         <select id='mobile-selector'>
                             <option value='Fires'>Fires</option>
                             <option value='Fuel Moisture'>Fuel Moisture</option>
-                            <option value='Satellite Data'>Satellite Data</option>
+                            <option value='Lidar Data'>Lidar Data</option>
+                            <option value='NFMDB Links'>NFMDB Links</option>
                         </select>
                         <div id='fires-column' class='column'>
                             <div class='column-header'>Fires</div>
@@ -328,15 +329,19 @@ export class CatalogMenu extends HTMLElement {
         const firesListDOM = this.querySelector('#fires-column');
         const fuelMoistureListDOM = this.querySelector('#fuel-moisture-column');
         const lidarProfilesDOM = this.querySelector('#lidar-profiles');
+        const nfmdbLinksDOM = this.querySelector('#nfmdb-links');
         firesListDOM.classList.add('hidden');
         fuelMoistureListDOM.classList.add('hidden');
         lidarProfilesDOM.classList.add('hidden');
+        nfmdbLinksDOM.classList.add('hidden');
         if (selection == 'Fires') {
             firesListDOM.classList.remove('hidden');
         } else if (selection == 'Fuel Moisture') {
             fuelMoistureListDOM.classList.remove('hidden');
-        } else {
+        } else if (selection == 'Lidar Data') {
             lidarProfilesDOM.classList.remove('hidden');
+        } else {
+            nfmdbLinksDOM.classList.remove('hidden');
         }
     }
 }
