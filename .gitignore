@@ -17,7 +17,6 @@ tmp
 notes.txt
 server/
 venv/
-api/.env
 api/venv/
 api/user_feedback.db
 api/__pycache__/
