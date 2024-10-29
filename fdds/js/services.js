@@ -56,6 +56,28 @@ export function getSimulation(path) {
     });
 }
 
+export async function createUser(formData) {
+  const POST_URL = "/api/create_user";
+  let json = {};
+  try {
+    const response = await fetch(POST_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    json = await response.json();
+    if (!response.ok) {
+      throw new Error(json.message);
+    }
+    return json;
+  } catch (error) {
+    return { error: error.message };
+    //alert(`Error submitting issue: ${error.message}`);
+  }
+}
+
 export async function login(formData) {
   const POST_URL = "/api/login";
   let json = {};

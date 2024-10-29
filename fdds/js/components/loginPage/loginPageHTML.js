@@ -20,7 +20,7 @@ export const loginPageHTML = `
     </div>
     <div id="signup-page" class="login-page">
       <h2 class="login-title">SignUp For Portal</h2>
-      <button id="login-screen-button" class="switch-button" type="button">Login Screen</button>
+      <button id="login-screen-button" class="switch-button" type="button">Back to Login</button>
       <form id="signup-form">
         <div class="login-field">
           <label class="login-label" for="name">Full Name:</label>
@@ -46,6 +46,7 @@ export const loginPageHTML = `
           <button id="signup-button" class="login-button" type="submit">Sign Up</button>
         </div>
       </form>
+      <p id="signup-error" class="login-error hidden">SignUp failed, please try again.</p>
     </div>
   </div>
 `;
