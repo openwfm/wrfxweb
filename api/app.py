@@ -1,5 +1,6 @@
 from flask import Flask, request
 import jwt
+import bcrypt
 from dotenv import load_dotenv
 import sqlite3
 import datetime
@@ -58,13 +59,58 @@ def submit_issue():
         return {"message": msg}
 
 
+@app.route("/api/create_user", methods=["POST"])
+def create_user():
+    json = request.get_json()
+    username = json["user"]
+    password = json["password"]
+    contact = json["contact"]
+    full_name = json["fullName"]
+    organization = json["organization"]
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    msg = ""
+    try:
+        with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO users (date_added, full_name, organization, contact, user, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
+                (date, full_name, organization, contact, username, hashed_password),
+            )
+            conn.commit()
+            msg = "User successfully created"
+    except Exception as e:
+        print("Error Creating User:", str(e))
+        conn.rollback()
+        msg = "Error creating user: " + str(e)
+    finally:
+        conn.close()
+        return {"message": msg}
+
+
 @app.route("/api/login", methods=["POST"])
 def login():
-    auth = request.authorization
-    if auth and auth.username == "admin" and auth.password == "admin":
+    json = request.get_json()
+    username = json["user"]
+    password = json["password"]
+    userPassword = ""
+    try:
+        with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT password_hash FROM users WHERE user = ?", (username,)
+            )
+            userPassword = cursor.fetchone()[0]
+    except Exception as e:
+        conn.rollback()
+        msg = "Error logging in: " + str(e)
+        return {"message": msg}, 401
+    finally:
+        conn.close()
+    if bcrypt.checkpw(password.encode("utf-8"), userPassword.encode("utf-8")):
         token = jwt.encode(
             {
-                "user": auth.username,
+                "user": username,
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30),
             },
             SECRET_KEY,

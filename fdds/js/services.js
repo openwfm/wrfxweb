@@ -73,7 +73,8 @@ export async function login(formData) {
     }
     return json;
   } catch (error) {
-    alert(`Error submitting issue: ${error.message}`);
+    return { error: error.message };
+    //alert(`Error submitting issue: ${error.message}`);
   }
 }
 

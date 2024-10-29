@@ -7,17 +7,39 @@ export class LoginPage extends HTMLElement {
     super();
     this.innerHTML = loginPageHTML;
     this.uiElements = {
+      loginContainer: this.querySelector("#login-container"),
       loginPage: this.querySelector("#login-page"),
+      signUpPage: this.querySelector("#signup-page"),
       userName: this.querySelector("#user"),
       password: this.querySelector("#password"),
       loginButton: this.querySelector("#login-button"),
       loginForm: this.querySelector("#login-form"),
       loginError: this.querySelector("#login-error"),
+      signupScreenButton: this.querySelector("#signup-screen-button"),
+      loginScreenButton: this.querySelector("#login-screen-button"),
     };
   }
 
   connectedCallback() {
-    const { loginPage, userName, password, loginForm } = this.uiElements;
+    const {
+      loginContainer,
+      loginPage,
+      signUpPage,
+      userName,
+      password,
+      loginForm,
+    } = this.uiElements;
+    const { signupScreenButton, loginScreenButton } = this.uiElements;
+
+    signupScreenButton.onclick = () => {
+      loginPage.classList.add("hidden");
+      signUpPage.classList.remove("hidden");
+    };
+    loginScreenButton.onclick = () => {
+      signUpPage.classList.add("hidden");
+      loginPage.classList.remove("hidden");
+    };
+
     loginForm.onsubmit = async (e) => {
       e.preventDefault();
       let userVal = sanitizeInput(userName.value);
@@ -26,27 +48,42 @@ export class LoginPage extends HTMLElement {
         user: userVal,
         password: passVal,
       };
-      login(formData);
+      let response = await login(formData);
+      if (response.error) {
+        this.showLoginError();
+      } else {
+        this.hideModal();
+      }
       this.clearModal();
-      this.hideModal();
     };
     if (IS_MOBILE) {
       this.setupMobile();
     } else {
-      loginPage.style.right = (CLIENT_WIDTH - loginPage.clientWidth) / 2 + "px";
+      loginContainer.style.right =
+        (CLIENT_WIDTH - loginContainer.clientWidth) / 2 + "px";
     }
+  }
+
+  showLoginError() {
+    const { loginError } = this.uiElements;
+    loginError.classList.remove("hidden");
   }
 
   setupMobile() {}
 
-  showModal() {
+  showLoginModal() {
     const { loginPage } = this.uiElements;
     loginPage.classList.remove("hidden");
   }
 
-  hideModal() {
+  hideLoginModal() {
     const { loginPage } = this.uiElements;
     loginPage.classList.add("hidden");
+  }
+
+  hideModal() {
+    const { loginContainer } = this.uiElements;
+    loginContainer.classList.add("hidden");
   }
 
   clearModal() {

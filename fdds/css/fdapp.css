@@ -390,7 +390,7 @@ body {
 }
 
 /* ===== LoginPage block ===== */
-#login-page {
+#login-container {
   position: absolute;
   padding: 15px;
   z-index: 9990;
@@ -403,6 +403,14 @@ body {
   line-height: normal;
   font-size: 1rem;
   border-radius: 0.4rem;
+}
+
+.switch-button {
+  display: block;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  color: blue;
 }
 
 .login-input {
@@ -429,11 +437,20 @@ body {
 }
 
 .login-button {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  display: inline-block;
   margin-top: 10px;
   font-size: 1rem;
+}
+
+.login-buttons {
+  display: block;
+  text-align: center;
+}
+
+.login-error {
+  color: red;
+  font-size: 1rem;
+  margin-bottom: 0px;
 }
 
 /* ===== IssueReporting block ===== */
