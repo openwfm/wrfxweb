@@ -19,7 +19,7 @@
 
 /* ===== Body block ===== */
 html {
-  margin-top:0;
+  margin-top: 0;
   height: 100%;
   overflow-y: hidden;
 }
@@ -33,10 +33,10 @@ h4 {
 }
 
 .feature-controller {
-  background:#e8e8e8;
+  background: #e8e8e8;
   color: #5d5d5d;
   border: none;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   z-index: 8000;
 }
 
@@ -54,17 +54,17 @@ h4 {
 }
 
 .svgIcon {
-    margin: 0;
-    padding: 0;
-    height: 24px;
-    width: 24px;
+  margin: 0;
+  padding: 0;
+  height: 24px;
+  width: 24px;
 }
 
 .splash {
   position: fixed;
   line-height: 90vh;
   font-size: 1rem;
-  top:0;
+  top: 0;
   left: 0;
   width: 100%;
   height: 100vh;
@@ -105,14 +105,14 @@ h4 {
 }
 
 @keyframes fadeIn {
-  to{
+  to {
     opacity: 1;
   }
 }
 
 .fade-in {
   opacity: 0;
-  animation: fadeIn .6s ease-in forwards;
+  animation: fadeIn 0.6s ease-in forwards;
 }
 
 #map-fd {
@@ -123,16 +123,19 @@ h4 {
   bottom: 0;
 }
 
-body.waiting * {cursor: wait !important;}
+body.waiting * {
+  cursor: wait !important;
+}
 
-body.grabbing * {cursor: grabbing !important;}
+body.grabbing * {
+  cursor: grabbing !important;
+}
 
 #map-domains {
   height: 400px;
   width: 500px;
   margin-left: auto;
   margin-right: auto;
-
 }
 
 #map-patch-springs {
@@ -154,7 +157,8 @@ div.control-column {
   margin-right: auto;
 }
 
-html, body {
+html,
+body {
   height: 100vh;
 }
 
@@ -173,9 +177,9 @@ html, body {
 }
 
 #simulation-flags {
-  position: fixed; 
-  top:15px; 
-  z-index:1000;
+  position: fixed;
+  top: 15px;
+  z-index: 1000;
 }
 
 .displayTest {
@@ -198,7 +202,7 @@ html, body {
 }
 
 .mq-logo-control {
-	display: none;
+  display: none;
 }
 
 .leaflet-top {
@@ -218,7 +222,7 @@ html, body {
   width: 100px;
   left: -38px;
   bottom: 200px;
-  border-radius: .4rem .4rem 0 0;
+  border-radius: 0.4rem 0.4rem 0 0;
   font-size: 1.2rem;
   text-align: center;
   font-weight: bold;
@@ -235,7 +239,7 @@ html, body {
   width: 150px;
   height: 350px;
   background-color: rgba(255, 255, 255, 1);
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   font-size: 1.2rem;
 }
 
@@ -285,8 +289,8 @@ html, body {
   place-items: center;
   height: 100%;
   width: 100%;
-  background:#d6d6d6;
-  border-radius: .4rem 0 0 .4rem;
+  background: #d6d6d6;
+  border-radius: 0.4rem 0 0 0.4rem;
 }
 
 .catalog-button:hover #catalog-menu-icon {
@@ -295,13 +299,13 @@ html, body {
 
 /* Menu Style */
 .catalog-menu {
-  position:absolute;
+  position: absolute;
   padding: 5px;
   z-index: 9990;
   width: 800px;
   height: 440px;
   top: 15%;
-  background:#f2f2f2;
+  background: #f2f2f2;
   line-height: normal;
   font-size: 1rem;
 }
@@ -309,7 +313,7 @@ html, body {
 .menu-title {
   display: flex;
   padding: 8px;
-  background:#f7af39;
+  background: #f7af39;
   color: #ffffff;
   font-weight: bold;
   cursor: grab;
@@ -331,8 +335,8 @@ html, body {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   height: 330px;
   padding: 5px;
-  margin-top:5px;
-  overflow-y:auto;
+  margin-top: 5px;
+  overflow-y: auto;
 }
 
 .search-header {
@@ -385,6 +389,53 @@ html, body {
   text-decoration: underline;
 }
 
+/* ===== LoginPage block ===== */
+#login-page {
+  position: absolute;
+  padding: 15px;
+  z-index: 9990;
+  height: fit-content;
+  width: 330px;
+  /*height: 200px;*/
+  top: 20%;
+  /*left: 100px;*/
+  background: #f2f2f2;
+  line-height: normal;
+  font-size: 1rem;
+  border-radius: 0.4rem;
+}
+
+.login-input {
+  width: 230px;
+  font-size: 1rem;
+}
+
+.login-label {
+  width: 80px;
+  display: inline-block;
+}
+
+.login-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+
+.login-field {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  /*margin-left: 10px;*/
+}
+
+.login-button {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
 /* ===== IssueReporting block ===== */
 #issue-reporting-button:hover {
   cursor: pointer;
@@ -402,9 +453,9 @@ html, body {
   z-index: 9000;
   font-size: 1.15rem;
   font-weight: bold;
-  background:#e8e8e8;
+  background: #e8e8e8;
   color: #5d5d5d;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
 }
 
 #issue-reporting-modal {
@@ -416,7 +467,7 @@ html, body {
   background: white;
   font-size: 1rem;
   border: 1px solid #000000;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   padding: 10px;
   z-index: 10000;
 }
@@ -469,12 +520,12 @@ html, body {
   right: 15px;
   height: 10px;
   width: 10px;
-  font-size: 1rem; 
+  font-size: 1rem;
 }
 
 .section-break {
-  width: 100%; 
-  height: 1px; 
+  width: 100%;
+  height: 1px;
   background: #5d5d5d;
 }
 
@@ -517,7 +568,7 @@ html, body {
   display: block;
 }
 
-#infoPanel.clicked { 
+#infoPanel.clicked {
   display: block;
 }
 
@@ -528,7 +579,8 @@ html, body {
 .expand-collapse {
   position: absolute;
   opacity: 50%;
-  top: 0px; right: 10px;
+  top: 0px;
+  right: 10px;
 }
 
 .hover {
@@ -594,9 +646,9 @@ html, body {
   margin-left: 50px;
 }
 
-/* ===== TimeSeriesButton block ===== */ 
+/* ===== TimeSeriesButton block ===== */
 .timeSeriesButton {
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   padding: 5px;
   margin-bottom: 5px;
   background: #b6e2f0;
@@ -608,7 +660,7 @@ html, body {
 }
 
 .timeSeriesButton:disabled {
-  background:#d6d6d6;
+  background: #d6d6d6;
 }
 
 .timeSeriesButton:hover:not([disabled]) {
@@ -659,7 +711,7 @@ html, body {
   height: 550px;
   width: 560px;
   background: white;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   border: 1px solid #5d5d5d;
   cursor: pointer;
 }
@@ -691,15 +743,15 @@ html, body {
   background: #e8e8e8;
 }
 
-#addLayers{
+#addLayers {
   padding: 10px;
   position: absolute;
   z-index: 9001;
   width: 100px;
-  top:130px;
+  top: 130px;
   left: -80px;
   border-right: 1px solid #5d5d5d;
-  border-radius: .4rem .4rem 0 0;
+  border-radius: 0.4rem 0.4rem 0 0;
   text-align: center;
   font-weight: bold;
   transform: rotate(-90deg);
@@ -713,17 +765,17 @@ html, body {
   height: 400px;
   top: 39px;
   border-bottom: 1px solid #5d5d5d;
-  border-radius: .4rem 0 0 .4rem;
+  border-radius: 0.4rem 0 0 0.4rem;
 }
 
 #zoomBox {
-  position: fixed; 
-  display:none; 
-  height: 0px; 
-  width: 0px; 
+  position: fixed;
+  display: none;
+  height: 0px;
+  width: 0px;
   background-color: #b6e2f0;
   opacity: 50%;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   border: 1px solid #b6e2f0;
 }
 
@@ -734,7 +786,7 @@ html, body {
   left: 200px;
   width: 220px;
   background: #e8e8e8;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   border: 1px solid darkgray;
 }
 
@@ -759,7 +811,7 @@ html, body {
 }
 
 #timeSeriesChart {
-  margin-left:10px;
+  margin-left: 10px;
   cursor: pointer;
 }
 
@@ -775,7 +827,7 @@ html, body {
   width: 360px;
   z-index: 4000;
   border-radius: 4px;
-  background:#e8e8e8;
+  background: #e8e8e8;
   padding: 6px;
   font-size: 1.15rem;
 }
@@ -802,7 +854,7 @@ html, body {
 
 .slider-button {
   display: inline-block;
-  background:#d6d6d6;
+  background: #d6d6d6;
   border: none;
   padding: 2px;
   height: 28px;
@@ -825,18 +877,18 @@ html, body {
 }
 
 .disabled-button:hover {
-  background:#d6d6d6;
+  background: #d6d6d6;
 }
 
 .tooltip {
-  position:absolute;
+  position: absolute;
   top: -25px;
   left: -10px;
   background: #f8f8f8;
   border: 1px solid #5d5d5d;
-  opacity: .75;
+  opacity: 0.75;
   padding: 3px;
-  font-size: .9rem;
+  font-size: 0.9rem;
   border-radius: 4px;
 }
 
@@ -860,7 +912,7 @@ html, body {
   background: #e8e8e8;
   border-style: solid;
   border-radius: 4px;
-  border-width: .5px;
+  border-width: 0.5px;
   border-color: #cccccc;
   cursor: pointer;
 }
@@ -871,13 +923,15 @@ html, body {
 
 .slider-head {
   position: absolute;
-  bottom: 3px; left: 0; right: 0;
+  bottom: 3px;
+  left: 0;
+  right: 0;
   height: 15px;
   width: 15px;
   background: #f6f6f6;
-  border-style: solid; 
+  border-style: solid;
   border-radius: 4px;
-  border-width: .5px;
+  border-width: 0.5px;
   border-color: #dddddd;
   cursor: grab;
   z-index: 3000;
@@ -892,15 +946,18 @@ html, body {
   background: #e8e8e8;
   border-style: solid;
   border-radius: 4px;
-  border-width: .5px;
+  border-width: 0.5px;
   border-color: #cccccc;
   cursor: pointer;
 }
 
 #slider-progress {
-  position:absolute;
+  position: absolute;
   margin: auto 0;
-  top: 0; bottom: 0; left: 0; right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 1%;
   background: #f8f8f8;
   border-style: solid;
@@ -910,18 +967,21 @@ html, body {
 #slider-marker-info {
   position: absolute;
   margin: 0 auto;
-  top: 20px; bottom: 0; left: 0; right: 0;
+  top: 20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: white;
   width: 160px;
   height: 20px;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   display: none;
   font-weight: bold;
-  font-size: 1rem; 
+  font-size: 1rem;
   padding: 5px 5px 8px 10px;
 }
 
-#slider-marker-info.hovered { 
+#slider-marker-info.hovered {
   display: block;
 }
 
@@ -932,7 +992,10 @@ html, body {
 .slider-marker {
   position: absolute;
   margin: auto 0;
-  top: 0; bottom: 0; left: 0; right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: #5d5d5d;
   width: 4px;
   height: 11px;
@@ -944,7 +1007,7 @@ html, body {
 }
 
 #progressBar {
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   margin-top: 5px;
   background: black;
   height: 10px;
@@ -967,7 +1030,7 @@ html, body {
 
   #issue-reporting-modal {
     width: 300px;
-    height:75%;
+    height: 75%;
     right: 10px;
     top: 70px;
   }
@@ -1048,17 +1111,17 @@ html, body {
 
   #colorbar-opacity {
     top: 30px;
-    font-size: .6rem;
+    font-size: 0.6rem;
   }
 
   #colorbar-opacity-label {
-    font-size: .6rem;
+    font-size: 0.6rem;
     font-weight: bold;
     left: 5px;
   }
 
   #colorbar-opacity-done {
-    font-size: .6rem;
+    font-size: 0.6rem;
     left: 25px;
   }
 
@@ -1073,8 +1136,8 @@ html, body {
   }
 
   #catalog-menu-icon-container {
-    border-radius: .4rem;
-    background:#e8e8e8;
+    border-radius: 0.4rem;
+    background: #e8e8e8;
   }
 
   /* menu style */
@@ -1116,7 +1179,7 @@ html, body {
   #infoPanel {
     width: 300px;
     height: 600px;
-}
+  }
 
   #infoButton {
     left: 230px;
@@ -1140,7 +1203,7 @@ html, body {
   }
 
   #slider-header {
-    height:60px;
+    height: 60px;
   }
 
   .slider-container button:hover:not([disabled]) {
@@ -1152,7 +1215,7 @@ html, body {
     left: 10px;
     width: 300px;
   }
-  
+
   /* ====== TimeSeriesChart-mobile ====== */
   #timeSeriesChartContainer {
     padding: 20px;
@@ -1167,7 +1230,7 @@ html, body {
     left: 5px;
   }
 
-  #addLayers{
+  #addLayers {
     left: 10px;
     top: 8px;
     transform: rotate(0deg);
@@ -1180,7 +1243,7 @@ html, body {
 
   #layers-to-add {
     border-right: 1px solid #5d5d5d;
-    border-radius: .4rem;
+    border-radius: 0.4rem;
     width: 250px;
     left: 0px;
     top: 46px;
