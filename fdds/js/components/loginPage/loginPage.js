@@ -101,15 +101,17 @@ export class LoginPage extends HTMLElement {
 
     let response = await createUser(formData);
     if (response.error) {
-      this.showCreateError();
+      this.showCreateError(response.error);
     } else {
       this.clearSignUpModal();
       this.hideModal();
     }
   }
 
-  showCreateError() {
+  showCreateError(msg) {
     const { signUpError } = this.uiElements;
+    let signUpErrorMsg = "SignUp failed, please try again: " + msg;
+    signUpError.textContent = signUpErrorMsg;
     signUpError.classList.remove("hidden");
   }
 

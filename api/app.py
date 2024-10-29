@@ -10,6 +10,7 @@ import os
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 USER_FEEDBACK_DATABASE = "user_feedback.db"
+USER_DATABASE = "user.db"
 
 app = Flask(__name__)
 feedback_counts = defaultdict(int)
@@ -70,22 +71,34 @@ def create_user():
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     msg = ""
+    statusCode = 200
     try:
-        with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
+        with sqlite3.connect(USER_DATABASE) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO users (date_added, full_name, organization, contact, user, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
-                (date, full_name, organization, contact, username, hashed_password),
+                "SELECT user FROM user WHERE user = ? OR contact = ?",
+                (username, contact),
             )
-            conn.commit()
-            msg = "User successfully created"
+            userFetch = cursor.fetchone()
+            if userFetch != None:
+                statusCode = 409
+                msg = "User already exists with username or contact"
+            else:
+                cursor.execute(
+                    "INSERT INTO user (date_added, full_name, organization, contact, user, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
+                    (date, full_name, organization, contact, username, hashed_password),
+                )
+                conn.commit()
+                statusCode = 200
+                msg = "User successfully created"
     except Exception as e:
         print("Error Creating User:", str(e))
         conn.rollback()
-        msg = "Error creating user: " + str(e)
+        msg = "Error creating user"
+        return {"message": msg}, 500
     finally:
         conn.close()
-        return {"message": msg}
+    return {"message": msg}, statusCode
 
 
 @app.route("/api/login", methods=["POST"])
@@ -95,11 +108,9 @@ def login():
     password = json["password"]
     userPassword = ""
     try:
-        with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
+        with sqlite3.connect(USER_DATABASE) as conn:
             cursor = conn.cursor()
-            cursor.execute(
-                "SELECT password_hash FROM users WHERE user = ?", (username,)
-            )
+            cursor.execute("SELECT password_hash FROM user WHERE user = ?", (username,))
             userPassword = cursor.fetchone()[0]
     except Exception as e:
         conn.rollback()
