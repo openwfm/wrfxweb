@@ -29,10 +29,19 @@ export async function getConfigurations() {
 
 /** Service request for building the initial catalogMenu */
 export async function getCatalogEntries() {
+  const GET_URL = "/api/catalog";
   let json = {};
   try {
-    const response = await fetch("simulations/catalog.json");
-    json = response.json();
+    //const response = await fetch("simulations/catalog.json");
+    const response = await fetch(GET_URL, {
+      method: "GET",
+      headers: {
+        Authorization: controllers.webToken.getValue(),
+        "Content-Type": "application/json",
+      },
+    });
+    json = await response.json();
+    console.log(json);
   } catch (error) {
     console.error("Error fetching catalog entries: " + error);
   }

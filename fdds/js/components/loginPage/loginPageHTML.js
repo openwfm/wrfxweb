@@ -1,6 +1,6 @@
 export const loginPageHTML = `
   <div id="login-container">
-    <div id="login-page" class="login-page hidden">
+    <div id="login-page" class="login-page">
       <h2 class="login-title">Login To Portal</h2>
       <button id="signup-screen-button" class="switch-button" type="button">Sign Up</button>
       <form id="login-form">
@@ -16,9 +16,10 @@ export const loginPageHTML = `
           <button id="login-button" class="login-button" type="submit">Login</button>
         </div>
       </form>
+      <p id="signup-success" class="signup-success hidden">SignUp successful! Please login.</p>
       <p id="login-error" class="login-error hidden">Username and password combination is incorrect, please try again.</p>
     </div>
-    <div id="signup-page" class="login-page">
+    <div id="signup-page" class="login-page hidden">
       <h2 class="login-title">SignUp For Portal</h2>
       <button id="login-screen-button" class="switch-button" type="button">Back to Login</button>
       <form id="signup-form">

@@ -453,6 +453,12 @@ body {
   margin-bottom: 0px;
 }
 
+.signup-success {
+  color: green;
+  font-size: 1rem;
+  margin-bottom: 0px;
+}
+
 /* ===== IssueReporting block ===== */
 #issue-reporting-button:hover {
   cursor: pointer;

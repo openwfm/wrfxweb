@@ -6,6 +6,7 @@ import {
 } from "../../util.js";
 import { getCatalogEntries } from "../../services.js";
 import { CatalogItem } from "./catalogItem.js";
+import { controllers } from "../Controller.js";
 
 /** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data.
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and
@@ -100,6 +101,9 @@ export class CatalogMenu extends HTMLElement {
   }
 
   connectedCallback() {
+    controllers.webToken.subscribe(() => {
+      this.webTokenCheck();
+    });
     const catalogMenu = this.querySelector(".catalog-menu");
     L.DomEvent.disableClickPropagation(catalogMenu);
 
@@ -110,7 +114,31 @@ export class CatalogMenu extends HTMLElement {
       this.responsiveUI();
     });
     this.initializeMenuSearching();
-    this.createMenuEntries();
+    this.webTokenCheck();
+  }
+
+  webTokenCheck() {
+    if (controllers.webToken.getValue()) {
+      this.showMenu();
+      this.createMenuEntries();
+    } else {
+      this.clearMenu();
+      this.hideMenu();
+    }
+  }
+
+  hideMenu() {
+    const catalogMenu = this.querySelector(".catalog-menu");
+    const catalogButton = this.querySelector("#catalog-button");
+    catalogButton.classList.add("hidden");
+    catalogMenu.classList.add("hidden");
+  }
+
+  showMenu() {
+    const catalogMenu = this.querySelector(".catalog-menu");
+    const catalogButton = this.querySelector("#catalog-button");
+    catalogButton.classList.remove("hidden");
+    catalogMenu.classList.remove("hidden");
   }
 
   hideShowMenu() {
@@ -209,6 +237,15 @@ export class CatalogMenu extends HTMLElement {
     }
     this.sortMenu("start-date", false);
     this.clickMostRecent(navJobId);
+  }
+
+  clearMenu() {
+    const firesListDOM = this.querySelector("#catalog-fires");
+    const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
+    const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
+    firesListDOM.innerHTML = "";
+    fuelMoistureListDOM.innerHTML = "";
+    lidarProfilesDOM.innerHTML = "";
   }
 
   clickMostRecent(navJobId) {

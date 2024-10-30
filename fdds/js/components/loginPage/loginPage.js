@@ -1,6 +1,7 @@
 import { loginPageHTML } from "./loginPageHTML.js";
 import { CLIENT_WIDTH, IS_MOBILE, sanitizeInput } from "../../util.js";
 import { login, createUser } from "../../services.js";
+import { controllers } from "../Controller.js";
 
 export class LoginPage extends HTMLElement {
   constructor() {
@@ -15,6 +16,7 @@ export class LoginPage extends HTMLElement {
       loginForm: this.querySelector("#login-form"),
       loginError: this.querySelector("#login-error"),
       loginScreenButton: this.querySelector("#login-screen-button"),
+      signUpSuccess: this.querySelector("#signup-success"),
       signUpPage: this.querySelector("#signup-page"),
       signUpScreenButton: this.querySelector("#signup-screen-button"),
       signUpName: this.querySelector("#name"),
@@ -73,6 +75,7 @@ export class LoginPage extends HTMLElement {
     if (response.error) {
       this.showLoginError();
     } else {
+      controllers.webToken.setValue(response.token);
       this.hideModal();
     }
     this.clearLoginModal();
@@ -104,7 +107,7 @@ export class LoginPage extends HTMLElement {
       this.showCreateError(response.error);
     } else {
       this.clearSignUpModal();
-      this.hideModal();
+      this.showSignUpSuccess();
     }
   }
 
@@ -115,9 +118,18 @@ export class LoginPage extends HTMLElement {
     signUpError.classList.remove("hidden");
   }
 
+  showSignUpSuccess() {
+    const { signUpSuccess, signUpError, signUpPage, loginPage } =
+      this.uiElements;
+    signUpPage.classList.add("hidden");
+    loginPage.classList.remove("hidden");
+    signUpError.classList.add("hidden");
+    signUpSuccess.classList.remove("hidden");
+  }
+
   showLoginError() {
-    const { signUpError } = this.uiElements;
-    signUpError.classList.remove("hidden");
+    const { loginError } = this.uiElements;
+    loginError.classList.remove("hidden");
   }
 
   setupMobile() {}

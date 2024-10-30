@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import sqlite3
 import datetime
 from collections import defaultdict
+from functools import wraps
 import os
 
 load_dotenv()
@@ -14,6 +15,37 @@ USER_DATABASE = "user.db"
 
 app = Flask(__name__)
 feedback_counts = defaultdict(int)
+
+
+def token_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        print(f"Token: {token}")
+        if not token:
+            return {"message": "Token is missing"}, 401
+        try:
+            jwt.decode(token, SECRET_KEY)
+        except jwt.ExpiredSignatureError:
+            return {"message": "Token has expired"}, 401
+        except jwt.InvalidTokenError:
+            return {"message": "Invalid token"}, 401
+        return func(*args, **kwargs)
+
+    wrapper.__name__ = func.__name__
+    return wrapper
+
+
+@app.route("/api/auth", methods=["GET"])
+@token_required
+def auth():
+    return {"message": "Authenticated"}
+
+
+@app.route("/api/catalog", methods=["GET"])
+@token_required
+def catalog():
+    return {"message": "Authenticated"}
 
 
 @app.route("/api/submit_issue", methods=["POST"])
@@ -118,7 +150,7 @@ def login():
         return {"message": msg}, 401
     finally:
         conn.close()
-    if bcrypt.checkpw(password.encode("utf-8"), userPassword.encode("utf-8")):
+    if bcrypt.checkpw(password.encode("utf-8"), userPassword):
         token = jwt.encode(
             {
                 "user": username,
@@ -126,5 +158,6 @@ def login():
             },
             SECRET_KEY,
         )
+        print(f"Token sent: {token}")
         return {"token": token}
     return {"message": "Login failed"}, 401
