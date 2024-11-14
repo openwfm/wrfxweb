@@ -152,5 +152,5 @@ export const controllers = {
   timeSeriesProgress: new Controller(0),
   timeSeriesStart: new Controller(""),
   timeSeriesEnd: new Controller(""),
-  webToken: new Controller(""),
+  catalogUrl: new Controller(""),
 };

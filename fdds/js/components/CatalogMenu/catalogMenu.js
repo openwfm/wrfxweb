@@ -101,8 +101,8 @@ export class CatalogMenu extends HTMLElement {
   }
 
   connectedCallback() {
-    controllers.webToken.subscribe(() => {
-      this.webTokenCheck();
+    controllers.catalogUrl.subscribe(() => {
+      this.catalogCheck();
     });
     const catalogMenu = this.querySelector(".catalog-menu");
     L.DomEvent.disableClickPropagation(catalogMenu);
@@ -114,11 +114,11 @@ export class CatalogMenu extends HTMLElement {
       this.responsiveUI();
     });
     this.initializeMenuSearching();
-    this.webTokenCheck();
+    this.catalogCheck();
   }
 
-  webTokenCheck() {
-    if (controllers.webToken.getValue()) {
+  catalogCheck() {
+    if (controllers.catalogUrl.getValue()) {
       this.showMenu();
       this.createMenuEntries();
     } else {
@@ -218,7 +218,10 @@ export class CatalogMenu extends HTMLElement {
     const firesListDOM = this.querySelector("#catalog-fires");
     const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
-    const catalogEntries = await getCatalogEntries();
+    const catalogEntries = await getCatalogEntries(
+      controllers.catalogUrl.getValue(),
+    );
+    console.log("catalogEntries ", catalogEntries);
     for (let catName in catalogEntries) {
       let catEntry = catalogEntries[catName];
       this.addOrder.push(catEntry.job_id);

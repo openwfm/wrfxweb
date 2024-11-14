@@ -20,7 +20,8 @@ venv/
 api/venv/
 api/user_feedback.db
 api/__pycache__/
-
-
+api/instance
+api/api_key.py
+api/user.db
 
 

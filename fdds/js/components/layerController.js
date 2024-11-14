@@ -74,7 +74,7 @@ export class LayerController extends HTMLElement {
     this.createOpacitySlider();
     this.createMapBaseCheckBoxes();
     this.createThreadManager();
-    controllers.webToken.subscribe(() => {
+    controllers.catalogUrl.subscribe(() => {
       this.resetLayers();
     });
   }

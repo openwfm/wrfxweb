@@ -75,7 +75,7 @@ export class LoginPage extends HTMLElement {
     if (response.error) {
       this.showLoginError();
     } else {
-      controllers.webToken.setValue(response.token);
+      controllers.catalogUrl.setValue(response.catalogUrl);
       this.hideModal();
     }
     this.clearLoginModal();
@@ -132,7 +132,7 @@ export class LoginPage extends HTMLElement {
     loginError.classList.remove("hidden");
   }
 
-  setupMobile() {}
+  setupMobile() { }
 
   showModal() {
     const { loginContainer } = this.uiElements;
