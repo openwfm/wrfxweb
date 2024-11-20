@@ -3,7 +3,7 @@ import { simVars } from "./simVars.js";
 
 /** Service request for fetching the conf.json file. */
 export async function getConfigurations() {
-  await fetch("conf.json")
+  await fetch("conf")
     .then((response) => response.json())
     .then(function(configData) {
       if (configData.organization) {
@@ -28,11 +28,11 @@ export async function getConfigurations() {
 }
 
 /** Service request for building the initial catalogMenu */
-export async function getCatalogEntries(catalogUrl) {
+export async function getCatalogEntries() {
   let json = {};
   try {
-    //const response = await fetch("simulations/catalog.json");
-    const response = await fetch(catalogUrl);
+    const response = await fetch("simulations/catalog.json");
+    //const response = await fetch(catalogUrl);
     json = await response.json();
   } catch (error) {
     console.error("Error fetching catalog entries: " + error);
@@ -58,7 +58,7 @@ export function getSimulation(path) {
 }
 
 export async function createUser(formData) {
-  const POST_URL = "/api/create_user";
+  const POST_URL = "/create_user";
   let json = {};
   try {
     const response = await fetch(POST_URL, {
@@ -80,7 +80,7 @@ export async function createUser(formData) {
 }
 
 export async function login(formData) {
-  const POST_URL = "/api/login";
+  const POST_URL = "/login";
   let json = {};
   try {
     const response = await fetch(POST_URL, {
@@ -101,8 +101,29 @@ export async function login(formData) {
   }
 }
 
+export async function loginGoogle() {
+  const POST_URL = "/login/google";
+  let json = {};
+  try {
+    const response = await fetch(POST_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    json = await response.json();
+    if (!response.ok) {
+      throw new Error(json.message);
+    }
+    console.log("Google login response: ", json);
+    return json;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
 export async function submitIssue(formData) {
-  const POST_URL = "/api/submit_issue";
+  const POST_URL = "/submit_issue";
   let json = {};
   try {
     const response = await fetch(POST_URL, {

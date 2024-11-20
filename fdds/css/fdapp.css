@@ -440,6 +440,13 @@ body {
   display: inline-block;
   margin-top: 10px;
   font-size: 1rem;
+  padding: 5px;
+  border-radius: 0.4rem;
+  border: 1px solid #5d5d5d;
+}
+
+.login-button:hover {
+  cursor: pointer;
 }
 
 .login-buttons {

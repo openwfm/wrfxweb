@@ -1,12 +1,18 @@
-from flask import Flask, request, url_for, session, redirect
-import bcrypt
+from .app import create_app, db
+from flask import (
+    render_template,
+    send_from_directory,
+    url_for,
+    redirect,
+    session,
+    request,
+)
 from dotenv import load_dotenv
-import sqlite3
-import datetime
-from collections import defaultdict
 import os
 from authlib.integrations.flask_client import OAuth
-from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
+
+from .models.Users import User
 
 load_dotenv()
 
@@ -15,40 +21,15 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 FLASK_SECRET = os.getenv("FLASK_SECRET")
 
-USER_FEEDBACK_DATABASE = "user_feedback.db"
 
-app = Flask(__name__)
+app = create_app()
+
 app.secret_key = FLASK_SECRET
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(25), unique=True, nullable=False)
-    password_hash = db.Column(db.String(100), nullable=False)
-    contact = db.Column(db.String(100), unique=True, nullable=False)
-    full_name = db.Column(db.String(100), nullable=False)
-    organization = db.Column(db.String(100), nullable=False)
-    date_created = db.Column(db.String(10), nullable=False)
-
-    def set_password(self, password):
-        self.password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
-    def check_password(self, password):
-        return bcrypt.checkpw(password.encode("utf-8"), self.password_hash)
-
 
 with app.app_context():
     db.create_all()
 
-
-feedback_counts = defaultdict(int)
-
 oauth = OAuth(app)
-
 google = oauth.register(
     name="google",
     client_id=CLIENT_ID,
@@ -58,12 +39,54 @@ google = oauth.register(
 )
 
 
-@app.route("/api/catalog", methods=["GET"])
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if "google_id" not in session:
+            return redirect(url_for("login_page"))
+        else:
+            return f(*args, **kwargs)
+
+    return wrapper
+
+
+@app.route("/")
+@login_required
+def index():
+    return render_template("index.html")
+
+
+@app.route("/js/<path:filename>")
+def serve_js(filename):
+    return send_from_directory("../../fdds/js", filename)
+
+
+@app.route("/css/<path:filename>")
+def serve_css(filename):
+    return send_from_directory("../../fdds/css", filename)
+
+
+@app.route("/simulations/<path:filename>")
+def serve_simulations(filename):
+    return send_from_directory("../../fdds/simulations", filename)
+
+
+@app.route("/threadManager.js")
+def serve_thread_manager():
+    return send_from_directory("../../fdds", "threadManager.js")
+
+
+@app.route("/conf")
+def serve_conf():
+    return send_from_directory("../../fdds", "conf.json")
+
+
+@app.route("/catalog", methods=["GET"])
 def catalog():
     return {"catalogUrl": "simulations/catalog.json"}
 
 
-@app.route("/api/submit_issue", methods=["POST"])
+@app.route("/submit_issue", methods=["POST"])
 def submit_issue():
     json = request.get_json()
     featureOrBug = int(json["featureOrBug"])
@@ -79,35 +102,10 @@ def submit_issue():
         return {
             "message": "Daily feedback limit reached. Please try again tomorrow."
         }, 429
-    try:
-        with sqlite3.connect(USER_FEEDBACK_DATABASE) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO user_feedback (date, full_name, organization, contact, type, title, description, steps) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (
-                    date,
-                    full_name,
-                    organization,
-                    contact,
-                    featureOrBug,
-                    title,
-                    description,
-                    steps,
-                ),
-            )
-            conn.commit()
-            msg = "Issue successfully submitted"
-    except Exception as e:
-        print("Error Submitting Issue:", str(e))
-        conn.rollback()
-        msg = "Error submitting issue: " + str(e)
-    finally:
-        conn.close()
-        feedback_counts[date] += 1
-        return {"message": msg}
+    return {"message": "success"}
 
 
-@app.route("/api/create_user", methods=["POST"])
+@app.route("/create_user", methods=["POST"])
 def create_user():
     json = request.get_json()
     username = json["user"]
@@ -135,20 +133,25 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     session["username"] = new_user.username
-    return redirect(url_for("catalog"))
+    return redirect(url_for("index"))
 
 
-@app.route("/api/google_login", methods=["POST"])
+@app.route("/login/google", methods=["POST"])
 def google_login():
     try:
         redirect_uri = url_for("authorize_google", _external=True)
+        # auth = google.authorize_redirect(redirect_uri)
         return google.authorize_redirect(redirect_uri)
+        # print(f"auth: {auth}")
+        return {"auth": auth}
+        # return {"test": "test"}
     except Exception as e:
         return {"message": "Error logging in with Google: " + str(e)}, 401
 
 
-@app.route("/api/authorize/google", methods=["GET"])
+@app.route("/authorize/google", methods=["GET"])
 def authorize_google():
+    print(" ==== authorize_google ====")
     token = google.authorize_access_token()
     userinfo_endpoint = google.server_metadata["userinfo_endpoint"]
     resp = google.get(userinfo_endpoint)
@@ -168,10 +171,10 @@ def authorize_google():
     session["username"] = user.username
     session["oauth_token"] = token
 
-    return redirect(url_for("catalog"))
+    return redirect(url_for("index"))
 
 
-@app.route("/api/login", methods=["POST"])
+@app.route("/login/submit", methods=["POST"])
 def login():
     json = request.get_json()
     username = json["user"]
@@ -179,5 +182,10 @@ def login():
     user = User.query.filter_by(username=username).first()
     if user and user.check_password(password):
         session["username"] = user.username
-        return redirect(url_for("catalog"))
+        return redirect(url_for("index"))
     return {"message": "Login failed"}, 401
+
+
+@app.route("/login", methods=["GET"])
+def login_page():
+    return render_template("login.html")

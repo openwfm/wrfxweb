@@ -1,7 +1,6 @@
 import { loginPageHTML } from "./loginPageHTML.js";
 import { CLIENT_WIDTH, IS_MOBILE, sanitizeInput } from "../../util.js";
-import { login, createUser } from "../../services.js";
-import { controllers } from "../Controller.js";
+import { login, createUser, loginGoogle } from "../../services.js";
 
 export class LoginPage extends HTMLElement {
   constructor() {
@@ -13,6 +12,7 @@ export class LoginPage extends HTMLElement {
       userName: this.querySelector("#user"),
       password: this.querySelector("#password"),
       loginButton: this.querySelector("#login-button"),
+      loginGoogleButton: this.querySelector("#login-google"),
       loginForm: this.querySelector("#login-form"),
       loginError: this.querySelector("#login-error"),
       loginScreenButton: this.querySelector("#login-screen-button"),
@@ -31,8 +31,14 @@ export class LoginPage extends HTMLElement {
   }
 
   connectedCallback() {
-    const { loginContainer, loginPage, signUpPage, loginForm, signUpForm } =
-      this.uiElements;
+    const {
+      loginContainer,
+      loginPage,
+      signUpPage,
+      loginForm,
+      signUpForm,
+      loginGoogleButton,
+    } = this.uiElements;
     const { signUpScreenButton, loginScreenButton } = this.uiElements;
 
     signUpScreenButton.onclick = () => {
@@ -43,6 +49,11 @@ export class LoginPage extends HTMLElement {
       signUpPage.classList.add("hidden");
       loginPage.classList.remove("hidden");
       this.clearSignUpModal();
+    };
+
+    loginGoogleButton.onclick = async () => {
+      let response = await loginGoogle();
+      console.log(response);
     };
 
     loginForm.onsubmit = async (e) => {
@@ -75,7 +86,6 @@ export class LoginPage extends HTMLElement {
     if (response.error) {
       this.showLoginError();
     } else {
-      controllers.catalogUrl.setValue(response.catalogUrl);
       this.hideModal();
     }
     this.clearLoginModal();

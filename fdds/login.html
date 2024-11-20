@@ -59,16 +59,6 @@
 
   <script src="js/leaflet/leaflet.js"></script>
   <script src="https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=3rdoGP1zhCE27Q69RXFiR0A3foqbvoZd"></script>
-  <script src="js/partial1.js" type="module"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.1/chartjs-plugin-annotation.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/dayjs.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/plugin/utc.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.10.4/plugin/timezone.min.js"></script>
-  <script>
-    dayjs.extend(window.dayjs_plugin_utc);
-    dayjs.extend(window.dayjs_plugin_timezone);
-  </script>
 
   <!-- WRF Fire Display Server; Copyright 2016, University of Colorado Denver,
        Department of Mathematical and Statistical Sciences -->
@@ -76,27 +66,18 @@
   <div class="splash" id="splash-screen">
     <h1 class="fade-in">WIRC</h1>
   </div>
-	<div id="simulation-flags" class='hidden'>
-    <span id="current-sim-label" class="displayTest"></span>
-  </div>
-	<catalog-menu></catalog-menu>
-  <simulation-controller></simulation-controller>
-  <domain-selector></domain-selector>
-  <timeseries-controller></timeseries-controller>
-  <colorbar-panel></colorbar-panel>
-  <info-panel></info-panel>
-  <timeseries-chart></timeseries-chart>
   <issue-reporting></issue-reporting>
+  <login-page></login-page>
 
-  <div id="copyLink" class="feature-controller hidden">Copy Link to Clipboard</div>
-
-	<script src="js/components/CatalogMenu/catalogMenu.js" type="module"></script>
-	<script src="js/components/simulationController.js" type="module"></script>
-	<script src="js/components/domainSelector.js" type="module"></script>
-	<script src="js/components/timeSeriesController.js" type="module"></script>
-  <script src="js/components/colorbarPanel.js" type="module"></script>
-  <script src="js/components/infoPanel.js" type="module" async="true"></script>
-  <script src="js/components/timeSeriesChart.js" type="module" async="true"></script>
   <script src="js/components/issueReporting/issueReporting.js" type="module"></script>
+  <script src="js/components/loginPage/loginPage.js" type="module"></script>
+  <script>
+    window.onload = () => {
+      const splash = document.querySelector('#splash-screen');
+        setTimeout(() => {
+          splash.classList.add('hidden');
+        }, 500);
+    }
+  </script>
 </body>
 </html>
