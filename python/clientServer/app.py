@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from dotenv import load_dotenv
 
 db = SQLAlchemy()
 
@@ -16,3 +15,6 @@ def create_app():
     migrate = Migrate(app, db)
 
     return app
+
+
+app = create_app()
