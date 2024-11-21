@@ -1,37 +1,41 @@
-from ..app import app
+from ..app import app, db
 from ..models.Users import User
 from ..serverKeys import CLIENT_ID, CLIENT_SECRET
 
-from flask import request, redirect, url_for, session, render_template
-from flask_cors import CORS, cross_origin
+from flask import request, redirect, url_for, session, render_template, flash, abort
+from flask_login import LoginManager, login_user, logout_user, current_user
 
-from authlib.integrations.flask_client import OAuth
+from urllib.parse import urlencode
+import secrets
+import requests
+import datetime
 
-# from flask_oauthlib.client import OAuth
 
-cors = CORS(app)
-app.config["CORS_HEADERS"] = "Access-Control-Allow-Origin"
+provider_data = {
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "authorize_url": "https://accounts.google.com/o/oauth2/auth",
+    "token_url": "https://accounts.google.com/o/oauth2/token",
+    "userinfo": {
+        "url": "https://www.googleapis.com/oauth2/v3/userinfo",
+        "email": lambda json: json["email"],
+    },
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email"],
+}
+login = LoginManager(app)
 
-oauth = OAuth(app)
-google = oauth.register(
-    name="google",
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={"scope": "openid profile email"},
-)
 
-# google = oauth.remote_app(
-#     "google",
-#     consumer_key=CLIENT_ID,
-#     consumer_secret=CLIENT_SECRET,
-#     request_token_params={"scope": "email"},
-#     base_url="https://www.googleapis.com/oauth2/v1/",
-#     request_token_url=None,
-#     access_token_method="POST",
-#     access_token_url="https://accounts.google.com/o/oauth2/token",
-#     authorize_url="https://accounts.google.com/o/oauth2/auth",
-# )
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+
+
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
+    response.headers.add("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS")
+    return response
 
 
 @app.route("/create_user", methods=["POST"])
@@ -65,40 +69,90 @@ def create_user():
     return redirect(url_for("index"))
 
 
-@app.route("/login/google", methods=["POST"])
-@cross_origin()
+@app.route("/login/google")
 def google_login():
-    try:
-        redirect_uri = url_for("authorize_google", _external=True)
-        return google.authorize_redirect(redirect_uri)
-        return google.authorize(callback=redirect_uri)
-    except Exception as e:
-        return {"message": "Error logging in with Google: " + str(e)}, 401
+    if not current_user.is_anonymous:
+        return redirect(url_for("index"))
+
+    # generate a random string for the state parameter
+    session["oauth2_state"] = secrets.token_urlsafe(16)
+
+    # create a query string with all the OAuth2 parameters
+    qs = urlencode(
+        {
+            "client_id": provider_data["client_id"],
+            "redirect_uri": url_for("authorize_google", _external=True),
+            "response_type": "code",
+            "scope": " ".join(provider_data["scopes"]),
+            "state": session["oauth2_state"],
+        }
+    )
+
+    # redirect the user to the OAuth2 provider authorization URL
+    return redirect(provider_data["authorize_url"] + "?" + qs)
 
 
 @app.route("/authorize/google", methods=["GET"])
-@cross_origin()
 def authorize_google():
-    print(" ==== authorize_google ====")
-    token = google.authorize_access_token()
-    userinfo_endpoint = google.server_metadata["userinfo_endpoint"]
-    resp = google.get(userinfo_endpoint)
-    user_info = resp.json()
-    contact = user_info["email"]
-    user = User.query.filter_by(contact=contact).first()
-    if not user:
-        user = User(
-            username=user_info["email"],
-            contact=user_info["email"],
-            full_name=user_info["name"],
-            organization="",
-            date_created=datetime.datetime.now().strftime("%Y-%m-%d"),
-        )
+    if not current_user.is_anonymous:
+        return redirect(url_for("index"))
+
+    # if there was an authentication error, flash the error messages and exit
+    if "error" in request.args:
+        for k, v in request.args.items():
+            if k.startswith("error"):
+                flash(f"{k}: {v}")
+        return redirect(url_for("index"))
+
+    # make sure that the state parameter matches the one we created in the
+    # authorization request
+    if request.args["state"] != session.get("oauth2_state"):
+        abort(401)
+
+    # make sure that the authorization code is present
+    if "code" not in request.args:
+        abort(401)
+
+    # exchange the authorization code for an access token
+    response = requests.post(
+        provider_data["token_url"],
+        data={
+            "client_id": provider_data["client_id"],
+            "client_secret": provider_data["client_secret"],
+            "code": request.args["code"],
+            "grant_type": "authorization_code",
+            "redirect_uri": url_for("authorize_google", _external=True),
+        },
+        headers={"Accept": "application/json"},
+    )
+    if response.status_code != 200:
+        abort(401)
+    oauth2_token = response.json().get("access_token")
+    if not oauth2_token:
+        abort(401)
+
+    # use the access token to get the user's email address
+    response = requests.get(
+        provider_data["userinfo"]["url"],
+        headers={
+            "Authorization": "Bearer " + oauth2_token,
+            "Accept": "application/json",
+        },
+    )
+    if response.status_code != 200:
+        abort(401)
+    email = provider_data["userinfo"]["email"](response.json())
+
+    # find or create the user in the database
+    user = db.session.scalar(db.select(User).where(User.email == email))
+    if user is None:
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        user = User(email=email, username=email.split("@")[0], date_created=date)
         db.session.add(user)
         db.session.commit()
-    session["username"] = user.username
-    session["oauth_token"] = token
 
+    # log the user in
+    login_user(user)
     return redirect(url_for("index"))
 
 
@@ -117,3 +171,10 @@ def login():
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    flash("You have been logged out.")
+    return redirect(url_for("login_page"))

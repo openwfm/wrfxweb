@@ -8,6 +8,7 @@ from flask import (
     session,
     request,
 )
+from flask_login import LoginManager, login_user, logout_user, current_user
 
 from authlib.integrations.flask_client import OAuth
 
@@ -24,7 +25,7 @@ with app.app_context():
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if "google_id" not in session:
+        if current_user.is_anonymous:
             return redirect(url_for("login_page"))
         else:
             return f(*args, **kwargs)
