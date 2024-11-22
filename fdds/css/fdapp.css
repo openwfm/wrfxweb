@@ -465,6 +465,9 @@ body {
   padding: 5px;
   border-radius: 0.4rem;
   border: 1px solid #5d5d5d;
+  background: white;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .login-button:hover {
