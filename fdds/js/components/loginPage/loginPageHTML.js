@@ -14,7 +14,7 @@ export const loginPageHTML = `
         </div>
         <div class="login-buttons">
           <button id="login-button" class="login-button" type="submit">Login</button>
-          <button id="login-google" class="login-button"i type="button">Login with Google</button>
+          <a id="login-google" class="login-button" href="login/google">Login with Google</a>
         </div>
       </form>
       <p id="signup-success" class="signup-success hidden">SignUp successful! Please login.</p>

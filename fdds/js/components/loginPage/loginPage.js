@@ -51,10 +51,10 @@ export class LoginPage extends HTMLElement {
       this.clearSignUpModal();
     };
 
-    loginGoogleButton.onclick = async () => {
-      let response = await loginGoogle();
-      console.log(response);
-    };
+    //loginGoogleButton.onclick = async () => {
+    //  let response = await loginGoogle();
+    //  console.log(response);
+    //};
 
     loginForm.onsubmit = async (e) => {
       e.preventDefault();

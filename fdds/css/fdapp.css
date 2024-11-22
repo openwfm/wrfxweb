@@ -176,6 +176,28 @@ body {
   cursor: pointer;
 }
 
+#logout {
+  position: absolute;
+  width: 100px;
+  height: 40px;
+  top: 20px;
+  right: 220px;
+  display: grid;
+  place-items: center;
+  z-index: 9000;
+  font-size: 1.15rem;
+  font-weight: bold;
+  background: #e8e8e8;
+  color: #5d5d5d;
+  border-radius: 0.4rem;
+  text-decoration: none;
+}
+
+#logout:hover {
+  background: #ececec;
+  cursor: pointer;
+}
+
 #simulation-flags {
   position: fixed;
   top: 15px;
@@ -659,7 +681,7 @@ body {
 #layer-controller-container {
   position: absolute;
   right: 20px;
-  top: 5%;
+  top: 6%;
   width: 300px;
   max-height: 85%;
   background: white;
@@ -1046,6 +1068,16 @@ body {
 }
 
 @media (max-width: 769px) {
+  #logout {
+    top: auto;
+    bottom: 5px;
+    right: 270px;
+    font-weight: normal;
+    width: 70px;
+    height: 20px;
+    font-size: 0.75rem;
+  }
+
   #issue-reporting-button {
     position: absolute;
     height: 30px;
@@ -1218,6 +1250,7 @@ body {
   /* ===== SimulationController-mobile block ===== */
   .slider-container {
     width: 320px;
+    bottom: 30px;
   }
 
   #slider-timestamp {

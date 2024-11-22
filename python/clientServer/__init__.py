@@ -1,20 +1,15 @@
 from .app import db, app
 from .serverKeys import CLIENT_SECRET
+from . import routes
+
 from flask import (
     render_template,
     send_from_directory,
     url_for,
     redirect,
-    session,
-    request,
 )
-from flask_login import LoginManager, login_user, logout_user, current_user
-
-from authlib.integrations.flask_client import OAuth
-
-# from flask_oauthlib.client import OAuth
+from flask_login import current_user
 from functools import wraps
-from .routes.login import login
 
 app.secret_key = CLIENT_SECRET
 
@@ -59,6 +54,11 @@ def serve_thread_manager():
     return send_from_directory("../../fdds", "threadManager.js")
 
 
+@app.route("/imageLoadingWorker.js")
+def serve_image_loading_worker():
+    return send_from_directory("../../fdds", "imageLoadingWorker.js")
+
+
 @app.route("/conf")
 def serve_conf():
     return send_from_directory("../../fdds", "conf.json")
@@ -67,22 +67,3 @@ def serve_conf():
 @app.route("/catalog", methods=["GET"])
 def catalog():
     return {"catalogUrl": "simulations/catalog.json"}
-
-
-@app.route("/submit_issue", methods=["POST"])
-def submit_issue():
-    json = request.get_json()
-    featureOrBug = int(json["featureOrBug"])
-    title = json["title"]
-    description = json["description"]
-    steps = json["steps"]
-    contact = json["contact"]
-    full_name = json["fullName"]
-    organization = json["organization"]
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-    if feedback_counts[date] >= 100:
-        print("Daily feedback limit reached.")
-        return {
-            "message": "Daily feedback limit reached. Please try again tomorrow."
-        }, 429
-    return {"message": "success"}

@@ -106,9 +106,8 @@ export async function loginGoogle() {
   let json = {};
   try {
     const response = await fetch(POST_URL, {
-      method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
     });
     json = await response.json();
