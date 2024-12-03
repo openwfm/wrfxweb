@@ -1,5 +1,5 @@
 from .app import db, app
-from .serverKeys import CLIENT_SECRET
+from .serverKeys import CLIENT_SERVER_SECRET
 from . import routes
 
 from flask import (
@@ -11,7 +11,7 @@ from flask import (
 from flask_login import current_user
 from functools import wraps
 
-app.secret_key = CLIENT_SECRET
+app.secret_key = CLIENT_SERVER_SECRET
 
 with app.app_context():
     db.create_all()

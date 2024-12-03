@@ -23,6 +23,7 @@ api/__pycache__/
 api/instance
 api/api_key.py
 api/user.db
+deployment.MD
 
 
 python/clientServer/models/__pycache__/*
