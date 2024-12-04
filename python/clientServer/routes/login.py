@@ -72,7 +72,7 @@ def google_login():
     # create a query string with all the OAuth2 parameters
     redirect_url = url_for("authorize_google", _external=True)
     if ENVIRONMENT == "production":
-        redirect_url = f"#{OAUTH_REDIRECT_URI}/authorize/google"
+        redirect_url = f"{OAUTH_REDIRECT_URI}/authorize/google"
     qs = urlencode(
         {
             "client_id": provider_data["client_id"],
