@@ -1,6 +1,6 @@
 from ..app import app, db
 from ..models.Users import User
-from ..serverKeys import CLIENT_ID, CLIENT_SECRET
+from ..serverKeys import CLIENT_ID, CLIENT_SECRET, OAUTH_REDIRECT_URI, ENVIRONMENT
 
 from flask import request, redirect, url_for, session, render_template, flash, abort
 from flask_login import LoginManager, login_user, logout_user, current_user
@@ -70,10 +70,13 @@ def google_login():
     session["oauth2_state"] = secrets.token_urlsafe(16)
 
     # create a query string with all the OAuth2 parameters
+    redirect_url = url_for("authorize_google", _external=True)
+    if ENVIRONMENT == "production":
+        redirect_url = f"#{OAUTH_REDIRECT_URI}/authorize/google"
     qs = urlencode(
         {
             "client_id": provider_data["client_id"],
-            "redirect_uri": url_for("authorize_google", _external=True),
+            "redirect_uri": redirect_url,
             "response_type": "code",
             "scope": " ".join(provider_data["scopes"]),
             "state": session["oauth2_state"],
