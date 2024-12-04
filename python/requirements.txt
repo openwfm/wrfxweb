@@ -16,7 +16,6 @@ Flask-Login==0.6.3
 Flask-Migrate==4.0.7
 Flask-OAuthlib==0.9.6
 Flask-SQLAlchemy==3.1.1
-FMRLite @ file:///Users/chaseporter/wildfires/FMRLite
 fonttools==4.42.1
 idna==3.4
 itsdangerous==2.1.2
