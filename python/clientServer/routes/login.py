@@ -30,37 +30,6 @@ def load_user(id):
     return db.session.get(User, int(id))
 
 
-@app.route("/create_user", methods=["POST"])
-def create_user():
-    json = request.get_json()
-    username = json["user"]
-    password = json["password"]
-    contact = json["contact"]
-    full_name = json["fullName"]
-    organization = json["organization"]
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-
-    user_username = User.query.filter_by(username=username).first()
-    if user_username:
-        return {"message": "User already exists with username"}, 409
-    user_contact = User.query.filter_by(contact=contact).first()
-    if user_contact:
-        return {"message": "User already exists with contact"}, 409
-
-    new_user = User(
-        username=username,
-        contact=contact,
-        full_name=full_name,
-        organization=organization,
-        date_created=date,
-    )
-    new_user.set_password(password)
-    db.session.add(new_user)
-    db.session.commit()
-    session["username"] = new_user.username
-    return redirect(url_for("index"))
-
-
 @app.route("/login/google")
 def google_login():
     if not current_user.is_anonymous:
@@ -149,18 +118,6 @@ def authorize_google():
     # log the user in
     login_user(user)
     return redirect(url_for("index"))
-
-
-@app.route("/login/submit", methods=["POST"])
-def login():
-    json = request.get_json()
-    username = json["user"]
-    password = json["password"]
-    user = User.query.filter_by(username=username).first()
-    if user and user.check_password(password):
-        session["username"] = user.username
-        return redirect(url_for("index"))
-    return {"message": "Login failed"}, 401
 
 
 @app.route("/login", methods=["GET"])

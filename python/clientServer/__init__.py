@@ -1,5 +1,5 @@
 from .app import db, app
-from .serverKeys import CLIENT_SERVER_SECRET
+from .serverKeys import CLIENT_SERVER_SECRET, API_URL
 from . import routes
 
 from flask import (
@@ -10,6 +10,7 @@ from flask import (
 )
 from flask_login import current_user
 from functools import wraps
+import requests
 
 app.secret_key = CLIENT_SERVER_SECRET
 
@@ -67,3 +68,14 @@ def serve_conf():
 @app.route("/catalog", methods=["GET"])
 def catalog():
     return {"catalogUrl": "simulations/catalog.json"}
+
+
+@app.route("/api/<path:api_path>")
+def serve_api(api_path):
+    response = requests.get(f"{API_URL}/{api_path}")
+
+    if response.status_code == 200:
+        data = response.json()
+        return data
+    else:
+        return {"error": "API request failed"}, 500

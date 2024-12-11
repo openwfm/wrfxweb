@@ -31,6 +31,9 @@ export async function getConfigurations() {
 export async function getCatalogEntries() {
   let json = {};
   try {
+    const testresponse = await fetch("api/simulation");
+    const testjson = await testresponse.json();
+    console.log("test : ", testjson);
     const response = await fetch("simulations/catalog.json");
     //const response = await fetch(catalogUrl);
     json = await response.json();
