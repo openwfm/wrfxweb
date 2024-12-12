@@ -26,6 +26,7 @@ api/user.db
 deployment.MD
 
 
+python/clientServer/services/__pycache__/*
 python/clientServer/models/__pycache__/*
 python/clientServer/__pycache__/*
 python/instance/

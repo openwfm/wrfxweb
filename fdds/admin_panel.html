@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" ng-app="fdApp">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width-device-width, initial-scale=1">
+  <title></title>
+  <link rel="stylesheet" href="css/fdapp.css"/>
+</head>
+<body">
+  <h1>Admin Panel</h1>
+  <div class="splash" id="splash-screen">
+    <h1 class="fade-in">WIRC</h1>
+  </div>
+  
+
+  <script>
+    window.onload = () => {
+      const splash = document.querySelector('#splash-screen');
+        setTimeout(() => {
+          splash.classList.add('hidden');
+        }, 500);
+    }
+  </script>
+</body>
+</html>

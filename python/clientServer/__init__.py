@@ -1,12 +1,11 @@
 from .app import db, app
 from .serverKeys import CLIENT_SERVER_SECRET, API_URL
 from . import routes
+from .routes.login import login_required
 
 from flask import (
     render_template,
     send_from_directory,
-    url_for,
-    redirect,
 )
 from flask_login import current_user
 from functools import wraps
@@ -16,17 +15,6 @@ app.secret_key = CLIENT_SERVER_SECRET
 
 with app.app_context():
     db.create_all()
-
-
-def login_required(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if current_user.is_anonymous:
-            return redirect(url_for("login_page"))
-        else:
-            return f(*args, **kwargs)
-
-    return wrapper
 
 
 @app.route("/")

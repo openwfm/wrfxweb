@@ -1,5 +1,5 @@
 from ..app import app, db
-from ..models.UserFeedbacks import UserFeedback
+from ..models.UserFeedback import UserFeedback
 
 from flask import request
 

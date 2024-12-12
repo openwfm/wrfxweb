@@ -1,14 +1,15 @@
 from ..app import app, db
-from ..models.Users import User
+from ..models.User import User
 from ..serverKeys import CLIENT_ID, CLIENT_SECRET, OAUTH_REDIRECT_URI, ENVIRONMENT
+from ..services import UserServices as UserServices
 
 from flask import request, redirect, url_for, session, render_template, flash, abort
-from flask_login import LoginManager, login_user, logout_user, current_user
-
+from flask_login import login_user, logout_user, current_user, LoginManager
+from functools import wraps
 from urllib.parse import urlencode
+
 import secrets
 import requests
-import datetime
 
 
 provider_data = {
@@ -28,6 +29,17 @@ login = LoginManager(app)
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
+
+
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if current_user.is_anonymous:
+            return redirect(url_for("login_page"))
+        else:
+            return f(*args, **kwargs)
+
+    return wrapper
 
 
 @app.route("/login/google")
@@ -108,12 +120,7 @@ def authorize_google():
     email = provider_data["userinfo"]["email"](response.json())
 
     # find or create the user in the database
-    user = db.session.scalar(db.select(User).where(User.email == email))
-    if user is None:
-        date = datetime.datetime.now().strftime("%Y-%m-%d")
-        user = User(email=email, username=email.split("@")[0], date_created=date)
-        db.session.add(user)
-        db.session.commit()
+    user = UserServices.find_or_create(email)
 
     # log the user in
     login_user(user)
