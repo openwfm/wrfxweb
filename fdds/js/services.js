@@ -31,7 +31,7 @@ export async function getConfigurations() {
 export async function getCatalogEntries() {
   let json = {};
   try {
-    const response = await fetch("simulations/catalog.json");
+    const response = await fetch("catalog");
     //const response = await fetch(catalogUrl);
     json = await response.json();
   } catch (error) {
