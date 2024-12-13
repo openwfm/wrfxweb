@@ -10,6 +10,7 @@ from flask import (
 from flask_login import current_user
 from functools import wraps
 import requests
+import datetime
 
 app.secret_key = CLIENT_SERVER_SECRET
 
@@ -38,6 +39,15 @@ def serve_simulations(filename):
     return send_from_directory("../../fdds/simulations", filename)
 
 
+@app.route("/simulation/<path:filename>")
+def serve_simulation(filename):
+    time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+    app.logger.info(
+        f"[SimulationAccess] {current_user.email} {time_now} {filename.split('/')[0]}"
+    )
+    return send_from_directory("../../fdds/simulations", filename)
+
+
 @app.route("/threadManager.js")
 def serve_thread_manager():
     return send_from_directory("../../fdds", "threadManager.js")
@@ -55,7 +65,7 @@ def serve_conf():
 
 @app.route("/catalog", methods=["GET"])
 def catalog():
-    return {"catalogUrl": "simulations/catalog.json"}
+    return send_from_directory("../../fdds/simulations", "catalog.json")
 
 
 @app.route("/api/<path:api_path>")

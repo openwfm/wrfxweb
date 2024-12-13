@@ -121,6 +121,8 @@ def authorize_google():
 
     # find or create the user in the database
     user = UserServices.find_or_create(email)
+    time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+    app.logger.info(f"[Login] {user.email} {time_now}")
 
     # log the user in
     login_user(user)
