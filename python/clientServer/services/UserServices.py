@@ -14,5 +14,9 @@ def create(email):
 def find_or_create(email):
     user = db.session.scalar(db.select(User).where(User.email == email))
     if user is None:
-        user = create_user(email)
+        user = create(email)
     return user
+
+
+def find(email):
+    return db.session.scalar(db.select(User).where(User.email == email))

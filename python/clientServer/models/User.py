@@ -8,23 +8,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=True)
     date_created = db.Column(db.String(10), nullable=False)
-    # type = db.Column(db.String(64), nullable=False)
-    #
-    # __mapper_args__ = {
-    #     "polymorphic_on": type,
-    #     "polymorphic_identity": "user",
-    # }
+
+    def is_admin(self):
+        return False
 
     def __repr__(self):
         return f"<User {self.username}>"
-
-
-# class AdminUser(User):
-#     __tablename__ = "admin_users"
-#
-#     __mapper_args__ = {
-#         "polymorphic_identity": "admin",
-#     }
-#
-#     def __repr__(self):
-#         return f"<AdminUser {self.username}>"

@@ -1,15 +1,8 @@
-from ..app import app, db
-from ..models.User import User
-from ..serverKeys import OAUTH_REDIRECT_URI, ENVIRONMENT
+from ..app import app
 
-from flask import request, redirect, url_for, session, render_template, flash, abort
-from flask_login import login_user, logout_user, current_user
+from flask import redirect, url_for, render_template
+from flask_login import current_user
 from functools import wraps
-from urllib.parse import urlencode
-
-import secrets
-import requests
-import datetime
 
 
 def admin_login_required(f):
@@ -17,24 +10,24 @@ def admin_login_required(f):
     def wrapper(*args, **kwargs):
         if current_user.is_anonymous:
             return redirect(url_for("login_page"))
+        elif not current_user.is_admin():
+            return redirect(url_for("index"))
         else:
             return f(*args, **kwargs)
 
     return wrapper
 
 
-@app.route("/admin/authorize/google", methods=["GET"])
-def admin_authorize_google():
-    pass
-
-
 @app.route("/admin/create_admin")
+@admin_login_required
 def create_admin():
-    pass
+    return {"message": "Not implemented"}, 501
 
 
+@app.route("/admin/delete_admin")
+@admin_login_required
 def delete_admin():
-    pass
+    return {"message": "Not implemented"}, 501
 
 
 @app.route("/admin")
