@@ -25,6 +25,7 @@ api/api_key.py
 api/user.db
 deployment.MD
 python/clientServer/logging/*
+python/clientServer/logging
 
 
 python/clientServer/services/__pycache__/*
