@@ -24,3 +24,9 @@ def destroy(email):
     admin = find(user.id)
     db.session.delete(admin)
     db.session.commit()
+
+
+def isAdmin(user):
+    return (
+        db.session.scalar(db.select(Admin).where(Admin.user_id == user.id)) is not None
+    )

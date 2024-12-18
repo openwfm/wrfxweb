@@ -17,6 +17,16 @@ def serve_css(filename):
     return send_from_directory("../../fdds/css", filename)
 
 
+@app.route("/admin/css/<path:filename>")
+def serve_admin_css(filename):
+    return send_from_directory("../../fdds/admin/css", filename)
+
+
+@app.route("/admin/js/<path:filename>")
+def serve_admin_js(filename):
+    return send_from_directory("../../fdds/admin/js", filename)
+
+
 @app.route("/simulations/<path:filename>")
 def serve_simulations(filename):
     return send_from_directory("../../fdds/simulations", filename)
