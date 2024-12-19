@@ -1,5 +1,6 @@
 import { createAdmin } from "../adminServices.js";
 import { sanitizeInput } from "../adminUtils.js";
+import { adminControllers } from "../adminControllers.js";
 
 export class CreateAdmin extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -41,7 +42,7 @@ export class CreateAdmin extends HTMLElement {
       this.showErrorMessage(response.error);
     } else {
       this.clearForm();
-      // trigger admin list to refresh somehow
+      adminControllers.admins.push(response.admin);
     }
   }
 

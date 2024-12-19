@@ -19,3 +19,20 @@ export async function createAdmin(create_admin_json) {
     console.error("Error:", error);
   }
 }
+
+export async function getAdmins() {
+  const GET_URL = "/admin/all";
+  let response_json = {};
+
+  try {
+    const response = await fetch(GET_URL);
+    if (response.status !== 200) {
+      throw new Error(response_json.message);
+    }
+    response_json = await response.json();
+    return response_json.admins;
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+}

@@ -12,7 +12,7 @@ def create(email):
     admin = Admin(user_id=user.id, date_created=date)
     db.session.add(admin)
     db.session.commit()
-    return admin
+    return user
 
 
 def find(user_id):

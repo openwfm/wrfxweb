@@ -8,4 +8,4 @@ class Admin(db.Model):
     date_created = db.Column(db.String(10), nullable=False)
 
     def __repr__(self):
-        return f"<Admin {self.username}>"
+        return f"<Admin {self.user_id}>"

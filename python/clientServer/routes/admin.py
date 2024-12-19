@@ -1,6 +1,9 @@
-from ..app import app
+from ..app import app, db
 
 from ..services import AdminServices as AdminServices
+from ..serializers import UserSerializer as UserSerializer
+from ..models.User import User
+from ..models.Admin import Admin
 
 from flask import redirect, url_for, render_template, request
 from flask_login import current_user
@@ -20,13 +23,25 @@ def admin_login_required(f):
     return wrapper
 
 
+@app.route("/admin/all", methods=["GET"])
+@admin_login_required
+def all_admins():
+    admins = db.session.query(User).join(Admin).all()
+    admin_jsons = [UserSerializer.serialize_user(admin) for admin in admins]
+
+    return {"admins": admin_jsons}, 200
+
+
 @app.route("/admin/create", methods=["POST"])
 @admin_login_required
 def create_admin():
     json = request.get_json()
     email = json["email"]
-    created_admin = AdminServices.create(email)
-    return {"message": "Admin Successfully Created!"}, 200
+    created_admin_user = AdminServices.create(email)
+    return {
+        "message": "Admin Successfully Created!",
+        "admin": UserSerializer.serialize_user(created_admin_user),
+    }, 200
 
 
 @app.route("/admin/delete_admin")
