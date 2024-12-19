@@ -54,6 +54,12 @@ def delete_admin():
     return {"message": "admin deleted"}, 200
 
 
+@app.route("/admin/simulation_catalogs", methods=["GET"])
+@admin_login_required
+def simulation_catalogs():
+    return {"message": "simulation catalogs"}, 200
+
+
 @app.route("/admin")
 @admin_login_required
 def admin_index():
