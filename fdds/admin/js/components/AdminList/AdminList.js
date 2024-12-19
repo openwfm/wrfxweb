@@ -1,5 +1,6 @@
-import { getAdmins } from "../adminServices.js";
-import { adminControllers } from "../adminControllers.js";
+import { getAdmins } from "../../adminServices.js";
+import { adminControllers } from "../../adminControllers.js";
+import { AdminEntry } from "./AdminEntry.js";
 
 export class AdminList extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -37,8 +38,7 @@ export class AdminList extends HTMLElement {
 
   createAdminListEntry(admin) {
     const { adminList } = this.uiElements;
-    let adminEntry = document.createElement("li");
-    adminEntry.textContent = admin.email;
+    let adminEntry = new AdminEntry(admin);
     adminList.appendChild(adminEntry);
   }
 }

@@ -36,3 +36,25 @@ export async function getAdmins() {
     return [];
   }
 }
+
+export async function deleteAdmin(adminEmail) {
+  const DELETE_URL = `/admin/delete`;
+  let response_json = {};
+
+  try {
+    const response = await fetch(DELETE_URL, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: adminEmail }),
+    });
+    if (response.status !== 200) {
+      throw new Error(response_json.message);
+    }
+    response_json = await response.json();
+    return response_json;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
