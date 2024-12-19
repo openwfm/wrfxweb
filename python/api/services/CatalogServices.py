@@ -3,7 +3,7 @@ from ..models.Catalog import Catalog
 import datetime
 
 
-def create_catalog(name, description):
+def create(name, description):
     new_catalog = Catalog(
         name=name,
         description=description,
@@ -12,3 +12,7 @@ def create_catalog(name, description):
     db.session.add(new_catalog)
     db.session.commit()
     return new_catalog
+
+
+def find_all():
+    return Catalog.query.all()
