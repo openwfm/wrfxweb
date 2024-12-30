@@ -1,4 +1,4 @@
-import { deleteAdmin } from "../../adminServices.js";
+import { deleteAdmin } from "../../services/adminServices.js";
 import { adminControllers } from "../../adminControllers.js";
 
 export class AdminEntry extends HTMLElement {
@@ -11,8 +11,8 @@ export class AdminEntry extends HTMLElement {
               <p id='admin-id'>${adminUser.id}</p>
               <label for='admin-email'>email:</label>
               <p id='admin-email'>${adminUser.email}</p>
-              <label for='admin-email'>date created:</label>
-              <p id='admin-email'>${adminUser.date_created}</p>
+              <label for='admin-date'>date created:</label>
+              <p id='admin-date'>${adminUser.date_created}</p>
               <button id='delete-admin-button'>Delete</button>
             </li>
         `;
@@ -24,8 +24,7 @@ export class AdminEntry extends HTMLElement {
   connectedCallback() {
     const { deleteAdminButton } = this.uiElements;
     deleteAdminButton.onclick = () => {
-      deleteAdmin(this.adminUser.email);
-      this.remove();
+      this.deleteAdmin();
     };
   }
 

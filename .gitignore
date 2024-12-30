@@ -1,3 +1,5 @@
+progress.txt
+
 logs/*
 !.gitkeep
 node_modules/

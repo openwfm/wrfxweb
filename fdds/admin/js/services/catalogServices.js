@@ -1,5 +1,7 @@
-export async function createAdmin(create_admin_json) {
-  const POST_URL = "/admin/create";
+const CATALOG_URL = "admin/catalogs";
+
+export async function createCatalog(create_catalog_json) {
+  const POST_URL = `${CATALOG_URL}/create`;
   let response_json = {};
 
   try {
@@ -8,7 +10,7 @@ export async function createAdmin(create_admin_json) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(create_admin_json),
+      body: JSON.stringify(create_catalog_json),
     });
     if (response.status !== 200) {
       throw new Error(response_json.message);
@@ -17,11 +19,12 @@ export async function createAdmin(create_admin_json) {
     return response_json;
   } catch (error) {
     console.error("Error:", error);
+    return { error: error };
   }
 }
 
-export async function getAdmins() {
-  const GET_URL = "/admin/all";
+export async function getCatalogs() {
+  const GET_URL = `${CATALOG_URL}/all`;
   let response_json = {};
 
   try {
@@ -30,15 +33,15 @@ export async function getAdmins() {
       throw new Error(response_json.message);
     }
     response_json = await response.json();
-    return response_json.admins;
+    return response_json.catalogs;
   } catch (error) {
     console.error("Error:", error);
     return [];
   }
 }
 
-export async function deleteAdmin(adminEmail) {
-  const DELETE_URL = `/admin/delete`;
+export async function deleteCatalog(catalogId) {
+  const DELETE_URL = `${CATALOG_URL}/delete/${catalogId}`;
   let response_json = {};
 
   try {
@@ -47,7 +50,6 @@ export async function deleteAdmin(adminEmail) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email: adminEmail }),
     });
     if (response.status !== 200) {
       throw new Error(response_json.message);

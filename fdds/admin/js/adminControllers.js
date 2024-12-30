@@ -71,4 +71,5 @@ class ArrayController extends Controller {
 // global controllers
 export const adminControllers = {
   admins: new ArrayController([]),
+  catalogs: new ArrayController([]),
 };

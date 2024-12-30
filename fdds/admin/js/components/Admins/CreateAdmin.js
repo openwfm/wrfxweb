@@ -1,6 +1,6 @@
-import { createAdmin } from "../adminServices.js";
-import { sanitizeInput } from "../adminUtils.js";
-import { adminControllers } from "../adminControllers.js";
+import { createAdmin } from "../../services/adminServices.js";
+import { sanitizeInput } from "../../adminUtils.js";
+import { adminControllers } from "../../adminControllers.js";
 
 export class CreateAdmin extends HTMLElement {
   /** ===== Initialization block ===== */

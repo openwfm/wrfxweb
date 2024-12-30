@@ -1,2 +1,2 @@
-from . import simulation
-from . import catalog
+from . import simulations
+from . import catalogs

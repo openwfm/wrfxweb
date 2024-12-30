@@ -5,3 +5,7 @@ def serialize_user(user):
         "username": user.username,
         "date_created": user.date_created,
     }
+
+
+def serialize_users(users):
+    return [serialize_user(user) for user in users]

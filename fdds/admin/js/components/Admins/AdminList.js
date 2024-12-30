@@ -1,4 +1,4 @@
-import { getAdmins } from "../../adminServices.js";
+import { getAdmins } from "../../services/adminServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { AdminEntry } from "./AdminEntry.js";
 

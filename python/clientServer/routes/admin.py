@@ -1,7 +1,9 @@
 from ..app import app, db
 
 from ..services import AdminServices as AdminServices
+from ..services import CatalogServices as CatalogServices
 from ..serializers import UserSerializer as UserSerializer
+from ..serializers import CatalogSerializer as CatalogSerializer
 from ..models.User import User
 from ..models.Admin import Admin
 
@@ -54,10 +56,35 @@ def delete_admin():
     return {"message": "admin deleted"}, 200
 
 
-@app.route("/admin/simulation_catalogs", methods=["GET"])
+@app.route("/admin/catalogs/all", methods=["GET"])
 @admin_login_required
 def simulation_catalogs():
-    return {"message": "simulation catalogs"}, 200
+    catalogs = CatalogServices.find_all()
+
+    return {"catalogs": CatalogSerializer.serialize_catalogs(catalogs)}, 200
+
+
+@app.route("/admin/catalogs/delete/<catalog_id>", methods=["DELETE"])
+@admin_login_required
+def delete_catalog_id(catalog_id):
+    CatalogServices.destroy(int(catalog_id))
+    return {
+        "message": "Catalog Successfully Deleted!",
+    }, 200
+
+
+@app.route("/admin/catalogs/create", methods=["POST"])
+@admin_login_required
+def create_catalog():
+    json = request.get_json()
+    name = json["name"]
+    description = json["description"]
+
+    created_catalog = CatalogServices.create(name, description)
+    return {
+        "message": "Catalog Successfully Created!",
+        "catalog": CatalogSerializer.serialize_catalog(created_catalog),
+    }, 200
 
 
 @app.route("/admin")
