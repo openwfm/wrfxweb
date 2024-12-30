@@ -1,5 +1,6 @@
 from ..app import db
 from ..models.Catalog import Catalog
+from . import CatalogAccessServices as CatalogAccessServices
 import datetime
 
 
@@ -15,6 +16,8 @@ def create(name, description):
 
 
 def destroy(catalog_id):
+    CatalogAccessServices.destroy_all(catalog_id)
+
     catalog = Catalog.query.get(catalog_id)
     db.session.delete(catalog)
     db.session.commit()

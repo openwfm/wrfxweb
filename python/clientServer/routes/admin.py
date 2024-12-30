@@ -2,6 +2,7 @@ from ..app import app, db
 
 from ..services import AdminServices as AdminServices
 from ..services import CatalogServices as CatalogServices
+from ..services import CatalogAccessServices as CatalogAccessServices
 from ..serializers import UserSerializer as UserSerializer
 from ..serializers import CatalogSerializer as CatalogSerializer
 from ..models.User import User
@@ -68,6 +69,54 @@ def simulation_catalogs():
 @admin_login_required
 def delete_catalog_id(catalog_id):
     CatalogServices.destroy(int(catalog_id))
+    return {
+        "message": "Catalog Successfully Deleted!",
+    }, 200
+
+
+@app.route(
+    "/admin/catalogs/<catalog_id>/permissions/create/users/<email>",
+    methods=["POST"],
+)
+@admin_login_required
+def create_catalog_access_for_user(catalog_id, email):
+    CatalogAccessServices.create_for_user(int(catalog_id), email)
+    return {
+        "message": "Catalog Access Created!",
+    }, 200
+
+
+@app.route(
+    "/admin/catalogs/<catalog_id>/permissions/create/users/<email>",
+    methods=["POST"],
+)
+@admin_login_required
+def create_catalog_access_for_domain(catalog_id, domain):
+    CatalogAccessServices.create_for_domain(int(catalog_id), domain)
+    return {
+        "message": "Catalog Access Created!",
+    }, 200
+
+
+@app.route(
+    "/admin/catalogs/<catalog_id>/permissions/delete/users/<user_id>",
+    methods=["DELETE"],
+)
+@admin_login_required
+def delete_catalog_access_for_user(catalog_id, user_id):
+    CatalogAccessServices.destroy_for_user(int(catalog_id), int(user_id))
+    return {
+        "message": "Catalog Access Deleted!",
+    }, 200
+
+
+@app.route(
+    "/admin/catalogs/<catalog_id>/permissions/delete/domain/<domain>",
+    methods=["DELETE"],
+)
+@admin_login_required
+def delete_catalog_access_for_domain(catalog_id, domain):
+    CatalogAccessServices.destroy_for_domain(int(catalog_id), domain)
     return {
         "message": "Catalog Successfully Deleted!",
     }, 200

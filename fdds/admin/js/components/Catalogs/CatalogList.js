@@ -1,6 +1,7 @@
 import { getCatalogs } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { CatalogEntry } from "./CatalogEntry.js";
+import { CatalogEditModal } from "./CatalogEditModal/CatalogEditModal.js";
 
 export class CatalogList extends HTMLElement {
   /** ===== Initialization block ===== */
