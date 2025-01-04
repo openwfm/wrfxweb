@@ -11,6 +11,10 @@ export class CreateCatalog extends HTMLElement {
               <form id='create-catalog-form'>
                 <input type='text' id='name-input' placeholder='name'></input>
                 <input type='text' id='description-input' placeholder='description'></input>
+                <select id='permission-select'>
+                  <option value='private'>Private</option>
+                  <option value='public'>Public</option>
+                </select>
                 <button id='create-catalog-button'>Create Catalog</button>
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
@@ -21,6 +25,7 @@ export class CreateCatalog extends HTMLElement {
     this.uiElements = {
       nameInput: this.querySelector("#name-input"),
       descriptionInput: this.querySelector("#description-input"),
+      permissionSelect: this.querySelector("#permission-select"),
       createCatalogForm: this.querySelector("#create-catalog-form"),
       errorMessageContainer: this.querySelector("#error-message-container"),
       errorMessage: this.querySelector("#error-message"),
@@ -36,10 +41,15 @@ export class CreateCatalog extends HTMLElement {
   }
 
   async createCatalog() {
-    const { nameInput, descriptionInput } = this.uiElements;
+    const { nameInput, descriptionInput, permissionSelect } = this.uiElements;
     let name = sanitizeInput(nameInput.value);
     let description = sanitizeInput(descriptionInput.value);
-    let catalogJson = { name: name, description: description };
+    let isPublic = permissionSelect.value === "public";
+    let catalogJson = {
+      name: name,
+      description: description,
+      public: isPublic,
+    };
     let response = await createCatalog(catalogJson);
     if (response.error) {
       this.showErrorMessage(response.error);

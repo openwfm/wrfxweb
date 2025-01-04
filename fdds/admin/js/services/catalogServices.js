@@ -1,7 +1,7 @@
 const CATALOG_URL = "admin/catalogs";
 
 export async function createCatalog(create_catalog_json) {
-  const POST_URL = `${CATALOG_URL}/create`;
+  const POST_URL = `${CATALOG_URL}`;
   let response_json = {};
 
   try {
@@ -41,7 +41,7 @@ export async function getCatalogs() {
 }
 
 export async function deleteCatalog(catalogId) {
-  const DELETE_URL = `${CATALOG_URL}/delete/${catalogId}`;
+  const DELETE_URL = `${CATALOG_URL}/${catalogId}`;
   let response_json = {};
 
   try {
@@ -61,9 +61,30 @@ export async function deleteCatalog(catalogId) {
   }
 }
 
+export async function getPermissionsForCatalog(catalogId) {
+  const GET_URL = `${CATALOG_URL}/${catalogId}/permissions/all`;
+  let response_json = {};
+
+  try {
+    const response = await fetch(GET_URL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (response.status !== 200) {
+      throw new Error(response_json.message);
+    }
+    response_json = await response.json();
+    return response_json.permissions;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 export async function createPermissionForUser(permission) {
   const { catalogId, email } = permission;
-  const CREATE_URL = `${CATALOG_URL}/${catalogId}/permissions/create/users/${email}`;
+  const CREATE_URL = `${CATALOG_URL}/${catalogId}/permissions/users/${email}`;
   let response_json = {};
 
   try {
@@ -85,7 +106,7 @@ export async function createPermissionForUser(permission) {
 
 export async function createPermissionForDomain(permission) {
   const { catalogId, domain } = permission;
-  const CREATE_URL = `${CATALOG_URL}/${catalogId}/permissions/create/domain/${domain}`;
+  const CREATE_URL = `${CATALOG_URL}/${catalogId}/permissions/domain/${domain}`;
   let response_json = {};
 
   try {
@@ -107,7 +128,7 @@ export async function createPermissionForDomain(permission) {
 
 export async function deletePermissionForUser(permission) {
   const { userid, catalogid } = permission;
-  const delete_url = `${CATALOG_URL}/${catalogid}/permissions/delete/users/${userid}`;
+  const delete_url = `${CATALOG_URL}/${catalogid}/permissions/users/${userid}`;
   let response_json = {};
 
   try {
@@ -129,7 +150,7 @@ export async function deletePermissionForUser(permission) {
 
 export async function deletePermissionForDomain(permission) {
   const { catalogid, domain } = permission;
-  const DELETE_URL = `${CATALOG_URL}/${catalogid}/permissions/delete/domain/${domain}`;
+  const DELETE_URL = `${CATALOG_URL}/${catalogid}/permissions/domain/${domain}`;
   let response_json = {};
 
   try {

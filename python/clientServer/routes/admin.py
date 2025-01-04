@@ -5,6 +5,7 @@ from ..services import CatalogServices as CatalogServices
 from ..services import CatalogAccessServices as CatalogAccessServices
 from ..serializers import UserSerializer as UserSerializer
 from ..serializers import CatalogSerializer as CatalogSerializer
+from ..serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from ..models.User import User
 from ..models.Admin import Admin
 
@@ -65,8 +66,18 @@ def simulation_catalogs():
     return {"catalogs": CatalogSerializer.serialize_catalogs(catalogs)}, 200
 
 
-@app.route("/admin/catalogs/delete/<catalog_id>", methods=["DELETE"])
+@app.route("/admin/catalogs/<catalog_id>", methods=["DELETE", "PATCH"])
 @admin_login_required
+def catalog_id(catalog_id):
+    if request.method == "DELETE":
+        return delete_catalog_id(catalog_id)
+    elif request.method == "PATCH":
+        return update_catalog_id(catalog_id)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
 def delete_catalog_id(catalog_id):
     CatalogServices.destroy(int(catalog_id))
     return {
@@ -74,11 +85,49 @@ def delete_catalog_id(catalog_id):
     }, 200
 
 
+def update_catalog_id(catalog_id):
+    json = request.get_json()
+    name = json["name"]
+    description = json["description"]
+    public = json["public"]
+
+    # updated_catalog = CatalogServices.update(int(catalog_id), name, description, public)
+    # return {
+    #     "message": "Catalog Successfully Updated!",
+    #     "catalog": CatalogSerializer.serialize_catalog(updated_catalog),
+    # }, 200
+    return {
+        "message": "Catalog Successfully Updated!",
+    }, 200
+
+
 @app.route(
-    "/admin/catalogs/<catalog_id>/permissions/create/users/<email>",
-    methods=["POST"],
+    "/admin/catalogs/<catalog_id>/permissions/all",
+    methods=["GET"],
 )
 @admin_login_required
+def get_catalog_accessess(catalog_id):
+    catalog_accesses = CatalogAccessServices.find_all(int(catalog_id))
+    return {
+        "permissons": CatalogAccessSerializer.serialize_accesses(catalog_accesses)
+    }, 200
+
+
+@app.route(
+    "/admin/catalogs/<catalog_id>/permissions/users/<email>",
+    methods=["POST", "DELETE"],
+)
+@admin_login_required
+def catalog_access_for_user(catalog_id, email):
+    if request.method == "POST":
+        return create_catalog_access_for_user(catalog_id, email)
+    if request.method == "DELETE":
+        return delete_catalog_access_for_user(catalog_id, email)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
 def create_catalog_access_for_user(catalog_id, email):
     CatalogAccessServices.create_for_user(int(catalog_id), email)
     return {
@@ -86,11 +135,28 @@ def create_catalog_access_for_user(catalog_id, email):
     }, 200
 
 
+def delete_catalog_access_for_user(catalog_id, email):
+    CatalogAccessServices.destroy_for_user(int(catalog_id), email)
+    return {
+        "message": "Catalog Access Deleted!",
+    }, 200
+
+
 @app.route(
-    "/admin/catalogs/<catalog_id>/permissions/create/users/<email>",
-    methods=["POST"],
+    "/admin/catalogs/<catalog_id>/permissions/domain/<domain>",
+    methods=["POST", "DELETE"],
 )
 @admin_login_required
+def catalog_access_for_domain(catalog_id, domain):
+    if request.method == "POST":
+        return create_catalog_access_for_domain(catalog_id, domain)
+    if request.method == "DELETE":
+        return delete_catalog_access_for_domain(catalog_id, domain)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
 def create_catalog_access_for_domain(catalog_id, domain):
     CatalogAccessServices.create_for_domain(int(catalog_id), domain)
     return {
@@ -98,38 +164,22 @@ def create_catalog_access_for_domain(catalog_id, domain):
     }, 200
 
 
-@app.route(
-    "/admin/catalogs/<catalog_id>/permissions/delete/users/<user_id>",
-    methods=["DELETE"],
-)
-@admin_login_required
-def delete_catalog_access_for_user(catalog_id, user_id):
-    CatalogAccessServices.destroy_for_user(int(catalog_id), int(user_id))
+def delete_catalog_access_for_domain(catalog_id, domain):
+    CatalogAccessServices.destroy_for_domain(int(catalog_id), domain)
     return {
         "message": "Catalog Access Deleted!",
     }, 200
 
 
-@app.route(
-    "/admin/catalogs/<catalog_id>/permissions/delete/domain/<domain>",
-    methods=["DELETE"],
-)
-@admin_login_required
-def delete_catalog_access_for_domain(catalog_id, domain):
-    CatalogAccessServices.destroy_for_domain(int(catalog_id), domain)
-    return {
-        "message": "Catalog Successfully Deleted!",
-    }, 200
-
-
-@app.route("/admin/catalogs/create", methods=["POST"])
+@app.route("/admin/catalogs", methods=["POST"])
 @admin_login_required
 def create_catalog():
     json = request.get_json()
     name = json["name"]
     description = json["description"]
+    public = json["public"]
 
-    created_catalog = CatalogServices.create(name, description)
+    created_catalog = CatalogServices.create(name, description, public)
     return {
         "message": "Catalog Successfully Created!",
         "catalog": CatalogSerializer.serialize_catalog(created_catalog),

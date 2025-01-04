@@ -7,3 +7,4 @@ class Catalog(db.Model):
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255), nullable=True)
     date_created = db.Column(db.String(10), nullable=False)
+    public = db.Column(db.Boolean, default=False)

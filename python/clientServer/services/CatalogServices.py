@@ -4,11 +4,12 @@ from . import CatalogAccessServices as CatalogAccessServices
 import datetime
 
 
-def create(name, description):
+def create(name, description, public=False):
     new_catalog = Catalog(
         name=name,
         description=description,
         date_created=datetime.datetime.now().strftime("%Y-%m-%d"),
+        public=public,
     )
     db.session.add(new_catalog)
     db.session.commit()

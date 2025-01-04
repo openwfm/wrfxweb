@@ -3,6 +3,7 @@ def serialize_catalog(catalog):
         "id": catalog.id,
         "description": catalog.description,
         "name": catalog.name,
+        "public": catalog.public,
         "date_created": catalog.date_created,
     }
 
