@@ -1,39 +1,24 @@
-import { deletePermission } from "../../../services/catalogServices.js";
-
 export class CatalogPermissionEntry extends HTMLElement {
-  constructor(user_id, catalog_id, deleteCallback) {
+  constructor(permission, deleteCallback) {
     super();
-    this.catalog_id = catalog_id;
-    this.user_id = user_id;
+    this.permission = permission;
     this.deleteCallback = deleteCallback;
     this.innerHTML = `
-            <li class='catalog-entry'>
-              <label for='user-id'>id:</label>
-              <p id='catalog-id'>${user_id}</p>
-              <label for='user-id'>id:</label>
-              <p id='catalog-id'>${catalog_id}</p>
-              <button id='delete-permission-button'>Delete</button>
+            <li class='catalog-permission-entry'>
+              <p id='permission-id'>${permission}</p>
+              <button id='delete-permission-button'>x</button>
             </li>
         `;
     this.uiElements = {
-      deleteCatalogButton: this.querySelector("#delete-catalog-button"),
+      deletePermissionButton: this.querySelector("#delete-permission-button"),
     };
   }
 
   connectedCallback() {
-    const { deleteCatalogButton } = this.uiElements;
-    deleteCatalogButton.onclick = () => {
-      this.deleteCatalog();
+    const { deletePermissionButton } = this.uiElements;
+    deletePermissionButton.onclick = () => {
+      this.deleteCallback(this);
     };
-  }
-
-  async deletePermission() {
-    const permission = {
-      user_id: this.user_id,
-      catalog_id: this.catalog_id,
-    };
-    await deletePermission(permission);
-    this.deleteCallback(permission);
   }
 }
 

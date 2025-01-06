@@ -109,7 +109,7 @@ def update_catalog_id(catalog_id):
 def get_catalog_accessess(catalog_id):
     catalog_accesses = CatalogAccessServices.find_all(int(catalog_id))
     return {
-        "permissons": CatalogAccessSerializer.serialize_accesses(catalog_accesses)
+        "permissions": CatalogAccessSerializer.serialize_accesses(catalog_accesses)
     }, 200
 
 
