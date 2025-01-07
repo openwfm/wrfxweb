@@ -15,6 +15,7 @@ export class CreateCatalog extends HTMLElement {
                   <option value='private'>Private</option>
                   <option value='public'>Public</option>
                 </select>
+                <permissions-container></permissions-container>
                 <button id='create-catalog-button'>Create Catalog</button>
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
@@ -26,6 +27,7 @@ export class CreateCatalog extends HTMLElement {
       nameInput: this.querySelector("#name-input"),
       descriptionInput: this.querySelector("#description-input"),
       permissionSelect: this.querySelector("#permission-select"),
+      permissionsContainer: this.querySelector("permissions-container"),
       createCatalogForm: this.querySelector("#create-catalog-form"),
       errorMessageContainer: this.querySelector("#error-message-container"),
       errorMessage: this.querySelector("#error-message"),
@@ -33,10 +35,18 @@ export class CreateCatalog extends HTMLElement {
   }
 
   connectedCallback() {
-    const { createCatalogForm } = this.uiElements;
+    const { createCatalogForm, permissionSelect, permissionsContainer } =
+      this.uiElements;
     createCatalogForm.onsubmit = async (e) => {
       e.preventDefault();
       this.createCatalog();
+    };
+    permissionSelect.onchange = () => {
+      if (permissionSelect.value === "public") {
+        permissionsContainer.classList.add("hidden");
+      } else {
+        permissionsContainer.classList.remove("hidden");
+      }
     };
   }
 
@@ -49,6 +59,7 @@ export class CreateCatalog extends HTMLElement {
       name: name,
       description: description,
       public: isPublic,
+      permissions: this.catalogPermissions(),
     };
     let response = await createCatalog(catalogJson);
     if (response.error) {
@@ -57,6 +68,14 @@ export class CreateCatalog extends HTMLElement {
       this.clearForm();
       adminControllers.catalogs.push(response.catalog);
     }
+  }
+
+  catalogPermissions() {
+    const { permissionsContainer, permissionSelect } = this.uiElements;
+    if (permissionSelect.value === "public") {
+      return [];
+    }
+    return permissionsContainer.permissions;
   }
 
   clearForm() {
