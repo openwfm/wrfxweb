@@ -1,6 +1,10 @@
 import { CatalogPermissionEntry } from "./CatalogPermissionEntry.js";
+import { adminControllers } from "../../../adminControllers.js";
 
-import { getPermissionsForCatalog } from "../../../services/catalogServices.js";
+import {
+  getPermissionsForCatalog,
+  updateCatalog,
+} from "../../../services/catalogServices.js";
 import {
   sanitizeInput,
   validateEmail,
@@ -12,7 +16,7 @@ export class CatalogEditModal extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-            <div id='catalog-edit-modal-container'>
+            <div id='catalog-edit-modal-container' class='hidden'>
               <h2>Edit Catalog</h2>
               <p id='catalog-id'></p>
               <label for='catalog-name'>Name:</label>
@@ -37,9 +41,15 @@ export class CatalogEditModal extends HTMLElement {
               </div>
               <button id='save-catalog-button'>Save Catalog</button>
               <button id='cancel-catalog-button'>Cancel</button>
+              <p id="update-error-message" class="hidden">
+                An error occurred while saving the catalog. Please try again.
+              </p>
             </div>
         `;
     this.uiElements = {
+      catalogEditModalContainer: this.querySelector(
+        "#catalog-edit-modal-container",
+      ),
       catalogId: this.querySelector("#catalog-id"),
       catalogName: this.querySelector("#catalog-name"),
       catalogDescription: this.querySelector("#catalog-description"),
@@ -51,6 +61,7 @@ export class CatalogEditModal extends HTMLElement {
       permissionErrorMessage: this.querySelector("#permission-error-message"),
       saveCatalogButton: this.querySelector("#save-catalog-button"),
       cancelCatalogButton: this.querySelector("#cancel-catalog-button"),
+      updateErrorMessage: this.querySelector("#update-error-message"),
     };
 
     this.permissions = [];
@@ -86,9 +97,16 @@ export class CatalogEditModal extends HTMLElement {
   }
 
   open(catalog) {
-    const { catalogName, catalogDescription, catalogId, catalogPermission } =
-      this.uiElements;
+    const {
+      catalogEditModalContainer,
+      catalogName,
+      catalogDescription,
+      catalogId,
+      catalogPermission,
+      updateErrorMessage,
+    } = this.uiElements;
     this.catalog = catalog;
+    updateErrorMessage.classList.add("hidden");
     catalogId.innerText = catalog.id;
     catalogName.value = catalog.name;
     catalogDescription.value = catalog.description;
@@ -98,6 +116,41 @@ export class CatalogEditModal extends HTMLElement {
     } else {
       catalogPermission.value = "private";
       this.showPermissions();
+    }
+    catalogEditModalContainer.classList.remove("hidden");
+  }
+
+  close() {
+    const { catalogEditModalContainer } = this.uiElements;
+
+    catalogEditModalContainer.classList.add("hidden");
+  }
+
+  async saveCatalog() {
+    const {
+      catalogName,
+      catalogDescription,
+      catalogPermission,
+      updateErrorMessage,
+    } = this.uiElements;
+    let catalogId = this.catalog.id;
+    const catalogParams = {
+      name: catalogName.value,
+      description: catalogDescription.value,
+      public: catalogPermission.value === "public",
+      permissions: [],
+    };
+    if (catalogPermission.value === "private") {
+      catalogParams.permissions = this.permissions.map((permission) => {
+        return permission.permission;
+      });
+    }
+    const response = await updateCatalog(catalogId, catalogParams);
+    if (response.error) {
+      updateErrorMessage.classList.remove("hidden");
+    } else {
+      adminControllers.catalogs.update(response.catalog);
+      this.close();
     }
   }
 

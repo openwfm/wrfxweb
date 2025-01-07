@@ -71,5 +71,15 @@ class ArrayController extends Controller {
 // global controllers
 export const adminControllers = {
   admins: new ArrayController([]),
-  catalogs: new ArrayController([]),
+  catalogs: (function createCatalogsController() {
+    let catalogs = new ArrayController([]);
+    catalogs.update = (newCatalog) => {
+      catalogs.setValue(
+        catalogs.value.map((catalog) =>
+          catalog.id === newCatalog.id ? newCatalog : catalog,
+        ),
+      );
+    };
+    return catalogs;
+  })(),
 };

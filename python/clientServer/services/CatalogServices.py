@@ -24,5 +24,14 @@ def destroy(catalog_id):
     db.session.commit()
 
 
+def update(catalog_id, name, description, public):
+    catalog = Catalog.query.get(catalog_id)
+    catalog.name = name
+    catalog.description = description
+    catalog.public = public
+    db.session.commit()
+    return catalog
+
+
 def find_all():
     return Catalog.query.all()
