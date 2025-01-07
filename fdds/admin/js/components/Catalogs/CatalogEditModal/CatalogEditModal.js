@@ -1,4 +1,3 @@
-import { CatalogPermissionEntry } from "./CatalogPermissionEntry.js";
 import { adminControllers } from "../../../adminControllers.js";
 
 import {
@@ -30,15 +29,7 @@ export class CatalogEditModal extends HTMLElement {
                 <option value='public'>Public</option>
               </select>
 
-              <div id='permissions-container' class='hidden'>
-                <p>Permissions:</p>
-                <input type='text' id='add-permission-input'></input>
-                <button id='add-permission-button'>Add Permission</button>
-                <p id="permission-error-message" class="hidden">
-                  Invalid permission: use a properly formatted email or a domain that begins with '@'
-                </p>
-                <ul id='permissions-list'></ul>
-              </div>
+              <permissions-container class='hidden'></permissions-container>
               <button id='save-catalog-button'>Save Catalog</button>
               <button id='cancel-catalog-button'>Cancel</button>
               <p id="update-error-message" class="hidden">
@@ -54,19 +45,11 @@ export class CatalogEditModal extends HTMLElement {
       catalogName: this.querySelector("#catalog-name"),
       catalogDescription: this.querySelector("#catalog-description"),
       catalogPermission: this.querySelector("#permission-select"),
-      permissionsList: this.querySelector("#permissions-list"),
-      permissionsContainer: this.querySelector("#permissions-container"),
-      addPermissionInput: this.querySelector("#add-permission-input"),
-      addPermissionButton: this.querySelector("#add-permission-button"),
-      permissionErrorMessage: this.querySelector("#permission-error-message"),
+      permissionsContainer: this.querySelector("permissions-container"),
       saveCatalogButton: this.querySelector("#save-catalog-button"),
       cancelCatalogButton: this.querySelector("#cancel-catalog-button"),
       updateErrorMessage: this.querySelector("#update-error-message"),
     };
-
-    this.permissions = [];
-    this.deletePermissionCallback = (permission) =>
-      this.deletePermission(permission);
   }
 
   connectedCallback() {
@@ -81,16 +64,6 @@ export class CatalogEditModal extends HTMLElement {
         this.hidePermissions();
       } else {
         this.showPermissions();
-      }
-    };
-    addPermissionButton.onclick = () => {
-      const permission = sanitizeInput(addPermissionInput.value);
-      if (validateEmail(permission) || validateDomain(permission)) {
-        addPermissionInput.value = "";
-        this.uiElements.permissionErrorMessage.classList.add("hidden");
-        this.addPermission(permission);
-      } else {
-        this.uiElements.permissionErrorMessage.classList.remove("hidden");
       }
     };
     saveCatalogButton.onclick = () => this.saveCatalog();
@@ -132,6 +105,7 @@ export class CatalogEditModal extends HTMLElement {
       catalogDescription,
       catalogPermission,
       updateErrorMessage,
+      permissionsContainer,
     } = this.uiElements;
     let catalogId = this.catalog.id;
     const catalogParams = {
@@ -141,9 +115,11 @@ export class CatalogEditModal extends HTMLElement {
       permissions: [],
     };
     if (catalogPermission.value === "private") {
-      catalogParams.permissions = this.permissions.map((permission) => {
-        return permission.permission;
-      });
+      catalogParams.permissions = permissionsContainer.permissions.map(
+        (permission) => {
+          return permission.permission;
+        },
+      );
     }
     const response = await updateCatalog(catalogId, catalogParams);
     if (response.error) {
@@ -169,30 +145,7 @@ export class CatalogEditModal extends HTMLElement {
   showPermissions() {
     const { permissionsContainer } = this.uiElements;
     permissionsContainer.classList.remove("hidden");
-    this.renderPermissionsList();
-  }
-
-  addPermission(permission) {
-    const newPermission = new CatalogPermissionEntry(
-      permission,
-      this.deletePermissionCallback,
-    );
-    this.permissions.push(permission);
-    this.uiElements.permissionsList.appendChild(newPermission);
-  }
-
-  async renderPermissionsList() {
-    const { permissionsList } = this.uiElements;
-    permissionsList.innerHTML = "";
-    let permissions = await getPermissionsForCatalog(this.catalog.id);
-
-    permissions.map((permission) => {
-      if (permission.email && validateEmail(permission.email)) {
-        this.addPermission(sanitizeInput(permission.email));
-      } else if (permission.domain && validateDomain(permission.domain)) {
-        this.addPermission(sanitizeInput(permission.domain));
-      }
-    });
+    permissionsContainer.renderPermissionsList(this.catalog);
   }
 }
 
