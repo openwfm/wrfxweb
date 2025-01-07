@@ -1,5 +1,6 @@
 from ..app import app, db
 
+from .validators import CatalogValidators as CatalogValidators
 from ..services import AdminServices as AdminServices
 from ..services import CatalogServices as CatalogServices
 from ..services import CatalogAccessServices as CatalogAccessServices
@@ -86,17 +87,10 @@ def delete_catalog_id(catalog_id):
 
 
 def update_catalog_id(catalog_id):
-    json = request.get_json()
-    name = json["name"]
-    description = json["description"]
-    public = json["public"]
-    permissions = json["permissions"]
+    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    catalog_params = CatalogValidators.validate_catalog_params(request.get_json())
 
-    updated_catalog = CatalogServices.update(int(catalog_id), name, description, public)
-    # return {
-    #     "message": "Catalog Successfully Updated!",
-    #     "catalog": CatalogSerializer.serialize_catalog(updated_catalog),
-    # }, 200
+    updated_catalog = CatalogServices.update(catalog_id, catalog_params)
     return {
         "message": "Catalog Successfully Updated!",
         "catalog": CatalogSerializer.serialize_catalog(updated_catalog),
@@ -146,12 +140,9 @@ def get_catalog_accessess(catalog_id):
 @app.route("/admin/catalogs", methods=["POST"])
 @admin_login_required
 def create_catalog():
-    json = request.get_json()
-    name = json["name"]
-    description = json["description"]
-    public = json["public"]
+    catalog_params = CatalogValidators.validate_catalog_params(request.get_json())
 
-    created_catalog = CatalogServices.create(name, description, public)
+    created_catalog = CatalogServices.create(catalog_params)
     return {
         "message": "Catalog Successfully Created!",
         "catalog": CatalogSerializer.serialize_catalog(created_catalog),

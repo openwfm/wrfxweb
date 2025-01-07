@@ -4,7 +4,15 @@ from . import CatalogAccessServices as CatalogAccessServices
 import datetime
 
 
-def create(name, description, public=False):
+def find_by_id(catalog_id):
+    return Catalog.query.get(catalog_id)
+
+
+def create(catalog_params):
+    name = catalog_params["name"]
+    description = catalog_params["description"]
+    public = catalog_params["public"]
+    permissions = catalog_params["permissions"]
     new_catalog = Catalog(
         name=name,
         description=description,
@@ -24,7 +32,12 @@ def destroy(catalog_id):
     db.session.commit()
 
 
-def update(catalog_id, name, description, public):
+def update(catalog_id, catalog_params):
+    name = catalog_params["name"]
+    description = catalog_params["description"]
+    public = catalog_params["public"]
+    permissions = catalog_params["permissions"]
+
     catalog = Catalog.query.get(catalog_id)
     catalog.name = name
     catalog.description = description

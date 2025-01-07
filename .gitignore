@@ -30,6 +30,7 @@ python/clientServer/logging/*
 python/clientServer/logging
 
 
+python/clientServer/routes/validators/__pycache__/*
 python/clientServer/serializers/__pycache__/*
 python/clientServer/services/__pycache__/*
 python/clientServer/models/__pycache__/*
