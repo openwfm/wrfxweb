@@ -21,6 +21,11 @@ def create(catalog_params):
     )
     db.session.add(new_catalog)
     db.session.commit()
+
+    if not public:
+        for permission in permissions:
+            CatalogAccessServices.create(new_catalog.id, permission)
+
     return new_catalog
 
 
@@ -38,11 +43,16 @@ def update(catalog_id, catalog_params):
     public = catalog_params["public"]
     permissions = catalog_params["permissions"]
 
-    catalog = Catalog.query.get(catalog_id)
+    catalog = find_by_id(catalog_id)
     catalog.name = name
     catalog.description = description
     catalog.public = public
     db.session.commit()
+
+    if not public:
+        CatalogAccessServices.destroy_all(catalog_id)
+        for permission in permissions:
+            CatalogAccessServices.create(catalog_id, permission)
     return catalog
 
 

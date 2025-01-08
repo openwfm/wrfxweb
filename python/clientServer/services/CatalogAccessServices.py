@@ -12,6 +12,12 @@ def find_by_domain(catalog_id, domain):
     return CatalogAccess.query.filter_by(catalog_id=catalog_id, domain=domain).first()
 
 
+def create(catalog_id, permission):
+    if permission[0] == "@":
+        return create_for_domain(catalog_id, permission)
+    return create_for_user(catalog_id, permission)
+
+
 def create_for_user(catalog_id, email):
     user = UserServices.find_or_create(email)
     new_catalog_access = find_by_user(catalog_id, email)

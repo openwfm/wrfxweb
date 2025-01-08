@@ -2,8 +2,8 @@ def serialize_access(access):
     return {
         "id": access.id,
         "catalog_id": access.catalog_id,
-        "user_id": access.user_id,
-        "domain": access.domain,
+        "type": access.permission_type(),
+        "text": access.permission_text(),
     }
 
 

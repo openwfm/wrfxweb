@@ -1,14 +1,6 @@
 import { adminControllers } from "../../../adminControllers.js";
 
-import {
-  getPermissionsForCatalog,
-  updateCatalog,
-} from "../../../services/catalogServices.js";
-import {
-  sanitizeInput,
-  validateEmail,
-  validateDomain,
-} from "../../../adminUtils.js";
+import { updateCatalog } from "../../../services/catalogServices.js";
 
 export class CatalogEditModal extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -53,12 +45,7 @@ export class CatalogEditModal extends HTMLElement {
   }
 
   connectedCallback() {
-    const {
-      catalogPermission,
-      addPermissionInput,
-      addPermissionButton,
-      saveCatalogButton,
-    } = this.uiElements;
+    const { catalogPermission, saveCatalogButton } = this.uiElements;
     catalogPermission.onchange = () => {
       if (catalogPermission.value === "public") {
         this.hidePermissions();
@@ -115,11 +102,7 @@ export class CatalogEditModal extends HTMLElement {
       permissions: [],
     };
     if (catalogPermission.value === "private") {
-      catalogParams.permissions = permissionsContainer.permissions.map(
-        (permission) => {
-          return permission.permission;
-        },
-      );
+      catalogParams.permissions = permissionsContainer.permissions;
     }
     const response = await updateCatalog(catalogId, catalogParams);
     if (response.error) {

@@ -68,17 +68,18 @@ export class PermissionsContainer extends HTMLElement {
     this.uiElements.permissionsList.appendChild(newPermission);
   }
 
+  clearPermissions() {
+    this.permissions = [];
+    this.uiElements.permissionsList.innerHTML = "";
+  }
+
   async renderPermissionsList(catalog) {
     const { permissionsList } = this.uiElements;
     permissionsList.innerHTML = "";
     let permissions = await getPermissionsForCatalog(catalog.id);
 
     permissions.map((permission) => {
-      if (permission.email && validateEmail(permission.email)) {
-        this.addPermission(sanitizeInput(permission.email));
-      } else if (permission.domain && validateDomain(permission.domain)) {
-        this.addPermission(sanitizeInput(permission.domain));
-      }
+      this.addPermission(sanitizeInput(permission.text));
     });
   }
 }

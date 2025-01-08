@@ -8,7 +8,7 @@ export class CreateCatalog extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='create-catalog-container'>
-              <form id='create-catalog-form'>
+              <div id='create-catalog-form'>
                 <input type='text' id='name-input' placeholder='name'></input>
                 <input type='text' id='description-input' placeholder='description'></input>
                 <select id='permission-select'>
@@ -20,7 +20,7 @@ export class CreateCatalog extends HTMLElement {
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
                 </div>
-              </form>
+              </div>
             </div>
         `;
     this.uiElements = {
@@ -28,17 +28,17 @@ export class CreateCatalog extends HTMLElement {
       descriptionInput: this.querySelector("#description-input"),
       permissionSelect: this.querySelector("#permission-select"),
       permissionsContainer: this.querySelector("permissions-container"),
-      createCatalogForm: this.querySelector("#create-catalog-form"),
+      createCatalogButton: this.querySelector("#create-catalog-button"),
       errorMessageContainer: this.querySelector("#error-message-container"),
       errorMessage: this.querySelector("#error-message"),
     };
   }
 
   connectedCallback() {
-    const { createCatalogForm, permissionSelect, permissionsContainer } =
+    const { createCatalogButton, permissionSelect, permissionsContainer } =
       this.uiElements;
-    createCatalogForm.onsubmit = async (e) => {
-      e.preventDefault();
+    createCatalogButton.onclick = async () => {
+      console.log("create catalog");
       this.createCatalog();
     };
     permissionSelect.onchange = () => {
@@ -52,6 +52,10 @@ export class CreateCatalog extends HTMLElement {
 
   async createCatalog() {
     const { nameInput, descriptionInput, permissionSelect } = this.uiElements;
+    if (nameInput.value === "" || descriptionInput.value === "") {
+      this.showErrorMessage("Name and description are required");
+      return;
+    }
     let name = sanitizeInput(nameInput.value);
     let description = sanitizeInput(descriptionInput.value);
     let isPublic = permissionSelect.value === "public";
@@ -79,9 +83,11 @@ export class CreateCatalog extends HTMLElement {
   }
 
   clearForm() {
-    const { nameInput, descriptionInput } = this.uiElements;
+    const { nameInput, descriptionInput, permissionsContainer } =
+      this.uiElements;
     nameInput.value = "";
     descriptionInput.value = "";
+    permissionsContainer.clearPermissions();
   }
 
   showErrorMessage(errorMessageText) {
