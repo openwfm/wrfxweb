@@ -45,7 +45,8 @@ export class CatalogEditModal extends HTMLElement {
   }
 
   connectedCallback() {
-    const { catalogPermission, saveCatalogButton } = this.uiElements;
+    const { catalogPermission, saveCatalogButton, cancelCatalogButton } =
+      this.uiElements;
     catalogPermission.onchange = () => {
       if (catalogPermission.value === "public") {
         this.hidePermissions();
@@ -54,6 +55,7 @@ export class CatalogEditModal extends HTMLElement {
       }
     };
     saveCatalogButton.onclick = () => this.saveCatalog();
+    cancelCatalogButton.onclick = () => this.close();
   }
 
   open(catalog) {
@@ -82,8 +84,18 @@ export class CatalogEditModal extends HTMLElement {
 
   close() {
     const { catalogEditModalContainer } = this.uiElements;
+    this.clearForm();
 
     catalogEditModalContainer.classList.add("hidden");
+  }
+
+  clearForm() {
+    const { catalogName, catalogDescription, catalogId, permissionsContainer } =
+      this.uiElements;
+    catalogName.value = "";
+    catalogDescription.value = "";
+    catalogId.innerText = "";
+    permissionsContainer.clearPermissions();
   }
 
   async saveCatalog() {
