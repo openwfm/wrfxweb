@@ -71,3 +71,7 @@ def validate_boolean(boolean_input):
     if type(boolean_input) is not bool:
         raise ValueError("Boolean input must be true or false")
     return boolean_input
+
+
+def validate_catalog_entry(catalog_entry):
+    pass

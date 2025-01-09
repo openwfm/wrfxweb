@@ -6,6 +6,8 @@ class CatalogEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"))
     name = db.Column(db.String(255), nullable=False)
+    # type = db.Column(db.String(255), nullable=False)
+    # entry_type = db.Column(db.String(255), nullable=False)
     zip_size = db.Column(db.String(255), nullable=True)
     description = db.Column(db.String(255), nullable=False)
     to_utc = db.Column(db.String(255), nullable=False)

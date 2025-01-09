@@ -33,6 +33,7 @@ export async function getCatalogs() {
       throw new Error(response_json.message);
     }
     response_json = await response.json();
+    console.log("catalogs: ", response_json.catalogs);
     return response_json.catalogs;
   } catch (error) {
     console.error("Error:", error);

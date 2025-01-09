@@ -1,5 +1,6 @@
 from ..app import db
 from .CatalogAccess import CatalogAccess
+from .CatalogEntry import CatalogEntry
 
 
 class Catalog(db.Model):
@@ -12,3 +13,6 @@ class Catalog(db.Model):
 
     def permissions(self):
         return CatalogAccess.query.filter_by(catalog_id=self.id).all()
+
+    def entries(self):
+        return CatalogEntry.query.filter_by(catalog_id=self.id).all()

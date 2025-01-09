@@ -3,9 +3,11 @@ from ..app import app, db
 from .validators import CatalogValidators as CatalogValidators
 from ..services import AdminServices as AdminServices
 from ..services import CatalogServices as CatalogServices
+from ..services import CatalogEntryServices as CatalogEntryServices
 from ..services import CatalogAccessServices as CatalogAccessServices
 from ..serializers import UserSerializer as UserSerializer
 from ..serializers import CatalogSerializer as CatalogSerializer
+from ..serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from ..serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from ..models.User import User
 from ..models.Admin import Admin
@@ -152,6 +154,37 @@ def create_catalog():
         "catalog": CatalogSerializer.serialize_catalog_with_permissions(
             created_catalog
         ),
+    }, 200
+
+
+@app.route("/admin/catalogs/<catalog_id>/entries", methods=["GET", "POST"])
+@admin_login_required
+def catalog_entries(catalog_id):
+    if request.method == "GET":
+        return get_catalog_entries(catalog_id)
+    elif request.method == "POST":
+        return create_catalog_entry(catalog_id)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
+def get_catalog_entries(catalog_id):
+    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    catalog = CatalogServices.find_by_id(catalog_id)
+    return {
+        "entries": CatalogEntrySerializer.serialize_entries(catalog.entries),
+    }, 200
+
+
+def create_catalog_entry(catalog_id):
+    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
+    CatalogEntryServices.create(catalog_id, catalog_entry_params)
+    catalog = CatalogServices.find_by_id(catalog_id)
+    return {
+        "message": "Entry Successfully Created!",
+        "catalog": CatalogSerializer.serialize_catalog_with_permissions(catalog),
     }, 200
 
 
