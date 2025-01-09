@@ -1,4 +1,5 @@
 from ..app import db
+from .CatalogAccess import CatalogAccess
 
 
 class Catalog(db.Model):
@@ -8,3 +9,6 @@ class Catalog(db.Model):
     description = db.Column(db.String(255), nullable=True)
     date_created = db.Column(db.String(10), nullable=False)
     public = db.Column(db.Boolean, default=False)
+
+    def permissions(self):
+        return CatalogAccess.query.filter_by(catalog_id=self.id).all()

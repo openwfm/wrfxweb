@@ -1,3 +1,4 @@
+import "../PermissionsContainer/PermissionsContainer.js";
 import { adminControllers } from "../../../adminControllers.js";
 
 import { updateCatalog } from "../../../services/catalogServices.js";
@@ -21,7 +22,7 @@ export class CatalogEditModal extends HTMLElement {
                 <option value='public'>Public</option>
               </select>
 
-              <permissions-container class='hidden'></permissions-container>
+              <permissions-container mutable="true" class='hidden'></permissions-container>
               <button id='save-catalog-button'>Save Catalog</button>
               <button id='cancel-catalog-button'>Cancel</button>
               <p id="update-error-message" class="hidden">

@@ -1,6 +1,8 @@
 import { deleteCatalog } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 
+import "./PermissionsContainer/PermissionsContainer.js";
+
 export class CatalogEntry extends HTMLElement {
   constructor(catalog, editCatalog) {
     super();
@@ -20,22 +22,31 @@ export class CatalogEntry extends HTMLElement {
               <p id='catalog-date'>${catalog.date_created}</p>
               <button id='delete-catalog-button'>Delete</button>
               <button id='edit-catalog-button'>Edit</button>
+              <permissions-container mutable="false"></permissions-container>
             </li>
         `;
     this.uiElements = {
       deleteCatalogButton: this.querySelector("#delete-catalog-button"),
       editCatalogButton: this.querySelector("#edit-catalog-button"),
+      permissionsContainer: this.querySelector("permissions-container"),
     };
   }
 
   connectedCallback() {
-    const { deleteCatalogButton, editCatalogButton } = this.uiElements;
+    const { deleteCatalogButton, editCatalogButton, permissionsContainer } =
+      this.uiElements;
     deleteCatalogButton.onclick = () => {
       this.deleteCatalog();
     };
     editCatalogButton.onclick = () => {
       this.editCatalog(this.catalog);
     };
+    if (this.catalog.public) {
+      permissionsContainer.classList.add("hidden");
+    } else {
+      permissionsContainer.classList.remove("hidden");
+      permissionsContainer.renderPermissionsList(this.catalog);
+    }
   }
 
   async deleteCatalog() {

@@ -4,6 +4,7 @@ def serialize_access(access):
         "catalog_id": access.catalog_id,
         "type": access.permission_type(),
         "text": access.permission_text(),
+        # "text": "test",
     }
 
 

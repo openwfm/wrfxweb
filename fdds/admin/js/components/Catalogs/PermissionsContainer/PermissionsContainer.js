@@ -8,6 +8,10 @@ import {
 } from "../../../adminUtils.js";
 
 export class PermissionsContainer extends HTMLElement {
+  static get observedAttributes() {
+    return ["mutable"];
+  }
+
   /** ===== Initialization block ===== */
   constructor() {
     super();
@@ -33,6 +37,7 @@ export class PermissionsContainer extends HTMLElement {
       permissionErrorMessage: this.querySelector("#permission-error-message"),
     };
 
+    this.mutable = this.getAttribute("mutable") === "true";
     this.permissions = [];
     this.deletePermissionCallback = (permission) =>
       this.deletePermission(permission);
@@ -40,6 +45,10 @@ export class PermissionsContainer extends HTMLElement {
 
   connectedCallback() {
     const { addPermissionInput, addPermissionButton } = this.uiElements;
+    if (!this.mutable) {
+      addPermissionInput.classList.add("hidden");
+      addPermissionButton.classList.add("hidden");
+    }
     addPermissionButton.onclick = () => {
       const permission = sanitizeInput(addPermissionInput.value);
       if (validateEmail(permission) || validateDomain(permission)) {
@@ -63,6 +72,7 @@ export class PermissionsContainer extends HTMLElement {
     const newPermission = new CatalogPermissionEntry(
       permission,
       this.deletePermissionCallback,
+      this.mutable,
     );
     this.permissions.push(permission);
     this.uiElements.permissionsList.appendChild(newPermission);
@@ -76,9 +86,8 @@ export class PermissionsContainer extends HTMLElement {
   async renderPermissionsList(catalog) {
     const { permissionsList } = this.uiElements;
     permissionsList.innerHTML = "";
-    let permissions = await getPermissionsForCatalog(catalog.id);
 
-    permissions.map((permission) => {
+    catalog.permissions.map((permission) => {
       this.addPermission(sanitizeInput(permission.text));
     });
   }

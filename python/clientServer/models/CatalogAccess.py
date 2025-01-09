@@ -7,6 +7,7 @@ class CatalogAccess(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"), nullable=False)
     domain = db.Column(db.String(255))
+    user = db.relationship("User", foreign_keys="CatalogAccess.user_id")
 
     def user_email(self):
         return self.user.email

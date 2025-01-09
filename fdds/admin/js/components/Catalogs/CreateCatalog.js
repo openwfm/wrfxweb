@@ -1,6 +1,7 @@
 import { createCatalog } from "../../services/catalogServices.js";
 import { sanitizeInput } from "../../adminUtils.js";
 import { adminControllers } from "../../adminControllers.js";
+import "./PermissionsContainer/PermissionsContainer.js";
 
 export class CreateCatalog extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -15,7 +16,7 @@ export class CreateCatalog extends HTMLElement {
                   <option value='private'>Private</option>
                   <option value='public'>Public</option>
                 </select>
-                <permissions-container></permissions-container>
+                <permissions-container mutable="true"></permissions-container>
                 <button id='create-catalog-button'>Create Catalog</button>
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
@@ -38,7 +39,6 @@ export class CreateCatalog extends HTMLElement {
     const { createCatalogButton, permissionSelect, permissionsContainer } =
       this.uiElements;
     createCatalogButton.onclick = async () => {
-      console.log("create catalog");
       this.createCatalog();
     };
     permissionSelect.onchange = () => {

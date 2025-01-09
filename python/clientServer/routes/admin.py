@@ -64,7 +64,9 @@ def delete_admin():
 def simulation_catalogs():
     catalogs = CatalogServices.find_all()
 
-    return {"catalogs": CatalogSerializer.serialize_catalogs(catalogs)}, 200
+    return {
+        "catalogs": CatalogSerializer.serialize_catalogs_with_permissions(catalogs)
+    }, 200
 
 
 @app.route("/admin/catalogs/<catalog_id>", methods=["DELETE", "PATCH"])
@@ -93,7 +95,9 @@ def update_catalog_id(catalog_id):
     updated_catalog = CatalogServices.update(catalog_id, catalog_params)
     return {
         "message": "Catalog Successfully Updated!",
-        "catalog": CatalogSerializer.serialize_catalog(updated_catalog),
+        "catalog": CatalogSerializer.serialize_catalog_with_permissions(
+            updated_catalog
+        ),
     }, 200
 
 
@@ -145,7 +149,9 @@ def create_catalog():
     created_catalog = CatalogServices.create(catalog_params)
     return {
         "message": "Catalog Successfully Created!",
-        "catalog": CatalogSerializer.serialize_catalog(created_catalog),
+        "catalog": CatalogSerializer.serialize_catalog_with_permissions(
+            created_catalog
+        ),
     }, 200
 
 
