@@ -71,6 +71,7 @@ def google_login():
 
 @app.route("/authorize/google", methods=["GET"])
 def authorize_google():
+    time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
     if not current_user.is_anonymous:
         return redirect(url_for("index"))
 
@@ -84,10 +85,14 @@ def authorize_google():
     # make sure that the state parameter matches the one we created in the
     # authorization request
     if request.args["state"] != session.get("oauth2_state"):
+        app.logger.info(
+            f"[LoginError] request state doesn't match one created in authorization request {time_now}"
+        )
         abort(401)
 
     # make sure that the authorization code is present
     if "code" not in request.args:
+        app.logger.info(f"[LoginError] no authorization code in request {time_now}")
         abort(401)
 
     # exchange the authorization code for an access token
@@ -103,9 +108,13 @@ def authorize_google():
         headers={"Accept": "application/json"},
     )
     if response.status_code != 200:
+        app.logger.info(
+            f"[LoginError] error status code when getting oauth2_token {response.status_code}: {response.json()} {time_now}"
+        )
         abort(401)
     oauth2_token = response.json().get("access_token")
     if not oauth2_token:
+        app.logger.info(f"[LoginError] no oauth2_token: {response.json()} {time_now}")
         abort(401)
 
     # use the access token to get the user's email address
@@ -117,12 +126,17 @@ def authorize_google():
         },
     )
     if response.status_code != 200:
+        app.logger.info(
+            f"[LoginError] error status code when retrieving user email {response.status_code}: {response.json()} {time_now}"
+        )
+
         abort(401)
     email = provider_data["userinfo"]["email"](response.json())
 
     # find or create the user in the database
     user = UserServices.find_or_create(email)
     time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+
     app.logger.info(f"[Login] {user.email} {time_now}")
 
     # log the user in
