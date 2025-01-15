@@ -1,7 +1,8 @@
 import { getCatalogs } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { CatalogEntry } from "./CatalogEntry.js";
-import { CatalogEditModal } from "./CatalogEditModal/CatalogEditModal.js";
+import "./CatalogEditModal/CatalogEditModal.js";
+import "./CatalogEntryUploadModal/CatalogEntryUploadModal.js";
 
 export class CatalogList extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -11,11 +12,13 @@ export class CatalogList extends HTMLElement {
             <div id='catalog-list-container'>
               <ul id='catalog-list'></ul>
               <catalog-edit-modal></catalog-edit-modal>
+              <catalog-entry-upload-modal></catalog-entry-upload-modal>
             </div>
         `;
     this.uiElements = {
       catalogList: this.querySelector("#catalog-list"),
       catalogEditModal: this.querySelector("catalog-edit-modal"),
+      catalogEntryUploadModal: this.querySelector("catalog-entry-upload-modal"),
     };
   }
 
@@ -25,6 +28,8 @@ export class CatalogList extends HTMLElement {
       adminControllers.catalogs.value.map((catalog) =>
         this.createCatalogListEntry(catalog),
       );
+
+      this.openUploadModal(adminControllers.catalogs.value[0]);
     });
     this.getCatalogs();
   }
@@ -42,13 +47,19 @@ export class CatalogList extends HTMLElement {
   createCatalogListEntry(catalog) {
     const { catalogList } = this.uiElements;
     const openModal = (catalog) => this.openEditModal(catalog);
-    let catalogEntry = new CatalogEntry(catalog, openModal);
+    const openUpload = (catalog) => this.openUploadModal(catalog);
+    let catalogEntry = new CatalogEntry(catalog, openModal, openUpload);
     catalogList.appendChild(catalogEntry);
   }
 
   openEditModal(catalog) {
     const { catalogEditModal } = this.uiElements;
     catalogEditModal.open(catalog);
+  }
+
+  openUploadModal(catalog) {
+    const { catalogEntryUploadModal } = this.uiElements;
+    catalogEntryUploadModal.open(catalog);
   }
 }
 
