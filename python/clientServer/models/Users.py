@@ -8,3 +8,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(64), nullable=True)
     date_created = db.Column(db.String(10), nullable=False)
+
+    def destroy(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def __repr__(self):
+        return f"<User {self.email}>"
