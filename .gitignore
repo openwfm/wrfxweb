@@ -45,3 +45,5 @@ python/api/__pycache__/*
 python/api/routes/__pycache__/*
 python/api/models/__pycache__/*
 
+unzip_sims.sh
+
