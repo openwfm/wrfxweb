@@ -5,6 +5,7 @@ logs/*
 node_modules/
 bower_components/
 fdds/simulations/
+fdds/simulations
 fdds/conf.json
 src/__pycache__/*
 package-lock.json

@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import fcntl, errno, logging, json, os, sys
 import os.path as osp
 
+
 class Dict(dict):
     """
     A dictionary that allows member access to its keys.
@@ -21,48 +22,48 @@ class Dict(dict):
         self[item] = value
 
 
-class lock():
+class lock:
     """
     Lock file for exclusive access
     """
 
-    def __init__(self,path):
+    def __init__(self, path):
         self.lock_path = path
-        logging.info('Initializing lock on %s' % self.lock_path)
-        self.lock_file=open(self.lock_path,'w',0)
-        self.locked=False
+        logging.info("Initializing lock on %s" % self.lock_path)
+        self.lock_file = open(self.lock_path, "w")
+        self.locked = False
 
     def islocked(self):
-        return(self.locked)
+        return self.locked
 
     def acquire(self):
-   
         """
         Block until exclusive lock can be acquired.
         Used before code that should be executed by one process at a time only,
         such as updating the catalog.
         """
         if self.locked:
-            logging.warning('lock.acquire: already locked %s' % self.lock_path)
+            logging.warning("lock.acquire: already locked %s" % self.lock_path)
         try:
-            fcntl.flock(self.lock_file,fcntl.LOCK_EX|fcntl.LOCK_NB)
+            fcntl.flock(self.lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except IOError as e:
             if e.errno == errno.EACCES or e.errno == errno.EAGAIN:
-                logging.warning('Waiting for lock on %s' % self.lock_path)
+                logging.warning("Waiting for lock on %s" % self.lock_path)
             else:
                 logging.error("I/O error %s: %s" % (e.errno, e.strerror))
-        fcntl.flock(self.lock_file,fcntl.LOCK_EX)
-        logging.info('Acquired lock on %s' % self.lock_path)
-        self.locked=True
-   
+        fcntl.flock(self.lock_file, fcntl.LOCK_EX)
+        logging.info("Acquired lock on %s" % self.lock_path)
+        self.locked = True
+
     def release(self):
         if not self.locked:
-            logging.warning('lock.release: not yet locked %s' % self.lock_path)
-        logging.info('Releasing lock on %s' % self.lock_path)
-        fcntl.flock(self.lock_file,fcntl.LOCK_UN)
-        self.locked=False
+            logging.warning("lock.release: not yet locked %s" % self.lock_path)
+        logging.info("Releasing lock on %s" % self.lock_path)
+        fcntl.flock(self.lock_file, fcntl.LOCK_UN)
+        self.locked = False
 
-def update_nested_dict(d,u,level=0):
+
+def update_nested_dict(d, u, level=0):
     """
     Recursively update nested dictionary. Does not overwrite any values.
     Identical key is allowed only if both values are dictionaries and the
@@ -82,25 +83,30 @@ def update_nested_dict(d,u,level=0):
     d
     {1: {8: 9, 2: 3}, 2: {4: 5}, 3: {10: 11}}
     update_nested_dict(d,u)
-    ValueError: update_nested_dict: level 1: values for common key 8 must be dictionaries 
+    ValueError: update_nested_dict: level 1: values for common key 8 must be dictionaries
     """
 
     # print ('update_nested_dict: level %s entering with d=%s u=%s' % (level,d,u))
     if type(d) is not dict or type(u) is not dict:
-        raise ValueError ('update_nested_dict: level %s: both arguments must be dictionaries' % level)
+        raise ValueError(
+            "update_nested_dict: level %s: both arguments must be dictionaries" % level
+        )
     for k in u.keys():
         # print ('update_nested_dict: level %s found key %s in u' % (level,k))
         if k in d:
             # print ('update_nested_dict: level %s key %s in both u and d' % (level,k))
             # print ('update_nested_dict: level %s recursive update in d=%s and u=%s' % (level,d,u))
             if type(d[k]) is not dict or type(u[k]) is not dict:
-                raise ValueError ('update_nested_dict: level %s: values for common key %s must be dictionaries' % (level,k))
-            update_nested_dict(d[k],u[k],level+1)
+                raise ValueError(
+                    "update_nested_dict: level %s: values for common key %s must be dictionaries"
+                    % (level, k)
+                )
+            update_nested_dict(d[k], u[k], level + 1)
             # print ('update_nested_dict: level %s got updated d=%s' % (level,d))
         else:
             # print ('update_nested_dict: level %s key %s from u not found in d' % (level,k))
             # print ('update_nested_dict: level %s adding item to d=%s from u=%s' % (level,d,u))
-            d[k]=u[k]
+            d[k] = u[k]
             # print ('update_nested_dict: level %s got updated d=%s' % (level,d))
     # print ('update_nested_dict: level %s exiting with updated d=%s' % (level,d))
 
@@ -109,11 +115,12 @@ def load_sys_cfg():
     # load the system configuration
     sys_cfg = None
     try:
-        sys_cfg = Dict(json.load(open('etc/conf.json')))
+        sys_cfg = Dict(json.load(open("etc/conf.json")))
     except IOError:
-        logging.critical('Cannot find system configuration, have you created etc/conf.json?')
+        logging.critical(
+            "Cannot find system configuration, have you created etc/conf.json?"
+        )
         sys.exit(2)
     # set defaults
-    sys = sys_cfg.sys_install_path = sys_cfg.get('sys_install_path',os.getcwd())
+    sys = sys_cfg.sys_install_path = sys_cfg.get("sys_install_path", os.getcwd())
     return sys_cfg
-
