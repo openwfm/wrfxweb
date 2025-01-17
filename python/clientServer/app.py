@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from .serverKeys import LOG_FILE
+from .serverKeys import LOG_FILE, CLIENT_SERVER_SECRET
 
 import logging
 
@@ -10,8 +10,11 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__, template_folder="../../fdds")
+
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///primary.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.secret_key = CLIENT_SERVER_SECRET
+
     if LOG_FILE:
         app.logger.setLevel(logging.DEBUG)
         handler = logging.FileHandler(LOG_FILE)

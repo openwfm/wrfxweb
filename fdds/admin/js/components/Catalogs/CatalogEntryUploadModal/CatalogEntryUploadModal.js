@@ -142,10 +142,10 @@ export class CatalogEntryUploadModal extends HTMLElement {
       catalogEntryName,
       catalogEntryDescription,
       catalogEntryColumn,
-      updateErrorMessage,
+      uploadErrorMessage,
     } = this.uiElements;
 
-    updateErrorMessage.classList.add("hidden");
+    uploadErrorMessage.classList.add("hidden");
     catalogId.innerText = "";
     catalogName.value = "";
     catalogDescription.value = "";

@@ -59,7 +59,9 @@ export class CatalogList extends HTMLElement {
 
   openUploadModal(catalog) {
     const { catalogEntryUploadModal } = this.uiElements;
-    catalogEntryUploadModal.open(catalog);
+    if (catalog) {
+      catalogEntryUploadModal.open(catalog);
+    }
   }
 }
 
