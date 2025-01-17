@@ -88,6 +88,11 @@ def authorize_google():
         app.logger.info(
             f"[LoginError] request state doesn't match one created in authorization request {time_now}"
         )
+        if request.args["state"] == None:
+            app.logger.info(f"[LoginError] no session state present")
+        if session.get("oauth2_state") == None:
+            app.logger.info(f"[LoginError] no request state present")
+
         abort(401)
 
     # make sure that the authorization code is present

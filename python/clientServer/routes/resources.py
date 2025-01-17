@@ -34,10 +34,10 @@ def serve_simulations(filename):
 
 @app.route("/simulation/<path:filename>")
 def serve_simulation(filename):
-    time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
-    app.logger.info(
-        f"[SimulationAccess] {current_user.email} {time_now} {filename.split('/')[0]}"
-    )
+    # time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
+    # app.logger.info(
+    #     f"[SimulationAccess] {current_user.email} {time_now} {filename.split('/')[0]}"
+    # )
     return send_from_directory("../../fdds/simulations", filename)
 
 
