@@ -12,7 +12,7 @@ from ..serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from ..models.User import User
 from ..models.Admin import Admin
 
-from flask import redirect, url_for, render_template, request
+from flask import redirect, url_for, render_template, request, session
 from flask_login import current_user
 from functools import wraps
 
@@ -192,3 +192,10 @@ def create_catalog_entry(catalog_id):
 @admin_login_required
 def admin_index():
     return render_template("admin/admin_panel.html")
+
+
+@app.route("/admin/reset_sessions")
+@admin_login_required
+def reset_sessions():
+    session.clear()
+    return {"message": "Sessions Successfully Reset!"}, 200
