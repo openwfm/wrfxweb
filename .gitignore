@@ -40,8 +40,11 @@ python/api/__pycache__/*
 python/api/routes/__pycache__/*
 python/api/models/__pycache__/*
 
+unzip_sims.sh
+
 # Remove the following lines when merging into new branch
 python/clientServer/routes/validators/*
 python/clientServer/serializers/*
 progress.txt
+
 
