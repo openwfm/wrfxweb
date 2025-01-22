@@ -29,6 +29,7 @@ api/user.db
 deployment.MD
 python/clientServer/logging/*
 python/clientServer/logging
+python/clientServer/client_secret.json
 
 
 python/clientServer/routes/validators/__pycache__/*
