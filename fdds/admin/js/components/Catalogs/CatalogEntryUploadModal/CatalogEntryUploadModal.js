@@ -159,19 +159,40 @@ export class CatalogEntryUploadModal extends HTMLElement {
       catalogEntryName,
       catalogEntryDescription,
       catalogEntryColumn,
-      updateErrorMessage,
+      uploadErrorMessage,
+      catalogEntryPopulate,
+      uploadCatalogEntryInput,
     } = this.uiElements;
     let catalogId = this.catalog.id;
-    const catalogEntryParams = {
-      name: catalogEntryName.value,
-      description: catalogEntryDescription.value,
-      column: catalogEntryColumn.value,
-    };
+    let zipFile = uploadCatalogEntryInput.files[0];
+
+    let catalogEntryParams = new FormData();
+    catalogEntryParams.append("name", catalogEntryName.value);
+    catalogEntryParams.append("description", catalogEntryDescription.value);
+    catalogEntryParams.append("column", catalogEntryColumn.value);
+    catalogEntryParams.append(
+      "populateMetadataFromZip",
+      catalogEntryPopulate.checked,
+    );
+    catalogEntryParams.append("zipFile", zipFile);
+
+    //const catalogEntryParams = {
+    //  name: catalogEntryName.value,
+    //  description: catalogEntryDescription.value,
+    //  column: catalogEntryColumn.value,
+    //  populateMetadataFromZip: catalogEntryPopulate.checked,
+    //  zipFile: zipFile,
+    //};
+    //console.log("zipFile: ", zipFile);
+    //
+    console.log("catalogEntryParams: ", JSON.stringify(catalogEntryParams));
+    console.log("catalogEntryParams: ", catalogEntryParams);
+
     const response = await createCatalogEntry(catalogId, catalogEntryParams);
     if (response.error) {
-      updateErrorMessage.classList.remove("hidden");
+      uploadErrorMessage.classList.remove("hidden");
     } else {
-      adminControllers.catalogs.update(response.catalog);
+      //adminControllers.catalogs.update(response.catalog);
       this.close();
     }
   }

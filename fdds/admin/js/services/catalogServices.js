@@ -1,60 +1,12 @@
 const CATALOG_URL = "admin/catalogs";
 
-async function postRequest(request_url, request_json) {
-  let response_json = {};
-
-  try {
-    const response = await fetch(request_url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request_json),
-    });
-    if (response.status !== 200) {
-      throw new Error(response_json.message);
-    }
-    response_json = await response.json();
-    return response_json;
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: error };
-  }
-}
-
-async function getRequest(request_url) {
-  let response_json = {};
-
-  try {
-    const response = await fetch(request_url);
-    if (response.status !== 200) {
-      throw new Error(response_json.message);
-    }
-    response_json = await response.json();
-    return response_json;
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: error };
-  }
-}
-
-async function deleteRequest(request_url) {
-  let response_json = {};
-
-  try {
-    const response = await fetch(request_url, {
-      method: "DELETE",
-    });
-    if (response.status !== 200) {
-      throw new Error(response_json.message);
-    }
-    response_json = await response.json();
-    return response_json;
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: error };
-  }
-}
+import {
+  postRequest,
+  postRequestFormData,
+  getRequest,
+  deleteRequest,
+  updateRequest,
+} from "./services.js";
 
 export async function createCatalog(create_catalog_json) {
   const POST_URL = `${CATALOG_URL}`;
@@ -78,7 +30,7 @@ export async function getCatalogs() {
 export async function createCatalogEntry(catalogId, entryParams) {
   const POST_URL = `${CATALOG_URL}/${catalogId}/entries`;
 
-  const response_json = await postRequest(POST_URL, entryParams);
+  const response_json = await postRequestFormData(POST_URL, entryParams);
 
   return response_json;
 }
@@ -102,23 +54,8 @@ export async function getPermissionsForCatalog(catalogId) {
 
 export async function updateCatalog(catalogId, catalogParams) {
   const PATCH_URL = `${CATALOG_URL}/${catalogId}`;
-  let response_json = {};
 
-  try {
-    const response = await fetch(PATCH_URL, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(catalogParams),
-    });
-    if (response.status !== 200) {
-      throw new Error(response_json.message);
-    }
-    response_json = await response.json();
-    return response_json;
-  } catch (error) {
-    console.error("Error:", error);
-    return { error: error };
-  }
+  const response_json = await updateRequest(PATCH_URL, catalogParams);
+
+  return response_json;
 }

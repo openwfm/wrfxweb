@@ -178,13 +178,18 @@ def get_catalog_entries(catalog_id):
 
 
 def create_catalog_entry(catalog_id):
-    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-    catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
-    CatalogEntryServices.create(catalog_id, catalog_entry_params)
-    catalog = CatalogServices.find_by_id(catalog_id)
+    # catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    # raw_catalog_entry_params = request.get_json()
+    # print(f"raw params {raw_catalog_entry_params}")
+    # catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
+    # files = request.files
+    # print(f"files {files}")
+    # CatalogEntryServices.create(catalog_id, catalog_entry_params)
+    # catalog = CatalogServices.find_by_id(catalog_id)
+    print("=========== Create Entry Success ===========")
     return {
         "message": "Entry Successfully Created!",
-        "catalog": CatalogSerializer.serialize_catalog_with_permissions(catalog),
+        # "catalog": CatalogSerializer.serialize_catalog_with_permissions(catalog),
     }, 200
 
 

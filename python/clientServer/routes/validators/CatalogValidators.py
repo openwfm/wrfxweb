@@ -74,4 +74,35 @@ def validate_boolean(boolean_input):
 
 
 def validate_catalog_entry(catalog_entry):
-    pass
+    if "name" not in catalog_entry:
+        raise ValueError("Name is required")
+    if "description" not in catalog_entry:
+        raise ValueError("Description is required")
+    if "column" not in catalog_entry:
+        raise ValueError("Public is required")
+    if "populateMetadataFromZip" not in catalog_entry:
+        raise ValueError("Permissions is required")
+    if "zipFile" not in catalog_entry:
+        raise ValueError("Permissions is required")
+
+    populateMetadataFromZip = validate_boolean(catalog_entry["populateMetadataFromZip"])
+    name = ""
+    description = ""
+
+    if not populateMetadataFromZip:
+        name = validate_text(catalog_entry["name"])
+        description = validate_text(catalog_entry["description"])
+
+    sanitized_catalog_entry = {
+        "name": name,
+        "description": description,
+        "column": validate_text(catalog_entry["column"]),
+        "populateMetadataFromZip": populateMetadataFromZip,
+        "zipFile": validate_zip_file(catalog_entry["zipFile"]),
+    }
+
+    return sanitized_catalog_entry
+
+
+def validate_zip_file(zip_file):
+    return {}
