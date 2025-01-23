@@ -94,8 +94,9 @@ def authorize_google():
     flow.redirect_uri = request_url
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    authorization_response = request.url
-    flow.fetch_token(authorization_response=authorization_response)
+    # authorization_response = request.url
+    # flow.fetch_token(authorization_response=authorization_response)
+    flow.fetch_token(authorization_response=request_url)
 
     # Store credentials in the session.
     credentials = flow.credentials
