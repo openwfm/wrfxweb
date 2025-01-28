@@ -62,7 +62,7 @@ def google_login():
     )
     flow.redirect_uri = redirect_url
 
-    app.logger.info(f"[Login] redirect_url: {redirect_url}")
+    # app.logger.info(f"[Login] redirect_url: {redirect_url}")
 
     authorization_url, state = flow.authorization_url(
         # Recommended, enable offline access so that you can refresh an access token without
@@ -73,6 +73,7 @@ def google_login():
         # Optional, set prompt to 'consent' will prompt the user for consent
         # prompt="consent",
     )
+    # app.logger.info(f"[Login] authorization url: {authorization_url}")
 
     # generate a random string for the state parameter
     session["oauth2_state"] = state
@@ -98,10 +99,10 @@ def authorize_google():
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
-    app.logger.info(f"[Login Redirect] request url: {request_url}")
-    app.logger.info(
-        f"[Login Redirect] authorization response url: {authorization_response}"
-    )
+    # app.logger.info(f"[Login Redirect] request url: {request_url}")
+    # app.logger.info(
+    #     f"[Login Redirect] authorization response url: {authorization_response}"
+    # )
 
     # Store credentials in the session.
     credentials = flow.credentials

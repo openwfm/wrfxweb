@@ -178,9 +178,9 @@ def get_catalog_entries(catalog_id):
 
 
 def create_catalog_entry(catalog_id):
-    # catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-    # raw_catalog_entry_params = request.get_json()
-    # print(f"raw params {raw_catalog_entry_params}")
+    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    raw_catalog_entry_params = request.get_json()
+    print(f"raw params {raw_catalog_entry_params}")
     # catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
     # files = request.files
     # print(f"files {files}")
