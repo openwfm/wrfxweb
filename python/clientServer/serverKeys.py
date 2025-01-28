@@ -12,3 +12,4 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 LOG_FILE = os.getenv("LOG_FILE")
 CLIENT_SECRETS_FILE = os.getenv("CLIENT_SECRETS_FILE")
 OAUTH_SCOPES = ["openid", "https://www.googleapis.com/auth/userinfo.email"]
+DEBUG_LOGS = os.getenv("DEBUG_LOGS")

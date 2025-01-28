@@ -27,11 +27,13 @@ api/instance
 api/api_key.py
 api/user.db
 deployment.MD
-python/clientServer/logging/*
-python/clientServer/logging
+python/clientServer/logs/*
+python/clientServer/logs
 python/clientServer/client_secret.json
 
 
+python/clientServer/logging/__pycache__/
+python/clientServer/logging/__pycache__/*
 python/clientServer/routes/validators/__pycache__/*
 python/clientServer/serializers/__pycache__/*
 python/clientServer/services/__pycache__/*

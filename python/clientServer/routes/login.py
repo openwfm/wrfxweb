@@ -7,6 +7,7 @@ from ..serverKeys import (
     OAUTH_SCOPES,
 )
 from ..services import UserServices as UserServices
+from ..logging import utils as loggingUtils
 
 from flask import request, redirect, url_for, session, render_template, flash, abort
 from flask_login import login_user, logout_user, current_user, LoginManager
@@ -62,7 +63,7 @@ def google_login():
     )
     flow.redirect_uri = redirect_url
 
-    # app.logger.info(f"[Login] redirect_url: {redirect_url}")
+    loggingUtils.log_login(f"redirect_url: {redirect_url}")
 
     authorization_url, state = flow.authorization_url(
         # Recommended, enable offline access so that you can refresh an access token without
@@ -73,7 +74,7 @@ def google_login():
         # Optional, set prompt to 'consent' will prompt the user for consent
         # prompt="consent",
     )
-    # app.logger.info(f"[Login] authorization url: {authorization_url}")
+    loggingUtils.log_login(f"authorization_url: {authorization_url}")
 
     # generate a random string for the state parameter
     session["oauth2_state"] = state
@@ -99,10 +100,8 @@ def authorize_google():
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
-    # app.logger.info(f"[Login Redirect] request url: {request_url}")
-    # app.logger.info(
-    #     f"[Login Redirect] authorization response url: {authorization_response}"
-    # )
+    loggingUtils.log_auth(f"request_url: {request_url}")
+    loggingUtils.log_auth(f"authorization_response_url: {authorization_response}")
 
     # Store credentials in the session.
     credentials = flow.credentials
@@ -115,7 +114,7 @@ def authorize_google():
     # find or create the user in the database
     user = UserServices.find_or_create(email)
 
-    app.logger.info(f"[Login] {user.email} {time_now}")
+    loggingUtils.log_login(f"{user.email}")
 
     # log the user in
     login_user(user)
