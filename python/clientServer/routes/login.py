@@ -98,6 +98,10 @@ def authorize_google():
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
+    app.logger.info(f"[Login Redirect] request url: {request_url}")
+    app.logger.info(
+        f"[Login Redirect] authorization response url: {authorization_response}"
+    )
 
     # Store credentials in the session.
     credentials = flow.credentials
