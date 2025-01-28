@@ -62,6 +62,8 @@ def google_login():
     )
     flow.redirect_uri = redirect_url
 
+    app.logger.info(f"[Login] redirect_url: {redirect_url}")
+
     authorization_url, state = flow.authorization_url(
         # Recommended, enable offline access so that you can refresh an access token without
         # re-prompting the user for permission. Recommended for web server apps.
