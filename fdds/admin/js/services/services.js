@@ -26,9 +26,9 @@ export async function postRequestFormData(request_url, formData) {
   try {
     const response = await fetch(request_url, {
       method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      //headers: {
+      //  "Content-Type": "multipart/form-data",
+      //},
       body: formData,
     });
     if (response.status !== 200) {

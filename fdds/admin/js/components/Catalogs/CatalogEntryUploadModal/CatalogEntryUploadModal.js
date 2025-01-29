@@ -163,10 +163,10 @@ export class CatalogEntryUploadModal extends HTMLElement {
       catalogEntryPopulate,
       uploadCatalogEntryInput,
     } = this.uiElements;
-    let catalogId = this.catalog.id;
-    let zipFile = uploadCatalogEntryInput.files[0];
+    const catalogId = this.catalog.id;
+    console.log("zipFiles: ", uploadCatalogEntryInput.files);
 
-    let catalogEntryParams = new FormData();
+    const catalogEntryParams = new FormData();
     catalogEntryParams.append("name", catalogEntryName.value);
     catalogEntryParams.append("description", catalogEntryDescription.value);
     catalogEntryParams.append("column", catalogEntryColumn.value);
@@ -174,17 +174,7 @@ export class CatalogEntryUploadModal extends HTMLElement {
       "populateMetadataFromZip",
       catalogEntryPopulate.checked,
     );
-    catalogEntryParams.append("zipFile", zipFile);
-
-    //const catalogEntryParams = {
-    //  name: catalogEntryName.value,
-    //  description: catalogEntryDescription.value,
-    //  column: catalogEntryColumn.value,
-    //  populateMetadataFromZip: catalogEntryPopulate.checked,
-    //  zipFile: zipFile,
-    //};
-    //console.log("zipFile: ", zipFile);
-    //
+    catalogEntryParams.append("zipFile", uploadCatalogEntryInput.files[0]);
 
     const response = await createCatalogEntry(catalogId, catalogEntryParams);
     if (response.error) {

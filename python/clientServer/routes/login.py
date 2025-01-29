@@ -7,11 +7,9 @@ from ..serverKeys import (
 from ..services import UserServices as UserServices
 from ..logging import utils as loggingUtils
 
-from flask import request, redirect, url_for, session, render_template, flash, abort
+from flask import request, redirect, url_for, session, render_template, flash
 from flask_login import login_user, logout_user, current_user, LoginManager
 from functools import wraps
-
-import datetime
 
 import google.oauth2.credentials
 import google_auth_oauthlib.flow

@@ -11,10 +11,14 @@ from ..serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from ..serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from ..models.User import User
 from ..models.Admin import Admin
+from ..serverKeys import ADMIN_UPLOADS_FOLDER
+
 
 from flask import redirect, url_for, render_template, request, session
 from flask_login import current_user
 from functools import wraps
+
+from ..logging import utils as loggingUtils
 
 
 def admin_login_required(f):
@@ -179,19 +183,15 @@ def get_catalog_entries(catalog_id):
 
 def create_catalog_entry(catalog_id):
     catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-    formData = request.form.to_dict()
-    print(f"raw form data {formData}")
-    zipFile = formData.get("zipFile")
-    print(f"zipFile {zipFile}")
+    zipFile = request.files["zipFile"]
+    loggingUtils.log_debug(f"formData: {request.form.to_dict()}")
 
-    # raw_catalog_entry_params = request.get_json()
-    # print(f"raw params {raw_catalog_entry_params}")
+    if zipFile.filename != "":
+        zipFile.save(f"{ADMIN_UPLOADS_FOLDER}/{zipFile.filename}")
+
     # catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
-    # files = request.files
-    # print(f"files {files}")
     # CatalogEntryServices.create(catalog_id, catalog_entry_params)
     # catalog = CatalogServices.find_by_id(catalog_id)
-    print("=========== Create Entry Success ===========")
     return {
         "message": "Entry Successfully Created!",
         # "catalog": CatalogSerializer.serialize_catalog_with_permissions(catalog),
