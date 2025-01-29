@@ -1,8 +1,6 @@
 from ..app import app, db
 from ..models.User import User
 from ..serverKeys import (
-    CLIENT_ID,
-    CLIENT_SECRET,
     CLIENT_SECRETS_FILE,
     OAUTH_SCOPES,
 )
@@ -19,17 +17,6 @@ import google.oauth2.credentials
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 
-provider_data = {
-    "client_id": CLIENT_ID,
-    "client_secret": CLIENT_SECRET,
-    "authorize_url": "https://accounts.google.com/o/oauth2/auth",
-    "token_url": "https://accounts.google.com/o/oauth2/token",
-    "userinfo": {
-        "url": "https://www.googleapis.com/oauth2/v3/userinfo",
-        "email": lambda json: json["email"],
-    },
-    "scopes": ["https://www.googleapis.com/auth/userinfo.email"],
-}
 login = LoginManager(app)
 
 
@@ -85,7 +72,6 @@ def google_login():
 
 @app.route("/authorize/google", methods=["GET"])
 def authorize_google():
-    time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
     if not current_user.is_anonymous:
         return redirect(url_for("index"))
 

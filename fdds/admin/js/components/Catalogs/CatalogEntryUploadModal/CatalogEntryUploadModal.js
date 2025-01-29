@@ -185,8 +185,6 @@ export class CatalogEntryUploadModal extends HTMLElement {
     //};
     //console.log("zipFile: ", zipFile);
     //
-    console.log("catalogEntryParams: ", JSON.stringify(catalogEntryParams));
-    console.log("catalogEntryParams: ", catalogEntryParams);
 
     const response = await createCatalogEntry(catalogId, catalogEntryParams);
     if (response.error) {
