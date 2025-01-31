@@ -1,6 +1,6 @@
 const ADMIN_URL = "/admin";
 
-import { postRequest, getRequest, deleteRequest } from "./services.js";
+import { postRequest, getRequest, deleteRequest } from "../../../services.js";
 
 export async function createAdmin(create_admin_json) {
   const POST_URL = `${ADMIN_URL}/create`;
