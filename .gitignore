@@ -18,6 +18,9 @@ notes.txt
 server/
 venv/
 api/
+deployment.md
+progress.txt
+python/
 
 
 
