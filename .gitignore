@@ -33,6 +33,8 @@ python/clientServer/client_secret.json
 
 
 */__pycache__/*
+python/clientServer/routes/admin/__pycache__/*
+python/clientServer/routes/admin/__pycache__/
 python/clientServer/logging/__pycache__/
 python/clientServer/logging/__pycache__/*
 python/clientServer/routes/validators/__pycache__/*

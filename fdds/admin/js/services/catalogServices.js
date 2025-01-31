@@ -6,7 +6,7 @@ import {
   getRequest,
   deleteRequest,
   updateRequest,
-} from "./services.js";
+} from "../../../services.js";
 
 export async function createCatalog(create_catalog_json) {
   const POST_URL = `${CATALOG_URL}`;

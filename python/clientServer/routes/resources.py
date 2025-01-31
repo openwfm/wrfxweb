@@ -46,6 +46,11 @@ def serve_thread_manager():
     return send_from_directory("../../fdds", "threadManager.js")
 
 
+@app.route("/services.js")
+def serve_services():
+    return send_from_directory("../../fdds", "services.js")
+
+
 @app.route("/imageLoadingWorker.js")
 def serve_image_loading_worker():
     return send_from_directory("../../fdds", "imageLoadingWorker.js")
