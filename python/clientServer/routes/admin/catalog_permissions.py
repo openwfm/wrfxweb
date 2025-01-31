@@ -1,9 +1,9 @@
-from ...app import app
+from clientServer.app import app
 
-from .admin_utils import admin_login_required
+from clientServer.routes.admin.admin_utils import admin_login_required
 
-from ...services import CatalogAccessServices as CatalogAccessServices
-from ...serializers import CatalogAccessSerializer as CatalogAccessSerializer
+from clientServer.services import CatalogAccessServices as CatalogAccessServices
+from clientServer.serializers import CatalogAccessSerializer as CatalogAccessSerializer
 
 
 def create_catalog_access_for_user(catalog_id, email):

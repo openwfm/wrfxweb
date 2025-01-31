@@ -1,5 +1,5 @@
-from ..app import db
-from ..models.User import User
+from clientServer.app import db
+from clientServer.models.User import User
 import datetime
 
 

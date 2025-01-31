@@ -38,6 +38,8 @@ python/clientServer/routes/admin/__pycache__/
 python/clientServer/logging/__pycache__/
 python/clientServer/logging/__pycache__/*
 python/clientServer/routes/validators/__pycache__/*
+python/clientServer/validators/__pycache__/*
+python/clientServer/validators/__pycache__/
 python/clientServer/serializers/__pycache__/*
 python/clientServer/services/__pycache__/*
 python/clientServer/models/__pycache__/*

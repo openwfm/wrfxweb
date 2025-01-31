@@ -1,6 +1,6 @@
-from ..app import db
-from .CatalogAccess import CatalogAccess
-from .CatalogEntry import CatalogEntry
+from clientServer.app import db
+from clientServer.models.CatalogAccess import CatalogAccess
+from clientServer.models.CatalogEntry import CatalogEntry
 
 
 class Catalog(db.Model):

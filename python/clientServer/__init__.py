@@ -1,6 +1,6 @@
-from .app import db, app
-from . import routes
-from .routes.login import login_required
+from clientServer.app import db, app
+from clientServer import routes
+from clientServer.routes.login import login_required
 
 from flask import render_template
 

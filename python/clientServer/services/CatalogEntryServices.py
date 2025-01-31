@@ -1,5 +1,5 @@
-from ..app import db
-from ..models.CatalogEntry import CatalogEntry
+from clientServer.app import db
+from clientServer.models.CatalogEntry import CatalogEntry
 
 
 def create(catalog_id, catalog_entry_params):

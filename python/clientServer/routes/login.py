@@ -1,11 +1,11 @@
-from ..app import app, db
-from ..models.User import User
-from ..serverKeys import (
+from clientServer.app import app, db
+from clientServer.models.User import User
+from clientServer.serverKeys import (
     CLIENT_SECRETS_FILE,
     OAUTH_SCOPES,
 )
-from ..services import UserServices as UserServices
-from ..logging import utils as loggingUtils
+from clientServer.services import UserServices as UserServices
+from clientServer.logging import utils as loggingUtils
 
 from flask import request, redirect, url_for, session, render_template, flash
 from flask_login import login_user, logout_user, current_user, LoginManager

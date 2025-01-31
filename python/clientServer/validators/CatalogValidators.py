@@ -1,6 +1,7 @@
+from clientServer.services import CatalogServices as CatalogServices
+
 import re
 import html
-from ...services import CatalogServices as CatalogServices
 
 
 def validate_catalog_params(json):

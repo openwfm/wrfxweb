@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from .serverKeys import LOG_FILE, CLIENT_SERVER_SECRET
+from clientServer.serverKeys import LOG_FILE, CLIENT_SERVER_SECRET
 
 import logging
 

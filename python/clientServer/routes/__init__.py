@@ -1,5 +1,2 @@
-from . import resources
-from . import login
-from .admin import admin
-from . import user_feedback
-from . import catalogs
+from clientServer.routes import resources, login, user_feedback, catalogs
+from clientServer.routes.admin import admin

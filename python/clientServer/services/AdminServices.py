@@ -1,7 +1,7 @@
-from ..app import db
-from ..models.Admin import Admin
+from clientServer.app import db
+from clientServer.models.Admin import Admin
+from clientServer.services import UserServices as UserServices
 
-from . import UserServices as UserServices
 
 import datetime
 

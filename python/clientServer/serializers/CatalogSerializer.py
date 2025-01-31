@@ -1,5 +1,5 @@
-from . import CatalogAccessSerializer as CatalogAccessSerializer
-from . import CatalogEntrySerializer as CatalogEntrySerializer
+from clientServer.serializers import CatalogAccessSerializer as CatalogAccessSerializer
+from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 
 def serialize_catalog(catalog):

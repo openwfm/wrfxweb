@@ -1,7 +1,7 @@
-from ..app import db
-from ..models.Catalog import Catalog
-from . import CatalogAccessServices as CatalogAccessServices
-from . import CatalogEntryServices as CatalogEntryServices
+from clientServer.app import db
+from clientServer.models.Catalog import Catalog
+from clientServer.services import CatalogAccessServices as CatalogAccessServices
+from clientServer.services import CatalogEntryServices as CatalogEntryServices
 import datetime
 
 

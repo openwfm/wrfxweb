@@ -1,4 +1,4 @@
-from ..app import db
+from clientServer.app import db
 
 
 class Admin(db.Model):

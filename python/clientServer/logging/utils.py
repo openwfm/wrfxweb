@@ -1,6 +1,6 @@
-from ..app import app
+from clientServer.app import app
 
-from ..serverKeys import DEBUG_LOGS
+from clientServer.serverKeys import DEBUG_LOGS
 
 import datetime
 

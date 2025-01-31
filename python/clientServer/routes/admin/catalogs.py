@@ -1,10 +1,10 @@
-from ...app import app
+from clientServer.app import app
 
-from .admin_utils import admin_login_required
+from clientServer.routes.admin.admin_utils import admin_login_required
 
-from ...services import CatalogServices as CatalogServices
-from ...serializers import CatalogSerializer as CatalogSerializer
-from ..validators import CatalogValidators as CatalogValidators
+from clientServer.validators import CatalogValidators as CatalogValidators
+from clientServer.services import CatalogServices as CatalogServices
+from clientServer.serializers import CatalogSerializer as CatalogSerializer
 
 from flask import request
 

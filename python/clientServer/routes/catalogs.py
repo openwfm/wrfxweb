@@ -1,5 +1,5 @@
-from ..app import app
-from .login import login_required
+from clientServer.app import app
+from clientServer.routes.login import login_required
 
 
 @app.route("/catalogs/<catalog_id>", methods=["GET"])

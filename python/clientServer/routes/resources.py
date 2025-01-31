@@ -1,10 +1,8 @@
-from ..app import app
+from clientServer.app import app
 
 from flask import send_from_directory
 
 from flask_login import current_user
-
-import datetime
 
 
 @app.route("/js/<path:filename>")

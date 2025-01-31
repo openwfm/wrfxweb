@@ -1,14 +1,12 @@
-from ...app import app, db
+from clientServer.app import app, db
 
-from .admin_utils import admin_login_required
-from . import catalogs
-from . import catalog_permissions
-from . import catalog_entries
+from clientServer.routes.admin.admin_utils import admin_login_required
+from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
 
-from ...services import AdminServices as AdminServices
-from ...serializers import UserSerializer as UserSerializer
-from ...models.User import User
-from ...models.Admin import Admin
+from clientServer.services import AdminServices as AdminServices
+from clientServer.serializers import UserSerializer as UserSerializer
+from clientServer.models.User import User
+from clientServer.models.Admin import Admin
 
 
 from flask import render_template, request, session

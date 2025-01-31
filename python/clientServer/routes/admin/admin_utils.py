@@ -1,4 +1,4 @@
-from ...services import AdminServices as AdminServices
+from clientServer.services import AdminServices as AdminServices
 
 from flask import redirect, url_for
 from flask_login import current_user

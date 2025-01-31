@@ -1,13 +1,14 @@
-from ...app import app
+from clientServer.app import app
+
+from clientServer.serverKeys import ADMIN_UPLOADS_FOLDER
+from clientServer.logging import utils as loggingUtils
 
 from .admin_utils import admin_login_required
-from ...logging import utils as loggingUtils
-from ...serverKeys import ADMIN_UPLOADS_FOLDER
 
-from ..validators import CatalogValidators as CatalogValidators
-from ...services import CatalogEntryServices as CatalogEntryServices
-from ...services import CatalogServices as CatalogServices
-from ...serializers import CatalogEntrySerializer as CatalogEntrySerializer
+from clientServer.validators import CatalogValidators as CatalogValidators
+from clientServer.services import CatalogEntryServices as CatalogEntryServices
+from clientServer.services import CatalogServices as CatalogServices
+from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask import request
 

@@ -1,7 +1,7 @@
-from ..app import db
-from ..models.CatalogAccess import CatalogAccess
+from clientServer.app import db
+from clientServer.models.CatalogAccess import CatalogAccess
 
-from . import UserServices as UserServices
+from clientServer.services import UserServices as UserServices
 
 
 def find_by_user(catalog_id, user_id):
