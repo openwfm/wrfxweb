@@ -9,6 +9,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), nullable=True)
     date_created = db.Column(db.String(10), nullable=False)
 
+    def domain(self):
+        return f"@{self.email.split('@')[1]}"
+
     def destroy(self):
         db.session.delete(self)
         db.session.commit()

@@ -5,7 +5,7 @@ import { simVars } from "./simVars.js";
 export async function getConfigurations() {
   await fetch("conf")
     .then((response) => response.json())
-    .then(function (configData) {
+    .then(function(configData) {
       if (configData.organization) {
         simVars.organization = configData.organization;
       }
@@ -43,7 +43,7 @@ export async function getCatalogEntries() {
 export function getSimulation(path) {
   fetch(path)
     .then((response) => response.json())
-    .then(function (selectedSimulation) {
+    .then(function(selectedSimulation) {
       // store in global state
       simVars.rasters = selectedSimulation;
       simVars.rasterBase = path.substring(0, path.lastIndexOf("/") + 1);

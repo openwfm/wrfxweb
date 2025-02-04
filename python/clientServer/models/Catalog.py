@@ -2,6 +2,8 @@ from clientServer.app import db
 from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.models.CatalogEntry import CatalogEntry
 
+from sqlalchemy import or_, select
+
 
 class Catalog(db.Model):
     __tablename__ = "catalog"
@@ -16,3 +18,18 @@ class Catalog(db.Model):
 
     def entries(self):
         return CatalogEntry.query.filter_by(catalog_id=self.id).all()
+
+    def user_has_access(self, user):
+        if self.public:
+            return True
+
+        any_access_query = select(CatalogAccess).where(
+            or_(
+                CatalogAccess.user_id == user.id,
+                CatalogAccess.domain == user.domain(),
+            )
+        )
+        return db.session.execute(any_access_query).first() != None
+
+    def __repr__(self):
+        return f"<Catalog {self.id}: public: {self.public}>"

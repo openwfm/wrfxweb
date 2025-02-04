@@ -5,7 +5,10 @@ import {
   utcToLocal,
 } from "../../util.js";
 import { getCatalogEntries } from "../../services.js";
+import { getCatalogs } from "../../clientServices.js";
+
 import { CatalogItem } from "./catalogItem.js";
+import { CatalogOption } from "./CatalogOption.js";
 
 /** Component for menu. Includes three different columns for data related to fires, fuel moisture, and satellite data.
  * Can be moved around by clicking the title bar, can be closed by clicking x in top right corner, and
@@ -24,6 +27,7 @@ export class CatalogMenu extends HTMLElement {
     this.fuelMoistureList = [];
     this.satelliteList = [];
     this.addOrder = [];
+    this.catalogs = [];
     this.innerHTML = `
             <div>
                 <div id='catalog-button' class='feature-controller catalog-button'>
@@ -33,6 +37,8 @@ export class CatalogMenu extends HTMLElement {
                         </svg>
                     </div>
                     <div id='menu-label'>Catalog</div>
+                    <ul id='catalog-options'>
+                    </ul>
                 </div>
                 <div class='catalog-menu round-border'>
                     <div id='menu-title' class='menu-title round-border'>
@@ -110,7 +116,13 @@ export class CatalogMenu extends HTMLElement {
       this.responsiveUI();
     });
     this.initializeMenuSearching();
-    this.createMenuEntries();
+    this.createCatalogs();
+  }
+
+  async createCatalogs() {
+    this.catalogs = await getCatalogs();
+    const catalogId = "public";
+    this.createMenuEntries(catalogId);
   }
 
   hideShowMenu() {
@@ -184,7 +196,7 @@ export class CatalogMenu extends HTMLElement {
     };
   }
 
-  async createMenuEntries() {
+  async createMenuEntries(catalogId) {
     const urlParams = new URLSearchParams(window.location.search);
     const navJobId = urlParams.get("job_id");
     const firesListDOM = this.querySelector("#catalog-fires");

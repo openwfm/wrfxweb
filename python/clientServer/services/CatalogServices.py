@@ -1,7 +1,10 @@
 from clientServer.app import db
 from clientServer.models.Catalog import Catalog
+from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.services import CatalogAccessServices as CatalogAccessServices
 from clientServer.services import CatalogEntryServices as CatalogEntryServices
+
+from sqlalchemy import select, outerjoin, or_
 import datetime
 
 
@@ -60,3 +63,27 @@ def update(catalog_id, catalog_params):
 
 def find_all():
     return Catalog.query.all()
+
+
+def find_by_user(user):
+    user_id = user.id
+    user_domain = user.domain()
+
+    catalog_join_query = outerjoin(
+        Catalog, CatalogAccess, Catalog.id == CatalogAccess.catalog_id
+    )
+    user_catalogs_query = (
+        select(Catalog)
+        .select_from(catalog_join_query)
+        .where(
+            or_(
+                catalog_join_query.c.catalog_access_user_id == user_id,
+                catalog_join_query.c.catalog_public == True,
+                catalog_join_query.c.catalog_access_domain == user_domain,
+            )
+        )
+    )
+
+    user_catalogs = [row[0] for row in db.session.execute(user_catalogs_query)]
+
+    return user_catalogs
