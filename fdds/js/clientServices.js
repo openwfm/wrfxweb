@@ -15,13 +15,13 @@ export async function getCatalogs() {
 }
 
 export async function getCatalogEntries(catalogId) {
-  let GET_URL = `${CATALOG_URL}/${catalogId}/entries`;
+  let GET_URL = `${CATALOG_URL}/${catalogId}/catalog_json`;
 
   const response_json = await getRequest(GET_URL);
 
   if (response_json.error) {
-    return [];
+    return {};
   }
-  console.log("catalog entries: ", response_json.catalogs);
-  return response_json.catalogs;
+  console.log("catalog entries: ", response_json);
+  return response_json;
 }

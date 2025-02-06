@@ -1,8 +1,11 @@
 from clientServer.app import app
+from clientServer.logging import utils as loggingUtils
 from clientServer.routes.login import login_required
 from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogSerializer as CatalogSerializer
+from clientServer.serverKeys import SIMULATIONS_FOLDER
 
+from flask import send_from_directory
 from flask_login import current_user
 
 
@@ -13,3 +16,16 @@ def client_catalogs():
     serialized_catalogs = CatalogSerializer.serialize_catalogs(catalogs)
 
     return {"message": "api successful", "catalogs": serialized_catalogs}, 200
+
+
+@app.route("/catalogs/<catalog_id>/catalog_json", methods=["GET"])
+@login_required
+def client_catalog_json(catalog_id):
+    catalog = CatalogServices.find_by_id(catalog_id)
+
+    catalog_folder = catalog.catalog_folder()
+
+    catalog_path = f"{SIMULATIONS_FOLDER}/{catalog_folder}"
+    loggingUtils.debug_log(catalog_path)
+
+    return send_from_directory(catalog_path, "catalog.json")

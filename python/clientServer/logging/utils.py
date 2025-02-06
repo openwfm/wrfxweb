@@ -28,5 +28,9 @@ def debug_log_auth(message):
     log_statement("LoginRedirect", message, False)
 
 
-def log_debug(message):
+def debug_log(message):
     log_statement("Debug", message, True)
+
+
+def log_error(message):
+    log_statement("ERROR", message, True)

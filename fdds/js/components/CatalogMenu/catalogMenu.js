@@ -4,8 +4,8 @@ import {
   IS_MOBILE,
   utcToLocal,
 } from "../../util.js";
-import { getCatalogEntries } from "../../services.js";
-import { getCatalogs } from "../../clientServices.js";
+//import { getCatalogEntries } from "../../services.js";
+import { getCatalogs, getCatalogEntries } from "../../clientServices.js";
 
 import { CatalogItem } from "./catalogItem.js";
 import { CatalogOption } from "./CatalogOption.js";
@@ -120,9 +120,17 @@ export class CatalogMenu extends HTMLElement {
   }
 
   async createCatalogs() {
+    const catalogOptions = this.querySelector("#catalog-options");
     this.catalogs = await getCatalogs();
-    const catalogId = "public";
-    this.createMenuEntries(catalogId);
+    if (this.catalogs.length > 0) {
+      const catalogId = this.catalogs[0].id;
+      this.createMenuEntries(catalogId);
+      for (let catalog of this.catalogs) {
+        let catalogOption = new CatalogOption(catalog);
+        catalogOption.onclick = () => this.createMenuEntries(catalog.id);
+        catalogOptions.appendChild(catalogOption);
+      }
+    }
   }
 
   hideShowMenu() {
@@ -202,7 +210,11 @@ export class CatalogMenu extends HTMLElement {
     const firesListDOM = this.querySelector("#catalog-fires");
     const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
-    const catalogEntries = await getCatalogEntries();
+    const catalogEntries = await getCatalogEntries(catalogId);
+    this.addOrder = [];
+    firesListDOM.innerHTML = "";
+    fuelMoistureListDOM.innerHTML = "";
+    lidarProfilesDOM.innerHTML = "";
     for (let catName in catalogEntries) {
       let catEntry = catalogEntries[catName];
       this.addOrder.push(catEntry.job_id);

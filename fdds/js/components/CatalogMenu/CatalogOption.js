@@ -9,11 +9,11 @@ import { CatalogItem } from "./catalogItem.js";
 
 export class CatalogOption extends HTMLElement {
   /** ===== Initialization block ===== */
-  constructor() {
-    super(catalogName);
+  constructor(catalog) {
+    super(catalog);
     this.innerHTML = `
             <div>
-              <h1>{catalogName}</h1>
+              <p>${catalog.name}</p>
             </div>
         `;
   }

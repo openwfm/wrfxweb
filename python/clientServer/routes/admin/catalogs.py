@@ -1,5 +1,11 @@
 from clientServer.app import app
+from clientServer.serverKeys import (
+    SIMULATIONS_FOLDER,
+    ADMIN_UPLOADS_FOLDER,
+    EXTERNAL_UPLOADS_FOLDER,
+)
 
+from clientServer.logging import utils as loggingUtils
 from clientServer.routes.admin.admin_utils import admin_login_required
 
 from clientServer.validators import CatalogValidators as CatalogValidators
@@ -7,6 +13,7 @@ from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogSerializer as CatalogSerializer
 
 from flask import request
+import os
 
 
 @app.route("/admin/catalogs/all", methods=["GET"])
@@ -25,6 +32,19 @@ def create_catalog():
     catalog_params = CatalogValidators.validate_catalog_params(request.get_json())
 
     created_catalog = CatalogServices.create(catalog_params)
+
+    catalog_path = f"{SIMULATIONS_FOLDER}/{created_catalog.catalog_folder()}"
+    try:
+        os.makedirs(catalog_path)
+    except OSError as e:
+        error_message = "Error while making Catalog Directory"
+        loggingUtils.log_error(
+            f"POST /admin/catalogs {error_message} {catalog_path}: {e}"
+        )
+        CatalogServices.destroy(created_catalog.id)
+
+        return {"message": error_message}, 500
+
     return {
         "message": "Catalog Successfully Created!",
         "catalog": CatalogSerializer.serialize_catalog_with_permissions(

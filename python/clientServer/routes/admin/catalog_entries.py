@@ -36,7 +36,7 @@ def get_catalog_entries(catalog_id):
 def create_catalog_entry(catalog_id):
     catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
     zipFile = request.files["zipFile"]
-    loggingUtils.log_debug(f"formData: {request.form.to_dict()}")
+    loggingUtils.debug_log(f"formData: {request.form.to_dict()}")
 
     if zipFile.filename != "":
         zipFile.save(f"{ADMIN_UPLOADS_FOLDER}/{zipFile.filename}")
