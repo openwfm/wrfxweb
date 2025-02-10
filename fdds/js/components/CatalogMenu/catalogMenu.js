@@ -3,6 +3,7 @@ import {
   dragElement,
   IS_MOBILE,
   utcToLocal,
+  toggleVisibility,
 } from "../../util.js";
 //import { getCatalogEntries } from "../../services.js";
 import { getCatalogs, getCatalogEntries } from "../../clientServices.js";
@@ -28,6 +29,7 @@ export class CatalogMenu extends HTMLElement {
     this.satelliteList = [];
     this.addOrder = [];
     this.catalogs = [];
+    this.catalogId = null;
     this.innerHTML = `
             <div>
                 <div id='catalog-button' class='feature-controller catalog-button'>
@@ -135,15 +137,18 @@ export class CatalogMenu extends HTMLElement {
 
   hideShowMenu() {
     const catalogMenu = this.querySelector(".catalog-menu");
-    const catalogButton = this.querySelector("#catalog-button");
-    L.DomEvent.disableClickPropagation(catalogButton);
+    const catalogButtons = this.querySelector("#catalog-button");
+    const catalogButton = this.querySelector("#menu-label");
+    const catalogMenuIcon = this.querySelector("#catalog-menu-icon-container");
+    const catalogOptions = this.querySelector("#catalog-options");
+    L.DomEvent.disableClickPropagation(catalogButtons);
     catalogButton.onpointerdown = () => {
-      if (catalogMenu.classList.contains("hidden")) {
-        catalogMenu.classList.remove("hidden");
-      } else {
-        catalogMenu.classList.add("hidden");
-      }
+      toggleVisibility(catalogMenu);
     };
+    catalogMenuIcon.onpointerdown = () => {
+      toggleVisibility(catalogOptions);
+    };
+
     this.querySelector("#menu-close").onclick = () => {
       catalogMenu.classList.add("hidden");
     };
@@ -205,13 +210,20 @@ export class CatalogMenu extends HTMLElement {
   }
 
   async createMenuEntries(catalogId) {
+    if (this.catalogId == catalogId) {
+      return;
+    }
     const urlParams = new URLSearchParams(window.location.search);
     const navJobId = urlParams.get("job_id");
     const firesListDOM = this.querySelector("#catalog-fires");
     const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
     const catalogEntries = await getCatalogEntries(catalogId);
+    this.catalogId = catalogId;
     this.addOrder = [];
+    this.fuelMoistureList = [];
+    this.satelliteList = [];
+    this.firesList = [];
     firesListDOM.innerHTML = "";
     fuelMoistureListDOM.innerHTML = "";
     lidarProfilesDOM.innerHTML = "";

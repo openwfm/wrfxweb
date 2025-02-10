@@ -22,6 +22,7 @@ export async function getCatalogEntries(catalogId) {
   if (response_json.error) {
     return {};
   }
+
   console.log("catalog entries: ", response_json);
   return response_json;
 }

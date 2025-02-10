@@ -119,11 +119,11 @@ function opacityToURL(addData) {
   }
 }
 
-map.on("zoomend", function () {
+map.on("zoomend", function() {
   setURL();
 });
 
-map.on("moveend", function () {
+map.on("moveend", function() {
   setURL();
 });
 
@@ -131,7 +131,7 @@ map.on("moveend", function () {
 /** Executes function with a maximum rate of delay. */
 export function debounceInIntervals(callback, delay) {
   let timeout;
-  return function (args = null) {
+  return function(args = null) {
     if (timeout) {
       return;
     }
@@ -146,7 +146,7 @@ export function debounceInIntervals(callback, delay) {
 /** Executes a function once at the end of an update cycle lasting delay. */
 export function debounce(callback, delay) {
   let timeout;
-  return function (args = null) {
+  return function(args = null) {
     if (timeout) {
       clearTimeout(timeout);
     }
@@ -354,7 +354,7 @@ export function dragElement(elmnt, subID = "", mobileEnabled = false) {
     if (
       elmntLeft != 0 &&
       elmnt.offsetLeft + elmnt.clientWidth / 2 >
-        document.body.clientWidth / 2 &&
+      document.body.clientWidth / 2 &&
       elmntLeft - offsetLeft > 0
     ) {
       elmntLeft = elmntLeft - offsetLeft;
@@ -364,7 +364,7 @@ export function dragElement(elmnt, subID = "", mobileEnabled = false) {
     if (
       elmntTop != 0 &&
       elmnt.offsetTop + elmnt.clientHeight / 2 >
-        document.body.clientHeight / 2 &&
+      document.body.clientHeight / 2 &&
       elmntTop - offsetTop > 0 &&
       elmntTop - offsetTop + elmnt.clientHeight < document.body.clientHeight
     ) {
@@ -434,4 +434,24 @@ export function sanitizeInput(unsafe) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+export function toggleVisibility(element) {
+  if (isShown(element)) {
+    hideElement(element);
+  } else {
+    showElement(element);
+  }
+}
+
+export function isShown(element) {
+  return !element.classList.contains("hidden");
+}
+
+export function showElement(element) {
+  element.classList.remove("hidden");
+}
+
+export function hideElement(element) {
+  element.classList.add("hidden");
 }
