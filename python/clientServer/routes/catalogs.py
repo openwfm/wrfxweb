@@ -1,6 +1,7 @@
 from clientServer.app import app
 from clientServer.logging import utils as loggingUtils
 from clientServer.routes.login import login_required
+from clientServer.validators import CatalogValidators as CatalogValidators
 from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogSerializer as CatalogSerializer
 from clientServer.serverKeys import SIMULATIONS_FOLDER
@@ -29,3 +30,12 @@ def client_catalog_json(catalog_id):
     loggingUtils.debug_log(catalog_path)
 
     return send_from_directory(catalog_path, "catalog.json")
+
+
+@app.route("/catalogs/<catalog_id>/simulation/<path:filename>", methods=["GET"])
+@login_required
+def catalog_simulation(catalog_id, filename):
+    catalog = CatalogValidators.validate_user_catalog_id(catalog_id)
+
+    catalog_folder = catalog.catalog_folder()
+    return send_from_directory(f"{SIMULATIONS_FOLDER}/{catalog_folder}", filename)

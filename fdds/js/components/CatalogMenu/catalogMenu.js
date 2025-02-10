@@ -7,6 +7,7 @@ import {
 } from "../../util.js";
 //import { getCatalogEntries } from "../../services.js";
 import { getCatalogs, getCatalogEntries } from "../../clientServices.js";
+import { controllers } from "../Controller.js";
 
 import { CatalogItem } from "./catalogItem.js";
 import { CatalogOption } from "./CatalogOption.js";
@@ -220,6 +221,7 @@ export class CatalogMenu extends HTMLElement {
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
     const catalogEntries = await getCatalogEntries(catalogId);
     this.catalogId = catalogId;
+    controllers.catalogId.setValue(catalogId);
     this.addOrder = [];
     this.fuelMoistureList = [];
     this.satelliteList = [];
@@ -231,7 +233,7 @@ export class CatalogMenu extends HTMLElement {
       let catEntry = catalogEntries[catName];
       this.addOrder.push(catEntry.job_id);
       let desc = catEntry.description;
-      let newLI = new CatalogItem(catEntry, navJobId);
+      let newLI = new CatalogItem(catEntry, navJobId, this.catalogId);
       if (desc.indexOf("GACC") >= 0 || desc.indexOf(" FM") >= 0) {
         this.fuelMoistureList.push(catEntry);
         fuelMoistureListDOM.appendChild(newLI);
@@ -404,7 +406,7 @@ export class CatalogMenu extends HTMLElement {
     categoryDOM.innerHTML = "";
     let newList = listCreator(categoryList);
     for (let catalogEntry of newList) {
-      let newLI = new CatalogItem(catalogEntry, null);
+      let newLI = new CatalogItem(catalogEntry, null, this.catalogId);
       categoryDOM.append(newLI);
     }
   }

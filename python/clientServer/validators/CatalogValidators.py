@@ -1,5 +1,6 @@
 from clientServer.services import CatalogServices as CatalogServices
 
+from flask_login import current_user
 import re
 import html
 
@@ -35,6 +36,19 @@ def validate_catalog_id(catalog_id):
     if type(catalog_id) is not int:
         raise ValueError("Catalog ID must be an integer")
     return catalog_id
+
+
+def validate_user_catalog_id(catalog_id):
+    catalog_id = int(catalog_id)
+    catalog = CatalogServices.find_by_id(catalog_id)
+    if catalog is None:
+        raise ValueError("catalog_id must be a valid catalog")
+    if not catalog.user_has_access(current_user):
+        raise ValueError("user does not have access to catalog")
+
+    if type(catalog_id) is not int:
+        raise ValueError("Catalog ID must be an integer")
+    return catalog
 
 
 def sanitize_text(text_input):

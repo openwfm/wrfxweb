@@ -1,6 +1,6 @@
 import { getRequest } from "../services.js";
 
-const CATALOG_URL = "/catalogs";
+export const CATALOG_URL = "/catalogs";
 
 export async function getCatalogs() {
   const GET_URL = CATALOG_URL;
@@ -10,7 +10,6 @@ export async function getCatalogs() {
   if (response_json.error) {
     return [];
   }
-  console.log("catalogs: ", response_json.catalogs);
   return response_json.catalogs;
 }
 
@@ -23,6 +22,16 @@ export async function getCatalogEntries(catalogId) {
     return {};
   }
 
-  console.log("catalog entries: ", response_json);
+  return response_json;
+}
+
+/** Service request for fetching a selected simulation from the menu. */
+export async function getSimulation(catalogId, simulationPath) {
+  let GET_URL = `${CATALOG_URL}/${catalogId}/simulation/${simulationPath}`;
+  const response_json = await getRequest(GET_URL);
+
+  if (response_json.error) {
+    return {};
+  }
   return response_json;
 }

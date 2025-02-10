@@ -1,10 +1,11 @@
-import { getSimulation } from "../../services.js";
+import { getSimulation, CATALOG_URL } from "../../clientServices.js";
+//import { getSimulation } from "../../services.js";
 import { utcToLocal } from "../../util.js";
 import { simVars } from "../../simVars.js";
 import { controllers } from "../Controller.js";
 
 export class CatalogItem extends HTMLElement {
-  constructor(catEntry, navJobId) {
+  constructor(catEntry, navJobId, catalogId) {
     super();
     this.innerHTML = `
             <li class='catalog-entry'>
@@ -22,6 +23,7 @@ export class CatalogItem extends HTMLElement {
         `;
     this.catEntry = catEntry;
     this.navJobId = navJobId;
+    this.catalogId = catalogId;
   }
 
   connectedCallback() {
@@ -67,10 +69,9 @@ export class CatalogItem extends HTMLElement {
     }
   }
 
-  clickItem() {
+  async clickItem() {
     let entryID = this.catEntry.job_id;
     let manifestPath = this.catEntry.manifest_path;
-    let path = "simulation/" + manifestPath;
     let description = this.catEntry.description;
 
     simVars.currentSimulation = entryID;
@@ -80,7 +81,13 @@ export class CatalogItem extends HTMLElement {
     document.querySelector(".catalog-menu").classList.add("hidden");
 
     document.querySelector("#simulation-flags").classList.remove("hidden");
-    getSimulation(path);
+
+    let selectedSimulation = await getSimulation(this.catalogId, manifestPath);
+    simVars.rasters = selectedSimulation;
+    let simulationPathBase = `simulation/${manifestPath.substring(0, manifestPath.lastIndexOf("/"))}/`;
+    simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
+    // retrieve all domains
+    controllers.domainInstance.setValue(Object.keys(selectedSimulation));
   }
 }
 

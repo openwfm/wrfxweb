@@ -68,6 +68,7 @@ export const controllers = {
     };
     return currentTimestamp;
   })(),
+  catalogId: new Controller(),
   domainInstance: new Controller(),
   currentDomain: new Controller(),
   loadingProgress: (function createLoadProg() {

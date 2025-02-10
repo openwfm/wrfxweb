@@ -1,9 +1,8 @@
 from clientServer.app import app
-from clientServer.logging import utils as loggingUtils
+from clientServer.routes.login import login_required
+from clientServer.serverKeys import SIMULATIONS_FOLDER
 
 from flask import send_from_directory
-
-from flask_login import current_user
 
 
 @app.route("/js/<path:filename>")
@@ -32,12 +31,9 @@ def serve_simulations(filename):
 
 
 @app.route("/simulation/<path:filename>")
+@login_required
 def serve_simulation(filename):
-    # time_now = datetime.datetime.now().strftime("%Y-%m-%d:%H-%M-%S")
-    # app.logger.info(
-    #     f"[SimulationAccess] {current_user.email} {time_now} {filename.split('/')[0]}"
-    # )
-    return send_from_directory("../../fdds/simulations", filename)
+    return send_from_directory(f"{SIMULATIONS_FOLDER}", filename)
 
 
 @app.route("/threadManager.js")
