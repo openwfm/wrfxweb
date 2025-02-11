@@ -27,7 +27,6 @@ def client_catalog_json(catalog_id):
     catalog_folder = catalog.catalog_folder()
 
     catalog_path = f"{SIMULATIONS_FOLDER}/{catalog_folder}"
-    loggingUtils.debug_log(catalog_path)
 
     return send_from_directory(catalog_path, "catalog.json")
 

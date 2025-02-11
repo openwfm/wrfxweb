@@ -11,6 +11,7 @@ from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask import request
+from flask_login import current_user
 
 
 @app.route("/admin/catalogs/<catalog_id>/entries", methods=["GET", "POST"])
@@ -26,20 +27,22 @@ def catalog_entries(catalog_id):
 
 
 def get_catalog_entries(catalog_id):
-    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-    catalog = CatalogServices.find_by_id(catalog_id)
+    catalog = CatalogValidators.validate_catalog(catalog_id)
     return {
         "entries": CatalogEntrySerializer.serialize_entries(catalog.entries),
     }, 200
 
 
 def create_catalog_entry(catalog_id):
-    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+    catalog = CatalogValidators.validate_catalog(catalog_id)
     zipFile = request.files["zipFile"]
-    loggingUtils.debug_log(f"formData: {request.form.to_dict()}")
+    # loggingUtils.debug_log(f"formData: {request.form.to_dict()}")
+
+    catalog_folder = catalog.catalog_folder()
 
     if zipFile.filename != "":
-        zipFile.save(f"{ADMIN_UPLOADS_FOLDER}/{zipFile.filename}")
+        save_path = f"{ADMIN_UPLOADS_FOLDER}/{catalog_folder}/{zipFile.filename}"
+        zipFile.save(save_path)
 
     # catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
     # CatalogEntryServices.create(catalog_id, catalog_entry_params)

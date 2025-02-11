@@ -1,6 +1,4 @@
 from clientServer.app import app
-from clientServer.routes.login import login_required
-from clientServer.serverKeys import SIMULATIONS_FOLDER
 
 from flask import send_from_directory
 
@@ -23,17 +21,6 @@ def serve_admin_css(filename):
 @app.route("/admin/js/<path:filename>")
 def serve_admin_js(filename):
     return send_from_directory("../../fdds/admin/js", filename)
-
-
-@app.route("/simulations/<path:filename>")
-def serve_simulations(filename):
-    return send_from_directory("../../fdds/simulations", filename)
-
-
-@app.route("/simulation/<path:filename>")
-@login_required
-def serve_simulation(filename):
-    return send_from_directory(f"{SIMULATIONS_FOLDER}", filename)
 
 
 @app.route("/threadManager.js")

@@ -38,6 +38,15 @@ def validate_catalog_id(catalog_id):
     return catalog_id
 
 
+def validate_catalog(catalog_id):
+    catalog_id = int(catalog_id)
+    catalog = CatalogServices.find_by_id(catalog_id)
+    if catalog is None:
+        raise ValueError("catalog_id must be a valid catalog")
+
+    return catalog
+
+
 def validate_user_catalog_id(catalog_id):
     catalog_id = int(catalog_id)
     catalog = CatalogServices.find_by_id(catalog_id)
