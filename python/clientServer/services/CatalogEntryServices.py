@@ -1,6 +1,5 @@
-from clientServer.app import db, aesgcm
+from clientServer.app import db, fernet
 from clientServer.models.CatalogEntry import CatalogEntry
-from clientServer.serverKeys import ENCRYPTION_NONCE
 
 
 # catalog_entry_params: {
@@ -16,9 +15,7 @@ def create(catalog_entry_params):
     save_path = catalog_entry_params["save_path"]
     zip_file.save(save_path)
 
-    encrypted_unzip_path = aesgcm.encrypt(
-        ENCRYPTION_NONCE, catalog_entry_params["unzip_path"].encode(), b""
-    )
+    encrypted_unzip_path = fernet.encrypt(catalog_entry_params["unzip_path"].encode())
 
     catalog_entry = CatalogEntry(
         catalog_id=catalog_entry_params["catalog_id"],

@@ -1,5 +1,4 @@
-from clientServer.app import db, aesgcm
-from clientServer.serverKeys import ENCRYPTION_NONCE
+from clientServer.app import db, fernet
 
 
 class CatalogEntry(db.Model):
@@ -25,7 +24,7 @@ class CatalogEntry(db.Model):
     # job_id = db.Column(db.String(255), nullable=False)
 
     def entry_path(self):
-        return aesgcm.decrypt(ENCRYPTION_NONCE, self.encrypted_entry_path, b"").decode()
+        return fernet.decrypt(self.encrypted_entry_path).decode()
 
     def destroy(self):
         db.session.delete(self)
