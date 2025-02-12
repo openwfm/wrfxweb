@@ -1,9 +1,9 @@
 from clientServer.app import db
 from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.models.CatalogEntry import CatalogEntry
+from clientServer.validators import utils as validationUtils
 
 from sqlalchemy import or_, select
-import pathvalidate
 
 
 class Catalog(db.Model):
@@ -33,7 +33,7 @@ class Catalog(db.Model):
         return db.session.execute(any_access_query).first() != None
 
     def catalog_folder(self):
-        return pathvalidate.sanitize_filename(self.name, platform="auto")
+        return validationUtils.sanitize_path(self.name)
 
     def __repr__(self):
         return f"<Catalog {self.id}: public: {self.public}>"

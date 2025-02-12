@@ -17,16 +17,16 @@ export class CatalogEntryUploadModal extends HTMLElement {
                 <p id='catalog-description'></p>
               </div>
               <div id='catalog-entry-upload'>
-                <div id='catalog-entry-name-container'>
+                <div id='catalog-entry-name-container' class='hidden'>
                   <label for='catalog-entry-name'>name:</label>
                   <input type='text' id='catalog-entry-name'></input>
                 </div>
-                <div id='catalog-entry-description-container'>
+                <div id='catalog-entry-description-container' class='hidden'>
                   <label for='catalog-entry-description'>description:</label>
                   <input type='text' id='catalog-entry-description'></input>
                 </div>
                 <label for='catalog-entry-populate'>populate name and description from upload:</label>
-                <input type='checkbox' id='catalog-entry-populate'>
+                <input type='checkbox' id='catalog-entry-populate' checked>
                 <select id='catalog-entry-column'>
                   <option value='Fire'>Fire</option>
                   <option value='Fuel Moisture'>Fuel Moisture</option>

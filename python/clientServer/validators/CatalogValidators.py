@@ -1,8 +1,7 @@
 from clientServer.services import CatalogServices as CatalogServices
+from clientServer.validators import utils as utils
 
 from flask_login import current_user
-import re
-import html
 
 
 def validate_catalog_params(json):
@@ -15,9 +14,9 @@ def validate_catalog_params(json):
         raise ValueError("Public is required")
     if "permissions" not in json:
         raise ValueError("Permissions is required")
-    validated_json["name"] = validate_text(json["name"])
-    validated_json["description"] = validate_text(json["description"])
-    is_public = validate_boolean(json["public"])
+    validated_json["name"] = utils.validate_text(json["name"])
+    validated_json["description"] = utils.validate_text(json["description"])
+    is_public = utils.validate_boolean(json["public"])
     validated_json["public"] = is_public
     if is_public:
         validated_json["permissions"] = []
@@ -60,41 +59,17 @@ def validate_user_catalog_id(catalog_id):
     return catalog
 
 
-def sanitize_text(text_input):
-    return html.escape(text_input)
-
-
-def is_valid_email(email):
-    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-    domain_pattern = r"^@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-
-    return bool(re.match(email_pattern, email)) or bool(re.match(domain_pattern, email))
-
-
 def validate_permissions(permissions):
     sanitized_permissions = []
     for permission in permissions:
         if type(permission) is not str:
             raise ValueError("Permission must be a string")
-        sanitized_permission = sanitize_text(permission)
-        if not is_valid_email(sanitized_permission):
+        sanitized_permission = utils.sanitize_text(permission)
+        if not utils.is_valid_email(sanitized_permission):
             raise ValueError("Permission must be a valid email or domain")
         sanitized_permissions.append(sanitized_permission)
 
     return sanitized_permissions
-
-
-def validate_text(text_input):
-    if type(text_input) is not str:
-        raise ValueError("Text input must be a string")
-    sanitized_text = sanitize_text(text_input)
-    return sanitized_text
-
-
-def validate_boolean(boolean_input):
-    if type(boolean_input) is not bool:
-        raise ValueError("Boolean input must be true or false")
-    return boolean_input
 
 
 def validate_catalog_entry(catalog_entry):
@@ -109,18 +84,20 @@ def validate_catalog_entry(catalog_entry):
     if "zipFile" not in catalog_entry:
         raise ValueError("Permissions is required")
 
-    populateMetadataFromZip = validate_boolean(catalog_entry["populateMetadataFromZip"])
+    populateMetadataFromZip = utils.validate_boolean(
+        catalog_entry["populateMetadataFromZip"]
+    )
     name = ""
     description = ""
 
     if not populateMetadataFromZip:
-        name = validate_text(catalog_entry["name"])
-        description = validate_text(catalog_entry["description"])
+        name = utils.validate_text(catalog_entry["name"])
+        description = utils.validate_text(catalog_entry["description"])
 
     sanitized_catalog_entry = {
         "name": name,
         "description": description,
-        "column": validate_text(catalog_entry["column"]),
+        "column": utils.validate_text(catalog_entry["column"]),
         "populateMetadataFromZip": populateMetadataFromZip,
         "zipFile": validate_zip_file(catalog_entry["zipFile"]),
     }

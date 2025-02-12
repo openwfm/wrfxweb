@@ -8,7 +8,7 @@ def serialize_catalog(catalog):
         "description": catalog.description,
         "name": catalog.name,
         "date_created": catalog.date_created,
-        "entries": CatalogEntrySerializer.serialize_entries(catalog.entries()),
+        "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
     }
 
 
@@ -27,7 +27,7 @@ def serialize_catalog_with_permissions(catalog):
         "name": catalog.name,
         "public": catalog.public,
         "date_created": catalog.date_created,
-        "entries": CatalogEntrySerializer.serialize_entries(catalog.entries()),
+        "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
         "permissions": CatalogAccessSerializer.serialize_accesses(
             catalog.permissions()
         ),

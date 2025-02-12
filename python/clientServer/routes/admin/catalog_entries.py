@@ -35,27 +35,14 @@ def get_catalog_entries(catalog_id):
 
 
 def create_catalog_entry(catalog_id):
-    catalog = CatalogValidators.validate_catalog(catalog_id)
     zipFile = request.files["zipFile"]
-    catalog_entry_params = {catalog_id: catalog_id, zipFile: zipFile}
+    catalog_entry_params = {"catalog_id": catalog_id, "zip_file": zipFile}
     validated_catalog_entry_params = CatalogEntryValidators.validate_catalog_entry(
         catalog_entry_params
     )
-    catalogEntry = CatalogEntryServices.create(validated_catalog_entry_params)
+    catalog_entry = CatalogEntryServices.create(validated_catalog_entry_params)
 
-    # loggingUtils.debug_log(f"formData: {request.form.to_dict()}")
-
-    catalog_folder = catalog.catalog_folder()
-
-    if zipFile.filename != "":
-        save_path = f"{ADMIN_UPLOADS_FOLDER}/{catalog_folder}/{zipFile.filename}"
-        zipFile.save(save_path)
-
-    # catalog_entry_params = CatalogValidators.validate_catalog_entry(request.get_json())
-    # CatalogEntryServices.create(catalog_id, catalog_entry_params)
-    # catalog = CatalogServices.find_by_id(catalog_id)
     return {
         "message": "Entry Successfully Created!",
-        "catalogEntry": catalogEntry,
-        # "catalog": CatalogSerializer.serialize_catalog_with_permissions(catalog),
+        "catalog": CatalogEntrySerializer.serialize_catalog_entry(catalog_entry),
     }, 200

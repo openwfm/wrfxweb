@@ -16,7 +16,7 @@ from flask import render_template, request, session
 @admin_login_required
 def all_admins():
     admins = db.session.query(User).join(Admin).all()
-    admin_jsons = [UserSerializer.serialize_user(admin) for admin in admins]
+    admin_jsons = [UserSerializer.serialize_user_with_email(admin) for admin in admins]
 
     return {"admins": admin_jsons}, 200
 
@@ -29,7 +29,7 @@ def create_admin():
     created_admin_user = AdminServices.create(email)
     return {
         "message": "Admin Successfully Created!",
-        "admin": UserSerializer.serialize_user(created_admin_user),
+        "admin": UserSerializer.serialize_user_with_email(created_admin_user),
     }, 200
 
 
