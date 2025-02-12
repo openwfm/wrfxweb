@@ -1,8 +1,15 @@
 from dotenv import load_dotenv
 import os
+import binascii
 
 load_dotenv()
 
+ENCRYPTION_KEY = bytes.fromhex(
+    os.getenv("ENCRYPTION_KEY", binascii.hexlify(os.urandom(32)).decode())
+)
+ENCRYPTION_NONCE = bytes.fromhex(
+    os.getenv("ENCRYPTION_NONCE", binascii.hexlify(os.urandom(12)).decode())
+)
 CLIENT_SERVER_SECRET = os.getenv("CLIENT_SERVER_SECRET")
 API_URL = os.getenv("API_URL")
 LOG_FILE = os.getenv("LOG_FILE")
