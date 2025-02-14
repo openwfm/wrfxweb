@@ -20,6 +20,8 @@ def create_app():
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///primary.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["UPLOAD_EXTENSIONS"] = [".zip"]
+
     app.secret_key = CLIENT_SERVER_SECRET
 
     if LOG_FILE:

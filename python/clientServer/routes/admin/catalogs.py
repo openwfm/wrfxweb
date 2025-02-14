@@ -1,8 +1,6 @@
 from clientServer.app import app
 from clientServer.serverKeys import (
-    SIMULATIONS_FOLDER,
-    ADMIN_UPLOADS_FOLDER,
-    EXTERNAL_UPLOADS_FOLDER,
+    UPLOADS_FOLDER,
 )
 
 from clientServer.logging import utils as loggingUtils
@@ -33,15 +31,10 @@ def create_catalog():
 
     created_catalog = CatalogServices.create(catalog_params)
 
-    catalog_path = f"{SIMULATIONS_FOLDER}/{created_catalog.catalog_folder()}"
-    admin_upload_path = f"{ADMIN_UPLOADS_FOLDER}/{created_catalog.catalog_folder()}"
-    external_upload_path = (
-        f"{EXTERNAL_UPLOADS_FOLDER}/{created_catalog.catalog_folder()}"
-    )
+    catalog_path = created_catalog.catalog_folder()
+
     try:
         os.makedirs(catalog_path)
-        os.makedirs(admin_upload_path)
-        os.makedirs(external_upload_path)
     except OSError as e:
         error_message = "Error while making Catalog Directory"
         loggingUtils.log_error(

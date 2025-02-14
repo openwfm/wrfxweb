@@ -4,6 +4,7 @@ from clientServer.routes.login import login_required
 from clientServer.validators import CatalogValidators as CatalogValidators
 from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogSerializer as CatalogSerializer
+from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from clientServer.serverKeys import SIMULATIONS_FOLDER
 
 from flask import send_from_directory
@@ -22,13 +23,9 @@ def client_catalogs():
 @app.route("/catalogs/<catalog_id>/catalog_json", methods=["GET"])
 @login_required
 def client_catalog_json(catalog_id):
-    catalog = CatalogServices.find_by_id(catalog_id)
+    catalog = CatalogValidators.validate_catalog(catalog_id)
 
-    catalog_folder = catalog.catalog_folder()
-
-    catalog_path = f"{SIMULATIONS_FOLDER}/{catalog_folder}"
-
-    return send_from_directory(catalog_path, "catalog.json")
+    return CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()), 200
 
 
 @app.route("/catalogs/<catalog_id>/simulation/<path:filename>", methods=["GET"])

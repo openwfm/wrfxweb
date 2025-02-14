@@ -1,4 +1,5 @@
 from clientServer.app import db
+from clientServer.serverKeys import SIMULATIONS_FOLDER
 from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.models.CatalogEntry import CatalogEntry
 from clientServer.validators import utils as validationUtils
@@ -33,7 +34,8 @@ class Catalog(db.Model):
         return db.session.execute(any_access_query).first() != None
 
     def catalog_folder(self):
-        return validationUtils.sanitize_path(self.name)
+        sanitized_id = validationUtils.sanitize_path(f"{self.id}")
+        return f"{SIMULATIONS_FOLDER}/{sanitized_id}"
 
     def __repr__(self):
         return f"<Catalog {self.id}: public: {self.public}>"

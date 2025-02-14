@@ -3,7 +3,9 @@ from clientServer.serverKeys import ENCRYPTION_NONCE
 from clientServer.models.Catalog import Catalog
 from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.services import CatalogAccessServices as CatalogAccessServices
-from clientServer.services import CatalogEntryServices as CatalogEntryServices
+from clientServer.services import (
+    CatalogEntryUploadServices as CatalogEntryUploadServices,
+)
 
 from sqlalchemy import select, outerjoin, or_
 import datetime
@@ -36,7 +38,7 @@ def create(catalog_params):
 
 def destroy(catalog_id):
     CatalogAccessServices.destroy_all(catalog_id)
-    CatalogEntryServices.destroy_all(catalog_id)
+    CatalogEntryUploadServices.destroy_all(catalog_id)
 
     catalog = Catalog.query.get(catalog_id)
     db.session.delete(catalog)

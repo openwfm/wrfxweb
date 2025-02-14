@@ -229,8 +229,8 @@ export class CatalogMenu extends HTMLElement {
     firesListDOM.innerHTML = "";
     fuelMoistureListDOM.innerHTML = "";
     lidarProfilesDOM.innerHTML = "";
-    for (let catName in catalogEntries) {
-      let catEntry = catalogEntries[catName];
+    for (let catEntry of catalogEntries) {
+      let catName = catEntry.name;
       this.addOrder.push(catEntry.job_id);
       let desc = catEntry.description;
       let newLI = new CatalogItem(catEntry, navJobId, this.catalogId);
