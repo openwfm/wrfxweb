@@ -49,6 +49,8 @@ python/clientServer/models/__pycache__/*
 python/clientServer/__pycache__/*
 python/instance/
 python/api/__pycache__/*
+python/simulationWorker/__pycache__/
+python/simulationWorker/__pycache__/*
 python/__pycache__/*
 python/api/instance/
 python/clientServer/routes/__pycache__/*
