@@ -6,6 +6,8 @@ node_modules/
 bower_components/
 fdds/simulations/
 fdds/admin_uploads/
+fdds/uploads/
+fdds/uploads
 fdds/admin_uploads
 fdds/external_uploads/
 fdds/external_uploads

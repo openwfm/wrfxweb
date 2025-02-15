@@ -1,6 +1,7 @@
 from clientServer.app import app
 
 from clientServer.routes.admin.admin_utils import admin_login_required
+from clientServer.logging import utils as loggingUtils
 
 from clientServer.validators import CatalogValidators as CatalogValidators
 from clientServer.validators import (
@@ -12,11 +13,9 @@ from clientServer.services import (
 from clientServer.services import CatalogServices as CatalogServices
 from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
-from flask import request
-
-# from flask_wtf import FlaskForm
-# from flask_wtf.file import FileField
-# from wtforms import SubmitField
+from flask import request, abort
+import zipfile
+import os
 
 
 @app.route("/admin/catalogs/<catalog_id>/entries", methods=["GET", "POST"])
@@ -38,23 +37,39 @@ def get_catalog_entries(catalog_id):
     }, 200
 
 
-# class PostCatalogEntryForm(FlaskForm):
-#     file = FileField('File')
-
-
 def create_catalog_entry(catalog_id):
-    zip_file = request.files["zipFile"]
-    entry_type = ""
-    catalog_entry_params = {
-        "catalog_id": catalog_id,
-        "zip_file": zip_file,
-        "entry_type": entry_type,
-    }
-    validated_catalog_entry_params = (
-        CatalogEntryUploadValidators.validate_catalog_entry_upload(catalog_entry_params)
-    )
-    CatalogEntryUploadServices.create(validated_catalog_entry_params)
+    try:
+        zip_file = request.files["zipFile"]
+        entry_form = request.form["column"]
+        catalog_entry_params = {
+            "catalog_id": catalog_id,
+            "zip_file": zip_file,
+            "entry_type": entry_form,
+        }
+        validated_catalog_entry_params = (
+            CatalogEntryUploadValidators.validate_catalog_entry_upload(
+                catalog_entry_params
+            )
+        )
+        catalog_entry_upload = CatalogEntryUploadServices.create(
+            validated_catalog_entry_params
+        )
+        verify_zip_upload(catalog_entry_upload)
+    except Exception as e:
+        abort(400, f"An error occurred while uploading file: {e}")
 
     return {
         "message": "Entry Successfully Created!",
     }, 200
+
+
+def verify_zip_upload(catalog_entry_upload):
+    upload_path = catalog_entry_upload.upload_path()
+    try:
+        with zipfile.ZipFile(upload_path) as zip_ref:
+            zip_ref.testzip()
+    except zipfile.BadZipFile:
+        os.remove(upload_path)
+        catalog_entry_upload.destroy()
+
+        abort(400, "Corrupted Zip File")

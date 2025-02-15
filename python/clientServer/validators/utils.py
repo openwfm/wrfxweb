@@ -1,6 +1,10 @@
+from clientServer.app import app
+
 import re
 import pathvalidate
 import html
+from werkzeug.utils import secure_filename
+import os
 
 
 def validate_text(text_input):
@@ -17,6 +21,16 @@ def validate_boolean(boolean_input):
 
 
 def validate_zip(zip_file):
+    file_name = secure_filename(zip_file.filename)
+    if file_name == "":
+        raise ValueError("No file present")
+    file_ext = os.path.splitext(file_name)[1]
+    if (
+        file_ext not in app.config["UPLOAD_EXTENSIONS"]
+        or zip_file.mimetype != "application/zip"
+    ):
+        raise ValueError("Uploaded File must be a zip file")
+
     return zip_file
 
 
