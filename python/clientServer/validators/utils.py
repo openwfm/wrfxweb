@@ -25,10 +25,7 @@ def validate_zip(zip_file):
     if file_name == "":
         raise ValueError("No file present")
     file_ext = os.path.splitext(file_name)[1]
-    if (
-        file_ext not in app.config["UPLOAD_EXTENSIONS"]
-        or zip_file.mimetype != "application/zip"
-    ):
+    if file_ext != ".zip" or zip_file.mimetype != "application/zip":
         raise ValueError("Uploaded File must be a zip file")
 
     return zip_file
