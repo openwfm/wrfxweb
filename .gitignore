@@ -32,6 +32,8 @@ api/instance
 api/api_key.py
 api/user.db
 deployment.MD
+python/logs/*
+python/taskQueueService/queue/*
 python/clientServer/logs/*
 python/clientServer/logs
 python/clientServer/client_secret.json

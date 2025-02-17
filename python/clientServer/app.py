@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from clientServer.serverKeys import (
-    LOG_FILE,
+    CLIENT_LOG_FILE,
     CLIENT_SERVER_SECRET,
     ENCRYPTION_KEY,
     SERVER_ENCRYPTION_KEY,
@@ -24,9 +24,9 @@ def create_app():
 
     app.secret_key = CLIENT_SERVER_SECRET
 
-    if LOG_FILE:
+    if CLIENT_LOG_FILE:
         app.logger.setLevel(logging.DEBUG)
-        handler = logging.FileHandler(LOG_FILE)
+        handler = logging.FileHandler(CLIENT_LOG_FILE)
         app.logger.addHandler(handler)
 
     db.init_app(app)
