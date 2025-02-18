@@ -3,7 +3,7 @@ import os
 import binascii
 from cryptography.fernet import Fernet
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 ENCRYPTION_KEY = bytes.fromhex(
     os.getenv("ENCRYPTION_KEY", binascii.hexlify(os.urandom(32)).decode())
@@ -22,3 +22,6 @@ OAUTH_SCOPES = os.getenv("OAUTH_SCOPES", "").split(" ")
 DEBUG_LOGS = os.getenv("DEBUG_LOGS")
 UPLOADS_FOLDER = os.getenv("UPLOADS_FOLDER")
 SIMULATIONS_FOLDER = os.getenv("SIMULATIONS_FOLDER")
+UPLOAD_QUEUE_SERVICE_URL = os.getenv("UPLOAD_QUEUE_SERVICE_URL")
+CLIENT_SERVER_API_KEY = os.getenv("CLIENT_SERVER_API_KEY")
+UPLOAD_QUEUE_SERVICE_API_KEY = os.getenv("UPLOAD_QUEUE_SERVICE_API_KEY")

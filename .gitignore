@@ -34,6 +34,10 @@ api/user.db
 deployment.MD
 python/logs/*
 python/taskQueueService/queue/*
+python/uploadQueueService/__pycache__/*
+python/uploadQueueService/services/__pycache__/*
+python/uploadQueueService/logging/__pycache__/*
+python/uploadQueueService/queue/*
 python/clientServer/logs/*
 python/clientServer/logs
 python/clientServer/client_secret.json
