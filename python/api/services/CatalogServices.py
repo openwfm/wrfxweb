@@ -1,5 +1,5 @@
-from clientServer.app import db, aesgcm
-from clientServer.serverKeys import ENCRYPTION_NONCE
+from clientServer.app import db
+import api.encryption as encryption
 from clientServer.models.Catalog import Catalog
 from clientServer.models.CatalogAccess import CatalogAccess
 from clientServer.services import CatalogAccessServices as CatalogAccessServices
@@ -71,7 +71,7 @@ def find_all():
 def find_by_user(user):
     user_id = user.id
     user_domain = user.domain()
-    encrypted_domain = aesgcm.encrypt(ENCRYPTION_NONCE, user_domain.encode(), b"")
+    encrypted_domain = encryption.encrypt_user_data(user_domain)
 
     catalog_join_query = outerjoin(
         Catalog, CatalogAccess, Catalog.id == CatalogAccess.catalog_id

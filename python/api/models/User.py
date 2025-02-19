@@ -1,6 +1,7 @@
 from clientServer.app import db, aesgcm
 from clientServer.serverKeys import ENCRYPTION_NONCE
 from flask_login import UserMixin
+import api.encryption as encryption
 
 
 class User(UserMixin, db.Model):
@@ -14,7 +15,7 @@ class User(UserMixin, db.Model):
         return f"@{self.email().split('@')[1]}"
 
     def email(self):
-        return aesgcm.decrypt(ENCRYPTION_NONCE, self.encrypted_email, b"").decode()
+        return encryption.decrypt_user_data(self.encrypted_email)
 
     def destroy(self):
         db.session.delete(self)

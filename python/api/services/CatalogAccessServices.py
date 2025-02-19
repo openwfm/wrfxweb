@@ -1,7 +1,7 @@
-from clientServer.app import db, aesgcm
-from clientServer.serverKeys import ENCRYPTION_NONCE
+from clientServer.app import db
 from clientServer.models.CatalogAccess import CatalogAccess
 
+import api.encryption as encryption
 
 from clientServer.services import UserServices as UserServices
 
@@ -11,7 +11,7 @@ def find_by_user(catalog_id, user_id):
 
 
 def find_by_domain(catalog_id, domain):
-    encrypted_domain = aesgcm.encrypt(ENCRYPTION_NONCE, domain.encode(), b"")
+    encrypted_domain = encryption.encrypt_user_data(domain)
     return CatalogAccess.query.filter_by(
         catalog_id=catalog_id, encrypted_domain=encrypted_domain
     ).first()
@@ -38,7 +38,7 @@ def create_for_user(catalog_id, email):
 
 
 def create_for_domain(catalog_id, domain):
-    encrypted_domain = aesgcm.encrypt(ENCRYPTION_NONCE, domain.encode(), b"")
+    encrypted_domain = encryption.encrypt_user_data(domain)
     new_catalog_access = find_by_domain(catalog_id, domain)
     if new_catalog_access:
         return new_catalog_access

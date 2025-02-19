@@ -1,5 +1,5 @@
-from clientServer.app import db, aesgcm
-from clientServer.serverKeys import ENCRYPTION_NONCE
+from clientServer.app import db
+import api.encryption as encryption
 
 
 class CatalogAccess(db.Model):
@@ -19,7 +19,7 @@ class CatalogAccess(db.Model):
         return self.domain()
 
     def domain(self):
-        return aesgcm.decrypt(ENCRYPTION_NONCE, self.encrypted_domain, b"").decode()
+        return encryption.decrypt_user_data(self.encrypted_domain)
 
     def permission_type(self):
         if self.user_id:
