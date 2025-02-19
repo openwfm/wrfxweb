@@ -1,5 +1,5 @@
 from uploadQueueService.app import app
-from uploadQueueService import services
+from uploadQueueService.queue.upload_queue import upload_queue
 from uploadQueueService.logging import utils as loggingUtils
 from uploadQueueService.serviceKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
@@ -7,8 +7,9 @@ from uploadQueueService.serviceKeys import (
     SIMULATION_WORKER_API_KEY,
 )
 from functools import wraps
-from flask import request
+from flask import request, abort
 import requests
+import threading
 
 
 def api_key_required(f):
@@ -25,16 +26,23 @@ def api_key_required(f):
 
 
 waiting_on_worker = False
+lock = threading.Lock()
 
 
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
 @app.route("/enqueue/<catalog_entry_upload_id>", methods=["POST"])
 @api_key_required
 def equeue_upload(catalog_entry_upload_id):
-    enqueue(catalog_entry_upload_id)
+    validate_catalog_entry_upload_id(catalog_entry_upload_id)
+    upload_queue.enqueue(catalog_entry_upload_id)
     if not waiting_on_worker:
         post_upload_worker(catalog_entry_upload_id)
     return {"message": "Success!"}, 200
+
+
+def validate_catalog_entry_upload_id(catalog_entry_upload_id):
+    if not catalog_entry_upload_id.isdigit():
+        abort(400, "Posted catalog_entry_upload_id must be an integer")
 
 
 # called after worker done with last upload. if queue empty, set busy to false. else, pop queue and respond
@@ -42,27 +50,12 @@ def equeue_upload(catalog_entry_upload_id):
 @app.route("/dequeue", methods=["GET"])
 @api_key_required
 def dequeue_upload():
-    dequeue()
-    next_catalog_entry_upload_id = peek()
+    upload_queue.dequeue()
+    next_catalog_entry_upload_id = upload_queue.peek()
     if next_catalog_entry_upload_id == None:
         return {"message": "Queue is Empty!"}, 204
     else:
         return {"catalog_entry_upload_id": next_catalog_entry_upload_id}
-
-
-def enqueue(catalog_entry_upload_id):
-    loggingUtils.log_enqueue(catalog_entry_upload_id)
-    pass
-
-
-def dequeue():
-    catalog_entry_upload_id = ""
-    loggingUtils.log_dequeue(catalog_entry_upload_id)
-    return ""
-
-
-def peek():
-    return ""
 
 
 def post_upload_worker(catalog_entry_upload_id):
