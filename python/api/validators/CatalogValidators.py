@@ -1,7 +1,5 @@
-from clientServer.services import CatalogServices as CatalogServices
-from clientServer.validators import utils as utils
-
-from flask_login import current_user
+from api.services import CatalogServices as CatalogServices
+from api.validators import utils as utils
 
 
 def validate_catalog_params(json):
@@ -46,7 +44,7 @@ def validate_catalog(catalog_id):
     return catalog
 
 
-def validate_user_catalog_id(catalog_id):
+def validate_user_catalog_id(catalog_id, current_user):
     catalog_id = int(catalog_id)
     catalog = CatalogServices.find_by_id(catalog_id)
     if catalog is None:
@@ -70,40 +68,3 @@ def validate_permissions(permissions):
         sanitized_permissions.append(sanitized_permission)
 
     return sanitized_permissions
-
-
-def validate_catalog_entry(catalog_entry):
-    if "name" not in catalog_entry:
-        raise ValueError("Name is required")
-    if "description" not in catalog_entry:
-        raise ValueError("Description is required")
-    if "column" not in catalog_entry:
-        raise ValueError("Public is required")
-    if "populateMetadataFromZip" not in catalog_entry:
-        raise ValueError("Permissions is required")
-    if "zipFile" not in catalog_entry:
-        raise ValueError("Permissions is required")
-
-    populateMetadataFromZip = utils.validate_boolean(
-        catalog_entry["populateMetadataFromZip"]
-    )
-    name = ""
-    description = ""
-
-    if not populateMetadataFromZip:
-        name = utils.validate_text(catalog_entry["name"])
-        description = utils.validate_text(catalog_entry["description"])
-
-    sanitized_catalog_entry = {
-        "name": name,
-        "description": description,
-        "column": utils.validate_text(catalog_entry["column"]),
-        "populateMetadataFromZip": populateMetadataFromZip,
-        "zipFile": validate_zip_file(catalog_entry["zipFile"]),
-    }
-
-    return sanitized_catalog_entry
-
-
-def validate_zip_file(zip_file):
-    return {}

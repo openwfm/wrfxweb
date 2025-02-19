@@ -1,4 +1,4 @@
-from clientServer.app import db
+from api.db import db
 import api.encryption as encryption
 
 

@@ -1,6 +1,5 @@
-from clientServer.app import db, aesgcm
-from clientServer.models.User import User
-from clientServer.serverKeys import ENCRYPTION_KEY, ENCRYPTION_NONCE
+from api.db import db
+from api.models.User import User
 import api.encryption as encryption
 import datetime
 
@@ -26,3 +25,7 @@ def find(email):
     return db.session.scalar(
         db.select(User).where(User.encrypted_email == email_cipher)
     )
+
+
+def find_by_id(user_id):
+    return User.query.get(user_id)

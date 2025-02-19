@@ -1,9 +1,9 @@
-from clientServer.app import db
+from api.db import db
 import api.encryption as encryption
-from clientServer.models.Catalog import Catalog
-from clientServer.models.CatalogAccess import CatalogAccess
-from clientServer.services import CatalogAccessServices as CatalogAccessServices
-from clientServer.services import (
+from api.models.Catalog import Catalog
+from api.models.CatalogAccess import CatalogAccess
+from api.services import CatalogAccessServices as CatalogAccessServices
+from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
 )
 

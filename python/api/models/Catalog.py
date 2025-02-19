@@ -1,8 +1,8 @@
-from clientServer.app import db
-from clientServer.serverKeys import SIMULATIONS_FOLDER
-from clientServer.models.CatalogAccess import CatalogAccess
-from clientServer.models.CatalogEntry import CatalogEntry
-from clientServer.validators import utils as validationUtils
+from api.db import db
+from api.apiKeys import SIMULATIONS_FOLDER
+from api.models.CatalogAccess import CatalogAccess
+from api.models.CatalogEntry import CatalogEntry
+from api.validators import utils as validationUtils
 
 from sqlalchemy import or_, select
 

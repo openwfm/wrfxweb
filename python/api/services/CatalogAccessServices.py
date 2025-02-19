@@ -1,9 +1,9 @@
-from clientServer.app import db
-from clientServer.models.CatalogAccess import CatalogAccess
+from api.db import db
+from api.models.CatalogAccess import CatalogAccess
 
 import api.encryption as encryption
 
-from clientServer.services import UserServices as UserServices
+from api.services import UserServices as UserServices
 
 
 def find_by_user(catalog_id, user_id):

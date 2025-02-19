@@ -1,5 +1,3 @@
-from clientServer.app import app
-
 import re
 import pathvalidate
 import html

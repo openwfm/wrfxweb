@@ -1,7 +1,5 @@
-from clientServer.app import db, fernet
-from clientServer.validators import utils as validationUtils
-from clientServer.models.CatalogEntryUpload import CatalogEntryUpload
-from clientServer.serverKeys import UPLOADS_FOLDER
+from api.db import db
+from api.models.CatalogEntryUpload import CatalogEntryUpload
 
 
 # catalog_entry_upload_params {

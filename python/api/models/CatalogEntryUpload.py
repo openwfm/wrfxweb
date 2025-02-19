@@ -1,6 +1,6 @@
-from clientServer.app import db
-from clientServer.serverKeys import UPLOADS_FOLDER
-from clientServer.validators import utils as validationUtils
+from api.db import db
+from api.apiKeys import UPLOADS_FOLDER
+from api.validators import utils as validationUtils
 
 
 class CatalogEntryUpload(db.Model):

@@ -1,8 +1,6 @@
-from clientServer.validators import CatalogValidators as CatalogValidators
-from clientServer.validators import utils as validationUtils
-from clientServer.serverKeys import SIMULATIONS_FOLDER
-
-from flask_login import current_user
+from api.validators import CatalogValidators as CatalogValidators
+from api.validators import UserValidators as UserValidators
+from api.validators import utils as validationUtils
 
 
 # uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -16,14 +14,17 @@ def validate_catalog_entry_upload(json):
         raise ValueError("zip_file is required")
     if "entry_type" not in json:
         raise ValueError("entry_type is required")
+    if "uploader_id" not in json:
+        raise ValueError("uploader_id is required")
 
     catalog_id = CatalogValidators.validate_catalog_id(json["catalog_id"])
+    uploader_id = UserValidators.validate_user_id(json["uploader_id"])
     zip_file = validationUtils.validate_zip(json["zip_file"])
     entry_type = validationUtils.validate_text(json["entry_type"])
 
     return {
         "catalog_id": catalog_id,
         "zip_file": zip_file,
-        "uploader_id": current_user.id,
+        "uploader_id": uploader_id,
         "entry_type": entry_type,
     }

@@ -1,5 +1,4 @@
-from clientServer.app import db, aesgcm
-from clientServer.serverKeys import ENCRYPTION_NONCE
+from api.db import db
 from flask_login import UserMixin
 import api.encryption as encryption
 
