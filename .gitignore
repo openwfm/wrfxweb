@@ -38,6 +38,9 @@ python/uploadQueueService/services/__pycache__/*
 python/uploadQueueService/logging/__pycache__/*
 python/uploadQueueService/queue/uploadQueue.log
 python/uploadQueueService/queue/__pycache__/*
+python/uploadWorker/__pycache__/*
+python/uploadWorker/logging/__pycache__/*
+python/uploadWorker/services/__pycache__/*
 python/clientServer/logs/*
 python/clientServer/logs
 python/clientServer/client_secret.json

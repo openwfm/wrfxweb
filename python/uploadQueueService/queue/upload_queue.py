@@ -25,6 +25,8 @@ class UploadQueue:
         with self.lock:
             with open(UPLOAD_QUEUE_SERVICE_QUEUE, "r+") as file:
                 lines = file.readlines()
+                if len(lines) == 0:
+                    return catalog_entry_upload_id
                 catalog_entry_upload_id = lines[0]
                 file.seek(0)
                 file.truncate()

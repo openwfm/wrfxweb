@@ -1,15 +1,11 @@
 from uploadQueueService.app import app
 from uploadQueueService.queue.upload_queue import upload_queue
-from uploadQueueService.logging import utils as loggingUtils
+from uploadQueueService.services.upload_worker_services import upload_worker_services
 from uploadQueueService.serviceKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
-    SIMULATION_WORKER_URL,
-    SIMULATION_WORKER_API_KEY,
 )
 from functools import wraps
 from flask import request, abort
-import requests
-import threading
 
 
 def api_key_required(f):
@@ -25,18 +21,14 @@ def api_key_required(f):
     return wrapper
 
 
-waiting_on_worker = False
-lock = threading.Lock()
-
-
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
 @app.route("/enqueue/<catalog_entry_upload_id>", methods=["POST"])
 @api_key_required
 def equeue_upload(catalog_entry_upload_id):
     validate_catalog_entry_upload_id(catalog_entry_upload_id)
     upload_queue.enqueue(catalog_entry_upload_id)
-    if not waiting_on_worker:
-        post_upload_worker(catalog_entry_upload_id)
+    if not upload_worker_services.waiting_on_upload_worker:
+        upload_worker_services.post(catalog_entry_upload_id)
     return {"message": "Success!"}, 200
 
 
@@ -52,21 +44,8 @@ def validate_catalog_entry_upload_id(catalog_entry_upload_id):
 def dequeue_upload():
     upload_queue.dequeue()
     next_catalog_entry_upload_id = upload_queue.peek()
-    if next_catalog_entry_upload_id == None:
+    if next_catalog_entry_upload_id == "":
+        upload_worker_services.waiting_on_upload_worker = False
         return {"message": "Queue is Empty!"}, 204
     else:
         return {"catalog_entry_upload_id": next_catalog_entry_upload_id}
-
-
-def post_upload_worker(catalog_entry_upload_id):
-    post_url = f"{SIMULATION_WORKER_URL}/{catalog_entry_upload_id}"
-    try:
-        headers = {
-            "Content-type": "application/json",
-            "API-Key": SIMULATION_WORKER_API_KEY,
-        }
-        response = requests.post(post_url, headers=headers)
-        response.raise_for_status()
-        loggingUtils.log_upload_worker(catalog_entry_upload_id)
-    except requests.exceptions.RequestException as e:
-        loggingUtils.log_upload_worker_error(catalog_entry_upload_id, f"{e}")

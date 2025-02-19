@@ -18,6 +18,7 @@
     "start-fe": "http-server --cors -g -a localhost -p 8000 -c-1 -P http://localhost:5000",
     "start-client": "cd python/clientServer && ../venv/bin/flask --app __init__ run --debug --port 8000",
     "start-upload-queue": "cd python/uploadQueueService && ../venv/bin/flask --app __init__ run --debug --port 8001",
+    "start-upload-worker": "cd python/uploadWorker && ../venv/bin/flask --app __init__ run --debug --port 8002",
     "start-api": "cd python/api && ../venv/bin/flask --app __init__ run --debug --port 8080",
     "test": "jest --silent"
   }
