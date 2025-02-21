@@ -12,6 +12,21 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
+def log_unpacking_error(catalog_entry_upload_id, file_path):
+    error_message = f"catalog_entry_upload_id: {catalog_entry_upload_id} - loading file {file_path} failed"
+    log_statement("UploadThreadError", error_message, True)
+
+
+def log_catalog_entry_fail(catalog_entry_upload, job_id):
+    error_message = f"failed to create CatalogEntry with job_id {job_id} for CatalogEntryUpload<{catalog_entry_upload.id}>"
+    log_statement("UploadThreadError", error_message, True)
+
+
+def log_catalog_entry(catalog_entry_upload, catalog_entry):
+    creation_message = f"created CatalogEntry<{catalog_entry.id}> from CatalogEntryUpload <{catalog_entry_upload.id}>"
+    log_statement("UploadThread", creation_message, True)
+
+
 def log_upload_worker_ready():
     worker_ready_message = f"done processing from queue. UploadWorker is ready"
     log_statement("UploadWorker", worker_ready_message, True)

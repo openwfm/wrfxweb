@@ -3,6 +3,10 @@ import os
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
+UPLOADS_FOLDER = os.getenv("UPLOADS_FOLDER")
+TEMP_FOLDER = os.getenv("TEMP_FOLDER", "")
+SIMULATIONS_FOLDER = os.getenv("SIMULATIONS_FOLDER", "")
+ERROR_FOLDER = os.getenv("ERROR_FOLDER", "")
 UPLOAD_WORKER_SECRET = os.getenv("UPLOAD_WORKER_SECRET")
 UPLOAD_WORKER_LOG = os.getenv("UPLOAD_WORKER_LOG")
 UPLOAD_WORKER_DEBUG_LOGS = os.getenv("UPLOAD_WORKER_DEBUG_LOGS")

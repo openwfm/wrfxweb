@@ -1,19 +1,21 @@
 from uploadWorker.app import app
 from uploadWorker.logging import utils as loggingUtils
 from uploadWorker.services.upload_queue_services import upload_queue_services
+import uploadWorker.threads.thread_utils as thread_utils
 
 import api.services.CatalogEntryUploadServices as CatalogEntryUploadServices
 
 import threading
-import time
 
-UPLOAD_EXTENSIONS = [".json", ".png", ".kmz"]
 REFETCH_ATTEMPTS = 5
 
 
 class UploadThread:
     def __init__(self):
         self.thread = None
+
+    def ready(self):
+        return self.thread == None or not self.thread.is_alive()
 
     def start(self, catalog_entry_upload_id):
         self.thread = threading.Thread(
@@ -29,9 +31,6 @@ class UploadThread:
         if next_catalog_entry_upload_id != None:
             self.process_and_dequeue(next_catalog_entry_upload_id)
 
-    def ready(self):
-        return self.thread == None or not self.thread.is_alive()
-
     def process_catalog_entry_upload_id(self, catalog_entry_upload_id):
         with app.app_context():
             catalog_entry_upload = CatalogEntryUploadServices.find_by_id(
@@ -43,7 +42,8 @@ class UploadThread:
                 return
 
             loggingUtils.log_processing_catalog_entry_upload(catalog_entry_upload.id)
-            time.sleep(10)
+
+            thread_utils.unpack_catalog_entry_upload(catalog_entry_upload)
 
             loggingUtils.log_processed_catalog_entry_upload(catalog_entry_upload.id)
 

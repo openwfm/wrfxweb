@@ -6,6 +6,8 @@ import os
 
 
 def validate_text(text_input):
+    if text_input == None:
+        return ""
     if type(text_input) is not str:
         raise ValueError("Text input must be a string")
     sanitized_text = sanitize_text(text_input)

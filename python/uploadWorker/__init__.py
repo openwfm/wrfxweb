@@ -1,6 +1,6 @@
 from uploadWorker.app import app
 from uploadWorker.logging import utils as loggingUtils
-from uploadWorker.services.upload_thread import upload_thread
+from uploadWorker.threads.upload_thread import upload_thread
 from uploadWorker.workerKeys import (
     UPLOAD_WORKER_API_KEY,
 )

@@ -31,19 +31,19 @@ def create_catalog():
 
     created_catalog = CatalogServices.create(catalog_params)
 
-    catalog_path = created_catalog.catalog_folder()
-
-    try:
-        os.makedirs(catalog_path)
-    except OSError as e:
-        error_message = "Error while making Catalog Directory"
-        loggingUtils.log_error(
-            f"POST /admin/catalogs {error_message} {catalog_path}: {e}"
-        )
-        CatalogServices.destroy(created_catalog.id)
-
-        return {"message": error_message}, 500
-
+    # catalog_path = created_catalog.catalog_folder()
+    #
+    # try:
+    #     os.makedirs(catalog_path)
+    # except OSError as e:
+    #     error_message = "Error while making Catalog Directory"
+    #     loggingUtils.log_error(
+    #         f"POST /admin/catalogs {error_message} {catalog_path}: {e}"
+    #     )
+    #     CatalogServices.destroy(created_catalog.id)
+    #
+    #     return {"message": error_message}, 500
+    #
     return {
         "message": "Catalog Successfully Created!",
         "catalog": CatalogSerializer.serialize_catalog_with_permissions(
