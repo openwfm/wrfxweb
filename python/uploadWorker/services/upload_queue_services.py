@@ -20,14 +20,19 @@ class UploadQueueServices:
                 next_catalog_entry_upload_id = response.json()[
                     "catalog_entry_upload_id"
                 ]
+                if not next_catalog_entry_upload_id.isdigit():
+                    loggingUtils.log_invalid_catalog_entry_upload(
+                        next_catalog_entry_upload_id
+                    )
+                    return -1
                 loggingUtils.log_upload_queue_service(next_catalog_entry_upload_id)
-                return next_catalog_entry_upload_id
+                return int(next_catalog_entry_upload_id)
             elif response.status_code == 204:
                 loggingUtils.log_upload_queue_service_empty()
-                return ""
+                return None
         except requests.exceptions.RequestException as e:
             loggingUtils.log_upload_queue_service_error(f"{e}")
-            return ""
+            return -1
 
 
 upload_queue_services = UploadQueueServices()

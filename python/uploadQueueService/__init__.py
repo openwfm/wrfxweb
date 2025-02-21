@@ -27,7 +27,7 @@ def api_key_required(f):
 def equeue_upload(catalog_entry_upload_id):
     validate_catalog_entry_upload_id(catalog_entry_upload_id)
     upload_queue.enqueue(catalog_entry_upload_id)
-    if not upload_worker_services.waiting_on_upload_worker:
+    if upload_worker_services.ready():
         upload_worker_services.post(catalog_entry_upload_id)
     return {"message": "Success!"}, 200
 
@@ -45,7 +45,6 @@ def dequeue_upload():
     upload_queue.dequeue()
     next_catalog_entry_upload_id = upload_queue.peek()
     if next_catalog_entry_upload_id == "":
-        upload_worker_services.waiting_on_upload_worker = False
         return {"message": "Queue is Empty!"}, 204
     else:
         return {"catalog_entry_upload_id": next_catalog_entry_upload_id}

@@ -36,7 +36,8 @@ def validate_catalog_id(catalog_id):
 
 
 def validate_catalog(catalog_id):
-    catalog_id = int(catalog_id)
+    if type(catalog_id) is not int:
+        raise ValueError("catalog_id must be an integer")
     catalog = CatalogServices.find_by_id(catalog_id)
     if catalog is None:
         raise ValueError("catalog_id must be a valid catalog")

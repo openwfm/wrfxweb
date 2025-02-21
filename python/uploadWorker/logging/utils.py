@@ -17,6 +17,16 @@ def log_upload_worker_ready():
     log_statement("UploadWorker", worker_ready_message, True)
 
 
+def log_invalid_catalog_entry_upload(catalog_entry_upload_id):
+    invalid_id_message = f"catalog_entry_upload_id: {catalog_entry_upload_id}"
+    log_statement("InvalidCatalogEntryUploadId", invalid_id_message, True)
+
+
+def log_no_catalog_entry_upload(catalog_entry_upload_id):
+    no_catalog_entry = f"catalog_entry_upload_id: {catalog_entry_upload_id}"
+    log_statement("NoCatalogEntryUploadFound", no_catalog_entry, True)
+
+
 def log_upload_queue_service_error(error):
     upload_error_message = f"error when dequeueing UploadQueueService: {error}"
     log_statement("UploadQueueService", upload_error_message, True)
@@ -29,6 +39,11 @@ def log_upload_worker_post(catalog_entry_upload_id):
 
 def log_processing_catalog_entry_upload(catalog_entry_upload_id):
     upload_message = f"Processing catalog_entry_upload_id: {catalog_entry_upload_id}"
+    log_statement("UploadWorker", upload_message, True)
+
+
+def log_processed_catalog_entry_upload(catalog_entry_upload_id):
+    upload_message = f"Processed catalog_entry_upload_id: {catalog_entry_upload_id}"
     log_statement("UploadWorker", upload_message, True)
 
 
