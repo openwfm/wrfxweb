@@ -8,6 +8,7 @@ from api.validators import utils as validationUtils
 # user = db.relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
 # entry_type = db.Column(db.String(255), nullable=False)
 def validate_create_json(json):
+    print(f"json: {json}")
     if "job_id" not in json:
         raise ValueError("job_id is required")
     if "uploader_id" not in json:

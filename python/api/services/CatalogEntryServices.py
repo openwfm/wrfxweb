@@ -13,12 +13,28 @@ def create(json):
     try:
         catalog_entry_params = CatalogEntryValidators.validate_create_json(json)
 
-        catalog_entry = CatalogEntry(catalog_entry_params)
+        catalog_entry = CatalogEntry(
+            catalog_id=catalog_entry_params["catalog_id"],
+            uploader_id=catalog_entry_params["uploader_id"],
+            entry_type=catalog_entry_params["entry_type"],
+            from_utc=catalog_entry_params["from_utc"],
+            to_utc=catalog_entry_params["to_utc"],
+            description=catalog_entry_params["description"],
+            manifest_path=catalog_entry_params["manifest_path"],
+            job_id=catalog_entry_params["job_id"],
+            zip_size=catalog_entry_params["zip_size"],
+            kml_size=catalog_entry_params["kml_size"],
+            processed_utc=catalog_entry_params["processed_utc"],
+            run_utc=catalog_entry_params["run_utc"],
+            zip_url=catalog_entry_params["zip_url"],
+            kml_url=catalog_entry_params["kml_url"],
+        )
 
         db.session.add(catalog_entry)
         db.session.commit()
 
-    except:
+        return catalog_entry
+    except Exception:
         return None
 
 

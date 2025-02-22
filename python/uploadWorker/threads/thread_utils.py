@@ -64,9 +64,9 @@ def create_catalog_entries(catalog_entry_jsons, catalog_entry_upload):
             "zip_size", None
         )
         catalog_entry_json["job_id"] = job_id
-        catalog_entry_json["uploader_id"] = catalog_entry_upload["uploader_id"]
-        catalog_entry_json["catalog_id"] = catalog_entry_upload["catalog_id"]
-        catalog_entry_json["entry_type"] = catalog_entry_upload["entry_type"]
+        catalog_entry_json["uploader_id"] = catalog_entry_upload.uploader_id
+        catalog_entry_json["catalog_id"] = catalog_entry_upload.catalog_id
+        catalog_entry_json["entry_type"] = catalog_entry_upload.entry_type
 
         with app.app_context():
             catalog_entry = CatalogEntryServices.create(catalog_entry_json)
