@@ -6,9 +6,9 @@ from clientServer.serverKeys import (
 from clientServer.logging import utils as loggingUtils
 from clientServer.routes.admin.admin_utils import admin_login_required
 
-from clientServer.validators import CatalogValidators as CatalogValidators
-from clientServer.services import CatalogServices as CatalogServices
-from clientServer.serializers import CatalogSerializer as CatalogSerializer
+from api.validators import CatalogValidators as CatalogValidators
+from api.services import CatalogServices as CatalogServices
+from api.serializers import CatalogSerializer as CatalogSerializer
 
 from flask import request
 import os

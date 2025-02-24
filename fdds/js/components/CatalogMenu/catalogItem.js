@@ -27,7 +27,7 @@ export class CatalogItem extends HTMLElement {
   }
 
   connectedCallback() {
-    let { description, job_id, to_utc, from_utc } = this.catEntry;
+    let { description, job_id, to_utc, from_utc, id } = this.catEntry;
 
     this.querySelector("h3").innerText = description;
     this.querySelector("#jobID").innerText += " " + job_id;
@@ -70,11 +70,12 @@ export class CatalogItem extends HTMLElement {
   }
 
   async clickItem() {
-    let entryID = this.catEntry.job_id;
+    let entryId = this.catEntry.id;
+    let jobId = this.catEntry.job_id;
     let manifestPath = this.catEntry.manifest_path;
     let description = this.catEntry.description;
 
-    simVars.currentSimulation = entryID;
+    simVars.currentSimulation = jobId;
     simVars.currentDescription = description;
     document.querySelector("#current-sim-label").innerText =
       "Shown simulation: " + description;
@@ -84,7 +85,13 @@ export class CatalogItem extends HTMLElement {
 
     let selectedSimulation = await getSimulation(this.catalogId, manifestPath);
     simVars.rasters = selectedSimulation;
-    let simulationPathBase = `simulation/${manifestPath.substring(0, manifestPath.lastIndexOf("/"))}/`;
+    //let simulationPathBase = `simulation/${manifestPath.substring(0, manifestPath.lastIndexOf("/"))}/`;
+    let simulationPathBase = `entries/${entryId}/simulation/`;
+    //simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
+    console.log(
+      "prev path",
+      `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`,
+    );
     simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
     // retrieve all domains
     controllers.domainInstance.setValue(Object.keys(selectedSimulation));

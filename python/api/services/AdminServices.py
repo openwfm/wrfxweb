@@ -1,7 +1,7 @@
 from api.db import db
 from api.models.Admin import Admin
 from api.services import UserServices as UserServices
-
+from api.apiKeys import ADMIN_SERVICES_API_KEY
 
 import datetime
 
@@ -26,7 +26,9 @@ def destroy(email):
     db.session.commit()
 
 
-def isAdmin(user):
+def isAdmin(user, admin_api_key):
+    if admin_api_key != ADMIN_SERVICES_API_KEY:
+        raise PermissionError("Invalid AdminServicesApiKey")
     return (
         db.session.scalar(db.select(Admin).where(Admin.user_id == user.id)) is not None
     )

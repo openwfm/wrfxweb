@@ -1,10 +1,11 @@
-from clientServer.app import app, db
-from clientServer.models.User import User
+from clientServer.app import app
 from clientServer.serverKeys import (
     CLIENT_SECRETS_FILE,
     OAUTH_SCOPES,
 )
-from clientServer.services import UserServices as UserServices
+from api.db import db
+from api.models.User import User
+from api.services import UserServices as UserServices
 from clientServer.logging import utils as loggingUtils
 
 from flask import request, redirect, url_for, session, render_template, flash

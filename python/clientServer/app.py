@@ -1,5 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from api.db import db
+
+# from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from clientServer.serverKeys import (
     CLIENT_LOG_FILE,
@@ -12,7 +14,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.fernet import Fernet
 import logging
 
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 
 def create_app():
@@ -37,5 +39,5 @@ def create_app():
 
 
 app = create_app()
-aesgcm = AESGCM(ENCRYPTION_KEY)
-fernet = Fernet(SERVER_ENCRYPTION_KEY)
+# aesgcm = AESGCM(ENCRYPTION_KEY)
+# fernet = Fernet(SERVER_ENCRYPTION_KEY)

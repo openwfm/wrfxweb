@@ -7,15 +7,15 @@ from clientServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
 )
 
-from clientServer.validators import CatalogValidators as CatalogValidators
-from clientServer.validators import (
+from api.validators import CatalogValidators as CatalogValidators
+from api.validators import (
     CatalogEntryUploadValidators as CatalogEntryUploadValidators,
 )
-from clientServer.services import (
+from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
 )
-from clientServer.services import CatalogServices as CatalogServices
-from clientServer.serializers import CatalogEntrySerializer as CatalogEntrySerializer
+from api.services import CatalogServices as CatalogServices
+from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask import request, abort
 import requests

@@ -1,4 +1,4 @@
-from api.services import CatalogServices as CatalogServices
+# from api.services import CatalogServices as CatalogServices
 from api.validators import utils as utils
 
 
@@ -25,37 +25,26 @@ def validate_catalog_params(json):
 
 
 def validate_catalog_id(catalog_id):
-    catalog_id = int(catalog_id)
-    catalog = CatalogServices.find_by_id(catalog_id)
-    if catalog is None:
-        raise ValueError("catalog_id must be a valid catalog")
-
+    if type(catalog_id) is str:
+        if not catalog_id.isdigit():
+            raise ValueError("catalog_id must be an integer")
+        return int(catalog_id)
     if type(catalog_id) is not int:
-        raise ValueError("Catalog ID must be an integer")
+        raise ValueError("catalog_id must be an integer")
     return catalog_id
 
 
-def validate_catalog(catalog_id):
-    if type(catalog_id) is not int:
-        raise ValueError("catalog_id must be an integer")
-    catalog = CatalogServices.find_by_id(catalog_id)
-    if catalog is None:
-        raise ValueError("catalog_id must be a valid catalog")
-
-    return catalog
-
-
-def validate_user_catalog_id(catalog_id, current_user):
-    catalog_id = int(catalog_id)
-    catalog = CatalogServices.find_by_id(catalog_id)
-    if catalog is None:
-        raise ValueError("catalog_id must be a valid catalog")
-    if not catalog.user_has_access(current_user):
-        raise ValueError("user does not have access to catalog")
-
-    if type(catalog_id) is not int:
-        raise ValueError("Catalog ID must be an integer")
-    return catalog
+# def validate_user_catalog_id(catalog_id, current_user):
+#     catalog_id = int(catalog_id)
+#     catalog = CatalogServices.find_by_id(catalog_id)
+#     if catalog is None:
+#         raise ValueError("catalog_id must be a valid catalog")
+#     if not catalog.user_has_access(current_user):
+#         raise ValueError("user does not have access to catalog")
+#
+#     if type(catalog_id) is not int:
+#         raise ValueError("Catalog ID must be an integer")
+#     return catalog
 
 
 def validate_permissions(permissions):

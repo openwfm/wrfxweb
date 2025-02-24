@@ -1,7 +1,9 @@
 from api.db import db
 import api.encryption as encryption
+from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.models.Catalog import Catalog
 from api.models.CatalogAccess import CatalogAccess
+from api.validators import CatalogValidators as CatalogValidators
 from api.services import CatalogAccessServices as CatalogAccessServices
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
@@ -68,27 +70,48 @@ def find_all():
     return Catalog.query.all()
 
 
-def find_by_user(user):
-    user_id = user.id
-    user_domain = user.domain()
-    encrypted_domain = encryption.encrypt_user_data(user_domain)
+def user_catalog(user, catalog_id, client_server_api_key):
+    try:
+        if client_server_api_key not in CLIENT_SERVER_API_KEYS:
+            raise PermissionError("Invalid UserServicesAPIKey")
 
-    catalog_join_query = outerjoin(
-        Catalog, CatalogAccess, Catalog.id == CatalogAccess.catalog_id
-    )
-    user_catalogs_query = (
-        select(Catalog)
-        .select_from(catalog_join_query)
-        .where(
-            or_(
-                catalog_join_query.c.catalog_access_user_id == user_id,
-                catalog_join_query.c.catalog_public == True,
-                catalog_join_query.c.catalog_access_encrypted_domain
-                == encrypted_domain,
+        validated_catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
+
+        catalog = find_by_id(validated_catalog_id)
+        if catalog == None or not catalog.user_has_access(user):
+            return None
+        return catalog
+
+    except Exception:
+        return None
+
+
+def user_catalogs(user, client_server_api_key):
+    try:
+        if client_server_api_key not in CLIENT_SERVER_API_KEYS:
+            raise PermissionError("Invalid UserServicesAPIKey")
+        user_id = user.id
+        user_domain = user.domain()
+        encrypted_domain = encryption.encrypt_user_data(user_domain)
+
+        catalog_join_query = outerjoin(
+            Catalog, CatalogAccess, Catalog.id == CatalogAccess.catalog_id
+        )
+        user_catalogs_query = (
+            select(Catalog)
+            .select_from(catalog_join_query)
+            .where(
+                or_(
+                    catalog_join_query.c.catalog_access_user_id == user_id,
+                    catalog_join_query.c.catalog_public == True,
+                    catalog_join_query.c.catalog_access_encrypted_domain
+                    == encrypted_domain,
+                )
             )
         )
-    )
 
-    user_catalogs = [row[0] for row in db.session.execute(user_catalogs_query)]
+        user_catalogs = [row[0] for row in db.session.execute(user_catalogs_query)]
 
-    return user_catalogs
+        return user_catalogs
+    except Exception:
+        return []
