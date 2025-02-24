@@ -1,6 +1,5 @@
 from api.db import db
 from api.apiKeys import SIMULATIONS_FOLDER
-from api.validators import utils as validationUtils
 
 
 class CatalogEntry(db.Model):
@@ -25,8 +24,19 @@ class CatalogEntry(db.Model):
 
     def entry_path(self):
         entry_path = f"{SIMULATIONS_FOLDER}/{self.job_id}"
-        return validationUtils.sanitize_path(entry_path)
+        return entry_path
+
+    def entry_manifest_path(self):
+        manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
+        return manifest_path
+
+    def directory(self):
+        return SIMULATIONS_FOLDER
 
     def destroy(self):
         db.session.delete(self)
         db.session.commit()
+
+    def user_has_access(self, user):
+        catalog = self.catalog
+        return catalog.user_has_access(user)

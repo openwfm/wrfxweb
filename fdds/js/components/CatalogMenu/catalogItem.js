@@ -83,15 +83,18 @@ export class CatalogItem extends HTMLElement {
 
     document.querySelector("#simulation-flags").classList.remove("hidden");
 
-    let selectedSimulation = await getSimulation(this.catalogId, manifestPath);
+    //let selectedSimulation = await getSimulation(this.catalogId, manifestPath);
+    console.log(
+      "prev path",
+      `${CATALOG_URL}/${this.catalogId}/simulation/${manifestPath}`,
+    );
+    let selectedSimulation = await getSimulation(this.catalogId, entryId);
+
     simVars.rasters = selectedSimulation;
     //let simulationPathBase = `simulation/${manifestPath.substring(0, manifestPath.lastIndexOf("/"))}/`;
     let simulationPathBase = `entries/${entryId}/simulation/`;
     //simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
-    console.log(
-      "prev path",
-      `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`,
-    );
+
     simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
     // retrieve all domains
     controllers.domainInstance.setValue(Object.keys(selectedSimulation));

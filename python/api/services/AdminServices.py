@@ -27,6 +27,9 @@ def destroy(email):
 
 
 def isAdmin(user, admin_api_key):
+    print(
+        f"ADMIN_SERVICES_API_KEY: {ADMIN_SERVICES_API_KEY}, admin_api_key: {admin_api_key}"
+    )
     if admin_api_key != ADMIN_SERVICES_API_KEY:
         raise PermissionError("Invalid AdminServicesApiKey")
     return (

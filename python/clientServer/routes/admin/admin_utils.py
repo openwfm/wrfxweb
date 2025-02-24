@@ -9,12 +9,15 @@ from functools import wraps
 def admin_login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if current_user.is_anonymous:
-            return redirect(url_for("login_page"))
-        elif not AdminServices.isAdmin(current_user, ADMIN_SERVICES_API_KEY):
+        try:
+            if current_user.is_anonymous:
+                return redirect(url_for("login_page"))
+            elif not AdminServices.isAdmin(current_user, ADMIN_SERVICES_API_KEY):
+                return redirect(url_for("index"))
+            else:
+                return f(*args, **kwargs)
+        except:
             return redirect(url_for("index"))
-        else:
-            return f(*args, **kwargs)
 
     return wrapper
 
