@@ -20,11 +20,8 @@ export async function getAdmins() {
   return response_json.admins;
 }
 
-export async function deleteAdmin(adminEmail) {
-  const DELETE_URL = `${ADMIN_URL}/delete`;
-  let adminParams = {
-    email: adminEmail,
-  };
-  let response_json = await deleteRequest(DELETE_URL, adminParams);
+export async function deleteAdmin(adminId) {
+  const DELETE_URL = `${ADMIN_URL}/${adminId}`;
+  let response_json = await deleteRequest(DELETE_URL);
   return response_json;
 }

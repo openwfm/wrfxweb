@@ -45,12 +45,11 @@ def create_admin():
     }, 200
 
 
-@app.route("/admin/delete/", methods=["DELETE"])
+@app.route("/admin/<admin_id>", methods=["DELETE"])
 @admin_login_required
-def delete_admin():
-    json = request.get_json()
-    email = json["email"]
-    AdminServices.destroy(email)
+def delete_admin(admin_id):
+    print(f"test")
+    AdminServices.admin_destroy(admin_id, current_user, ADMIN_SERVICES_API_KEY)
 
     return {"message": "admin deleted"}, 200
 

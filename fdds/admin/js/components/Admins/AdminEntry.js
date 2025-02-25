@@ -29,7 +29,7 @@ export class AdminEntry extends HTMLElement {
   }
 
   async deleteAdmin() {
-    await deleteAdmin(this.adminUser.email);
+    await deleteAdmin(this.adminUser.id);
     adminControllers.admins.remove(this.adminUser);
   }
 }
