@@ -81,5 +81,12 @@ def user_entries(catalog_id, user, client_server_api_key):
     return catalog.entries()
 
 
+def admin_entries(catalog_id, user, admin_services_api_key):
+    catalog = CatalogServices.admin_catalog(user, catalog_id, admin_services_api_key)
+    if catalog == None:
+        return []
+    return catalog.entries()
+
+
 def find_all(catalog_id):
     pass

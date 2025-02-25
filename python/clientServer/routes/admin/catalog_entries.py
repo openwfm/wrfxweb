@@ -5,6 +5,7 @@ from clientServer.logging import utils as loggingUtils
 from clientServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_URL,
     UPLOAD_QUEUE_SERVICE_API_KEY,
+    ADMIN_SERVICES_API_KEY,
 )
 
 from api.validators import CatalogValidators as CatalogValidators
@@ -14,10 +15,14 @@ from api.validators import (
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
 )
+from api.services import (
+    CatalogEntryServices as CatalogEntryServices,
+)
 from api.services import CatalogServices as CatalogServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask import request, abort
+from flask_login import current_user
 import requests
 import zipfile
 import os
@@ -46,9 +51,11 @@ def external_catalog_entries(catalog_id):
 
 
 def get_catalog_entries(catalog_id):
-    catalog = CatalogValidators.validate_catalog(catalog_id)
+    catalog_entries = CatalogEntryServices.admin_entries(
+        catalog_id, current_user, ADMIN_SERVICES_API_KEY
+    )
     return {
-        "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries),
+        "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog_entries),
     }, 200
 
 
@@ -60,14 +67,10 @@ def create_catalog_entry(catalog_id):
             "catalog_id": catalog_id,
             "zip_file": zip_file,
             "entry_type": entry_form,
+            "uploader_id": current_user.id,
         }
-        validated_catalog_entry_params = (
-            CatalogEntryUploadValidators.validate_catalog_entry_upload(
-                catalog_entry_params
-            )
-        )
         catalog_entry_upload = CatalogEntryUploadServices.create(
-            validated_catalog_entry_params
+            catalog_entry_params, ADMIN_SERVICES_API_KEY
         )
         verify_zip_upload(catalog_entry_upload)
     except Exception as e:

@@ -1,4 +1,9 @@
-def serialize_access(access):
+from api.services import AdminServices as AdminServices
+
+
+def serialize_access(access, user, admin_services_api_key):
+    if access == None or not AdminServices.isAdmin(user, admin_services_api_key):
+        return {}
     return {
         "id": access.id,
         "catalog_id": access.catalog_id,
@@ -7,5 +12,9 @@ def serialize_access(access):
     }
 
 
-def serialize_accesses(accesses):
-    return [serialize_access(access) for access in accesses]
+def serialize_accesses(accesses, user, admin_services_api_key):
+    if not AdminServices.isAdmin(user, admin_services_api_key):
+        return []
+    return [
+        serialize_access(access, user, admin_services_api_key) for access in accesses
+    ]

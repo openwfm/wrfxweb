@@ -1,6 +1,7 @@
 from api.db import db
 from api.models.CatalogEntryUpload import CatalogEntryUpload
 from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadValidators
+from api.apiKeys import UPLOAD_API_KEYS
 
 
 # catalog_entry_upload_params {
@@ -9,8 +10,10 @@ from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadVal
 #        "uploader_id": current_user.id,
 #        "entry_type": entry_type,
 #    }
-def create(json):
+def create(json, upload_api_key):
     try:
+        if upload_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
         catalog_entry_upload_params = CatalogEntryUploadValidators.validate_create_json(
             json
         )

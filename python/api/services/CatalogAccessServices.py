@@ -4,6 +4,7 @@ from api.models.CatalogAccess import CatalogAccess
 import api.encryption as encryption
 
 from api.services import UserServices as UserServices
+from api.services import AdminServices as AdminServices
 
 
 def find_by_user(catalog_id, user_id):
@@ -17,14 +18,20 @@ def find_by_domain(catalog_id, domain):
     ).first()
 
 
-def create(catalog_id, permission):
-    if permission[0] == "@":
-        return create_for_domain(catalog_id, permission)
-    return create_for_user(catalog_id, permission)
+def create(catalog_id, permission, user, admin_services_api_key):
+    try:
+        if not AdminServices.isAdmin(user, admin_services_api_key):
+            return None
+
+        if permission[0] == "@":
+            return create_for_domain(catalog_id, permission)
+        return create_for_user(catalog_id, permission, admin_services_api_key)
+    except:
+        return None
 
 
-def create_for_user(catalog_id, email):
-    user = UserServices.find_or_create(email)
+def create_for_user(catalog_id, email, admin_services_api_key):
+    user = UserServices.find_or_create(email, admin_services_api_key)
     new_catalog_access = find_by_user(catalog_id, user.id)
     if new_catalog_access:
         return new_catalog_access

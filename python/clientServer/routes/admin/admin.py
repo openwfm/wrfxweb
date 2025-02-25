@@ -34,7 +34,9 @@ def all_admins():
 def create_admin():
     json = request.get_json()
     email = json["email"]
-    created_admin_user = AdminServices.create(email)
+    created_admin_user = AdminServices.admin_create(
+        email, current_user, ADMIN_SERVICES_API_KEY
+    )
     return {
         "message": "Admin Successfully Created!",
         "admin": UserSerializer.serialize_user_with_email(

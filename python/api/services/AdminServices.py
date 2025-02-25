@@ -6,8 +6,11 @@ from api.apiKeys import ADMIN_SERVICES_API_KEY
 import datetime
 
 
+# make private
 def create(email):
-    user = UserServices.find_or_create(email)
+    user = UserServices.find_or_create(email, ADMIN_SERVICES_API_KEY)
+    if user == None:
+        return None
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     admin = Admin(user_id=user.id, date_created=date)
     db.session.add(admin)
@@ -27,11 +30,18 @@ def destroy(email):
 
 
 def isAdmin(user, admin_api_key):
-    print(
-        f"ADMIN_SERVICES_API_KEY: {ADMIN_SERVICES_API_KEY}, admin_api_key: {admin_api_key}"
-    )
     if admin_api_key != ADMIN_SERVICES_API_KEY:
         raise PermissionError("Invalid AdminServicesApiKey")
     return (
         db.session.scalar(db.select(Admin).where(Admin.user_id == user.id)) is not None
     )
+
+
+def admin_create(email, user, admin_api_key):
+    try:
+        if not isAdmin(user, admin_api_key):
+            return None
+        admin = create(email)
+        return admin
+    except:
+        return None

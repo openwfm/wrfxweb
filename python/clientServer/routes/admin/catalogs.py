@@ -1,7 +1,5 @@
 from clientServer.app import app
-from clientServer.serverKeys import (
-    UPLOADS_FOLDER,
-)
+from clientServer.serverKeys import ADMIN_SERVICES_API_KEY
 
 from clientServer.logging import utils as loggingUtils
 from clientServer.routes.admin.admin_utils import admin_login_required
@@ -11,43 +9,32 @@ from api.services import CatalogServices as CatalogServices
 from api.serializers import CatalogSerializer as CatalogSerializer
 
 from flask import request
-import os
+from flask_login import current_user
 
 
 @app.route("/admin/catalogs/all", methods=["GET"])
 @admin_login_required
 def simulation_catalogs():
-    catalogs = CatalogServices.find_all()
+    catalogs = CatalogServices.admin_catalogs(current_user, ADMIN_SERVICES_API_KEY)
 
     return {
-        "catalogs": CatalogSerializer.serialize_catalogs_with_permissions(catalogs)
+        "catalogs": CatalogSerializer.serialize_catalogs_with_permissions(
+            catalogs, current_user, ADMIN_SERVICES_API_KEY
+        )
     }, 200
 
 
 @app.route("/admin/catalogs", methods=["POST"])
 @admin_login_required
 def create_catalog():
-    catalog_params = CatalogValidators.validate_catalog_params(request.get_json())
+    created_catalog = CatalogServices.create(
+        request.get_json(), current_user, ADMIN_SERVICES_API_KEY
+    )
 
-    created_catalog = CatalogServices.create(catalog_params)
-
-    # catalog_path = created_catalog.catalog_folder()
-    #
-    # try:
-    #     os.makedirs(catalog_path)
-    # except OSError as e:
-    #     error_message = "Error while making Catalog Directory"
-    #     loggingUtils.log_error(
-    #         f"POST /admin/catalogs {error_message} {catalog_path}: {e}"
-    #     )
-    #     CatalogServices.destroy(created_catalog.id)
-    #
-    #     return {"message": error_message}, 500
-    #
     return {
         "message": "Catalog Successfully Created!",
         "catalog": CatalogSerializer.serialize_catalog_with_permissions(
-            created_catalog
+            created_catalog, current_user, ADMIN_SERVICES_API_KEY
         ),
     }, 200
 
@@ -65,20 +52,19 @@ def catalog_id(catalog_id):
 
 
 def delete_catalog_id(catalog_id):
-    CatalogServices.destroy(int(catalog_id))
+    CatalogServices.destroy(catalog_id, current_user, ADMIN_SERVICES_API_KEY)
     return {
         "message": "Catalog Successfully Deleted!",
     }, 200
 
 
 def update_catalog_id(catalog_id):
-    catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-    catalog_params = CatalogValidators.validate_catalog_params(request.get_json())
-
-    updated_catalog = CatalogServices.update(catalog_id, catalog_params)
+    updated_catalog = CatalogServices.update(
+        catalog_id, request.get_json(), current_user, ADMIN_SERVICES_API_KEY
+    )
     return {
         "message": "Catalog Successfully Updated!",
         "catalog": CatalogSerializer.serialize_catalog_with_permissions(
-            updated_catalog
+            updated_catalog, current_user, ADMIN_SERVICES_API_KEY
         ),
     }, 200

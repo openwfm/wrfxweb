@@ -2,6 +2,7 @@ from clientServer.app import app
 from clientServer.serverKeys import (
     CLIENT_SECRETS_FILE,
     OAUTH_SCOPES,
+    USER_SERVICES_API_KEY,
 )
 from api.db import db
 from api.models.User import User
@@ -97,7 +98,7 @@ def authorize_google():
     email = user_info["email"]
 
     # find or create the user in the database
-    user = UserServices.find_or_create(email)
+    user = UserServices.find_or_create(email, USER_SERVICES_API_KEY)
 
     loggingUtils.log_login(f"{user.id}")
 
