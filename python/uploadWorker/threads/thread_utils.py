@@ -16,6 +16,10 @@ import os
 UPLOAD_EXTENSIONS = [".json", ".png", ".kmz"]
 
 
+class CatalogEntryCreationError(Exception):
+    pass
+
+
 def unpack_catalog_entry_upload(catalog_entry_upload):
     upload_path = catalog_entry_upload.upload_path()
     if not unzip_catalog_entry_upload(upload_path):
@@ -26,12 +30,14 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
     try:
         catalog_entry_jsons = json.load(open(catalog_file))
         create_catalog_entries(catalog_entry_jsons, catalog_entry_upload)
-        shutil.move(f"{TEMP_FOLDER}/{directory}", f"{SIMULATIONS_FOLDER}/{directory}")
-        os.remove(upload_path)
-        catalog_entry_upload.destroy()
     except:
         shutil.rmtree(f"{TEMP_FOLDER}/{directory}")
         loggingUtils.log_unpacking_error(catalog_entry_upload.id, catalog_file)
+        return
+
+    catalog_entry_upload.destroy()
+    shutil.move(f"{TEMP_FOLDER}/{directory}", f"{SIMULATIONS_FOLDER}/{directory}")
+    os.remove(upload_path)
 
 
 def unzip_catalog_entry_upload(upload_path):
@@ -72,5 +78,6 @@ def create_catalog_entries(catalog_entry_jsons, catalog_entry_upload):
             catalog_entry = CatalogEntryServices.create(catalog_entry_json)
             if catalog_entry == None:
                 loggingUtils.log_catalog_entry_fail(catalog_entry_upload, job_id)
+                raise CatalogEntryCreationError(job_id)
             else:
                 loggingUtils.log_catalog_entry(catalog_entry_upload, catalog_entry)

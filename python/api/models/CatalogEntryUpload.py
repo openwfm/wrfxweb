@@ -1,6 +1,7 @@
 from api.db import db
 from api.apiKeys import UPLOADS_FOLDER
 from api.validators import utils as validationUtils
+import api.encryption as encryption
 
 
 class CatalogEntryUpload(db.Model):
@@ -13,7 +14,8 @@ class CatalogEntryUpload(db.Model):
     zip_filename = db.Column(db.String(255), nullable=False)
 
     def upload_path(self):
-        return f"{UPLOADS_FOLDER}/{self.zip_filename}"
+        zip_filename = encryption.decrypt_searchable_data(self.zip_filename)
+        return f"{UPLOADS_FOLDER}/{zip_filename}"
 
     def destroy(self):
         db.session.delete(self)

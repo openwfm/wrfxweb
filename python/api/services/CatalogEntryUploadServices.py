@@ -1,4 +1,5 @@
 from api.db import db
+import api.encryption as encryption
 from api.models.CatalogEntryUpload import CatalogEntryUpload
 from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadValidators
 from api.validators import utils as validationUtils
@@ -20,12 +21,14 @@ def create(json, upload_api_key):
         )
 
         zip_file = catalog_entry_upload_params["zip_file"]
+        zip_filename = validationUtils.validate_filename(zip_file.filename)
+        encrypted_filename = encryption.encrypt_searchable_data(zip_filename)
 
         catalog_entry_upload = CatalogEntryUpload(
             catalog_id=catalog_entry_upload_params["catalog_id"],
             uploader_id=catalog_entry_upload_params["uploader_id"],
             entry_type=catalog_entry_upload_params["entry_type"],
-            zip_filename=validationUtils.validate_filename(zip_file.filename),
+            zip_filename=encrypted_filename,
         )
 
         db.session.add(catalog_entry_upload)
