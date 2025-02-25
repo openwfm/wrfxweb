@@ -13,7 +13,6 @@ from flask_login import current_user
 @login_required
 def client_catalogs():
     catalogs = CatalogServices.user_catalogs(current_user, CLIENT_SERVER_API_KEY)
-    print(f"catalogs: {catalogs}")
     serialized_catalogs = CatalogSerializer.serialize_catalogs(catalogs)
 
     return {"message": "api successful", "catalogs": serialized_catalogs}, 200

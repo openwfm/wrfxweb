@@ -68,7 +68,6 @@ def user_entry(catalog_entry_id, user, client_server_api_key):
         if catalog_entry == None or not catalog_entry.user_has_access(user):
             return None
 
-        print(f"catalogEntry: {catalog_entry}")
         return catalog_entry
     except Exception:
         return None
