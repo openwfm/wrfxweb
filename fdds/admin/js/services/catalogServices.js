@@ -20,6 +20,7 @@ export async function getCatalogs() {
 
   const response_json = await getRequest(GET_URL);
 
+  console.log(response_json);
   if (response_json.error) {
     return [];
   }

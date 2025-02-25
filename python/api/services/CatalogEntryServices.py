@@ -1,8 +1,11 @@
 from api.db import db
 from api.models.CatalogEntry import CatalogEntry
+from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
 from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.validators import CatalogEntryValidators as CatalogEntryValidators
+from api.validators import CatalogValidators as CatalogValidators
+from api.validators import utils as validationUtils
 
 
 # catalog_entry_upload_params {
@@ -16,7 +19,6 @@ def create(json):
         catalog_entry_params = CatalogEntryValidators.validate_create_json(json)
 
         catalog_entry = CatalogEntry(
-            catalog_id=catalog_entry_params["catalog_id"],
             uploader_id=catalog_entry_params["uploader_id"],
             entry_type=catalog_entry_params["entry_type"],
             from_utc=catalog_entry_params["from_utc"],
@@ -31,8 +33,15 @@ def create(json):
             zip_url=catalog_entry_params["zip_url"],
             kml_url=catalog_entry_params["kml_url"],
         )
-
         db.session.add(catalog_entry)
+        db.session.commit()
+
+        catalog_entry_catalog = CatalogEntryCatalog(
+            catalog_id=catalog_entry_params["catalog_id"],
+            catalog_entry_id=catalog_entry.id,
+        )
+
+        db.session.add(catalog_entry_catalog)
         db.session.commit()
 
         return catalog_entry
@@ -58,14 +67,20 @@ def find_by_id(catalog_entry_id):
         return None
 
 
-def user_entry(catalog_entry_id, user, client_server_api_key):
+def user_entry(catalog_id, catalog_entry_id, user, client_server_api_key):
     try:
         if client_server_api_key not in CLIENT_SERVER_API_KEYS:
             raise PermissionError("Invalid ClientServerApiKey")
 
         catalog_entry = find_by_id(catalog_entry_id)
+        catalog = CatalogServices.find_by_id(catalog_id)
+        if catalog_entry == None or catalog == None:
+            return None
+        catalog_entry_catalog = CatalogEntryCatalog.query.filter_by(
+            catalog_id=catalog.id, catalog_entry_id=catalog_entry.id
+        ).first()
 
-        if catalog_entry == None or not catalog_entry.user_has_access(user):
+        if not catalog.user_has_access(user) or catalog_entry_catalog == None:
             return None
 
         return catalog_entry

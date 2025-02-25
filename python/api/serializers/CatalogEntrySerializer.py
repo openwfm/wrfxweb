@@ -5,7 +5,7 @@ from api.validators.utils import sanitize_text
 def serialize_catalog_entry(entry):
     return {
         "id": f"{entry.id}",
-        "catalog_id": sanitize_text(f"{entry.catalog_id}"),
+        # "catalog_id": sanitize_text(f"{entry.catalog_id}"),
         "entry_type": sanitize_text(entry.entry_type),
         "from_utc": sanitize_text(entry.from_utc),
         "to_utc": sanitize_text(entry.to_utc),

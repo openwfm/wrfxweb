@@ -34,6 +34,12 @@ def validate_catalog_id(catalog_id):
     return catalog_id
 
 
+def validate_catalog_ids(catalog_ids):
+    if type(catalog_ids) != list:
+        raise ValueError("catalog_ids must be a list")
+    return [validate_catalog_id(catalog_id) for catalog_id in catalog_ids]
+
+
 # def validate_user_catalog_id(catalog_id, current_user):
 #     catalog_id = int(catalog_id)
 #     catalog = CatalogServices.find_by_id(catalog_id)

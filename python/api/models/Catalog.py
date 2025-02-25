@@ -2,9 +2,10 @@ from api.db import db
 from api.apiKeys import SIMULATIONS_FOLDER
 from api.models.CatalogAccess import CatalogAccess
 from api.models.CatalogEntry import CatalogEntry
+from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.validators import utils as validationUtils
 
-from sqlalchemy import or_, select
+from sqlalchemy import or_, select, join
 
 
 class Catalog(db.Model):
@@ -19,16 +20,30 @@ class Catalog(db.Model):
         return CatalogAccess.query.filter_by(catalog_id=self.id).all()
 
     def entries(self):
-        return CatalogEntry.query.filter_by(catalog_id=self.id).all()
+        catalog_id = self.id
+
+        catalog_entry_catalogs = CatalogEntryCatalog.query.filter_by(
+            catalog_id=catalog_id
+        ).all()
+
+        # return CatalogEntry.query.filter_by(catalog_id=self.id).all()
+        return [
+            catalog_entry_catalog.catalog_entry
+            for catalog_entry_catalog in catalog_entry_catalogs
+        ]
 
     def user_has_access(self, user):
         if self.public:
             return True
 
-        any_access_query = select(CatalogAccess).where(
-            or_(
-                CatalogAccess.user_id == user.id,
-                CatalogAccess.domain == user.domain(),
+        any_access_query = (
+            select(CatalogAccess)
+            .filter_by(catalog_id=self.id)
+            .where(
+                or_(
+                    CatalogAccess.user_id == user.id,
+                    CatalogAccess.domain == user.domain(),
+                )
             )
         )
         return db.session.execute(any_access_query).first() != None
@@ -38,4 +53,4 @@ class Catalog(db.Model):
         return f"{SIMULATIONS_FOLDER}/{sanitized_id}"
 
     def __repr__(self):
-        return f"<Catalog {self.id}: public: {self.public}>"
+        return f"<Catalog: {self.id}, public: {self.public}>"

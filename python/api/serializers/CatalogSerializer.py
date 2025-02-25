@@ -37,9 +37,7 @@ def serialize_catalog_with_permissions(catalog, user, admin_services_api_key):
         "name": catalog.name,
         "public": catalog.public,
         "date_created": catalog.date_created,
-        "entries": CatalogEntrySerializer.serialize_catalog_entries_with_uploader_id(
-            catalog.entries(), user, admin_services_api_key
-        ),
+        "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
         "permissions": CatalogAccessSerializer.serialize_accesses(
             catalog.permissions(), user, admin_services_api_key
         ),

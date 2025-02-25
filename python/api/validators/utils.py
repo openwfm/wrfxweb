@@ -31,6 +31,16 @@ def validate_zip(zip_file):
     return zip_file
 
 
+def validate_int_id(int_id):
+    if type(int_id) is str:
+        if not int_id.isdigit():
+            raise ValueError("id must be an integer")
+        return int(int_id)
+    if type(int_id) is not int:
+        raise ValueError("id must be an integer")
+    return int_id
+
+
 def sanitize_text(text_input):
     return html.escape(text_input)
 

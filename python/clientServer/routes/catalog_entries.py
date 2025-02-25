@@ -25,9 +25,9 @@ def client_catalog_entries(catalog_id):
 @login_required
 def catalog_entry_rasters(catalog_id, catalog_entry_id):
     catalog_entry = CatalogEntryServices.user_entry(
-        catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
+        catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
     )
-    if catalog_entry == None or int(catalog_id) != catalog_entry.catalog_id:
+    if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
     manifest_path = catalog_entry.manifest_path
@@ -41,9 +41,9 @@ def catalog_entry_rasters(catalog_id, catalog_entry_id):
 @login_required
 def catalog_entry_simulations(catalog_id, catalog_entry_id, file_path):
     catalog_entry = CatalogEntryServices.user_entry(
-        catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
+        catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
     )
-    if catalog_entry == None or int(catalog_id) != catalog_entry.catalog_id:
+    if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
     return send_from_directory(catalog_entry.entry_path(), file_path)

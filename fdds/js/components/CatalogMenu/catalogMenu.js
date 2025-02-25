@@ -40,7 +40,7 @@ export class CatalogMenu extends HTMLElement {
                         </svg>
                     </div>
                     <div id='menu-label'>Catalog</div>
-                    <ul id='catalog-options'>
+                    <ul id='catalog-options' class="hidden">
                     </ul>
                 </div>
                 <div class='catalog-menu round-border'>
@@ -147,7 +147,7 @@ export class CatalogMenu extends HTMLElement {
       toggleVisibility(catalogMenu);
     };
     catalogMenuIcon.onpointerdown = () => {
-      toggleVisibility(catalogOptions);
+      //toggleVisibility(catalogOptions);
     };
 
     this.querySelector("#menu-close").onclick = () => {

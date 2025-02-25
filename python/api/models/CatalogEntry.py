@@ -1,14 +1,14 @@
 from api.db import db
 from api.apiKeys import SIMULATIONS_FOLDER
 
+from sqlalchemy import select, outerjoin, or_
+
 
 class CatalogEntry(db.Model):
     __tablename__ = "catalog_entry"
     id = db.Column(db.Integer, primary_key=True)
-    catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"), nullable=False)
     uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     user = db.relationship("User", foreign_keys="CatalogEntry.uploader_id")
-    catalog = db.relationship("Catalog", foreign_keys="CatalogEntry.catalog_id")
     entry_type = db.Column(db.String(255), nullable=False)
     from_utc = db.Column(db.String(255), nullable=False)
     to_utc = db.Column(db.String(255), nullable=False)
@@ -36,7 +36,3 @@ class CatalogEntry(db.Model):
     def destroy(self):
         db.session.delete(self)
         db.session.commit()
-
-    def user_has_access(self, user):
-        catalog = self.catalog
-        return catalog.user_has_access(user)
