@@ -20,6 +20,10 @@ def validate_boolean(boolean_input):
     return boolean_input
 
 
+def validate_filename(filename):
+    return secure_filename(filename)
+
+
 def validate_zip(zip_file):
     file_name = secure_filename(zip_file.filename)
     if file_name == "":

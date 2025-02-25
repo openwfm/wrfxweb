@@ -1,6 +1,7 @@
 from api.db import db
 from api.models.CatalogEntryUpload import CatalogEntryUpload
 from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadValidators
+from api.validators import utils as validationUtils
 from api.apiKeys import UPLOAD_API_KEYS
 
 
@@ -24,6 +25,7 @@ def create(json, upload_api_key):
             catalog_id=catalog_entry_upload_params["catalog_id"],
             uploader_id=catalog_entry_upload_params["uploader_id"],
             entry_type=catalog_entry_upload_params["entry_type"],
+            zip_filename=validationUtils.validate_filename(zip_file.filename),
         )
 
         db.session.add(catalog_entry_upload)

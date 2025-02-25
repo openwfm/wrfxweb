@@ -42,6 +42,7 @@ python/uploadWorker/__pycache__/*
 python/uploadWorker/threads/__pycache__/*
 python/uploadWorker/logging/__pycache__/*
 python/uploadWorker/services/__pycache__/*
+python/uploadWorker/scripts/__pycache__/*
 python/clientServer/logs/*
 python/clientServer/logs
 python/clientServer/client_secret.json

@@ -36,13 +36,13 @@ def create(json):
         db.session.add(catalog_entry)
         db.session.commit()
 
-        catalog_entry_catalog = CatalogEntryCatalog(
-            catalog_id=catalog_entry_params["catalog_id"],
-            catalog_entry_id=catalog_entry.id,
-        )
-
-        db.session.add(catalog_entry_catalog)
-        db.session.commit()
+        if catalog_entry_params["catalog_id"] != None:
+            catalog_entry_catalog = CatalogEntryCatalog(
+                catalog_id=catalog_entry_params["catalog_id"],
+                catalog_entry_id=catalog_entry.id,
+            )
+            db.session.add(catalog_entry_catalog)
+            db.session.commit()
 
         return catalog_entry
     except Exception:

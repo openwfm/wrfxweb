@@ -1,14 +1,12 @@
 from api.db import db
 from api.apiKeys import SIMULATIONS_FOLDER
-
-from sqlalchemy import select, outerjoin, or_
+from api.models.User import User
 
 
 class CatalogEntry(db.Model):
     __tablename__ = "catalog_entry"
     id = db.Column(db.Integer, primary_key=True)
-    uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    user = db.relationship("User", foreign_keys="CatalogEntry.uploader_id")
+    uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     entry_type = db.Column(db.String(255), nullable=False)
     from_utc = db.Column(db.String(255), nullable=False)
     to_utc = db.Column(db.String(255), nullable=False)
@@ -29,6 +27,11 @@ class CatalogEntry(db.Model):
     def entry_manifest_path(self):
         manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
         return manifest_path
+
+    def uploader(self):
+        if self.uploader_id == None or self.uploader_id < 1:
+            return None
+        return User.query.get(self.uploader_id)
 
     def directory(self):
         return SIMULATIONS_FOLDER
