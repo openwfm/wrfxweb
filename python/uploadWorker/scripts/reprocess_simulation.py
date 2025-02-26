@@ -6,23 +6,34 @@ import api.services.CatalogEntryServices as CatalogEntryServices
 
 import json
 import os.path as osp
+import os
 
 
 class CatalogEntryCreationError(Exception):
     pass
 
 
-def unpack_catalog(simulation_path, entry_type):
+def unpack_catalogs(catalog_id):
+    directories = os.listdir(SIMULATIONS_FOLDER)
+    for directory in directories:
+        print(f"directory: {directory}")
+        if " FM" in directory:
+            unpack_catalog(directory, "fuel-moisture", catalog_id)
+        else:
+            unpack_catalog(directory, "fire", catalog_id)
+
+
+def unpack_catalog(simulation_path, entry_type, catalog_id):
     catalog_file = osp.join(SIMULATIONS_FOLDER, f"{simulation_path}/catalog.json")
     try:
         catalog_entry_jsons = json.load(open(catalog_file))
-        create_catalog_entries(catalog_entry_jsons, entry_type)
+        create_catalog_entries(catalog_entry_jsons, entry_type, catalog_id)
     except:
         print(f"loading file {catalog_file} failed ")
         return
 
 
-def create_catalog_entries(catalog_entry_jsons, entry_type):
+def create_catalog_entries(catalog_entry_jsons, entry_type, catalog_id):
     for job_id in catalog_entry_jsons:
         catalog_entry_json = catalog_entry_jsons[job_id]
         catalog_entry_json["processed_utc"] = catalog_entry_jsons[job_id].get(
@@ -40,7 +51,7 @@ def create_catalog_entries(catalog_entry_jsons, entry_type):
         catalog_entry_json["job_id"] = job_id
         catalog_entry_json["uploader_id"] = 0
         catalog_entry_json["entry_type"] = entry_type
-        catalog_entry_json["catalog_id"] = 0
+        catalog_entry_json["catalog_id"] = catalog_id
 
         catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
         if catalog_entry == None:
