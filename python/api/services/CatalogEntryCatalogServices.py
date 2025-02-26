@@ -11,7 +11,7 @@ from api.validators import CatalogValidators as CatalogValidators
 def find(json):
     find_params = CatalogEntryCatalogValidators.validate_find_json(json)
     catalog_id = find_params["catalog_id"]
-    catalog_entry_id = find_params["catalog_entry_params"]
+    catalog_entry_id = find_params["catalog_entry_id"]
 
     return CatalogEntryCatalog.query.filter_by(
         catalog_id=catalog_id, catalog_entry_id=catalog_entry_id

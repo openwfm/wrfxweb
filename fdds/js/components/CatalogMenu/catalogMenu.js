@@ -147,7 +147,7 @@ export class CatalogMenu extends HTMLElement {
       toggleVisibility(catalogMenu);
     };
     catalogMenuIcon.onpointerdown = () => {
-      //toggleVisibility(catalogOptions);
+      toggleVisibility(catalogOptions);
     };
 
     this.querySelector("#menu-close").onclick = () => {

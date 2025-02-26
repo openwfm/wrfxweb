@@ -1,11 +1,11 @@
 from api.db import db
+import api.encryption as encryption
 from api.apiKeys import SIMULATIONS_FOLDER
 from api.models.CatalogAccess import CatalogAccess
-from api.models.CatalogEntry import CatalogEntry
 from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.validators import utils as validationUtils
 
-from sqlalchemy import or_, select, join
+from sqlalchemy import or_, select
 
 
 class Catalog(db.Model):
@@ -36,13 +36,14 @@ class Catalog(db.Model):
         if self.public:
             return True
 
+        encrypted_user_domain = encryption.encrypt_user_data(user.domain())
         any_access_query = (
             select(CatalogAccess)
             .filter_by(catalog_id=self.id)
             .where(
                 or_(
                     CatalogAccess.user_id == user.id,
-                    CatalogAccess.domain == user.domain(),
+                    CatalogAccess.encrypted_domain == encrypted_user_domain,
                 )
             )
         )

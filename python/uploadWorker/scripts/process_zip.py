@@ -71,7 +71,7 @@ def create_catalog_entries(catalog_entry_jsons, entry_type):
         catalog_entry_json["entry_type"] = entry_type
         catalog_entry_json["catalog_id"] = 0
 
-        catalog_entry = CatalogEntryServices.create(catalog_entry_json)
+        catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
         if catalog_entry == None:
             print(f"failed to create CatalogEntry for {job_id}")
             raise CatalogEntryCreationError(job_id)

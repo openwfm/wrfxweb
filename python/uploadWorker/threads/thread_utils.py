@@ -75,7 +75,7 @@ def create_catalog_entries(catalog_entry_jsons, catalog_entry_upload):
         catalog_entry_json["entry_type"] = catalog_entry_upload.entry_type
 
         with app.app_context():
-            catalog_entry = CatalogEntryServices.create(catalog_entry_json)
+            catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
             if catalog_entry == None:
                 loggingUtils.log_catalog_entry_fail(catalog_entry_upload, job_id)
                 raise CatalogEntryCreationError(job_id)
