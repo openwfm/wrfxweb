@@ -16,3 +16,6 @@ class CatalogEntryCatalog(db.Model):
     def destroy(self):
         db.session.delete(self)
         db.session.commit()
+
+    def __repr__(self):
+        return f"<CatalogEntryCatalog {self.id}: catalog_id: {self.catalog_id} catalog_entry_id: {self.catalog_entry_id}>"

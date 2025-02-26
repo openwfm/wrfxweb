@@ -8,8 +8,17 @@ from api.validators import CatalogValidators as CatalogValidators
 from api.validators import utils as validationUtils
 
 
+def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
+    catalog_entry_catalog = CatalogEntryCatalog.query.filter_by(
+        catalog_id=catalog_id, catalog_entry_id=catalog_entry_id
+    ).first()
+    return catalog_entry_catalog
+
+
 def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
     if catalog_id != 0:
+        if find_catalog_entry_catalogs(catalog_id, catalog_entry_id) != None:
+            return
         catalog_entry_catalog = CatalogEntryCatalog(
             catalog_id=catalog_id, catalog_entry_id=catalog_entry_id
         )
@@ -116,7 +125,6 @@ def user_entry(catalog_id, catalog_entry_id, user, client_server_api_key):
 
 def user_entries(catalog_id, user, client_server_api_key):
     catalog = CatalogServices.user_catalog(user, catalog_id, client_server_api_key)
-    print(f"catalog: {catalog}")
     if catalog == None:
         return []
     return catalog.entries()
