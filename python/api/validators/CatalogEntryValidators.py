@@ -34,8 +34,8 @@ def validate_create_json(json):
     from_utc = validationUtils.validate_text(json["from_utc"])
     manifest_path = validationUtils.validate_text(json["manifest_path"])
 
-    zip_size = validationUtils.validate_text(json["zip_size"])
-    kml_size = validationUtils.validate_text(json["kml_size"])
+    zip_size = validationUtils.validate_size(json["zip_size"])
+    kml_size = validationUtils.validate_size(json["kml_size"])
     processed_utc = validationUtils.validate_text(json["processed_utc"])
     run_utc = validationUtils.validate_text(json["run_utc"])
     zip_url = validationUtils.validate_text(json["zip_url"])

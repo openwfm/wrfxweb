@@ -35,6 +35,18 @@ def validate_zip(zip_file):
     return zip_file
 
 
+def validate_size(value):
+    if value == None:
+        return 0
+    if type(value) is str:
+        if not value.isdigit():
+            raise ValueError("value must be an integer")
+        return int(value)
+    if type(value) is not int:
+        raise ValueError("value must be an integer")
+    return value
+
+
 def validate_int_id(int_id):
     if type(int_id) is str:
         if not int_id.isdigit():
