@@ -41,6 +41,33 @@ def create(json, upload_api_key):
         return None
 
 
+def external_create(json, upload_api_key):
+    try:
+        if upload_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
+        catalog_entry_upload_params = (
+            CatalogEntryUploadValidators.validate_external_create_json(json)
+        )
+
+        zip_filename = catalog_entry_upload_params["zip_filename"]
+        zip_filename = validationUtils.validate_filename(zip_filename)
+        encrypted_filename = encryption.encrypt_searchable_data(zip_filename)
+
+        catalog_entry_upload = CatalogEntryUpload(
+            catalog_id=catalog_entry_upload_params["catalog_id"],
+            uploader_id=catalog_entry_upload_params["uploader_id"],
+            entry_type=catalog_entry_upload_params["entry_type"],
+            zip_filename=encrypted_filename,
+        )
+
+        db.session.add(catalog_entry_upload)
+        db.session.commit()
+
+        return catalog_entry_upload
+    except Exception:
+        return None
+
+
 def destroy(catalog_id, catalog_entry_id):
     pass
 

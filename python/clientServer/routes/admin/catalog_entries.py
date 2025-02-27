@@ -44,7 +44,7 @@ def catalog_entries(catalog_id):
 @api_key_required
 def external_catalog_entries(catalog_id):
     if request.method == "POST":
-        return create_catalog_entry(catalog_id)
+        return external_create_catalog_entry(catalog_id)
     return {
         "message": "Method Not Allowed",
     }, 405
@@ -73,6 +73,30 @@ def create_catalog_entry(catalog_id):
             catalog_entry_params, ADMIN_SERVICES_API_KEY
         )
         verify_zip_upload(catalog_entry_upload)
+    except Exception as e:
+        abort(400, f"An error occurred while uploading file: {e}")
+
+    loggingUtils.log_upload(catalog_entry_upload)
+    post_task_queue_service(catalog_entry_upload)
+
+    return {
+        "message": "Entry Successfully Created!",
+    }, 200
+
+
+def external_create_catalog_entry(catalog_id):
+    try:
+        zip_filename = request.form["zipFileName"]
+        entry_form = request.form["column"]
+        catalog_entry_params = {
+            "catalog_id": catalog_id,
+            "zip_filename": zip_filename,
+            "entry_type": entry_form,
+            "uploader_id": current_user.id,
+        }
+        catalog_entry_upload = CatalogEntryUploadServices.external_create(
+            catalog_entry_params, ADMIN_SERVICES_API_KEY
+        )
     except Exception as e:
         abort(400, f"An error occurred while uploading file: {e}")
 
