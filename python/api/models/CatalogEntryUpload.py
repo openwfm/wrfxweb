@@ -1,22 +1,21 @@
-from api.db import db
+from api.db import Base
 from api.apiKeys import UPLOADS_FOLDER
-from api.validators import utils as validationUtils
 import api.encryption as encryption
 
 
-class CatalogEntryUpload(db.Model):
+from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy.orm import relationship
+
+
+class CatalogEntryUpload(Base):
     __tablename__ = "catalog_entry_upload"
-    id = db.Column(db.Integer, primary_key=True)
-    uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"))
-    user = db.relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
-    entry_type = db.Column(db.String(255), nullable=False)
-    zip_filename = db.Column(db.String(255), nullable=False)
+    id = Column(Integer, primary_key=True)
+    uploader_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    catalog_id = Column(Integer, ForeignKey("catalog.id"))
+    user = relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
+    entry_type = Column(String(255), nullable=False)
+    zip_filename = Column(String(255), nullable=False)
 
     def upload_path(self):
         zip_filename = encryption.decrypt_searchable_data(self.zip_filename)
         return f"{UPLOADS_FOLDER}/{zip_filename}"
-
-    def destroy(self):
-        db.session.delete(self)
-        db.session.commit()

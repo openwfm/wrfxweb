@@ -1,3 +1,7 @@
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
 
-db = SQLAlchemy()
+from sqlalchemy.ext.declarative import declarative_base
+
+
+engine = create_engine("sqlite:///../instance/primary.db")
+Base = declarative_base()

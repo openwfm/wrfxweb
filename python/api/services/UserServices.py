@@ -1,9 +1,10 @@
-from api.db import db
+from api.session import db_session
 from api.models.User import User
 from api.apiKeys import USER_SERVICES_KEYS
 from api.validators import utils as validationUtils
 import api.encryption as encryption
 import datetime
+from sqlalchemy import select
 
 
 def create(email, user_services_key):
@@ -15,8 +16,8 @@ def create(email, user_services_key):
     email_cipher = encryption.encrypt_user_data(email)
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     user = User(encrypted_email=email_cipher, date_created=date)
-    db.session.add(user)
-    db.session.commit()
+    db_session.add(user)
+    db_session.commit()
     return user
 
 
@@ -29,9 +30,7 @@ def find_or_create(email, user_services_key):
 
 def find(email):
     email_cipher = encryption.encrypt_user_data(email)
-    return db.session.scalar(
-        db.select(User).where(User.encrypted_email == email_cipher)
-    )
+    return db_session.scalar(select(User).where(User.encrypted_email == email_cipher))
 
 
 def find_by_id(user_id):

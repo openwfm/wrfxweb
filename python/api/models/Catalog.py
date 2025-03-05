@@ -1,4 +1,6 @@
-from api.db import db
+from api.db import Base
+from sqlalchemy import Column, Integer, String, Boolean
+
 import api.encryption as encryption
 from api.apiKeys import SIMULATIONS_FOLDER
 from api.models.CatalogAccess import CatalogAccess
@@ -8,13 +10,13 @@ from api.validators import utils as validationUtils
 from sqlalchemy import or_, select
 
 
-class Catalog(db.Model):
+class Catalog(Base):
     __tablename__ = "catalog"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
-    date_created = db.Column(db.String(10), nullable=False)
-    public = db.Column(db.Boolean, default=False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255), nullable=False)
+    description = Column(String(255), nullable=True)
+    date_created = Column(String(10), nullable=False)
+    public = Column(Boolean, default=False)
 
     def permissions(self):
         return CatalogAccess.query.filter_by(catalog_id=self.id).all()
@@ -31,23 +33,6 @@ class Catalog(db.Model):
             catalog_entry_catalog.catalog_entry
             for catalog_entry_catalog in catalog_entry_catalogs
         ]
-
-    def user_has_access(self, user):
-        if self.public:
-            return True
-
-        encrypted_user_domain = encryption.encrypt_user_data(user.domain())
-        any_access_query = (
-            select(CatalogAccess)
-            .filter_by(catalog_id=self.id)
-            .where(
-                or_(
-                    CatalogAccess.user_id == user.id,
-                    CatalogAccess.encrypted_domain == encrypted_user_domain,
-                )
-            )
-        )
-        return db.session.execute(any_access_query).first() != None
 
     def catalog_folder(self):
         sanitized_id = validationUtils.sanitize_path(f"{self.id}")

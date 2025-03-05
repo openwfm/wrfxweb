@@ -1,4 +1,4 @@
-from api.db import db
+from api.session import db_session
 from api.models.CatalogAccess import CatalogAccess
 
 import api.encryption as encryption
@@ -39,8 +39,8 @@ def create_for_user(catalog_id, email, admin_services_api_key):
         catalog_id=catalog_id,
         user_id=user.id,
     )
-    db.session.add(new_catalog_access)
-    db.session.commit()
+    db_session.add(new_catalog_access)
+    db_session.commit()
     return new_catalog_access
 
 
@@ -53,21 +53,21 @@ def create_for_domain(catalog_id, domain):
         catalog_id=catalog_id,
         encrypted_domain=encrypted_domain,
     )
-    db.session.add(new_catalog_access)
-    db.session.commit()
+    db_session.add(new_catalog_access)
+    db_session.commit()
     return new_catalog_access
 
 
 def destroy_for_user(catalog_id, user_id):
     catalog_access = find_by_user(catalog_id, user_id)
-    db.session.delete(catalog_access)
-    db.session.commit()
+    db_session.delete(catalog_access)
+    db_session.commit()
 
 
 def destroy_for_domain(catalog_id, domain):
     catalog_access = find_by_domain(catalog_id, domain)
-    db.session.delete(catalog_access)
-    db.session.commit()
+    db_session.delete(catalog_access)
+    db_session.commit()
 
 
 def find_all(catalog_id):
@@ -77,5 +77,5 @@ def find_all(catalog_id):
 def destroy_all(catalog_id):
     catalog_accesses = find_all(catalog_id)
     for catalog_access in catalog_accesses:
-        db.session.delete(catalog_access)
-    db.session.commit()
+        db_session.delete(catalog_access)
+    db_session.commit()

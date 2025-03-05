@@ -1,4 +1,4 @@
-from api.db import db
+from api.session import db_session
 from api.apiKeys import ADMIN_SERVICES_API_KEY
 from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.validators import (
@@ -28,8 +28,8 @@ def create(json):
             catalog_id=create_params["catalog_id"],
             catalog_entry_id=create_params["catalog_entry_id"],
         )
-        db.session.add(catalog_entry_catalog)
-        db.session.commit()
+        db_session.add(catalog_entry_catalog)
+        db_session.commit()
     except:
         return None
 

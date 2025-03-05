@@ -1,4 +1,5 @@
-from clientServer.app import app, db
+from clientServer.app import app
+from api.session import db_session
 from api.models.UserFeedback import UserFeedback
 
 from flask import request
@@ -32,7 +33,7 @@ def submit_issue():
         steps=steps,
         description=description,
     )
-    db.session.add(user_feedback)
-    db.session.commit()
+    db_session.add(user_feedback)
+    db_session.commit()
 
     return {"message": "Issue successfully submitted"}, 200

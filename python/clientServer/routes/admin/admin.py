@@ -1,14 +1,17 @@
-from clientServer.app import app, db
+from clientServer.app import app
 
 from clientServer.routes.admin.admin_utils import admin_login_required
-from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
+
+# from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
+from clientServer.routes.admin import catalogs
 
 from clientServer.serverKeys import ADMIN_SERVICES_API_KEY
 
 from api.services import AdminServices as AdminServices
 from api.serializers import UserSerializer as UserSerializer
-from api.models.User import User
-from api.models.Admin import Admin
+
+# from api.models.User import User
+# from api.models.Admin import Admin
 
 
 from flask import render_template, request, session
@@ -18,7 +21,8 @@ from flask_login import current_user
 @app.route("/admin/all", methods=["GET"])
 @admin_login_required
 def all_admins():
-    admins = db.session.query(User).join(Admin).all()
+    admins = AdminServices.all_admins(current_user, ADMIN_SERVICES_API_KEY)
+    # admins = db.session.query(User).join(Admin).all()
     admin_jsons = [
         UserSerializer.serialize_user_with_email(
             admin, current_user, ADMIN_SERVICES_API_KEY

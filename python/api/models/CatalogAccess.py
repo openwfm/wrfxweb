@@ -1,14 +1,19 @@
-from api.db import db
+from api.db import Base
+from sqlalchemy import Column, Integer, ForeignKey, LargeBinary
+from sqlalchemy.orm import relationship
+
+
+# from api.db import db
 import api.encryption as encryption
 
 
-class CatalogAccess(db.Model):
+class CatalogAccess(Base):
     __tablename__ = "catalog_access"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"), nullable=False)
-    encrypted_domain = db.Column(db.LargeBinary)
-    user = db.relationship("User", foreign_keys="CatalogAccess.user_id")
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    catalog_id = Column(Integer, ForeignKey("catalog.id"), nullable=False)
+    encrypted_domain = Column(LargeBinary)
+    user = relationship("User", foreign_keys="CatalogAccess.user_id")
 
     def user_email(self):
         return self.user.email
@@ -26,6 +31,6 @@ class CatalogAccess(db.Model):
             return "user"
         return "domain"
 
-    def destroy(self):
-        db.session.delete(self)
-        db.session.commit()
+    # def destroy(self):
+    #     db.session.delete(self)
+    #     db.session.commit()

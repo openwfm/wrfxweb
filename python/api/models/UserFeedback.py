@@ -1,14 +1,16 @@
-from api.db import db
+from api.db import Base
+
+from sqlalchemy import Column, Integer, String
 
 
-class UserFeedback(db.Model):
+class UserFeedback(Base):
     __tablename__ = "user_feedbacks"
-    id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.String(10), nullable=False)
-    full_name = db.Column(db.String(100), nullable=False)
-    organization = db.Column(db.String(100), nullable=False)
-    contact = db.Column(db.String(100), nullable=True)
-    featureOrBug = db.Column(db.String(7), nullable=True)
-    title = db.Column(db.String(100), nullable=True)
-    steps = db.Column(db.String(700), nullable=True)
-    description = db.Column(db.String(700), nullable=True)
+    id = Column(Integer, primary_key=True)
+    date_created = Column(String(10), nullable=False)
+    full_name = Column(String(100), nullable=False)
+    organization = Column(String(100), nullable=False)
+    contact = Column(String(100), nullable=True)
+    featureOrBug = Column(String(7), nullable=True)
+    title = Column(String(100), nullable=True)
+    steps = Column(String(700), nullable=True)
+    description = Column(String(700), nullable=True)

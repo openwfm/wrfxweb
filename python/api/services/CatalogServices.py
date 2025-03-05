@@ -1,4 +1,4 @@
-from api.db import db
+from api.session import db_session
 import api.encryption as encryption
 from api.apiKeys import CLIENT_SERVER_API_KEYS, ADMIN_SERVICES_API_KEY
 from api.models.Catalog import Catalog
@@ -23,6 +23,28 @@ def find_by_id(catalog_id):
         return None
 
 
+def user_has_access(catalog_id, user):
+    catalog = find_by_id(catalog_id)
+
+    if catalog == None:
+        return False
+    if catalog.public:
+        return True
+
+    encrypted_user_domain = encryption.encrypt_user_data(user.domain())
+    any_access_query = (
+        select(CatalogAccess)
+        .filter_by(catalog_id=catalog.id)
+        .where(
+            or_(
+                CatalogAccess.user_id == user.id,
+                CatalogAccess.encrypted_domain == encrypted_user_domain,
+            )
+        )
+    )
+    return db_session.execute(any_access_query).first() != None
+
+
 def create(json, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
@@ -39,8 +61,8 @@ def create(json, user, admin_services_api_key):
             date_created=datetime.datetime.now().strftime("%Y-%m-%d"),
             public=public,
         )
-        db.session.add(new_catalog)
-        db.session.commit()
+        db_session.add(new_catalog)
+        db_session.commit()
 
         if not public:
             for permission in permissions:
@@ -63,8 +85,8 @@ def destroy(catalog_id, user, admin_services_api_key):
         CatalogEntryUploadServices.destroy_all(validated_catalog_id)
 
         catalog = Catalog.query.get(validated_catalog_id)
-        db.session.delete(catalog)
-        db.session.commit()
+        db_session.delete(catalog)
+        db_session.commit()
     except:
         return None
 
@@ -88,7 +110,7 @@ def update(catalog_id, json, user, admin_services_api_key):
         catalog.name = name
         catalog.description = description
         catalog.public = public
-        db.session.commit()
+        db_session.commit()
 
         if not public:
             CatalogAccessServices.destroy_all(catalog_id)
@@ -163,7 +185,7 @@ def user_catalogs(user, client_server_api_key):
             .distinct()
         )
 
-        user_catalogs = [row[0] for row in db.session.execute(user_catalogs_query)]
+        user_catalogs = [row[0] for row in db_session.execute(user_catalogs_query)]
 
         return user_catalogs
     except Exception:

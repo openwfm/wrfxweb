@@ -1,4 +1,4 @@
-from api.db import db
+from api.session import db_session
 from api.models.CatalogEntry import CatalogEntry
 from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
@@ -6,6 +6,8 @@ from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.validators import CatalogEntryValidators as CatalogEntryValidators
 from api.validators import CatalogValidators as CatalogValidators
 from api.validators import utils as validationUtils
+
+from sqlalchemy import select
 
 
 def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
@@ -22,8 +24,8 @@ def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
         catalog_entry_catalog = CatalogEntryCatalog(
             catalog_id=catalog_id, catalog_entry_id=catalog_entry_id
         )
-        db.session.add(catalog_entry_catalog)
-        db.session.commit()
+        db_session.add(catalog_entry_catalog)
+        db_session.commit()
 
 
 # catalog_entry_upload_params {
@@ -51,8 +53,8 @@ def create(json):
             zip_url=catalog_entry_params["zip_url"],
             kml_url=catalog_entry_params["kml_url"],
         )
-        db.session.add(catalog_entry)
-        db.session.commit()
+        db_session.add(catalog_entry)
+        db_session.commit()
 
         catalog_id = catalog_entry_params["catalog_id"]
         create_catalog_entry_catalog(catalog_id, catalog_entry.id)
@@ -87,9 +89,7 @@ def destroy_all(catalog_id):
 
 def find_by_job_id(job_id):
     job_id = validationUtils.validate_text(job_id)
-    return db.session.scalar(
-        db.select(CatalogEntry).where(CatalogEntry.job_id == job_id)
-    )
+    return db_session.scalar(select(CatalogEntry).where(CatalogEntry.job_id == job_id))
 
 
 def find_by_id(catalog_entry_id):

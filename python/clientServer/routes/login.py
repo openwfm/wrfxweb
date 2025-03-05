@@ -4,7 +4,7 @@ from clientServer.serverKeys import (
     OAUTH_SCOPES,
     USER_SERVICES_API_KEY,
 )
-from api.db import db
+from api.session import db_session
 from api.models.User import User
 from api.services import UserServices as UserServices
 from clientServer.logging import utils as loggingUtils
@@ -22,7 +22,7 @@ login = LoginManager(app)
 
 @login.user_loader
 def load_user(id):
-    return db.session.get(User, int(id))
+    return db_session.get(User, int(id))
 
 
 def login_required(f):

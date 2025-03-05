@@ -1,4 +1,4 @@
-from api.db import db
+from api.session import db_session
 import api.encryption as encryption
 from api.models.CatalogEntryUpload import CatalogEntryUpload
 from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadValidators
@@ -31,8 +31,8 @@ def create(json, upload_api_key):
             zip_filename=encrypted_filename,
         )
 
-        db.session.add(catalog_entry_upload)
-        db.session.commit()
+        db_session.add(catalog_entry_upload)
+        db_session.commit()
 
         zip_file.save(catalog_entry_upload.upload_path())
 
@@ -60,8 +60,8 @@ def external_create(json, upload_api_key):
             zip_filename=encrypted_filename,
         )
 
-        db.session.add(catalog_entry_upload)
-        db.session.commit()
+        db_session.add(catalog_entry_upload)
+        db_session.commit()
 
         return catalog_entry_upload
     except Exception:
