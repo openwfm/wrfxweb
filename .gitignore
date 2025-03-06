@@ -68,6 +68,8 @@ python/api/instance/
 python/api/__pycache__/*
 python/api/routes/__pycache__/*
 python/api/models/__pycache__/*
+python/api/models/catalog/__pycache__/*
+python/api/models/catalogEntry/__pycache__/*
 python/api/validators/__pycache__/*
 python/api/services/__pycache__/*
 python/api/serializers/__pycache__/*

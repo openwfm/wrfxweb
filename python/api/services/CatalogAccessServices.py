@@ -8,14 +8,20 @@ from api.services import AdminServices as AdminServices
 
 
 def find_by_user(catalog_id, user_id):
-    return CatalogAccess.query.filter_by(catalog_id=catalog_id, user_id=user_id).first()
+    return (
+        db_session.query(CatalogAccess)
+        .filter_by(catalog_id=catalog_id, user_id=user_id)
+        .first()
+    )
 
 
 def find_by_domain(catalog_id, domain):
     encrypted_domain = encryption.encrypt_user_data(domain)
-    return CatalogAccess.query.filter_by(
-        catalog_id=catalog_id, encrypted_domain=encrypted_domain
-    ).first()
+    return (
+        db_session.query(CatalogAccess)
+        .filter_by(catalog_id=catalog_id, encrypted_domain=encrypted_domain)
+        .first()
+    )
 
 
 def create(catalog_id, permission, user, admin_services_api_key):
@@ -71,7 +77,7 @@ def destroy_for_domain(catalog_id, domain):
 
 
 def find_all(catalog_id):
-    return CatalogAccess.query.filter_by(catalog_id=catalog_id).all()
+    return db_session.query(CatalogAccess).filter_by(catalog_id=catalog_id).all()
 
 
 def destroy_all(catalog_id):

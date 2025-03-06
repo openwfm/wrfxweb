@@ -1,5 +1,5 @@
 from api.session import db_session
-from api.models.CatalogEntry import CatalogEntry
+from api.models.catalogEntry.CatalogEntry import CatalogEntry
 from api.models.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
 from api.apiKeys import CLIENT_SERVER_API_KEYS
@@ -11,9 +11,11 @@ from sqlalchemy import select
 
 
 def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
-    catalog_entry_catalog = CatalogEntryCatalog.query.filter_by(
-        catalog_id=catalog_id, catalog_entry_id=catalog_entry_id
-    ).first()
+    catalog_entry_catalog = (
+        db_session.query(CatalogEntryCatalog)
+        .filter_by(catalog_id=catalog_id, catalog_entry_id=catalog_entry_id)
+        .first()
+    )
     return catalog_entry_catalog
 
 
@@ -97,7 +99,7 @@ def find_by_id(catalog_entry_id):
         validated_catalog_entry_upload_id = CatalogEntryValidators.validate_id(
             catalog_entry_id
         )
-        return CatalogEntry.query.get(validated_catalog_entry_upload_id)
+        return db_session.query(CatalogEntry).get(validated_catalog_entry_upload_id)
     except Exception:
         return None
 
@@ -109,11 +111,14 @@ def user_entry(catalog_id, catalog_entry_id, user, client_server_api_key):
 
         catalog_entry = find_by_id(catalog_entry_id)
         catalog = CatalogServices.find_by_id(catalog_id)
+
         if catalog_entry == None or catalog == None:
             return None
-        catalog_entry_catalog = CatalogEntryCatalog.query.filter_by(
-            catalog_id=catalog.id, catalog_entry_id=catalog_entry.id
-        ).first()
+        catalog_entry_catalog = (
+            db_session.query(CatalogEntryCatalog)
+            .filter_by(catalog_id=catalog.id, catalog_entry_id=catalog_entry.id)
+            .first()
+        )
 
         if not catalog.user_has_access(user) or catalog_entry_catalog == None:
             return None

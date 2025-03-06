@@ -1,5 +1,6 @@
 from api.session import db_session
 from api.models.Admin import Admin
+from api.models.User import User
 from api.services import UserServices as UserServices
 from api.apiKeys import ADMIN_SERVICES_API_KEY
 from api.validators import utils as validationUtils
@@ -32,7 +33,7 @@ def find(user_id):
 def find_by_admin_id(admin_id):
     try:
         validated_admin_id = AdminValidators.validate_admin_id(admin_id)
-        return Admin.query.get(validated_admin_id)
+        return db_session.query(Admin).get(validated_admin_id)
     except:
         return None
 

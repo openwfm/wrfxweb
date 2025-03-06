@@ -34,4 +34,4 @@ def find(email):
 
 
 def find_by_id(user_id):
-    return User.query.get(user_id)
+    return db_session.query(User).get(user_id)

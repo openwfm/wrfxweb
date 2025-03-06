@@ -13,9 +13,11 @@ def find(json):
     catalog_id = find_params["catalog_id"]
     catalog_entry_id = find_params["catalog_entry_id"]
 
-    return CatalogEntryCatalog.query.filter_by(
-        catalog_id=catalog_id, catalog_entry_id=catalog_entry_id
-    ).first()
+    return (
+        db_session.query(CatalogEntryCatalog)
+        .filter_by(catalog_id=catalog_id, catalog_entry_id=catalog_entry_id)
+        .first()
+    )
 
 
 def create(json):

@@ -1,7 +1,7 @@
 from api.session import db_session
 import api.encryption as encryption
 from api.apiKeys import CLIENT_SERVER_API_KEYS, ADMIN_SERVICES_API_KEY
-from api.models.Catalog import Catalog
+from api.models.catalog.Catalog import Catalog
 from api.models.CatalogAccess import CatalogAccess
 from api.validators import CatalogValidators as CatalogValidators
 from api.services import AdminServices as AdminServices
@@ -18,7 +18,7 @@ import datetime
 def find_by_id(catalog_id):
     try:
         validated_catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-        return Catalog.query.get(validated_catalog_id)
+        return db_session.query(Catalog).get(validated_catalog_id)
     except:
         return None
 
@@ -84,7 +84,7 @@ def destroy(catalog_id, user, admin_services_api_key):
         CatalogAccessServices.destroy_all(validated_catalog_id)
         CatalogEntryUploadServices.destroy_all(validated_catalog_id)
 
-        catalog = Catalog.query.get(validated_catalog_id)
+        catalog = db_session.query(Catalog).get(validated_catalog_id)
         db_session.delete(catalog)
         db_session.commit()
     except:
@@ -125,7 +125,7 @@ def update(catalog_id, json, user, admin_services_api_key):
 
 # make private
 def find_all():
-    return Catalog.query.all()
+    return db_session.query(Catalog).all()
 
 
 def admin_catalog(user, catalog_id, admin_services_api_key):

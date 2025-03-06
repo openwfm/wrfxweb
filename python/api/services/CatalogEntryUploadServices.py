@@ -81,7 +81,9 @@ def find_by_id(catalog_entry_upload_id):
         validated_catalog_entry_upload_id = CatalogEntryUploadValidators.validate_id(
             catalog_entry_upload_id
         )
-        return CatalogEntryUpload.query.get(validated_catalog_entry_upload_id)
+        return db_session.query(CatalogEntryUpload).get(
+            validated_catalog_entry_upload_id
+        )
     except Exception:
         return None
 

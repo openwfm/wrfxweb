@@ -1,0 +1,26 @@
+from api.session import db_session
+from api.models.User import User
+from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
+from api.apiKeys import SIMULATIONS_FOLDER
+
+
+class CatalogEntry(CatalogEntryDbModel):
+    def entry_path(self):
+        entry_path = f"{SIMULATIONS_FOLDER}/{self.job_id}"
+        return entry_path
+
+    def entry_manifest_path(self):
+        manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
+        return manifest_path
+
+    def uploader(self):
+        if self.uploader_id == None or self.uploader_id < 1:
+            return None
+        return User.query.get(self.uploader_id)
+
+    def directory(self):
+        return SIMULATIONS_FOLDER
+
+    def destroy(self):
+        db_session.delete(self)
+        db_session.commit()

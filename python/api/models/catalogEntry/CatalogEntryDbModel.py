@@ -1,11 +1,12 @@
 from api.db import Base
-from api.models.User import User
+
+# from api.models.User import User
 from api.apiKeys import SIMULATIONS_FOLDER
 
 from sqlalchemy import Column, Integer, ForeignKey, String
 
 
-class CatalogEntry(Base):
+class CatalogEntryDbModel(Base):
     __tablename__ = "catalog_entry"
     id = Column(Integer, primary_key=True)
     uploader_id = Column(Integer, ForeignKey("users.id"), nullable=True)
@@ -22,21 +23,21 @@ class CatalogEntry(Base):
     zip_url = Column(String(255), nullable=True)
     kml_url = Column(String(255), nullable=True)
 
-    def entry_path(self):
-        entry_path = f"{SIMULATIONS_FOLDER}/{self.job_id}"
-        return entry_path
-
-    def entry_manifest_path(self):
-        manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
-        return manifest_path
-
-    def uploader(self):
-        if self.uploader_id == None or self.uploader_id < 1:
-            return None
-        return User.query.get(self.uploader_id)
-
-    def directory(self):
-        return SIMULATIONS_FOLDER
+    # def entry_path(self):
+    #     entry_path = f"{SIMULATIONS_FOLDER}/{self.job_id}"
+    #     return entry_path
+    #
+    # def entry_manifest_path(self):
+    #     manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
+    #     return manifest_path
+    #
+    # def uploader(self):
+    #     if self.uploader_id == None or self.uploader_id < 1:
+    #         return None
+    #     return User.query.get(self.uploader_id)
+    #
+    # def directory(self):
+    #     return SIMULATIONS_FOLDER
 
     # def destroy(self):
     #     db.session.delete(self)

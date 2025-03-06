@@ -1,10 +1,12 @@
 from api.models import (
     Admin,
-    Catalog,
+    # Catalog,
     CatalogAccess,
-    CatalogEntry,
+    # CatalogEntry,
     CatalogEntryCatalog,
     CatalogEntryUpload,
     User,
     UserFeedback,
 )
+from api.models.catalog.CatalogDbModel import CatalogDbModel
+from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
