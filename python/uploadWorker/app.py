@@ -4,7 +4,7 @@ from uploadWorker.workerKeys import (
     UPLOAD_WORKER_LOG,
 )
 
-from api.db import db
+# from api.db import db
 
 import logging
 
@@ -12,8 +12,8 @@ import logging
 def create_app():
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///primary.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///primary.db"
+    # app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     app.secret_key = UPLOAD_WORKER_SECRET
 
@@ -22,7 +22,7 @@ def create_app():
         handler = logging.FileHandler(UPLOAD_WORKER_LOG)
         app.logger.addHandler(handler)
 
-    db.init_app(app)
+    # db.init_app(app)
 
     return app
 

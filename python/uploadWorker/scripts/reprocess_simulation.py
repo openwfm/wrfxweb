@@ -1,4 +1,4 @@
-from api.db import db
+# from api.db import db
 from uploadWorker.workerKeys import SIMULATIONS_FOLDER
 
 

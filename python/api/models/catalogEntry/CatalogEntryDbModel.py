@@ -3,7 +3,7 @@ from api.db import Base
 # from api.models.User import User
 from api.apiKeys import SIMULATIONS_FOLDER
 
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
 
 
 class CatalogEntryDbModel(Base):
@@ -22,23 +22,4 @@ class CatalogEntryDbModel(Base):
     run_utc = Column(String(255), nullable=True)
     zip_url = Column(String(255), nullable=True)
     kml_url = Column(String(255), nullable=True)
-
-    # def entry_path(self):
-    #     entry_path = f"{SIMULATIONS_FOLDER}/{self.job_id}"
-    #     return entry_path
-    #
-    # def entry_manifest_path(self):
-    #     manifest_path = f"{SIMULATIONS_FOLDER}/{self.manifest_path}"
-    #     return manifest_path
-    #
-    # def uploader(self):
-    #     if self.uploader_id == None or self.uploader_id < 1:
-    #         return None
-    #     return User.query.get(self.uploader_id)
-    #
-    # def directory(self):
-    #     return SIMULATIONS_FOLDER
-
-    # def destroy(self):
-    #     db.session.delete(self)
-    #     db.session.commit()
+    archived = Column(Boolean, default=False)
