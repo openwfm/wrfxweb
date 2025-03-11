@@ -33,19 +33,21 @@ export class CatalogMenu extends HTMLElement {
     this.catalogId = null;
     this.innerHTML = `
             <div>
-                <div id='catalog-button' class='feature-controller catalog-button'>
-                    <div id='catalog-menu-icon-container'>
-                        <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
-                            <use href='#menu-24px'></use>
-                        </svg>
-                    </div>
-                    <div id='menu-label'>Catalog</div>
-                    <ul id='catalog-options' class="hidden">
-                    </ul>
+                <div id='catalog-button-container'>
+                  <div id='catalog-button' class='feature-controller catalog-button'>
+                      <div id='catalog-menu-icon-container'>
+                          <svg id='catalog-menu-icon' class='interactive-button svgIcon'>
+                              <use href='#menu-24px'></use>
+                          </svg>
+                      </div>
+                      <div id='menu-label'>Catalog</div>
+                  </div>
+                  <ul id='catalog-options' class='feature-controller hidden'>
+                  </ul>
                 </div>
                 <div class='catalog-menu round-border'>
                     <div id='menu-title' class='menu-title round-border'>
-                        <div>Select Simulation...</div>
+                        <div id="catalog-description">Select Simulation...</div>
                         <div id='menu-close' class='round-border'>x</div>
                     </div>
                     <div class='search-header'>
@@ -126,11 +128,10 @@ export class CatalogMenu extends HTMLElement {
     const catalogOptions = this.querySelector("#catalog-options");
     this.catalogs = await getCatalogs();
     if (this.catalogs.length > 0) {
-      const catalogId = this.catalogs[0].id;
-      this.createMenuEntries(catalogId);
+      this.createMenuEntries(this.catalogs[0]);
       for (let catalog of this.catalogs) {
         let catalogOption = new CatalogOption(catalog);
-        catalogOption.onclick = () => this.createMenuEntries(catalog.id);
+        catalogOption.onclick = () => this.createMenuEntries(catalog);
         catalogOptions.appendChild(catalogOption);
       }
     }
@@ -148,6 +149,11 @@ export class CatalogMenu extends HTMLElement {
     };
     catalogMenuIcon.onpointerdown = () => {
       toggleVisibility(catalogOptions);
+      if (catalogOptions.classList.contains("hidden")) {
+        catalogMenuIcon.classList.remove("open");
+      } else {
+        catalogMenuIcon.classList.add("open");
+      }
     };
 
     this.querySelector("#menu-close").onclick = () => {
@@ -210,7 +216,8 @@ export class CatalogMenu extends HTMLElement {
     };
   }
 
-  async createMenuEntries(catalogId) {
+  async createMenuEntries(catalog) {
+    let catalogId = catalog.id;
     if (this.catalogId == catalogId) {
       return;
     }
@@ -220,7 +227,10 @@ export class CatalogMenu extends HTMLElement {
     const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
     const catalogEntries = await getCatalogEntries(catalogId);
+    const catalogDescription = this.querySelector("#catalog-description");
     this.catalogId = catalogId;
+
+    catalogDescription.innerText = `Select Simulation from ${catalog.description} catalog...`;
     controllers.catalogId.setValue(catalogId);
     this.addOrder = [];
     this.fuelMoistureList = [];
