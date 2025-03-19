@@ -1,6 +1,6 @@
 from clientServer.app import app
 
-from clientServer.routes.admin.admin_utils import admin_login_required, api_key_required
+from clientServer.routes.admin.admin_utils import admin_login_required
 from clientServer.logging import utils as loggingUtils
 from clientServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_URL,
@@ -8,15 +8,14 @@ from clientServer.serverKeys import (
     ADMIN_SERVICES_API_KEY,
 )
 
-from api.validators import CatalogValidators as CatalogValidators
-from api.validators import (
-    CatalogEntryUploadValidators as CatalogEntryUploadValidators,
-)
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
 )
 from api.services import (
     CatalogEntryServices as CatalogEntryServices,
+)
+from api.services import (
+    CatalogEntryCatalogServices as CatalogEntryCatalogServices,
 )
 from api.services import CatalogServices as CatalogServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
@@ -35,16 +34,6 @@ def catalog_entries(catalog_id):
         return get_catalog_entries(catalog_id)
     elif request.method == "POST":
         return create_catalog_entry(catalog_id)
-    return {
-        "message": "Method Not Allowed",
-    }, 405
-
-
-@app.route("/upload_service/catalogs/<catalog_id>/entries", methods=["POST"])
-@api_key_required
-def external_catalog_entries(catalog_id):
-    if request.method == "POST":
-        return external_create_catalog_entry(catalog_id)
     return {
         "message": "Method Not Allowed",
     }, 405
@@ -72,30 +61,15 @@ def create_catalog_entry(catalog_id):
         catalog_entry_upload = CatalogEntryUploadServices.create(
             catalog_entry_params, ADMIN_SERVICES_API_KEY
         )
+        if catalog_entry_upload == None:
+            abort(400, f"An error occurred while uploading file")
         verify_zip_upload(catalog_entry_upload)
-    except Exception as e:
-        abort(400, f"An error occurred while uploading file: {e}")
-
-    loggingUtils.log_upload(catalog_entry_upload)
-    post_task_queue_service(catalog_entry_upload)
-
-    return {
-        "message": "Entry Successfully Created!",
-    }, 200
-
-
-def external_create_catalog_entry(catalog_id):
-    try:
-        zip_filename = request.form["zipFileName"]
-        entry_form = request.form["column"]
-        catalog_entry_params = {
+        catalog_entry_catalog_params = {
             "catalog_id": catalog_id,
-            "zip_filename": zip_filename,
-            "entry_type": entry_form,
-            "uploader_id": current_user.id,
+            "catalog_entry_upload_id": catalog_entry_upload.id,
         }
-        catalog_entry_upload = CatalogEntryUploadServices.external_create(
-            catalog_entry_params, ADMIN_SERVICES_API_KEY
+        CatalogEntryCatalogServices.find_or_create(
+            catalog_entry_catalog_params, ADMIN_SERVICES_API_KEY
         )
     except Exception as e:
         abort(400, f"An error occurred while uploading file: {e}")

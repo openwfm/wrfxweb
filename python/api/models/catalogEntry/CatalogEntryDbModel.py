@@ -1,8 +1,5 @@
 from api.db import Base
 
-# from api.models.User import User
-from api.apiKeys import SIMULATIONS_FOLDER
-
 from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
 
 

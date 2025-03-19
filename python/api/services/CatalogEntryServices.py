@@ -1,11 +1,12 @@
 from api.session import db_session
 from api.models.catalogEntry.CatalogEntry import CatalogEntry
-from api.models.CatalogEntryCatalog import CatalogEntryCatalog
+from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
 from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.validators import CatalogEntryValidators as CatalogEntryValidators
 from api.validators import CatalogValidators as CatalogValidators
 from api.validators import utils as validationUtils
+import api.logging.utils as logging
 
 from sqlalchemy import select
 
@@ -77,7 +78,8 @@ def find_or_create(json):
             catalog_id = CatalogValidators.validate_catalog_id(json["catalog_id"])
             create_catalog_entry_catalog(catalog_id, catalog_entry.id)
         return catalog_entry
-    except:
+    except Exception as e:
+        logging.service_exception("CatalogEntry", "find_or_create", e)
         return None
 
 

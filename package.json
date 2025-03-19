@@ -15,9 +15,10 @@
   },
   "scripts": {
     "prestart": "npm install",
-    "start-client": "cd python/clientServer && ../venv/bin/flask --app __init__ run --debug --port 8000",
-    "start-upload-queue": "cd python/uploadQueueService && ../venv/bin/flask --app __init__ run --debug --port 8001",
-    "start-upload-worker": "cd python/uploadWorker && ../venv/bin/flask --app __init__ run --debug --port 8002",
+    "client": "cd python/clientServer && ../venv/bin/flask --app __init__ run --debug --port 8000",
+    "upload-service": "cd python/uploadService && ../venv/bin/flask --app __init__ run --debug --port 8001",
+    "upload-queue": "cd python/uploadQueueService && ../venv/bin/flask --app __init__ run --debug --port 8002",
+    "upload-worker": "cd python/uploadWorker && ../venv/bin/flask --app __init__ run --debug --port 8003",
     "test": "jest --silent"
   }
 }

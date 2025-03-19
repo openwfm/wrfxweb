@@ -1,7 +1,7 @@
 from api.session import db_session
 from api.models.catalog.CatalogDbModel import CatalogDbModel
 from api.models.CatalogAccess import CatalogAccess
-from api.models.CatalogEntryCatalog import CatalogEntryCatalog
+from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 
 from api.validators import utils as validationUtils
 from api.apiKeys import SIMULATIONS_FOLDER
@@ -18,7 +18,10 @@ class Catalog(CatalogDbModel):
         catalog_id = self.id
 
         catalog_entry_catalogs = (
-            db_session.query(CatalogEntryCatalog).filter_by(catalog_id=catalog_id).all()
+            db_session.query(CatalogEntryCatalog)
+            .filter(CatalogEntryCatalog.catalog_entry_id != None)
+            .filter_by(catalog_id=catalog_id)
+            .all()
         )
 
         return [

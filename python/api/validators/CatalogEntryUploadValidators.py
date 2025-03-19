@@ -8,8 +8,6 @@ from api.validators import utils as validationUtils
 # user = db.relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
 # entry_type = db.Column(db.String(255), nullable=False)
 def validate_create_json(json):
-    if "catalog_id" not in json:
-        raise ValueError("catalog_id is required")
     if "zip_file" not in json:
         raise ValueError("zip_file is required")
     if "entry_type" not in json:
@@ -17,13 +15,11 @@ def validate_create_json(json):
     if "uploader_id" not in json:
         raise ValueError("uploader_id is required")
 
-    catalog_id = CatalogValidators.validate_catalog_id(json["catalog_id"])
     uploader_id = UserValidators.validate_user_id(json["uploader_id"])
     zip_file = validationUtils.validate_zip(json["zip_file"])
     entry_type = validationUtils.validate_text(json["entry_type"])
 
     return {
-        "catalog_id": catalog_id,
         "zip_file": zip_file,
         "uploader_id": uploader_id,
         "entry_type": entry_type,

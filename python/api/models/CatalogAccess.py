@@ -2,8 +2,6 @@ from api.db import Base
 from sqlalchemy import Column, Integer, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 
-
-# from api.db import db
 import api.encryption as encryption
 
 
@@ -30,7 +28,3 @@ class CatalogAccess(Base):
         if self.user_id:
             return "user"
         return "domain"
-
-    # def destroy(self):
-    #     db.session.delete(self)
-    #     db.session.commit()

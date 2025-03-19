@@ -58,6 +58,9 @@ python/clientServer/serializers/__pycache__/*
 python/clientServer/services/__pycache__/*
 python/clientServer/models/__pycache__/*
 python/clientServer/__pycache__/*
+python/uploadService/__pycache__/*
+python/uploadService/logging/__pycache__/*
+python/uploadService/logs/*
 python/instance/
 python/simulationWorker/__pycache__/
 python/simulationWorker/__pycache__/*

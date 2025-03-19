@@ -2,8 +2,7 @@ from clientServer.app import app
 
 from clientServer.routes.admin.admin_utils import admin_login_required
 
-# from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
-from clientServer.routes.admin import catalogs
+from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
 
 from clientServer.serverKeys import ADMIN_SERVICES_API_KEY
 
@@ -22,7 +21,6 @@ from flask_login import current_user
 @admin_login_required
 def all_admins():
     admins = AdminServices.all_admins(current_user, ADMIN_SERVICES_API_KEY)
-    # admins = db.session.query(User).join(Admin).all()
     admin_jsons = [
         UserSerializer.serialize_user_with_email(
             admin, current_user, ADMIN_SERVICES_API_KEY
@@ -52,7 +50,6 @@ def create_admin():
 @app.route("/admin/<admin_id>", methods=["DELETE"])
 @admin_login_required
 def delete_admin(admin_id):
-    print(f"test")
     AdminServices.admin_destroy(admin_id, current_user, ADMIN_SERVICES_API_KEY)
 
     return {"message": "admin deleted"}, 200
