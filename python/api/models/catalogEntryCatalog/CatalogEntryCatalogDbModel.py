@@ -9,13 +9,9 @@ class CatalogEntryCatalogDbModel(Base):
     id = Column(Integer, primary_key=True)
     catalog_id = Column(Integer, ForeignKey("catalog.id"), nullable=False)
     catalog_entry_id = Column(Integer, ForeignKey("catalog_entry.id"))
-    catalog_entry_upload_id = Column(Integer, ForeignKey("catalog_entry_upload.id"))
     catalog = relationship("Catalog", foreign_keys="CatalogEntryCatalog.catalog_id")
     catalog_entry = relationship(
         "CatalogEntry", foreign_keys="CatalogEntryCatalog.catalog_entry_id"
-    )
-    catalog_entry_upload = relationship(
-        "CatalogEntryUpload", foreign_keys="CatalogEntryCatalog.catalog_entry_upload_id"
     )
 
     def __repr__(self):

@@ -1,7 +1,7 @@
 from api.db import Base
 
 
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
 from sqlalchemy.orm import relationship
 
 
@@ -12,3 +12,5 @@ class CatalogEntryUploadDbModel(Base):
     user = relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
     entry_type = Column(String(255), nullable=False)
     zip_filename = Column(String(255), nullable=False)
+    processed = Column(Boolean, default=False)
+    uploaded_timestamp = Column(String(26), nullable=False)

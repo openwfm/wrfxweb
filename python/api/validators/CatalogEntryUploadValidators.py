@@ -50,11 +50,8 @@ def validate_external_create_json(json):
 
 
 def validate_id(catalog_entry_upload_id):
-    if type(catalog_entry_upload_id) is int:
-        return catalog_entry_upload_id
-    if type(catalog_entry_upload_id) is str:
-        if not catalog_entry_upload_id.isdigit():
-            raise ValueError("catalog_id must be an integer")
-        return int(catalog_entry_upload_id)
-    else:
-        raise ValueError("catalog_id must be an integer")
+    try:
+        id = validationUtils.validate_int_id(catalog_entry_upload_id)
+        return id
+    except:
+        raise ValueError("catalog_entry_upload_id must be an integer")

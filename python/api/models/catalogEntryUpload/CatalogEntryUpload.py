@@ -13,5 +13,9 @@ class CatalogEntryUpload(CatalogEntryUploadDbModel):
         db_session.delete(self)
         db_session.commit()
 
+    def process(self):
+        self.processed = True
+        db_session.commit()
+
     def __repr__(self):
         return f"<CatalogEntryUpload {self.id}>"

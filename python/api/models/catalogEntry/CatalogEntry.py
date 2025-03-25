@@ -24,3 +24,6 @@ class CatalogEntry(CatalogEntryDbModel):
     def destroy(self):
         db_session.delete(self)
         db_session.commit()
+
+    def __repr__(self):
+        return f"<CatalogEntry {self.id}: {self.job_id} >"

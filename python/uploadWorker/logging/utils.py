@@ -12,9 +12,8 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
-def log_unpacking_error(catalog_entry_upload_id, file_path):
-    error_message = f"catalog_entry_upload_id: {catalog_entry_upload_id} - loading file {file_path} failed"
-    log_statement("UploadThreadError", error_message, True)
+def log_unpacking_error(error):
+    log_statement("UploadThreadError", error, True)
 
 
 def log_catalog_entry_fail(catalog_entry_upload, job_id):

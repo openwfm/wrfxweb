@@ -40,7 +40,6 @@ def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
 def create(json):
     try:
         catalog_entry_params = CatalogEntryValidators.validate_create_json(json)
-
         catalog_entry = CatalogEntry(
             uploader_id=catalog_entry_params["uploader_id"],
             entry_type=catalog_entry_params["entry_type"],
@@ -59,9 +58,6 @@ def create(json):
         db_session.add(catalog_entry)
         db_session.commit()
 
-        catalog_id = catalog_entry_params["catalog_id"]
-        create_catalog_entry_catalog(catalog_id, catalog_entry.id)
-
         return catalog_entry
     except Exception:
         return None
@@ -74,21 +70,10 @@ def find_or_create(json):
         catalog_entry = find_by_job_id(json["job_id"])
         if catalog_entry == None:
             catalog_entry = create(json)
-        elif "catalog_id" in json:
-            catalog_id = CatalogValidators.validate_catalog_id(json["catalog_id"])
-            create_catalog_entry_catalog(catalog_id, catalog_entry.id)
         return catalog_entry
     except Exception as e:
         logging.service_exception("CatalogEntry", "find_or_create", e)
         return None
-
-
-def destroy(catalog_id, catalog_entry_id):
-    pass
-
-
-def destroy_all(catalog_id):
-    pass
 
 
 def find_by_job_id(job_id):
@@ -142,7 +127,3 @@ def admin_entries(catalog_id, user, admin_services_api_key):
     if catalog == None:
         return []
     return catalog.entries()
-
-
-def find_all(catalog_id):
-    pass

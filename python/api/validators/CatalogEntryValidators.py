@@ -1,4 +1,3 @@
-from api.validators import CatalogValidators as CatalogValidators
 from api.validators import UserValidators as UserValidators
 from api.validators import utils as validationUtils
 
@@ -14,8 +13,6 @@ def validate_create_json(json):
         raise ValueError("uploader_id is required")
     if "entry_type" not in json:
         raise ValueError("entry_type is required")
-    if "catalog_id" not in json:
-        raise ValueError("catalog_id is required")
     if "description" not in json:
         raise ValueError("description is required")
     if "to_utc" not in json:
@@ -28,7 +25,6 @@ def validate_create_json(json):
     job_id = validationUtils.validate_text(json["job_id"])
     uploader_id = UserValidators.validate_user_id(json["uploader_id"])
     entry_type = validationUtils.validate_text(json["entry_type"])
-    catalog_id = CatalogValidators.validate_catalog_id(json["catalog_id"])
     description = validationUtils.validate_text(json["description"])
     to_utc = validationUtils.validate_text(json["to_utc"])
     from_utc = validationUtils.validate_text(json["from_utc"])
@@ -45,7 +41,6 @@ def validate_create_json(json):
         "job_id": job_id,
         "uploader_id": uploader_id,
         "entry_type": entry_type,
-        "catalog_id": catalog_id,
         "description": description,
         "to_utc": to_utc,
         "from_utc": from_utc,

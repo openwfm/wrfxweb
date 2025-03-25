@@ -17,6 +17,9 @@ from api.services import (
 from api.services import (
     CatalogEntryCatalogServices as CatalogEntryCatalogServices,
 )
+from api.services import (
+    UploadToCatalogServices as UploadToCatalogServices,
+)
 from api.services import CatalogServices as CatalogServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
@@ -53,7 +56,6 @@ def create_catalog_entry(catalog_id):
         zip_file = request.files["zipFile"]
         entry_form = request.form["column"]
         catalog_entry_params = {
-            "catalog_id": catalog_id,
             "zip_file": zip_file,
             "entry_type": entry_form,
             "uploader_id": current_user.id,
@@ -63,13 +65,15 @@ def create_catalog_entry(catalog_id):
         )
         if catalog_entry_upload == None:
             abort(400, f"An error occurred while uploading file")
+
         verify_zip_upload(catalog_entry_upload)
-        catalog_entry_catalog_params = {
-            "catalog_id": catalog_id,
+
+        upload_to_catalog_params = {
             "catalog_entry_upload_id": catalog_entry_upload.id,
+            "catalog_id": catalog_id,
         }
-        CatalogEntryCatalogServices.find_or_create(
-            catalog_entry_catalog_params, ADMIN_SERVICES_API_KEY
+        UploadToCatalogServices.find_or_create(
+            upload_to_catalog_params, ADMIN_SERVICES_API_KEY
         )
     except Exception as e:
         abort(400, f"An error occurred while uploading file: {e}")

@@ -12,3 +12,6 @@ from api.models.catalogEntryUpload.CatalogEntryUploadDbModel import (
 from api.models.catalogEntryCatalog.CatalogEntryCatalogDbModel import (
     CatalogEntryCatalogDbModel,
 )
+from api.models.uploadToCatalog.UploadToCatalogDbModel import (
+    UploadToCatalogDbModel,
+)

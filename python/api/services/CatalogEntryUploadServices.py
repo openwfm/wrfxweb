@@ -6,6 +6,7 @@ from api.validators import utils as validationUtils
 from api.apiKeys import UPLOAD_API_KEYS
 
 import api.logging.utils as logging
+import datetime
 
 
 # catalog_entry_upload_params {
@@ -30,6 +31,7 @@ def create(json, upload_api_key):
             uploader_id=catalog_entry_upload_params["uploader_id"],
             entry_type=catalog_entry_upload_params["entry_type"],
             zip_filename=encrypted_filename,
+            uploaded_timestamp=str(datetime.datetime.now()),
         )
 
         db_session.add(catalog_entry_upload)
