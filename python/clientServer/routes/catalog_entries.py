@@ -7,6 +7,7 @@ from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask_login import current_user
 from flask import send_from_directory
+import api.encryption as encryption
 
 
 @app.route("/catalogs/<catalog_id>/entries", methods=["GET"])
@@ -30,7 +31,7 @@ def catalog_entry_rasters(catalog_id, catalog_entry_id):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
-    manifest_path = catalog_entry.manifest_path
+    manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
     return send_from_directory(catalog_entry.directory(), manifest_path)
 
 
