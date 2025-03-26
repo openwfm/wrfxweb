@@ -6,23 +6,22 @@ import api.encryption as encryption
 def serialize_catalog_entry(entry):
     return {
         "id": f"{entry.id}",
-        # "catalog_id": sanitize_text(f"{entry.catalog_id}"),
         "entry_type": sanitize_text(entry.entry_type),
         "from_utc": sanitize_text(entry.from_utc),
         "to_utc": sanitize_text(entry.to_utc),
-        "description": encryption.decrypt_searchable_data(
-            sanitize_text(entry.description)
+        "description": sanitize_text(
+            encryption.decrypt_searchable_data(entry.description)
         ),
-        "manifest_path": encryption.decrypt_searchable_data(
-            sanitize_text(entry.manifest_path)
+        "manifest_path": sanitize_text(
+            encryption.decrypt_searchable_data(entry.manifest_path)
         ),
-        "job_id": encryption.decrypt_searchable_data(sanitize_text(entry.job_id)),
+        "job_id": sanitize_text(encryption.decrypt_searchable_data(entry.job_id)),
         "zip_size": f"{entry.zip_size}",
         "kml_size": f"{entry.kml_size}",
         "processed_utc": sanitize_text(entry.processed_utc),
         "run_utc": sanitize_text(entry.run_utc),
-        "zip_url": encryption.decrypt_searchable_data(sanitize_text(entry.zip_url)),
-        "kml_url": encryption.decrypt_searchable_data(sanitize_text(entry.kml_url)),
+        "zip_url": sanitize_text(encryption.decrypt_searchable_data(entry.zip_url)),
+        "kml_url": sanitize_text(encryption.decrypt_searchable_data(entry.kml_url)),
     }
 
 
