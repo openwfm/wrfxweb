@@ -1,79 +1,75 @@
-# from api.db import db
 from uploadWorker.workerKeys import TEMP_FOLDER, SIMULATIONS_FOLDER, UPLOADS_FOLDER
+import uploadWorker.scripts.utils as script_utils
 
-
-import api.services.CatalogEntryServices as CatalogEntryServices
 
 import json
-import os.path as osp
-
-
 import zipfile
 import shutil
-
 import os
 
 
-class CatalogEntryCreationError(Exception):
-    pass
-
-
-def unpack_catalog_entry_zip(upload_path, entry_type):
-    if not unzip_catalog_entry_upload(upload_path):
+def unpack_catalog_entry_zip(upload_path, entry_type, catalog_id):
+    try:
+        unzip_directory = unzip_catalog_entry_upload(upload_path)
+    except Exception:
         print(f"{upload_path} was unable to be unzipped")
         return
-    directory = os.listdir(TEMP_FOLDER)[0]
-    catalog_file = osp.join(TEMP_FOLDER, f"{directory}/catalog.json")
-    try:
-        catalog_entry_jsons = json.load(open(catalog_file))
-        create_catalog_entries(catalog_entry_jsons, entry_type)
-    except:
-        shutil.rmtree(f"{TEMP_FOLDER}/{directory}")
-        print(f"loading file {catalog_file} failed ")
-        return
 
-    shutil.move(f"{TEMP_FOLDER}/{directory}", f"{SIMULATIONS_FOLDER}/{directory}")
-    os.remove(f"{UPLOADS_FOLDER}/{upload_path}")
+    try:
+        catalog_entry_jsons = load_json(unzip_directory)
+        catalog_entry = script_utils.create_catalog_entries(
+            catalog_entry_jsons, entry_type
+        )
+        script_utils.create_catalog_entry_catalog(catalog_entry, catalog_id)
+        move_simulation(upload_path, unzip_directory, catalog_entry)
+    except Exception as e:
+        shutil.rmtree(unzip_directory)
+        print(f"Unpacking CatalogEntry {upload_path} failed: {e}")
 
 
 def unzip_catalog_entry_upload(upload_path):
     upload_path = f"{UPLOADS_FOLDER}/{upload_path}"
-    try:
-        with zipfile.ZipFile(upload_path, "r") as zip_ref:
-            zip_ref.testzip()
-            # for file_name in zip_ref.namelist():
-            #     file_ext = os.path.splitext(file_name)[1]
-            #     if file_ext not in UPLOAD_EXTENSIONS:
-            #         return False
-            zip_ref.extractall(TEMP_FOLDER)
-            return True
-    except:
-        return False
+    with zipfile.ZipFile(upload_path, "r") as zip_ref:
+        zip_ref.testzip()
+        # for later, more extensive zip testing
+        # for file_name in zip_ref.namelist():
+        #     file_ext = os.path.splitext(file_name)[1]
+        #     if file_ext not in UPLOAD_EXTENSIONS:
+        #         return False
+
+        unzip_directory = f"{TEMP_FOLDER}/unzipped_catalog_entry"
+        zip_ref.extractall(unzip_directory)
+
+        # zip was extracted into another folder. need to extract it
+        if len(os.listdir(unzip_directory)) == 1:
+            directory = os.listdir(unzip_directory)[0]
+            source = f"{unzip_directory}/{directory}"
+            shutil.move(source, TEMP_FOLDER)
+            shutil.rmtree(unzip_directory)
+            shutil.move(f"{TEMP_FOLDER}/{directory}", unzip_directory)
+        return unzip_directory
 
 
-def create_catalog_entries(catalog_entry_jsons, entry_type):
-    for job_id in catalog_entry_jsons:
-        catalog_entry_json = catalog_entry_jsons[job_id]
-        catalog_entry_json["processed_utc"] = catalog_entry_jsons[job_id].get(
-            "processed_utc", None
-        )
-        catalog_entry_json["run_utc"] = catalog_entry_jsons[job_id].get("run_utc", None)
-        catalog_entry_json["kml_url"] = catalog_entry_jsons[job_id].get("kml_url", None)
-        catalog_entry_json["kml_size"] = catalog_entry_jsons[job_id].get(
-            "kml_size", None
-        )
-        catalog_entry_json["zip_url"] = catalog_entry_jsons[job_id].get("zip_url", None)
-        catalog_entry_json["zip_size"] = catalog_entry_jsons[job_id].get(
-            "zip_size", None
-        )
-        catalog_entry_json["job_id"] = job_id
-        catalog_entry_json["uploader_id"] = 0
-        catalog_entry_json["entry_type"] = entry_type
-        catalog_entry_json["catalog_id"] = 0
+def load_json(unzip_directory):
+    catalog_file = f"{unzip_directory}/catalog.json"
+    catalog_entry_jsons = json.load(open(catalog_file))
+    return catalog_entry_jsons
 
-        catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
-        if catalog_entry == None:
-            print(f"failed to create CatalogEntry for {job_id}")
-            raise CatalogEntryCreationError(job_id)
-        else:
-            print(f"created <CatalogEntry {catalog_entry.id}> for {job_id}")
+
+def move_simulation(upload_path, unzip_directory, catalog_entry):
+    destination = catalog_entry.entry_directory()
+    if os.path.exists(destination):
+        merge_folders(unzip_directory, destination)
+    else:
+        shutil.move(unzip_directory, destination)
+    os.remove(f"{UPLOADS_FOLDER}/{upload_path}")
+
+
+def merge_folders(source_folder, dest_folder):
+    for item in os.listdir(source_folder):
+        source_item_path = os.path.join(source_folder, item)
+        destination_item_path = os.path.join(dest_folder, item)
+        if os.path.exists(destination_item_path):
+            os.remove(destination_item_path)
+        shutil.move(source_item_path, destination_item_path)
+    shutil.rmtree(source_folder)
