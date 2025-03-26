@@ -1,8 +1,6 @@
-from uploadWorker.app import app
 from uploadWorker.logging import utils as loggingUtils
 from uploadWorker.workerKeys import (
     TEMP_FOLDER,
-    SIMULATIONS_FOLDER,
     UPLOAD_WORKER_API_KEY,
 )
 
@@ -11,8 +9,6 @@ import api.services.UploadToCatalogServices as UploadToCatalogServices
 import api.services.CatalogEntryCatalogServices as CatalogEntryCatalogServices
 
 import json
-import os.path as osp
-
 
 import zipfile
 import shutil
@@ -35,7 +31,7 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
             catalog_entry_jsons, catalog_entry_upload
         )
         update_catalog_entry_catalogs(catalog_entry, catalog_entry_upload)
-        move_simulation(catalog_entry_upload)
+        move_simulation(catalog_entry_upload, catalog_entry)
         catalog_entry_upload.process()
     except Exception as e:
         remove_temp_directory()
@@ -53,12 +49,24 @@ def unzip_catalog_entry_upload(catalog_entry_upload):
         upload_path = catalog_entry_upload.upload_path()
         with zipfile.ZipFile(upload_path, "r") as zip_ref:
             zip_ref.testzip()
+            # for later, more extensive zip testing
             # for file_name in zip_ref.namelist():
             #     file_ext = os.path.splitext(file_name)[1]
             #     if file_ext not in UPLOAD_EXTENSIONS:
             #         return False
-            zip_ref.extractall(TEMP_FOLDER)
-    except Exception:
+
+            unzip_directory = catalog_entry_upload.unzip_directory()
+            zip_ref.extractall(unzip_directory)
+
+            # zip was extracted into another folder. need to extract it
+            if len(os.listdir(unzip_directory)) == 1:
+                directory = os.listdir(unzip_directory)[0]
+                source = f"{unzip_directory}/{directory}"
+                shutil.move(source, TEMP_FOLDER)
+                shutil.rmtree(unzip_directory)
+                shutil.move(f"{TEMP_FOLDER}/{directory}", unzip_directory)
+    except Exception as e:
+        print(e)
         raise UploadUnzippingError(catalog_entry_upload)
 
 
@@ -69,8 +77,7 @@ class JsonLoadingError(Exception):
 
 
 def load_json(catalog_entry_upload):
-    directory = os.listdir(TEMP_FOLDER)[0]
-    catalog_file = osp.join(TEMP_FOLDER, f"{directory}/catalog.json")
+    catalog_file = catalog_entry_upload.unzipped_catalog()
     try:
         catalog_entry_jsons = json.load(open(catalog_file))
         return catalog_entry_jsons
@@ -133,11 +140,10 @@ def create_catalog_entries(catalog_entry_jsons, catalog_entry_upload):
         raise CatalogEntryCreationError(catalog_entry_upload)
 
 
-def move_simulation(catalog_entry_upload):
+def move_simulation(catalog_entry_upload, catalog_entry):
     upload_path = catalog_entry_upload.upload_path()
-    directory = os.listdir(TEMP_FOLDER)[0]
-    temp_source = f"{TEMP_FOLDER}/{directory}"
-    destination = f"{SIMULATIONS_FOLDER}/{directory}"
+    temp_source = catalog_entry_upload.unzip_directory()
+    destination = catalog_entry.entry_directory()
     if os.path.exists(destination):
         merge_folders(temp_source, destination)
     else:
@@ -146,6 +152,12 @@ def move_simulation(catalog_entry_upload):
 
 
 def merge_folders(source_folder, dest_folder):
+    for item in os.listdir(source_folder):
+        source_item_path = os.path.join(source_folder, item)
+        destination_item_path = os.path.join(dest_folder, item)
+        if os.path.exists(destination_item_path):
+            os.remove(destination_item_path)
+        shutil.move(source_item_path, destination_item_path)
     shutil.rmtree(source_folder)
 
 

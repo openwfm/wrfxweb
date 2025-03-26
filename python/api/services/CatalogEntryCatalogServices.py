@@ -29,9 +29,7 @@ def find(json):
 
 def create(json):
     try:
-        print("CatalogEntryCatalog create 0")
         create_params = CatalogEntryCatalogValidators.validate_create_json(json)
-        print("CatalogEntryCatalog create 1")
         catalog_entry_catalog = CatalogEntryCatalog(
             catalog_id=create_params["catalog_id"],
             catalog_entry_id=create_params["catalog_entry_id"],
@@ -57,17 +55,13 @@ def update(catalog_entry_catalog, json, api_key):
 
 def find_or_create(json, services_api_key):
     try:
-        print("CatalogEntryCatalog 0")
         if services_api_key not in UPLOAD_API_KEYS:
             raise InvalidAPIKey()
-        print("CatalogEntryCatalog 1")
         catalog_entry_catalog = find(json)
-        print("CatalogEntryCatalog 2")
         if catalog_entry_catalog != None:
             return catalog_entry_catalog
 
         catalog_entry_catalog = create(json)
-        print("CatalogEntryCatalog 3")
 
         return catalog_entry_catalog
     except Exception as e:

@@ -21,6 +21,9 @@ class CatalogEntry(CatalogEntryDbModel):
     def directory(self):
         return SIMULATIONS_FOLDER
 
+    def entry_directory(self):
+        return f"{SIMULATIONS_FOLDER}/{self.job_id}"
+
     def destroy(self):
         db_session.delete(self)
         db_session.commit()
