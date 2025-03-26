@@ -7,6 +7,7 @@ from api.validators import CatalogEntryValidators as CatalogEntryValidators
 from api.validators import CatalogValidators as CatalogValidators
 from api.validators import utils as validationUtils
 import api.logging.utils as logging
+import api.encryption as encryption
 
 from sqlalchemy import select
 
@@ -78,6 +79,7 @@ def find_or_create(json):
 
 def find_by_job_id(job_id):
     job_id = validationUtils.validate_text(job_id)
+    job_id = encryption.encrypt_searchable_data(job_id)
     return db_session.scalar(select(CatalogEntry).where(CatalogEntry.job_id == job_id))
 
 

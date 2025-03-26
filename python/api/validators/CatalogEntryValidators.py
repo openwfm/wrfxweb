@@ -1,5 +1,6 @@
 from api.validators import UserValidators as UserValidators
 from api.validators import utils as validationUtils
+import api.encryption as encryption
 
 
 # uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -23,19 +24,24 @@ def validate_create_json(json):
         raise ValueError("manifest_path is required")
 
     job_id = validationUtils.validate_text(json["job_id"])
+    job_id = encryption.encrypt_searchable_data(job_id)
     uploader_id = UserValidators.validate_user_id(json["uploader_id"])
     entry_type = validationUtils.validate_text(json["entry_type"])
     description = validationUtils.validate_text(json["description"])
+    description = encryption.encrypt_searchable_data(description)
     to_utc = validationUtils.validate_text(json["to_utc"])
     from_utc = validationUtils.validate_text(json["from_utc"])
     manifest_path = validationUtils.validate_text(json["manifest_path"])
+    manifest_path = encryption.encrypt_searchable_data(manifest_path)
 
     zip_size = validationUtils.validate_size(json["zip_size"])
     kml_size = validationUtils.validate_size(json["kml_size"])
     processed_utc = validationUtils.validate_text(json["processed_utc"])
     run_utc = validationUtils.validate_text(json["run_utc"])
     zip_url = validationUtils.validate_text(json["zip_url"])
+    zip_url = encryption.encrypt_searchable_data(zip_url)
     kml_url = validationUtils.validate_text(json["kml_url"])
+    kml_url = encryption.encrypt_searchable_data(kml_url)
 
     return {
         "job_id": job_id,
