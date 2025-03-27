@@ -8,9 +8,9 @@ def api_key_required(f):
     def wrapper(*args, **kwargs):
         api_key = request.headers.get("API-Key")
         if api_key == None:
-            abort(403, "Missing API key")
+            return {"message": "Missing API key"}, 403
         if api_key == UPLOAD_SERVICE_API_KEY:
             return f(*args, **kwargs)
-        abort(401, "Invalid API key")
+        return {"message": "Invalid API key"}, 401
 
     return wrapper

@@ -66,7 +66,6 @@ def unzip_catalog_entry_upload(catalog_entry_upload):
                 shutil.rmtree(unzip_directory)
                 shutil.move(f"{TEMP_FOLDER}/{directory}", unzip_directory)
     except Exception as e:
-        print(e)
         raise UploadUnzippingError(catalog_entry_upload)
 
 

@@ -1,4 +1,4 @@
-from uploadWorker.workerKeys import TEMP_FOLDER, SIMULATIONS_FOLDER, UPLOADS_FOLDER
+from uploadWorker.workerKeys import TEMP_FOLDER, UPLOADS_FOLDER
 import uploadWorker.scripts.utils as script_utils
 
 

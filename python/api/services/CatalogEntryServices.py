@@ -2,7 +2,7 @@ from api.session import db_session
 from api.models.catalogEntry.CatalogEntry import CatalogEntry
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
-from api.apiKeys import CLIENT_SERVER_API_KEYS
+from api.apiKeys import CLIENT_SERVER_API_KEYS, UPLOAD_API_KEYS
 from api.validators import CatalogEntryValidators as CatalogEntryValidators
 from api.validators import CatalogValidators as CatalogValidators
 from api.validators import utils as validationUtils
@@ -115,6 +115,18 @@ def user_entry(catalog_id, catalog_entry_id, user, client_server_api_key):
         return catalog_entry
     except Exception:
         return None
+
+
+def external_entries(catalog_id, upload_server_api_key):
+    try:
+        if upload_server_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
+        catalog = CatalogServices.find_by_id(catalog_id)
+        if catalog == None:
+            return []
+        return catalog.entries()
+    except Exception:
+        return []
 
 
 def user_entries(catalog_id, user, client_server_api_key):
