@@ -88,6 +88,8 @@ def upload_zip():
 def upload_catalog_entry_to_catalog(catalog_id):
     try:
         catalog_entry_upload = upload_zip()
+        if catalog_entry_upload == None:
+            return {"message": "An error occurred while uploading file"}, 400
         upload_to_catalog_params = {
             "catalog_entry_upload_id": catalog_entry_upload.id,
             "catalog_id": catalog_id,
