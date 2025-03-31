@@ -16,6 +16,7 @@ FERNET_ENCRYPTION_KEY = os.getenv(
 ).encode()
 DB_LOG_FILE = os.getenv("DB_LOG_FILE", "")
 DB_DEBUG_LOGS = os.getenv("DB_DEBUG_LOGS")
+DB_INSTANCE = os.getenv("DB_INSTANCE")
 UPLOADS_FOLDER = os.getenv("UPLOADS_FOLDER")
 SIMULATIONS_FOLDER = os.getenv("SIMULATIONS_FOLDER")
 TEMP_FOLDER = os.getenv("TEMP_FOLDER")

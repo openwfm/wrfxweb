@@ -64,7 +64,7 @@ def create_catalog_entry(catalog_id):
             catalog_entry_params, ADMIN_SERVICES_API_KEY
         )
         if catalog_entry_upload == None:
-            abort(400, f"An error occurred while uploading file")
+            return {"message": "An error occurred while uploading file"}, 400
 
         verify_zip_upload(catalog_entry_upload)
 
@@ -76,7 +76,8 @@ def create_catalog_entry(catalog_id):
             upload_to_catalog_params, ADMIN_SERVICES_API_KEY
         )
     except Exception as e:
-        abort(400, f"An error occurred while uploading file: {e}")
+        loggingUtils.log_error(e)
+        return {"message": "An error occurred while uploading file"}, 400
 
     loggingUtils.log_upload(catalog_entry_upload)
     post_task_queue_service(catalog_entry_upload)
@@ -99,6 +100,11 @@ def post_task_queue_service(catalog_entry_upload):
         loggingUtils.log_upload_queue_error(catalog_entry_upload, f"{e}")
 
 
+class ZipVerificationException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
 def verify_zip_upload(catalog_entry_upload):
     upload_path = catalog_entry_upload.upload_path()
     try:
@@ -107,5 +113,4 @@ def verify_zip_upload(catalog_entry_upload):
     except zipfile.BadZipFile:
         os.remove(upload_path)
         catalog_entry_upload.destroy()
-
-        abort(400, "Corrupted Zip File")
+        raise ZipVerificationException("Corrupted Zip File")
