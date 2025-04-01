@@ -1,6 +1,6 @@
 from clientServer.app import app
 from clientServer.routes.login import login_required
-from clientServer.serverKeys import CLIENT_SERVER_API_KEY
+from clientServer.serverKeys import CLIENT_SERVER_API_KEY, FLASK_SIMULATIONS_FOLDER
 
 from api.services import CatalogEntryServices as CatalogEntryServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
@@ -32,7 +32,8 @@ def catalog_entry_rasters(catalog_id, catalog_entry_id):
         return {"message": "Requested Entry does not exist"}, 404
 
     manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
-    return send_from_directory(catalog_entry.directory(), manifest_path)
+    # return send_from_directory(catalog_entry.directory(), manifest_path)
+    return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
 
 
 @app.route(
@@ -47,4 +48,6 @@ def catalog_entry_simulations(catalog_id, catalog_entry_id, file_path):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
-    return send_from_directory(catalog_entry.entry_path(), file_path)
+    directory = f"{FLASK_SIMULATIONS_FOLDER}/{catalog_entry.folder_name()}"
+    # return send_from_directory(catalog_entry.entry_path(), file_path)
+    return send_from_directory(directory, file_path)
