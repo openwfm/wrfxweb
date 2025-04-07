@@ -131,12 +131,19 @@ export class CatalogMenu extends HTMLElement {
     const catalogOptions = this.querySelector("#catalog-options");
     this.catalogs = await getCatalogs();
     if (this.catalogs.length > 0) {
-      await this.createMenuEntries(this.catalogs[0]);
+      let selectedCatalog = this.catalogs[0];
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlCatalogId = urlParams.get("catalog_id");
       for (let catalog of this.catalogs) {
         let catalogOption = new CatalogOption(catalog);
         catalogOptions.appendChild(catalogOption);
         this.catalogMap[catalog.name] = catalog;
+        if (catalog.id == urlCatalogId) {
+          selectedCatalog = catalog;
+          catalogOptions.value = catalog.name;
+        }
       }
+      await this.createMenuEntries(selectedCatalog);
     }
     this.selectNavJobId();
   }
@@ -248,7 +255,6 @@ export class CatalogMenu extends HTMLElement {
     fuelMoistureListDOM.innerHTML = "";
     lidarProfilesDOM.innerHTML = "";
     for (let catEntry of catalogEntries) {
-      let catName = catEntry.name;
       this.addOrder.push(catEntry.job_id);
       let desc = catEntry.description;
       let newLI = new CatalogItem(catEntry, navJobId, this.catalogId);
@@ -265,7 +271,6 @@ export class CatalogMenu extends HTMLElement {
       this.catalogItems.push(newLI);
     }
     this.sortMenu("start-date", false);
-    //this.clickMostRecent(navJobId);
   }
 
   clearMenu() {
@@ -287,7 +292,7 @@ export class CatalogMenu extends HTMLElement {
       this.clickMostRecent(navJobId);
     } else {
       for (let catalogItem of this.catalogItems) {
-        if (catalogItem.navJobId == navJobId) {
+        if (catalogItem.job_id == navJobId) {
           catalogItem.clickItem();
         }
       }

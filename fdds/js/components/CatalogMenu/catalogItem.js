@@ -40,9 +40,7 @@ export class CatalogItem extends HTMLElement {
     this.querySelector("#entry").onclick = () => {
       this.clickItem();
     };
-    //if (this.navJobId == job_id) {
-    //  this.clickItem();
-    //}
+    this.job_id = job_id;
   }
 
   initializeKMLURL() {
@@ -77,6 +75,7 @@ export class CatalogItem extends HTMLElement {
 
     simVars.currentSimulation = jobId;
     simVars.currentDescription = description;
+    simVars.catalogId = this.catalogId;
     document.querySelector("#current-sim-label").innerText =
       "Shown simulation: " + description;
     document.querySelector(".catalog-menu").classList.add("hidden");
@@ -92,6 +91,7 @@ export class CatalogItem extends HTMLElement {
     //simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
 
     simVars.rasterBase = `${CATALOG_URL}/${this.catalogId}/${simulationPathBase}`;
+
     // retrieve all domains
     controllers.domainInstance.setValue(Object.keys(selectedSimulation));
   }

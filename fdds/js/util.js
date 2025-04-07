@@ -50,6 +50,7 @@ export function setURL() {
   timestampToURL(addData);
   addedLayersToURL(addData);
   opacityToURL(addData);
+  catalogIdToURL(addData);
 
   if (urlVars != "") {
     urlVars = "?" + urlVars.substr(1);
@@ -71,6 +72,11 @@ function panToURL(addData) {
 function jobIdToURL(addData) {
   let currentSimulation = simVars.currentSimulation;
   addData("job_id", currentSimulation);
+}
+
+function catalogIdToURL(addData) {
+  let catalogId = simVars.catalogId;
+  addData("catalog_id", catalogId);
 }
 
 function domainToURL(addData) {
