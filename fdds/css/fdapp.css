@@ -306,19 +306,19 @@ body {
   color: #5d5d5d;
 }
 
-#catalog-options {
-  position: fixed;
-  left: 20px;
-  top: 40px;
-  height: auto;
-  padding: 0px;
-  font-size: 1.15rem;
-  padding: 0px 5px 0px 5px;
-  font-weight: bold;
-  background: #d6d6d6;
-  color: #5d5d5d;
-  border-radius: 0 0 0.4rem 0.4rem;
-}
+/*#catalog-options {*/
+/*  position: fixed;*/
+/*  left: 20px;*/
+/*  top: 40px;*/
+/*  height: auto;*/
+/*  padding: 0px;*/
+/*  font-size: 1.15rem;*/
+/*  padding: 0px 5px 0px 5px;*/
+/*  font-weight: bold;*/
+/*  background: #d6d6d6;*/
+/*  color: #5d5d5d;*/
+/*  border-radius: 0 0 0.4rem 0.4rem;*/
+/*}*/
 
 #catalog-options li:hover {
   cursor: pointer;

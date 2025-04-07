@@ -5,7 +5,6 @@ import {
   utcToLocal,
   toggleVisibility,
 } from "../../util.js";
-//import { getCatalogEntries } from "../../services.js";
 import { getCatalogs, getCatalogEntries } from "../../clientServices.js";
 import { controllers } from "../Controller.js";
 
@@ -30,6 +29,8 @@ export class CatalogMenu extends HTMLElement {
     this.satelliteList = [];
     this.addOrder = [];
     this.catalogs = [];
+    this.catalogItems = [];
+    this.catalogMap = {};
     this.catalogId = null;
     this.innerHTML = `
             <div>
@@ -42,12 +43,12 @@ export class CatalogMenu extends HTMLElement {
                       </div>
                       <div id='menu-label'>Catalog</div>
                   </div>
-                  <ul id='catalog-options' class='feature-controller hidden'>
-                  </ul>
                 </div>
                 <div class='catalog-menu round-border'>
                     <div id='menu-title' class='menu-title round-border'>
                         <div id="catalog-description">Select Simulation...</div>
+                        <select id='catalog-options' class='feature-controller'>
+                        </select>
                         <div id='menu-close' class='round-border'>x</div>
                     </div>
                     <div class='search-header'>
@@ -115,6 +116,8 @@ export class CatalogMenu extends HTMLElement {
     L.DomEvent.disableClickPropagation(catalogMenu);
 
     dragElement(catalogMenu, "menu-title");
+
+    this.initializeCatalogSelect();
     this.hideShowMenu();
     this.responsiveUI();
     window.addEventListener("resize", () => {
@@ -128,13 +131,25 @@ export class CatalogMenu extends HTMLElement {
     const catalogOptions = this.querySelector("#catalog-options");
     this.catalogs = await getCatalogs();
     if (this.catalogs.length > 0) {
-      this.createMenuEntries(this.catalogs[0]);
+      await this.createMenuEntries(this.catalogs[0]);
       for (let catalog of this.catalogs) {
         let catalogOption = new CatalogOption(catalog);
-        catalogOption.onclick = () => this.createMenuEntries(catalog);
         catalogOptions.appendChild(catalogOption);
+        this.catalogMap[catalog.name] = catalog;
       }
     }
+    this.selectNavJobId();
+  }
+
+  initializeCatalogSelect() {
+    const catalogOptions = this.querySelector("#catalog-options");
+    catalogOptions.onclick = () => {
+      catalogOptions.showPicker();
+    };
+    catalogOptions.onchange = () => {
+      let catalog = this.catalogMap[catalogOptions.value];
+      this.createMenuEntries(catalog);
+    };
   }
 
   hideShowMenu() {
@@ -142,18 +157,12 @@ export class CatalogMenu extends HTMLElement {
     const catalogButtons = this.querySelector("#catalog-button");
     const catalogButton = this.querySelector("#menu-label");
     const catalogMenuIcon = this.querySelector("#catalog-menu-icon-container");
-    const catalogOptions = this.querySelector("#catalog-options");
     L.DomEvent.disableClickPropagation(catalogButtons);
     catalogButton.onpointerdown = () => {
       toggleVisibility(catalogMenu);
     };
     catalogMenuIcon.onpointerdown = () => {
-      toggleVisibility(catalogOptions);
-      if (catalogOptions.classList.contains("hidden")) {
-        catalogMenuIcon.classList.remove("open");
-      } else {
-        catalogMenuIcon.classList.add("open");
-      }
+      toggleVisibility(catalogMenu);
     };
 
     this.querySelector("#menu-close").onclick = () => {
@@ -227,15 +236,14 @@ export class CatalogMenu extends HTMLElement {
     const fuelMoistureListDOM = this.querySelector("#catalog-fuel-moisture");
     const lidarProfilesDOM = this.querySelector("#catalog-lidar-data");
     const catalogEntries = await getCatalogEntries(catalogId);
-    const catalogDescription = this.querySelector("#catalog-description");
     this.catalogId = catalogId;
 
-    catalogDescription.innerText = `Select Simulation from ${catalog.description} catalog...`;
     controllers.catalogId.setValue(catalogId);
     this.addOrder = [];
     this.fuelMoistureList = [];
     this.satelliteList = [];
     this.firesList = [];
+    this.catalogItems = [];
     firesListDOM.innerHTML = "";
     fuelMoistureListDOM.innerHTML = "";
     lidarProfilesDOM.innerHTML = "";
@@ -254,9 +262,10 @@ export class CatalogMenu extends HTMLElement {
         this.firesList.push(catEntry);
         firesListDOM.appendChild(newLI);
       }
+      this.catalogItems.push(newLI);
     }
     this.sortMenu("start-date", false);
-    this.clickMostRecent(navJobId);
+    //this.clickMostRecent(navJobId);
   }
 
   clearMenu() {
@@ -266,6 +275,23 @@ export class CatalogMenu extends HTMLElement {
     firesListDOM.innerHTML = "";
     fuelMoistureListDOM.innerHTML = "";
     lidarProfilesDOM.innerHTML = "";
+  }
+
+  selectNavJobId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const navJobId = urlParams.get("job_id");
+    if (navJobId == null) {
+      return;
+    }
+    if (navJobId.includes("recent")) {
+      this.clickMostRecent(navJobId);
+    } else {
+      for (let catalogItem of this.catalogItems) {
+        if (catalogItem.navJobId == navJobId) {
+          catalogItem.clickItem();
+        }
+      }
+    }
   }
 
   clickMostRecent(navJobId) {

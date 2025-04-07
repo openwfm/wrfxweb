@@ -40,9 +40,9 @@ export class CatalogItem extends HTMLElement {
     this.querySelector("#entry").onclick = () => {
       this.clickItem();
     };
-    if (this.navJobId == job_id) {
-      this.clickItem();
-    }
+    //if (this.navJobId == job_id) {
+    //  this.clickItem();
+    //}
   }
 
   initializeKMLURL() {

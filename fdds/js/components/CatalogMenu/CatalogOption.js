@@ -1,21 +1,13 @@
-import {
-  CLIENT_WIDTH,
-  dragElement,
-  IS_MOBILE,
-  utcToLocal,
-} from "../../util.js";
-import { getCatalogEntries } from "../../services.js";
-import { CatalogItem } from "./catalogItem.js";
-
 export class CatalogOption extends HTMLElement {
   /** ===== Initialization block ===== */
   constructor(catalog) {
-    super(catalog);
+    super();
     this.innerHTML = `
-            <div>
-              <p>${catalog.name}</p>
-            </div>
+            <option value=${catalog.name}>
+              ${catalog.name}
+            </option>
         `;
+    this.catalog = catalog;
   }
 
   connectedCallback() { }
