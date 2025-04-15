@@ -1,6 +1,7 @@
 from api.session import db_session
 from api.models.User import User
 from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
+from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.apiKeys import SIMULATIONS_FOLDER
 import api.encryption as encryption
 
@@ -29,6 +30,18 @@ class CatalogEntry(CatalogEntryDbModel):
 
     def entry_directory(self):
         return f"{SIMULATIONS_FOLDER}/{encryption.decrypt_searchable_data(self.job_id)}"
+
+    def catalogs(self):
+        catalog_entry_catalogs = (
+            db_session.query(CatalogEntryCatalog)
+            .filter_by(catalog_entry_id=self.id)
+            .all()
+        )
+
+        return [
+            catalog_entry_catalog.catalog
+            for catalog_entry_catalog in catalog_entry_catalogs
+        ]
 
     def destroy(self):
         db_session.delete(self)

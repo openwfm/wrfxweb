@@ -1,4 +1,5 @@
 from api.services import AdminServices as AdminServices
+from api.serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from api.validators.utils import sanitize_text
 import api.encryption as encryption
 
@@ -47,4 +48,55 @@ def serialize_catalog_entries_with_uploader_id(
             entry, current_user, admin_services_api_key
         )
         for entry in entries
+    ]
+
+
+def serialize_catalog_entry_with_catalogs(entry, current_user, admin_services_api_key):
+    serialized_catalog_entry = serialize_catalog_entry(entry)
+    if not AdminServices.isAdmin(current_user, admin_services_api_key):
+        return serialized_catalog_entry
+    serialized_catalog_entry["catalogs"] = serialize_catalogs_without_entries(
+        entry.catalogs(), current_user, admin_services_api_key
+    )
+    return serialized_catalog_entry
+
+
+def serialize_catalog_entries_with_catalogs(
+    entries, current_user, admin_services_api_key
+):
+    return [
+        serialize_catalog_entry_with_catalogs(
+            entry, current_user, admin_services_api_key
+        )
+        for entry in entries
+    ]
+
+
+def serialize_catalog_without_entries(catalog, user, admin_services_api_key):
+    if catalog == None:
+        return {}
+    if not AdminServices.isAdmin(user, admin_services_api_key):
+        return {
+            "id": catalog.id,
+            "description": catalog.description,
+            "name": catalog.name,
+            "date_created": catalog.date_created,
+        }
+
+    return {
+        "id": catalog.id,
+        "description": catalog.description,
+        "name": catalog.name,
+        "public": catalog.public,
+        "date_created": catalog.date_created,
+        "permissions": CatalogAccessSerializer.serialize_accesses(
+            catalog.permissions(), user, admin_services_api_key
+        ),
+    }
+
+
+def serialize_catalogs_without_entries(catalogs, user, admin_services_api_key):
+    return [
+        serialize_catalog_without_entries(catalog, user, admin_services_api_key)
+        for catalog in catalogs
     ]

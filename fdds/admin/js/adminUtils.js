@@ -26,7 +26,7 @@ export function validateDomain(domain) {
 /** Executes function with a maximum rate of delay. */
 export function debounceInIntervals(callback, delay) {
   let timeout;
-  return function (args = null) {
+  return function(args = null) {
     if (timeout) {
       return;
     }
@@ -41,10 +41,30 @@ export function debounceInIntervals(callback, delay) {
 /** Executes a function once at the end of an update cycle lasting delay. */
 export function debounce(callback, delay) {
   let timeout;
-  return function (args = null) {
+  return function(args = null) {
     if (timeout) {
       clearTimeout(timeout);
     }
     timeout = setTimeout(() => callback(args), delay);
   };
+}
+
+export function toggleVisibility(element) {
+  if (isShown(element)) {
+    hideElement(element);
+  } else {
+    showElement(element);
+  }
+}
+
+export function isShown(element) {
+  return !element.classList.contains("hidden");
+}
+
+export function showElement(element) {
+  element.classList.remove("hidden");
+}
+
+export function hideElement(element) {
+  element.classList.add("hidden");
 }

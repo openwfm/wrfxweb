@@ -42,6 +42,27 @@ def catalog_entries(catalog_id):
     }, 405
 
 
+@app.route("/admin/catalog_entries/all", methods=["GET"])
+@admin_login_required
+def all_catalog_entries():
+    if request.method == "GET":
+        return get_all_catalog_entries()
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
+def get_all_catalog_entries():
+    catalog_entries = CatalogEntryServices.admin_all_entries(
+        current_user, ADMIN_SERVICES_API_KEY
+    )
+    return {
+        "entries": CatalogEntrySerializer.serialize_catalog_entries_with_catalogs(
+            catalog_entries, current_user, ADMIN_SERVICES_API_KEY
+        )
+    }, 200
+
+
 def get_catalog_entries(catalog_id):
     catalog_entries = CatalogEntryServices.admin_entries(
         catalog_id, current_user, ADMIN_SERVICES_API_KEY

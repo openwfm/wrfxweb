@@ -1,4 +1,5 @@
 const CATALOG_URL = "admin/catalogs";
+const CATALOG_ENTRIES_URL = "admin/catalog_entries";
 
 import {
   postRequest,
@@ -20,12 +21,21 @@ export async function getCatalogs() {
 
   const response_json = await getRequest(GET_URL);
 
-  console.log(response_json);
   if (response_json.error) {
     return [];
   }
-  console.log("catalogs: ", response_json.catalogs);
   return response_json.catalogs;
+}
+
+export async function getCatalogEntries() {
+  const GET_URL = `${CATALOG_ENTRIES_URL}/all`;
+
+  const response_json = await getRequest(GET_URL);
+
+  if (response_json.error) {
+    return [];
+  }
+  return response_json.entries;
 }
 
 export async function createCatalogEntry(catalogId, entryParams) {

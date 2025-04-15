@@ -2,6 +2,7 @@ from api.session import db_session
 from api.models.catalogEntry.CatalogEntry import CatalogEntry
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import CatalogServices as CatalogServices
+from api.services import AdminServices as AdminServices
 from api.apiKeys import CLIENT_SERVER_API_KEYS, UPLOAD_API_KEYS
 from api.validators import CatalogEntryValidators as CatalogEntryValidators
 from api.validators import CatalogValidators as CatalogValidators
@@ -141,3 +142,9 @@ def admin_entries(catalog_id, user, admin_services_api_key):
     if catalog == None:
         return []
     return catalog.entries()
+
+
+def admin_all_entries(user, admin_services_api_key):
+    if AdminServices.isAdmin(user, admin_services_api_key):
+        return db_session.query(CatalogEntry).all()
+    return []
