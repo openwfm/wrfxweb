@@ -1,38 +1,30 @@
 import { deleteCatalog } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { toggleVisibility } from "../../adminUtils.js";
-import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
+import { CatalogEntryMetaData } from "../CatalogEntries/CatalogEntryMetaData.js";
+import { CatalogMetaData } from "./CatalogMetaData.js";
 import { ListItem } from "../ListItem.js";
 
-import "./PermissionsContainer/PermissionsContainer.js";
+import "../Permissions/PermissionsContainer/PermissionsContainer.js";
 
-export class CatalogEntry extends HTMLElement {
+export class CatalogEdit extends HTMLElement {
   constructor(catalog, editCatalog, uploadEntry) {
     super();
     this.catalog = catalog;
     this.editCatalog = editCatalog;
     this.uploadEntry = uploadEntry;
+    this.catalogMetaData = new CatalogMetaData(catalog);
     this.innerHTML = `
-            <li class='catalog-entry' id="catalog-container">
-              <label for='catalog-id'>id:</label>
-              <p id='catalog-id'>${catalog.id}</p>
-              <label for='catalog-name'>name:</label>
-              <p id='catalog-name'>${catalog.name}</p>
-              <label for='catalog-description'>description:</label>
-              <p id='catalog-description'>${catalog.description}</p>
-              <label for='catalog-access'>access:</label>
-              <p id='catalog-access'>${catalog.public ? "public" : "private"}</p>
-              <label for='catalog-date'>date created:</label>
-              <p id='catalog-date'>${catalog.date_created}</p>
+            <div class='catalog-edit' id="catalog-container">
+              ${this.catalogMetaData.innerHTML}
               <button id='delete-catalog-button'>Delete</button>
               <button id='edit-catalog-button'>Edit</button>
               <button id='upload-catalog-entry-button'>Upload Entry</button>
-              <permissions-container mutable="false"></permissions-container>
               <div id='catalog-entries-container' class="hidden">
                 <p>Catalog Entries:</p>
                 <ul id='catalog-entries' ></ul>
               </div>
-            </li>
+            </div>
         `;
     this.uiElements = {
       deleteCatalogButton: this.querySelector("#delete-catalog-button"),
@@ -96,4 +88,4 @@ export class CatalogEntry extends HTMLElement {
   }
 }
 
-window.customElements.define("catalog-entry", CatalogEntry);
+window.customElements.define("catalog-edit", CatalogEdit);

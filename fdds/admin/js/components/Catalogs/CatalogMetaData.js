@@ -1,4 +1,4 @@
-import "./PermissionsContainer/PermissionsContainer.js";
+import "../Permissions/PermissionsContainer/PermissionsContainer.js";
 
 export class CatalogMetaData extends HTMLElement {
   constructor(catalog) {

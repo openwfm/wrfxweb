@@ -1,7 +1,7 @@
 import { createCatalog } from "../../services/catalogServices.js";
 import { sanitizeInput } from "../../adminUtils.js";
 import { adminControllers } from "../../adminControllers.js";
-import "./PermissionsContainer/PermissionsContainer.js";
+import "../Permissions/PermissionsContainer/PermissionsContainer.js";
 
 export class CreateCatalog extends HTMLElement {
   /** ===== Initialization block ===== */

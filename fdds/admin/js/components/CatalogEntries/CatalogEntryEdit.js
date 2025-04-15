@@ -1,5 +1,5 @@
 import { toggleVisibility } from "../../adminUtils.js";
-import { CatalogMetaData } from "./CatalogMetaData.js";
+import { CatalogMetaData } from "../Catalogs/CatalogMetaData.js";
 import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
 import { ListItem } from "../ListItem.js";
 

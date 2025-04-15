@@ -2,7 +2,7 @@ import { getCatalogEntries } from "../../services/catalogServices.js";
 import { CatalogEntryEdit } from "./CatalogEntryEdit.js";
 import { ListItem } from "../ListItem.js";
 
-export class CatalogEntriesList extends HTMLElement {
+export class CatalogEntryList extends HTMLElement {
   /** ===== Initialization block ===== */
   constructor() {
     super();
@@ -44,4 +44,4 @@ export class CatalogEntriesList extends HTMLElement {
   }
 }
 
-window.customElements.define("catalog-entries-list", CatalogEntriesList);
+window.customElements.define("catalog-entry-list", CatalogEntryList);

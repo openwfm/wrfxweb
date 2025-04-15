@@ -1,4 +1,4 @@
-import "../PermissionsContainer/PermissionsContainer.js";
+import "../../Permissions/PermissionsContainer/PermissionsContainer.js";
 import { adminControllers } from "../../../adminControllers.js";
 
 import { updateCatalog } from "../../../services/catalogServices.js";
