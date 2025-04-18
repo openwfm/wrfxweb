@@ -10,20 +10,14 @@ from clientServer.serverKeys import (
 
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
-)
-from api.services import (
     CatalogEntryServices as CatalogEntryServices,
-)
-from api.services import (
     CatalogEntryCatalogServices as CatalogEntryCatalogServices,
-)
-from api.services import (
     UploadToCatalogServices as UploadToCatalogServices,
+    CatalogServices as CatalogServices,
 )
-from api.services import CatalogServices as CatalogServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
-from flask import request, abort
+from flask import request
 from flask_login import current_user
 import requests
 import zipfile
@@ -40,6 +34,43 @@ def catalog_entries(catalog_id):
     return {
         "message": "Method Not Allowed",
     }, 405
+
+
+@app.route("/admin/catalogs/<catalog_id>/entries/<catalog_entry_id>", methods=["POST"])
+@admin_login_required
+def add_catalog_entry_to_catalog(catalog_id, catalog_entry_id):
+    if request.method == "POST":
+        return create_catalog_entry_catalog(catalog_id, catalog_entry_id)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
+def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
+    try:
+        catalog_entry_catalog_params = {
+            "catalog_id": catalog_id,
+            "catalog_entry_id": catalog_entry_id,
+        }
+        catalog_entry_catalog = CatalogEntryCatalogServices.find_or_create(
+            catalog_entry_catalog_params, ADMIN_SERVICES_API_KEY
+        )
+
+        if catalog_entry_catalog == None:
+            return {
+                "message": "An error occurred while adding catalog entry to catalog"
+            }, 400
+
+    except Exception as e:
+        loggingUtils.log_error(e)
+        return {
+            "message": "An error occurred while adding catalog entry to catalog"
+        }, 400
+
+    loggingUtils.log_catalog_entry_catalog(catalog_entry_catalog, current_user.id)
+    return {
+        "message": "Entry Successfully Created!",
+    }, 200
 
 
 @app.route("/admin/catalog_entries/all", methods=["GET"])

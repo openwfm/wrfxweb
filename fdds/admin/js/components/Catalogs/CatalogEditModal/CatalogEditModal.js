@@ -55,6 +55,7 @@ export class CatalogEditModal extends HTMLElement {
         this.showPermissions();
       }
     };
+
     saveCatalogButton.onclick = () => this.saveCatalog();
     cancelCatalogButton.onclick = () => this.close();
   }

@@ -4,17 +4,19 @@ import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
 import { ListItem } from "../ListItem.js";
 
 export class CatalogEntryEdit extends HTMLElement {
-  constructor(catalogEntry) {
+  constructor(catalogEntry, addEntryToCatalog) {
     super();
     this.catalogEntry = catalogEntry;
     this.catalogEntryMetaData = new CatalogEntryMetaData(catalogEntry);
+    this.addEntryToCatalog = addEntryToCatalog;
     this.innerHTML = `
             <div class='catalog-entry-edit' id="catalog-entry-edit-container">
               ${this.catalogEntryMetaData.innerHTML} 
-              <div id='catalogs-container' class="hidden">
+              <div id='catalogs-container'>
                 <p>Catalogs:</p>
                 <ul id='catalogs'>
                 </ul>
+                <button id='add-to-catalog-button'>Add To Catalog</button>
               </div>
             </div>
         `;
@@ -26,14 +28,22 @@ export class CatalogEntryEdit extends HTMLElement {
       jobId: this.querySelector("#catalog-entry-job-id"),
       catalogs: this.querySelector("#catalogs"),
       catalogsContainer: this.querySelector("#catalogs-container"),
+      addToCatalogButton: this.querySelector("#add-to-catalog-button"),
     };
   }
 
   connectedCallback() {
-    const { container, catalogsContainer } = this.uiElements;
+    const { container, catalogsContainer, addToCatalogButton } =
+      this.uiElements;
     container.onclick = () => {
       toggleVisibility(catalogsContainer);
     };
+
+    addToCatalogButton.onclick = (e) => {
+      e.stopPropagation();
+      this.addEntryToCatalog(this.catalogEntry);
+    };
+
     this.populateCatalogs();
   }
 

@@ -4,6 +4,7 @@ export class CatalogMetaData extends HTMLElement {
   constructor(catalog) {
     super();
     this.catalog = catalog;
+    this.id = this.catalog.id;
     this.innerHTML = `
             <div class='catalog-entry' id="catalog-container">
               <label for='catalog-id'>id:</label>
@@ -28,11 +29,7 @@ export class CatalogMetaData extends HTMLElement {
   }
 
   connectedCallback() {
-    const { permissionsContainer, catalogContainer, catalogEntriesContainer } =
-      this.uiElements;
-    catalogContainer.onclick = () => {
-      toggleVisibility(catalogEntriesContainer);
-    };
+    const { permissionsContainer } = this.uiElements;
 
     if (this.catalog.public) {
       permissionsContainer.classList.add("hidden");

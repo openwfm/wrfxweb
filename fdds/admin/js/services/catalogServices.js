@@ -70,3 +70,11 @@ export async function updateCatalog(catalogId, catalogParams) {
 
   return response_json;
 }
+
+export async function addEntryToCatalog(catalogEntryId, catalogId) {
+  const POST_URL = `${CATALOG_URL}/${catalogId}/entries/${catalogEntryId}`;
+
+  const response_json = await postRequest(POST_URL);
+
+  return response_json;
+}

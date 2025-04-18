@@ -36,6 +36,7 @@ def create(json):
         )
         db_session.add(catalog_entry_catalog)
         db_session.commit()
+        return catalog_entry_catalog
     except Exception as e:
         logging.service_exception("CatalogEntryCatalog", "create", e)
         return None

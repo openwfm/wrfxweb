@@ -1,4 +1,4 @@
-export async function postRequest(request_url, request_json) {
+export async function postRequest(request_url, request_json = {}) {
   let response_json = {};
 
   try {

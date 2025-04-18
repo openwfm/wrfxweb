@@ -38,6 +38,13 @@ def log_upload(catalog_entry_upload):
     log_statement("Upload", upload_message, True)
 
 
+def log_catalog_entry_catalog(catalog_entry_catalog, admin_id):
+    catalog_id = catalog_entry_catalog.catalog_id
+    catalog_entry_id = catalog_entry_catalog.catalog_entry_id
+    message = f"<Admin {admin_id}> created <CatalogEntryCatalog {catalog_entry_catalog.id} catalog_id: {catalog_id} catalog_entry_id: {catalog_entry_id}>"
+    log_statement("CatalogEntryCatalog", message, True)
+
+
 def log_auth(message):
     log_statement("LoginRedirect", message, True)
 
