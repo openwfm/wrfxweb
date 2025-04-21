@@ -68,6 +68,28 @@ class ArrayController extends Controller {
   }
 }
 
+class FunctionController extends Controller {
+  constructor(value = () => { }) {
+    super(value);
+  }
+
+  reset() {
+    this.value = () => { };
+  }
+}
+
+class DataController extends Controller {
+  constructor(getRequest) {
+    this.getRequest = getRequest;
+    super([]);
+  }
+
+  async loadData() {
+    const initialData = await getRequest();
+    this.setValue(initialData);
+  }
+}
+
 // global controllers
 export const adminControllers = {
   admins: new ArrayController([]),
@@ -82,4 +104,5 @@ export const adminControllers = {
     };
     return catalogs;
   })(),
+  confirmation: new FunctionController(),
 };

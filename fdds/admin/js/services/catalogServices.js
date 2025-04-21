@@ -78,3 +78,11 @@ export async function addEntryToCatalog(catalogEntryId, catalogId) {
 
   return response_json;
 }
+
+export async function deleteEntryFromCatalog(catalogEntryId, catalogId) {
+  const DELETE_URL = `${CATALOG_URL}/${catalogId}/entries/${catalogEntryId}`;
+
+  const response_json = await deleteRequest(DELETE_URL);
+
+  return response_json;
+}

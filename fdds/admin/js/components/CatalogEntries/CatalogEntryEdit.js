@@ -1,7 +1,8 @@
 import { toggleVisibility } from "../../adminUtils.js";
 import { CatalogMetaData } from "../Catalogs/CatalogMetaData.js";
 import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
-import { ListItem } from "../ListItem.js";
+import { RemovableListItem } from "../RemovableListItem.js";
+import { deleteEntryFromCatalog } from "../../services/catalogServices.js";
 
 export class CatalogEntryEdit extends HTMLElement {
   constructor(catalogEntry, addEntryToCatalog) {
@@ -11,7 +12,9 @@ export class CatalogEntryEdit extends HTMLElement {
     this.addEntryToCatalog = addEntryToCatalog;
     this.innerHTML = `
             <div class='catalog-entry-edit' id="catalog-entry-edit-container">
-              ${this.catalogEntryMetaData.innerHTML} 
+              <div id='catalog-entry-meta-container'>
+                ${this.catalogEntryMetaData.innerHTML} 
+              </div>
               <div id='catalogs-container'>
                 <p>Catalogs:</p>
                 <ul id='catalogs'>
@@ -29,13 +32,16 @@ export class CatalogEntryEdit extends HTMLElement {
       catalogs: this.querySelector("#catalogs"),
       catalogsContainer: this.querySelector("#catalogs-container"),
       addToCatalogButton: this.querySelector("#add-to-catalog-button"),
+      catalogEntryMetaContainer: this.querySelector(
+        "#catalog-entry-meta-container",
+      ),
     };
   }
 
   connectedCallback() {
-    const { container, catalogsContainer, addToCatalogButton } =
+    const { catalogEntryMetaContainer, catalogsContainer, addToCatalogButton } =
       this.uiElements;
-    container.onclick = () => {
+    catalogEntryMetaContainer.onclick = () => {
       toggleVisibility(catalogsContainer);
     };
 
@@ -50,8 +56,14 @@ export class CatalogEntryEdit extends HTMLElement {
   populateCatalogs() {
     const { catalogs } = this.uiElements;
     for (let catalog of this.catalogEntry.catalogs) {
+      const removeFromCatalog = () => {
+        deleteEntryFromCatalog(this.catalogEntry.id, catalog.id);
+      };
       let catalogMetaData = new CatalogMetaData(catalog);
-      let catalogListItem = new ListItem(catalogMetaData);
+      let catalogListItem = new RemovableListItem(
+        catalogMetaData,
+        removeFromCatalog,
+      );
       catalogs.appendChild(catalogListItem);
     }
   }
