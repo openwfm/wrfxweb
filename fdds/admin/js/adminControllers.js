@@ -1,4 +1,5 @@
 import { debounceInIntervals } from "./adminUtils.js";
+import { getCatalogEntries, getCatalogs } from "./services/catalogServices.js";
 
 export const controllerEvents = {
   QUIET: "QUIET",
@@ -80,29 +81,45 @@ class FunctionController extends Controller {
 
 class DataController extends Controller {
   constructor(getRequest) {
+    super();
     this.getRequest = getRequest;
-    super([]);
   }
 
-  async loadData() {
-    const initialData = await getRequest();
-    this.setValue(initialData);
+  async refreshData() {
+    const refreshedData = await this.getRequest();
+    this.setValue(refreshedData);
+  }
+
+  async getValue() {
+    if (this.value == undefined) {
+      const initialData = await this.getRequest();
+      this.value = initialData;
+    }
+    return this.value;
   }
 }
 
 // global controllers
 export const adminControllers = {
   admins: new ArrayController([]),
-  catalogs: (function createCatalogsController() {
-    let catalogs = new ArrayController([]);
-    catalogs.update = (newCatalog) => {
-      catalogs.setValue(
-        catalogs.value.map((catalog) =>
-          catalog.id === newCatalog.id ? newCatalog : catalog,
-        ),
-      );
-    };
-    return catalogs;
-  })(),
+  //catalogs: (function createCatalogsController() {
+  //  let catalogs = new ArrayController([]);
+  //  catalogs.update = (newCatalog) => {
+  //    catalogs.setValue(
+  //      catalogs.value.map((catalog) =>
+  //        catalog.id === newCatalog.id ? newCatalog : catalog,
+  //      ),
+  //    );
+  //  };
+  //  return catalogs;
+  //})(),
+  catalogs: new DataController(getCatalogs),
   confirmation: new FunctionController(),
+  //entries: (async function createCatalogEntriesController() {
+  //  let entriesController = new DataController(getCatalogEntries);
+  //  await entriesController.loadData();
+  //  return entriesController;
+  //})(),
+  //
+  entries: new DataController(getCatalogEntries),
 };

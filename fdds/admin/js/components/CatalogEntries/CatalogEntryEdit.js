@@ -3,6 +3,7 @@ import { CatalogMetaData } from "../Catalogs/CatalogMetaData.js";
 import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
 import { RemovableListItem } from "../RemovableListItem.js";
 import { deleteEntryFromCatalog } from "../../services/catalogServices.js";
+import { adminControllers } from "../../adminControllers.js";
 
 export class CatalogEntryEdit extends HTMLElement {
   constructor(catalogEntry, addEntryToCatalog) {
@@ -58,6 +59,7 @@ export class CatalogEntryEdit extends HTMLElement {
     for (let catalog of this.catalogEntry.catalogs) {
       const removeFromCatalog = () => {
         deleteEntryFromCatalog(this.catalogEntry.id, catalog.id);
+        adminControllers.entries.refreshData();
       };
       let catalogMetaData = new CatalogMetaData(catalog);
       let catalogListItem = new RemovableListItem(

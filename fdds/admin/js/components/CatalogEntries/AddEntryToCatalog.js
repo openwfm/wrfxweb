@@ -52,6 +52,8 @@ export class AddEntryToCatalog extends HTMLElement {
     if (response.error) {
       addErrorMessage.classList.remove("hidden");
     } else {
+      adminControllers.entries.refreshData();
+      adminControllers.catalogs.refreshData();
       this.close();
     }
   }
@@ -74,13 +76,14 @@ export class AddEntryToCatalog extends HTMLElement {
     catalogEntryDescription.innerText = `Description: ${catalogEntry.description}`;
   }
 
-  populateCatalogSelect() {
+  async populateCatalogSelect() {
     const { catalogSelect } = this.uiElements;
     this.clearCatalogSelect();
     let addedCatalogIds = this.catalogEntry.catalogs.map(
       (catalog) => catalog.id,
     );
-    let unaddedCatalogs = adminControllers.catalogs.value.filter(
+    let catalogs = await adminControllers.catalogs.getValue();
+    let unaddedCatalogs = catalogs.filter(
       (catalog) => !addedCatalogIds.includes(catalog.id),
     );
     for (let catalog of unaddedCatalogs) {

@@ -1,4 +1,4 @@
-import { getCatalogEntries } from "../../services/catalogServices.js";
+import { adminControllers } from "../../adminControllers.js";
 import { CatalogEntryEdit } from "./CatalogEntryEdit.js";
 import { ListItem } from "../ListItem.js";
 import "./AddEntryToCatalog.js";
@@ -23,12 +23,15 @@ export class CatalogEntryList extends HTMLElement {
   }
 
   connectedCallback() {
-    this.clearCatalogEntriesList();
-    this.createCatalogListEntry();
+    adminControllers.entries.subscribe(() => {
+      this.reset();
+    });
+    this.reset();
   }
 
-  async getCatalogEntries() {
-    return await getCatalogEntries();
+  reset() {
+    this.clearCatalogEntriesList();
+    this.createCatalogListEntry();
   }
 
   clearCatalogEntriesList() {
@@ -38,7 +41,7 @@ export class CatalogEntryList extends HTMLElement {
 
   async createCatalogListEntry() {
     const { catalogEntriesList } = this.uiElements;
-    this.catalogEntries = await this.getCatalogEntries();
+    this.catalogEntries = await adminControllers.entries.getValue();
     const addEntryToCatalog = (catalogEntry) =>
       this.addEntryToCatalog(catalogEntry);
     for (let catalogEntry of this.catalogEntries) {
