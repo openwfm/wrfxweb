@@ -25,7 +25,6 @@ export class ConfirmationModal extends HTMLElement {
     const { yesButton, cancelButton } = this.uiElements;
 
     adminControllers.confirmation.subscribe(() => {
-      console.log("here");
       this.open(adminControllers.confirmation.value);
     });
     yesButton.onclick = () => {

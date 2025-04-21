@@ -36,11 +36,16 @@ def catalog_entries(catalog_id):
     }, 405
 
 
-@app.route("/admin/catalogs/<catalog_id>/entries/<catalog_entry_id>", methods=["POST"])
+@app.route(
+    "/admin/catalogs/<catalog_id>/entries/<catalog_entry_id>",
+    methods=["POST", "DELETE"],
+)
 @admin_login_required
 def add_catalog_entry_to_catalog(catalog_id, catalog_entry_id):
     if request.method == "POST":
         return create_catalog_entry_catalog(catalog_id, catalog_entry_id)
+    elif request.method == "DELETE":
+        return delete_catalog_entry_catalog(catalog_id, catalog_entry_id)
     return {
         "message": "Method Not Allowed",
     }, 405
@@ -67,9 +72,38 @@ def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
             "message": "An error occurred while adding catalog entry to catalog"
         }, 400
 
-    loggingUtils.log_catalog_entry_catalog(catalog_entry_catalog, current_user.id)
+    loggingUtils.log_catalog_entry_catalog_create(
+        catalog_entry_catalog, current_user.id
+    )
     return {
-        "message": "Entry Successfully Created!",
+        "message": "Entry Successfully Added To Catalog!",
+    }, 200
+
+
+def delete_catalog_entry_catalog(catalog_id, catalog_entry_id):
+    try:
+        catalog_entry_catalog_params = {
+            "catalog_id": catalog_id,
+            "catalog_entry_id": catalog_entry_id,
+        }
+        catalog_entry_catalog_deleted = CatalogEntryCatalogServices.delete(
+            catalog_entry_catalog_params, ADMIN_SERVICES_API_KEY
+        )
+        if not catalog_entry_catalog_deleted:
+            return {
+                "message": "An error occurred while deleting catalog entry from catalog"
+            }, 400
+    except Exception as e:
+        loggingUtils.log_error(e)
+        return {
+            "message": "An error occurred while deleting catalog entry from catalog"
+        }, 400
+
+    loggingUtils.log_catalog_entry_catalog_delete(
+        catalog_id, catalog_entry_id, current_user.id
+    )
+    return {
+        "message": "Entry Successfully Deleted From Catalog!",
     }, 200
 
 

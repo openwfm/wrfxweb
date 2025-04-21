@@ -42,6 +42,23 @@ def create(json):
         return None
 
 
+def delete(json, api_key):
+    try:
+        if api_key not in UPLOAD_API_KEYS:
+            raise InvalidAPIKey()
+        catalog_entry_catalog = find(json)
+        if catalog_entry_catalog == None:
+            logging.service_exception(
+                "CatalogEntryCatalog", "destroy", "No CatalogEntryCatalog found"
+            )
+            return False
+        catalog_entry_catalog.destroy()
+    except Exception as e:
+        logging.service_exception("CatalogEntryCatalog", "destroy", e)
+        return False
+    return True
+
+
 def update(catalog_entry_catalog, json, api_key):
     try:
         if api_key not in UPLOAD_API_KEYS:
