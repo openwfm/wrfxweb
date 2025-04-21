@@ -75,7 +75,8 @@ export class CatalogEdit extends HTMLElement {
 
   async deleteCatalog() {
     await deleteCatalog(this.catalog.id);
-    adminControllers.catalogs.remove(this.catalog);
+    adminControllers.entries.refreshData();
+    adminControllers.catalogs.refreshData();
   }
 
   populateCatalogEntries() {

@@ -1,4 +1,3 @@
-import { getCatalogs } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { CatalogEdit } from "./CatalogEdit.js";
 import { ListItem } from "../ListItem.js";
@@ -25,19 +24,18 @@ export class CatalogList extends HTMLElement {
 
   connectedCallback() {
     adminControllers.catalogs.subscribe(() => {
-      this.clearCatalogList();
-      adminControllers.catalogs.value.map((catalog) =>
-        this.createCatalogListEntry(catalog),
-      );
-
-      this.openUploadModal(adminControllers.catalogs.value[0]);
+      this.populateCatalogList();
     });
-    this.getCatalogs();
+    this.populateCatalogList();
   }
 
-  async getCatalogs() {
-    let catalogs = await getCatalogs();
-    adminControllers.catalogs.setValue(catalogs);
+  async populateCatalogList() {
+    this.clearCatalogList();
+
+    const catalogs = await adminControllers.catalogs.getValue();
+    catalogs.map((catalog) => this.createCatalogListEntry(catalog));
+
+    this.openUploadModal(catalogs[0]);
   }
 
   clearCatalogList() {

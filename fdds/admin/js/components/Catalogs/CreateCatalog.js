@@ -70,7 +70,8 @@ export class CreateCatalog extends HTMLElement {
       this.showErrorMessage(response.error);
     } else {
       this.clearForm();
-      adminControllers.catalogs.push(response.catalog);
+      adminControllers.catalogs.refreshData();
+      adminControllers.entries.refreshData();
     }
   }
 

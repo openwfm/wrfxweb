@@ -60,6 +60,7 @@ export class CatalogEntryEdit extends HTMLElement {
       const removeFromCatalog = () => {
         deleteEntryFromCatalog(this.catalogEntry.id, catalog.id);
         adminControllers.entries.refreshData();
+        adminControllers.catalogs.refreshData();
       };
       let catalogMetaData = new CatalogMetaData(catalog);
       let catalogListItem = new RemovableListItem(

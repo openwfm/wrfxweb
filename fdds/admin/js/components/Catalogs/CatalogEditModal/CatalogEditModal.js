@@ -122,7 +122,8 @@ export class CatalogEditModal extends HTMLElement {
     if (response.error) {
       updateErrorMessage.classList.remove("hidden");
     } else {
-      adminControllers.catalogs.update(response.catalog);
+      adminControllers.catalogs.refreshData();
+      adminControllers.entries.refreshData();
       this.close();
     }
   }
