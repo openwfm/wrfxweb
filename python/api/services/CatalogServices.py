@@ -1,6 +1,6 @@
 from api.session import db_session
 import api.encryption as encryption
-from api.apiKeys import CLIENT_SERVER_API_KEYS, ADMIN_SERVICES_API_KEY
+from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.models.catalog.Catalog import Catalog
 from api.models.CatalogAccess import CatalogAccess
 from api.validators import CatalogValidators as CatalogValidators
@@ -9,6 +9,7 @@ from api.services import CatalogAccessServices as CatalogAccessServices
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
 )
+import api.logging.utils as loggingUtils
 
 from sqlalchemy import select, outerjoin, or_
 import datetime
@@ -79,16 +80,15 @@ def create(json, user, admin_services_api_key):
 def destroy(catalog_id, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
-            return None
-        validated_catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
-        CatalogAccessServices.destroy_all(validated_catalog_id)
-        CatalogEntryUploadServices.destroy_all(validated_catalog_id)
-
-        catalog = db_session.query(Catalog).get(validated_catalog_id)
-        db_session.delete(catalog)
-        db_session.commit()
-    except:
-        return None
+            return False
+        catalog = find_by_id(catalog_id)
+        if catalog == None:
+            return False
+        catalog.destroy()
+    except Exception as e:
+        loggingUtils.service_exception("Catalog", "delete", e)
+        return False
+    return True
 
 
 # make private

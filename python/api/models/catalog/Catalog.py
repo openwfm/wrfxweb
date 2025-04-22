@@ -29,11 +29,9 @@ class Catalog(CatalogDbModel):
             for catalog_entry_catalog in catalog_entry_catalogs
         ]
 
-    def catalog_folder(self):
-        sanitized_id = validationUtils.sanitize_path(f"{self.id}")
-        return f"{SIMULATIONS_FOLDER}/{sanitized_id}"
-
     def destroy(self):
+        for entry in self.entries():
+            db_session.delete(entry)
         db_session.delete(self)
         db_session.commit()
 

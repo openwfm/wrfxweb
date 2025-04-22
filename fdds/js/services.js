@@ -100,26 +100,6 @@ export async function login(formData) {
   }
 }
 
-export async function loginGoogle() {
-  const POST_URL = "/login/google";
-  let json = {};
-  try {
-    const response = await fetch(POST_URL, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-    json = await response.json();
-    if (!response.ok) {
-      throw new Error(json.message);
-    }
-    console.log("Google login response: ", json);
-    return json;
-  } catch (error) {
-    return { error: error.message };
-  }
-}
-
 export async function submitIssue(formData) {
   const POST_URL = "/submit_issue";
   let json = {};

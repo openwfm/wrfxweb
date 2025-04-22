@@ -164,7 +164,6 @@ export class CatalogEntryUploadModal extends HTMLElement {
       uploadCatalogEntryInput,
     } = this.uiElements;
     const catalogId = this.catalog.id;
-    console.log("zipFiles: ", uploadCatalogEntryInput.files);
 
     const catalogEntryParams = new FormData();
     catalogEntryParams.append("name", catalogEntryName.value);
