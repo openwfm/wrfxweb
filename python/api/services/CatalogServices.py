@@ -4,10 +4,10 @@ from api.apiKeys import CLIENT_SERVER_API_KEYS
 from api.models.catalog.Catalog import Catalog
 from api.models.CatalogAccess import CatalogAccess
 from api.validators import CatalogValidators as CatalogValidators
-from api.services import AdminServices as AdminServices
-from api.services import CatalogAccessServices as CatalogAccessServices
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
+    AdminServices as AdminServices,
+    CatalogAccessServices as CatalogAccessServices,
 )
 import api.logging.utils as loggingUtils
 

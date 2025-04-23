@@ -3,8 +3,6 @@ from api.models.catalog.CatalogDbModel import CatalogDbModel
 from api.models.CatalogAccess import CatalogAccess
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 
-from api.validators import utils as validationUtils
-from api.apiKeys import SIMULATIONS_FOLDER
 import api.encryption as encryption
 
 from sqlalchemy import select, or_
@@ -30,8 +28,17 @@ class Catalog(CatalogDbModel):
         ]
 
     def destroy(self):
-        for entry in self.entries():
+        catalog_entry_catalogs = (
+            db_session.query(CatalogEntryCatalog)
+            .filter(CatalogEntryCatalog.catalog_entry_id != None)
+            .filter_by(catalog_id=self.id)
+            .all()
+        )
+        for entry in catalog_entry_catalogs:
             db_session.delete(entry)
+        for permission in self.permissions():
+            db_session.delete(permission)
+
         db_session.delete(self)
         db_session.commit()
 

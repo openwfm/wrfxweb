@@ -10,6 +10,7 @@ export class CatalogList extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='catalog-list-container'>
+              <h2>Catalog List</h2>
               <ul id='catalog-list'></ul>
               <catalog-edit-modal></catalog-edit-modal>
               <catalog-entry-upload-modal></catalog-entry-upload-modal>
@@ -34,8 +35,6 @@ export class CatalogList extends HTMLElement {
 
     const catalogs = await adminControllers.catalogs.getValue();
     catalogs.map((catalog) => this.createCatalogListEntry(catalog));
-
-    this.openUploadModal(catalogs[0]);
   }
 
   clearCatalogList() {

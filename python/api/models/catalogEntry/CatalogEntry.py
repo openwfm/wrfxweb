@@ -44,6 +44,14 @@ class CatalogEntry(CatalogEntryDbModel):
         ]
 
     def destroy(self):
+        catalog_entry_catalogs = (
+            db_session.query(CatalogEntryCatalog)
+            .filter_by(catalog_entry_id=self.id)
+            .all()
+        )
+        for entry in catalog_entry_catalogs:
+            db_session.delete(entry)
+
         db_session.delete(self)
         db_session.commit()
 

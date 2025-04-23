@@ -16,7 +16,7 @@ export class CatalogEntryEdit extends HTMLElement {
               <div id='catalog-entry-meta-container'>
                 ${this.catalogEntryMetaData.innerHTML} 
               </div>
-              <div id='catalogs-container'>
+              <div id='catalogs-container' class="hidden">
                 <p>Catalogs:</p>
                 <ul id='catalogs'>
                 </ul>

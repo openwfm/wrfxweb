@@ -1,4 +1,3 @@
-import { adminControllers } from "../../../adminControllers.js";
 import { createCatalogEntry } from "../../../services/catalogServices.js";
 
 export class CatalogEntryUploadModal extends HTMLElement {
@@ -179,7 +178,6 @@ export class CatalogEntryUploadModal extends HTMLElement {
     if (response.error) {
       uploadErrorMessage.classList.remove("hidden");
     } else {
-      //adminControllers.catalogs.update(response.catalog);
       this.close();
     }
   }

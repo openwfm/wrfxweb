@@ -1,9 +1,12 @@
-import { deleteCatalog } from "../../services/catalogServices.js";
+import {
+  deleteCatalog,
+  deleteEntryFromCatalog,
+} from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { toggleVisibility } from "../../adminUtils.js";
 import { CatalogEntryMetaData } from "../CatalogEntries/CatalogEntryMetaData.js";
 import { CatalogMetaData } from "./CatalogMetaData.js";
-import { ListItem } from "../ListItem.js";
+import { RemovableListItem } from "../RemovableListItem.js";
 
 import "../Permissions/PermissionsContainer/PermissionsContainer.js";
 
@@ -53,7 +56,10 @@ export class CatalogEdit extends HTMLElement {
     };
     deleteCatalogButton.onclick = (e) => {
       e.stopPropagation();
-      this.deleteCatalog();
+      const deleteCatalog = () => {
+        this.deleteCatalog();
+      };
+      adminControllers.confirmation.setValue(deleteCatalog);
     };
     editCatalogButton.onclick = (e) => {
       e.stopPropagation();
@@ -83,7 +89,16 @@ export class CatalogEdit extends HTMLElement {
     const { catalogEntries } = this.uiElements;
     for (let catalogEntry of this.catalog.entries) {
       let catalogEntryMetaData = new CatalogEntryMetaData(catalogEntry);
-      let catalogEntryListItem = new ListItem(catalogEntryMetaData);
+      const removeFromCatalog = async () => {
+        await deleteEntryFromCatalog(catalogEntry.id, this.catalog.id);
+        adminControllers.entries.refreshData();
+        adminControllers.catalogs.refreshData();
+      };
+
+      let catalogEntryListItem = new RemovableListItem(
+        catalogEntryMetaData,
+        removeFromCatalog,
+      );
       catalogEntries.appendChild(catalogEntryListItem);
     }
   }

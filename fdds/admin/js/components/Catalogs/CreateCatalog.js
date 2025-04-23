@@ -10,6 +10,7 @@ export class CreateCatalog extends HTMLElement {
     this.innerHTML = `
             <div id='create-catalog-container'>
               <div id='create-catalog-form'>
+                <h2>Create Catalog</h2>
                 <input type='text' id='name-input' placeholder='name'></input>
                 <input type='text' id='description-input' placeholder='description'></input>
                 <select id='permission-select'>
