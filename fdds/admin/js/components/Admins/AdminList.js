@@ -1,6 +1,7 @@
 import { getAdmins } from "../../services/adminServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { AdminEntry } from "./AdminEntry.js";
+import "./CreateAdmin.js";
 
 export class AdminList extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -8,6 +9,8 @@ export class AdminList extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='admin-list-container'>
+              <h2>Admin List</h2>
+              <create-admin></create-admin>
               <ul id='admin-list'></ul>
             </div>
         `;

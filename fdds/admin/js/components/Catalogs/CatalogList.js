@@ -26,7 +26,6 @@ export class CatalogList extends HTMLElement {
   }
 
   connectedCallback() {
-    const { createCatalogButton } = this.uiElements;
     adminControllers.catalogs.subscribe(() => {
       this.populateCatalogList();
     });
