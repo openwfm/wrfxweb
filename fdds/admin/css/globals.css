@@ -17,3 +17,18 @@
 .hidden {
   display: none;
 }
+
+.confirmation-modal {
+  position: absolute;
+  padding: 5px;
+  z-index: 9990;
+  width: 400px;
+  height: 140px;
+  top: 15%;
+  left: 25%;
+  background: white;
+  line-height: normal;
+  font-size: 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid #5d5d5d;
+}

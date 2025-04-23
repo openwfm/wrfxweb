@@ -24,7 +24,8 @@ export class AdminEntry extends HTMLElement {
   connectedCallback() {
     const { deleteAdminButton } = this.uiElements;
     deleteAdminButton.onclick = () => {
-      this.deleteAdmin();
+      const deleteAdmin = () => this.deleteAdmin();
+      adminControllers.confirmation.setValue(deleteAdmin);
     };
   }
 

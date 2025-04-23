@@ -6,7 +6,8 @@ export class ConfirmationModal extends HTMLElement {
     this.confirmation = () => { };
     this.innerHTML = `
             <div id="confirmation-mask" class="confirmation-mask hidden">
-              <div id="confirmation-modal">
+              <div id="confirmation-modal" class="confirmation-modal">
+                <h2>Confirm Action</h2>
                 <p>Are you sure? This action cannot be undone</p>
                 <button id="yes-button" class="confirmation-button">Yes</button>
                 <button id="cancel" class="confirmation-button">Cancel</button>

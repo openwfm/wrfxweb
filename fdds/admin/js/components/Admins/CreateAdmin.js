@@ -16,7 +16,7 @@ export class CreateAdmin extends HTMLElement {
                   <p id='error-message'></p>
                 </div>
               </div>
-              <button id='open-create-admin-button'>Create Catalog</button>
+              <button id='open-create-admin-button'>Create Admin</button>
             </div>
         `;
     this.uiElements = {
