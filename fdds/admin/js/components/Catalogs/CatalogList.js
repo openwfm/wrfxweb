@@ -3,6 +3,7 @@ import { CatalogEdit } from "./CatalogEdit.js";
 import { ListItem } from "../ListItem.js";
 import "./CatalogEditModal/CatalogEditModal.js";
 import "../CatalogEntries/CatalogEntryUploadModal/CatalogEntryUploadModal.js";
+import "./CreateCatalog.js";
 
 export class CatalogList extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -11,6 +12,7 @@ export class CatalogList extends HTMLElement {
     this.innerHTML = `
             <div id='catalog-list-container'>
               <h2>Catalog List</h2>
+              <create-catalog></create-catalog>
               <ul id='catalog-list'></ul>
               <catalog-edit-modal></catalog-edit-modal>
               <catalog-entry-upload-modal></catalog-entry-upload-modal>
@@ -24,6 +26,7 @@ export class CatalogList extends HTMLElement {
   }
 
   connectedCallback() {
+    const { createCatalogButton } = this.uiElements;
     adminControllers.catalogs.subscribe(() => {
       this.populateCatalogList();
     });

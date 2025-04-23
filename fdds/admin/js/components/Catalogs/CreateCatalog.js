@@ -9,8 +9,8 @@ export class CreateCatalog extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='create-catalog-container'>
-              <div id='create-catalog-form'>
-                <h2>Create Catalog</h2>
+              <div id='create-catalog-form' class="hidden">
+                <h3>Create Catalog</h3>
                 <input type='text' id='name-input' placeholder='name'></input>
                 <input type='text' id='description-input' placeholder='description'></input>
                 <select id='permission-select'>
@@ -19,10 +19,12 @@ export class CreateCatalog extends HTMLElement {
                 </select>
                 <permissions-container mutable="true"></permissions-container>
                 <button id='create-catalog-button'>Create Catalog</button>
+                <button id='cancel-create-catalog-button'>Cancel</button>
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
                 </div>
               </div>
+              <button id='open-create-catalog-button'>Create Catalog</button>
             </div>
         `;
     this.uiElements = {
@@ -33,12 +35,20 @@ export class CreateCatalog extends HTMLElement {
       createCatalogButton: this.querySelector("#create-catalog-button"),
       errorMessageContainer: this.querySelector("#error-message-container"),
       errorMessage: this.querySelector("#error-message"),
+      createCatalogOpen: this.querySelector("#open-create-catalog-button"),
+      createCatalogForm: this.querySelector("#create-catalog-form"),
+      cancelCatalogOpen: this.querySelector("#cancel-create-catalog-button"),
     };
   }
 
   connectedCallback() {
-    const { createCatalogButton, permissionSelect, permissionsContainer } =
-      this.uiElements;
+    const {
+      createCatalogButton,
+      permissionSelect,
+      permissionsContainer,
+      createCatalogOpen,
+      cancelCatalogOpen,
+    } = this.uiElements;
     createCatalogButton.onclick = async () => {
       this.createCatalog();
     };
@@ -48,6 +58,13 @@ export class CreateCatalog extends HTMLElement {
       } else {
         permissionsContainer.classList.remove("hidden");
       }
+    };
+    cancelCatalogOpen.onclick = () => {
+      this.closeForm();
+    };
+
+    createCatalogOpen.onclick = () => {
+      this.openForm();
     };
   }
 
@@ -96,6 +113,18 @@ export class CreateCatalog extends HTMLElement {
     const { errorMessageContainer, errorMessage } = this.uiElements;
     errorMessage.textContent = errorMessageText;
     errorMessageContainer.classList.remove("hidden");
+  }
+
+  openForm() {
+    const { createCatalogOpen, createCatalogForm } = this.uiElements;
+    createCatalogForm.classList.remove("hidden");
+    createCatalogOpen.classList.add("hidden");
+  }
+
+  closeForm() {
+    const { createCatalogOpen, createCatalogForm } = this.uiElements;
+    createCatalogForm.classList.add("hidden");
+    createCatalogOpen.classList.remove("hidden");
   }
 }
 

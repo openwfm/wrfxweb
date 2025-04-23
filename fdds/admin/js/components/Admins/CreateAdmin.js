@@ -8,13 +8,15 @@ export class CreateAdmin extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='create-admin-container'>
-              <form id='create-admin-form'>
+              <div id='create-admin-form' class="hidden">
                 <input type='text' id='email-input' placeholder='Email'></input>
                 <button id='create-admin-button'>Create Admin</button>
+                <button id='cancel-create-admin-button'>Cancel</button>
                 <div id='error-message-container' class='hidden'>
                   <p id='error-message'></p>
                 </div>
-              </form>
+              </div>
+              <button id='open-create-admin-button'>Create Catalog</button>
             </div>
         `;
     this.uiElements = {
@@ -22,14 +24,29 @@ export class CreateAdmin extends HTMLElement {
       createAdminForm: this.querySelector("#create-admin-form"),
       errorMessageContainer: this.querySelector("#error-message-container"),
       errorMessage: this.querySelector("#error-message"),
+      cancelAdminCreateButton: this.querySelector(
+        "#cancel-create-admin-button",
+      ),
+      openAdminCreateButton: this.querySelector("#open-create-admin-button"),
+      createAdminButton: this.querySelector("#create-admin-button"),
     };
   }
 
   connectedCallback() {
-    const { createAdminForm } = this.uiElements;
-    createAdminForm.onsubmit = async (e) => {
+    const {
+      createAdminButton,
+      openAdminCreateButton,
+      cancelAdminCreateButton,
+    } = this.uiElements;
+    createAdminButton.onclick = async (e) => {
       e.preventDefault();
       this.createAdmin();
+    };
+    openAdminCreateButton.onclick = () => {
+      this.openForm();
+    };
+    cancelAdminCreateButton.onclick = () => {
+      this.closeForm();
     };
   }
 
@@ -55,6 +72,18 @@ export class CreateAdmin extends HTMLElement {
     const { errorMessageContainer, errorMessage } = this.uiElements;
     errorMessage.textContent = errorMessageText;
     errorMessageContainer.classList.remove("hidden");
+  }
+
+  openForm() {
+    const { createAdminForm, openAdminCreateButton } = this.uiElements;
+    createAdminForm.classList.remove("hidden");
+    openAdminCreateButton.classList.add("hidden");
+  }
+
+  closeForm() {
+    const { createAdminForm, openAdminCreateButton } = this.uiElements;
+    createAdminForm.classList.add("hidden");
+    openAdminCreateButton.classList.remove("hidden");
   }
 }
 
