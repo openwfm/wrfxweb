@@ -3,7 +3,7 @@ export class CatalogEntryMetaData extends HTMLElement {
     super();
     this.catalogEntry = catalogEntry;
     this.innerHTML = `
-            <div class='catalog-entry-metadata' id="catalog-entry-metadata-container">
+            <div class='catalog-entry' id="catalog-entry-metadata-container">
               <label for='catalog-entry-id'>id:</label>
               <p id='catalog-entry-id'>${catalogEntry.id}</p>
               <label for='catalog-entry-description'>description:</label>
