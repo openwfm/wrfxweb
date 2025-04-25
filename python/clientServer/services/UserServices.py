@@ -1,22 +1,27 @@
 from clientServer.app import db
 from clientServer.models.User import User
+import api.encryption as encryption
 import datetime
 
 
 def create(email):
     date = datetime.datetime.now().strftime("%Y-%m-%d")
-    user = User(email=email, username=email.split("@")[0], date_created=date)
+    email_cipher = encryption.encrypt_user_data(email)
+    user = User(encrypted_email=email_cipher, date_created=date)
     db.session.add(user)
     db.session.commit()
     return user
 
 
 def find_or_create(email):
-    user = db.session.scalar(db.select(User).where(User.email == email))
+    user = find(email)
     if user is None:
         user = create(email)
     return user
 
 
 def find(email):
-    return db.session.scalar(db.select(User).where(User.email == email))
+    email_cipher = encryption.encrypt_user_data(email)
+    return db.session.scalar(
+        db.select(User).where(User.encrypted_email == email_cipher)
+    )

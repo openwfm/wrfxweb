@@ -7,5 +7,9 @@ class Admin(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     date_created = db.Column(db.String(10), nullable=False)
 
+    def destroy(self):
+        db.session.delete(self)
+        db.session.commit()
+
     def __repr__(self):
         return f"<Admin {self.user_id}>"
