@@ -98,7 +98,7 @@ def authorize_google():
     # find or create the user in the database
     user = UserServices.find_or_create(email)
 
-    loggingUtils.log_login(f"{user.email}")
+    loggingUtils.log_login(f"{user.id}")
 
     # log the user in
     login_user(user)
