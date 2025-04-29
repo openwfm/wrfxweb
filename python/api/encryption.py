@@ -1,10 +1,17 @@
-from api.apiKeys import AES_ENCRYPTION_KEY, AES_ENCRYPTION_NONCE, FERNET_ENCRYPTION_KEY
+from api.apiKeys import (
+    AES_ENCRYPTION_KEY,
+    AES_ENCRYPTION_NONCE,
+    FERNET_ENCRYPTION_KEY,
+    CATALOG_API_AES_ENCRYPTION_KEY,
+    CATALOG_API_AES_ENCRYPTION_NONCE,
+)
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.fernet import Fernet
 
 
 aesgcm = AESGCM(AES_ENCRYPTION_KEY)
+aesgcm = AESGCM(CATALOG_API_AES_ENCRYPTION_KEY)
 fernet = Fernet(FERNET_ENCRYPTION_KEY)
 
 
@@ -28,3 +35,16 @@ def encrypt_searchable_data(searchable_data):
 
 def decrypt_searchable_data(encrypted_searchable_data):
     return aesgcm.decrypt(AES_ENCRYPTION_NONCE, encrypted_searchable_data, b"").decode()
+
+
+def encrypt_api_key(api_key):
+    encrypted_api_key = aesgcm.encrypt(
+        CATALOG_API_AES_ENCRYPTION_NONCE, api_key.encode(), b""
+    )
+    return encrypted_api_key
+
+
+def decrypt_api_key(encrypted_api_key):
+    return aesgcm.decrypt(
+        CATALOG_API_AES_ENCRYPTION_NONCE, encrypted_api_key, b""
+    ).decode()

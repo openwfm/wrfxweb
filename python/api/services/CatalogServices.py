@@ -8,8 +8,10 @@ from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
     AdminServices as AdminServices,
     CatalogAccessServices as CatalogAccessServices,
+    CatalogApiKeyServices as CatalogApiKeyServices,
 )
 import api.logging.utils as loggingUtils
+import api.encryption as encryption
 
 from sqlalchemy import select, outerjoin, or_
 import datetime
@@ -64,6 +66,8 @@ def create(json, user, admin_services_api_key):
         )
         db_session.add(new_catalog)
         db_session.commit()
+
+        CatalogApiKeyServices.create(new_catalog.id, user, admin_services_api_key)
 
         if not public:
             for permission in permissions:
