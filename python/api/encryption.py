@@ -11,7 +11,7 @@ from cryptography.fernet import Fernet
 
 
 aesgcm = AESGCM(AES_ENCRYPTION_KEY)
-aesgcm = AESGCM(CATALOG_API_AES_ENCRYPTION_KEY)
+aesgcm_catalog = AESGCM(CATALOG_API_AES_ENCRYPTION_KEY)
 fernet = Fernet(FERNET_ENCRYPTION_KEY)
 
 
@@ -38,13 +38,13 @@ def decrypt_searchable_data(encrypted_searchable_data):
 
 
 def encrypt_api_key(api_key):
-    encrypted_api_key = aesgcm.encrypt(
+    encrypted_api_key = aesgcm_catalog.encrypt(
         CATALOG_API_AES_ENCRYPTION_NONCE, api_key.encode(), b""
     )
     return encrypted_api_key
 
 
 def decrypt_api_key(encrypted_api_key):
-    return aesgcm.decrypt(
+    return aesgcm_catalog.decrypt(
         CATALOG_API_AES_ENCRYPTION_NONCE, encrypted_api_key, b""
     ).decode()

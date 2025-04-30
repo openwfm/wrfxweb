@@ -10,4 +10,4 @@ class CatalogApiKeyDbModel(Base):
     catalog_id = Column(Integer, ForeignKey("catalog.id"), nullable=False)
     date_created = Column(String(10), nullable=False)
     encrypted_api_key = Column(LargeBinary)
-    catalog = relationship("Catalog", foreign_keys="CatalogEntryCatalog.catalog_id")
+    catalog = relationship("Catalog", foreign_keys="CatalogApiKey.catalog_id")

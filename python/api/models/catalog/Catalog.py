@@ -1,6 +1,7 @@
 from api.session import db_session
 from api.models.catalog.CatalogDbModel import CatalogDbModel
 from api.models.CatalogAccess import CatalogAccess
+from api.models.catalogApiKey.CatalogApiKey import CatalogApiKey
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 
 import api.encryption as encryption
@@ -27,6 +28,9 @@ class Catalog(CatalogDbModel):
             for catalog_entry_catalog in catalog_entry_catalogs
         ]
 
+    def catalog_api_key(self):
+        return db_session.query(CatalogApiKey).filter_by(catalog_id=self.id).first()
+
     def destroy(self):
         catalog_entry_catalogs = (
             db_session.query(CatalogEntryCatalog)
@@ -38,7 +42,9 @@ class Catalog(CatalogDbModel):
             db_session.delete(entry)
         for permission in self.permissions():
             db_session.delete(permission)
-
+        catalog_api_key = self.catalog_api_key()
+        if catalog_api_key != None:
+            db_session.delete(catalog_api_key)
         db_session.delete(self)
         db_session.commit()
 

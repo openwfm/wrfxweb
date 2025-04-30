@@ -3,7 +3,6 @@ from api.models.Admin import Admin
 from api.models.User import User
 from api.services import UserServices as UserServices
 from api.apiKeys import ADMIN_SERVICES_API_KEY
-from api.validators import utils as validationUtils
 from api.validators import AdminValidators as AdminValidators
 from sqlalchemy import select
 
