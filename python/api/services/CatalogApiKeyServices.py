@@ -57,8 +57,7 @@ def get_api_key(catalog_id, user, admin_services_api_key):
         catalog_api_key = find_by_catalog_id(catalog.id)
         if catalog_api_key == None:
             return None
-        api_key = encryption.decrypt_api_key(catalog_api_key.encrypted_api_key)
-        return api_key
+        return catalog_api_key
     except Exception as e:
         loggingUtils.service_exception("Catalog", "get_api_key", e)
         return None

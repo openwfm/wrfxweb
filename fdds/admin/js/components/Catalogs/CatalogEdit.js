@@ -1,6 +1,7 @@
 import {
   deleteCatalog,
   deleteEntryFromCatalog,
+  getApiKey,
 } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { toggleVisibility } from "../../adminUtils.js";
@@ -23,6 +24,11 @@ export class CatalogEdit extends HTMLElement {
               <button id='delete-catalog-button'>Delete</button>
               <button id='edit-catalog-button'>Edit</button>
               <button id='upload-catalog-entry-button'>Upload Entry</button>
+              <button id='catalog-api-key-button'>Show Upload Api Key</button>
+              <div id='catalog-api-key-container' class="hidden">
+                <p id='catalog-api-key'></p>
+                <button id='catalog-api-key-hide-button'>hide</button>
+              </div>
               <div id='catalog-entries-container' class="hidden">
                 <p>Catalog Entries:</p>
                 <ul id='catalog-entries' ></ul>
@@ -39,6 +45,12 @@ export class CatalogEdit extends HTMLElement {
       catalogContainer: this.querySelector("#catalog-container"),
       catalogEntries: this.querySelector("#catalog-entries"),
       catalogEntriesContainer: this.querySelector("#catalog-entries-container"),
+      catalogApiKeyButton: this.querySelector("#catalog-api-key-button"),
+      catalogApiKeyContainer: this.querySelector("#catalog-api-key-container"),
+      catalogApiKey: this.querySelector("#catalog-api-key"),
+      catalogApiKeyHideButton: this.querySelector(
+        "#catalog-api-key-hide-button",
+      ),
     };
   }
 
@@ -50,6 +62,9 @@ export class CatalogEdit extends HTMLElement {
       permissionsContainer,
       catalogContainer,
       catalogEntriesContainer,
+      catalogApiKeyButton,
+      catalogApiKeyHideButton,
+      catalogApiKeyContainer,
     } = this.uiElements;
     catalogContainer.onclick = () => {
       toggleVisibility(catalogEntriesContainer);
@@ -69,6 +84,17 @@ export class CatalogEdit extends HTMLElement {
       e.stopPropagation();
       this.uploadEntry(this.catalog);
     };
+    catalogApiKeyButton.onclick = (e) => {
+      e.stopPropagation();
+      this.showCatalogApiKey();
+    };
+    catalogApiKeyHideButton.onclick = (e) => {
+      e.stopPropagation();
+      this.hideCatalogApiKey();
+    };
+    catalogApiKeyContainer.onclick = (e) => {
+      e.stopPropagation();
+    };
 
     if (this.catalog.public) {
       permissionsContainer.classList.add("hidden");
@@ -77,6 +103,19 @@ export class CatalogEdit extends HTMLElement {
       permissionsContainer.renderPermissionsList(this.catalog);
     }
     this.populateCatalogEntries();
+  }
+
+  async showCatalogApiKey() {
+    const { catalogApiKeyContainer, catalogApiKey } = this.uiElements;
+    let apiKey = await getApiKey(this.catalog.id);
+    catalogApiKey.innerText = apiKey.api_key;
+    catalogApiKeyContainer.classList.remove("hidden");
+  }
+
+  hideCatalogApiKey() {
+    const { catalogApiKeyContainer, catalogApiKey } = this.uiElements;
+    catalogApiKey.innerText = "";
+    catalogApiKeyContainer.classList.add("hidden");
   }
 
   async deleteCatalog() {

@@ -27,6 +27,17 @@ export async function getCatalogs() {
   return response_json.catalogs;
 }
 
+export async function getApiKey(catalogId) {
+  const GET_URL = `${CATALOG_URL}/${catalogId}/api_key`;
+
+  const response_json = await getRequest(GET_URL);
+
+  if (response_json.error) {
+    return {};
+  }
+  return response_json.api_key;
+}
+
 export async function getCatalogEntries() {
   const GET_URL = `${CATALOG_ENTRIES_URL}/all`;
 
