@@ -1,12 +1,13 @@
 from api.services import AdminServices as AdminServices
 
 from api.apiKeys import ADMIN_SERVICES_API_KEY
+from api.validators.utils import sanitize_text
 
 
 def serialize_user(user):
     return {
-        "id": user.id,
-        "date_created": user.date_created,
+        "id": sanitize_text(f"{user.id}"),
+        "date_created": sanitize_text(f"{user.date_created}"),
     }
 
 
@@ -21,9 +22,9 @@ def serialize_user_with_email(user, current_user, admin_services_api_key):
         return serialize_user(user)
 
     return {
-        "id": user.id,
-        "date_created": user.date_created,
-        "email": user.email(),
+        "id": sanitize_text(f"{user.id}"),
+        "date_created": sanitize_text(f"{user.date_created}"),
+        "email": sanitize_text(f"{user.email()}"),
     }
 
 

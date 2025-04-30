@@ -1,16 +1,17 @@
 from api.serializers import CatalogAccessSerializer as CatalogAccessSerializer
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from api.services import AdminServices as AdminServices
+from api.validators.utils import sanitize_text
 
 
 def serialize_catalog(catalog):
     if catalog == None:
         return {}
     return {
-        "id": catalog.id,
-        "description": catalog.description,
-        "name": catalog.name,
-        "date_created": catalog.date_created,
+        "id": sanitize_text(f"{catalog.id}"),
+        "description": sanitize_text(f"{catalog.description}"),
+        "name": sanitize_text(f"{catalog.name}"),
+        "date_created": sanitize_text(f"{catalog.date_created}"),
         "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
     }
 
@@ -32,11 +33,11 @@ def serialize_catalog_with_permissions(catalog, user, admin_services_api_key):
     if not AdminServices.isAdmin(user, admin_services_api_key):
         return serialize_catalog(catalog)
     return {
-        "id": catalog.id,
-        "description": catalog.description,
-        "name": catalog.name,
-        "public": catalog.public,
-        "date_created": catalog.date_created,
+        "id": sanitize_text(f"{catalog.id}"),
+        "description": sanitize_text(f"{catalog.description}"),
+        "name": sanitize_text(f"{catalog.name}"),
+        "public": sanitize_text(f"{catalog.public}"),
+        "date_created": sanitize_text(f"{catalog.date_created}"),
         "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
         "permissions": CatalogAccessSerializer.serialize_accesses(
             catalog.permissions(), user, admin_services_api_key
