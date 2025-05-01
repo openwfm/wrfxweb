@@ -48,6 +48,13 @@ class Catalog(CatalogDbModel):
         db_session.delete(self)
         db_session.commit()
 
+    def verify_upload_key(self, upload_key):
+        catalog_api_key = self.catalog_api_key()
+        if catalog_api_key == None:
+            return False
+        encrypted_upload_key = encryption.encrypt_api_key(upload_key)
+        return encrypted_upload_key == catalog_api_key.encrypted_api_key
+
     def user_has_access(self, user):
         if self.public:
             return True
