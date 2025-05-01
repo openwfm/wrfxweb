@@ -9,7 +9,6 @@ from sqlalchemy import select
 import datetime
 
 
-# make private
 def create(email):
     user = UserServices.find_or_create(email, ADMIN_SERVICES_API_KEY)
     if user == None:

@@ -14,7 +14,6 @@ class InvalidAPIKey(Exception):
         self.message = "Provided API Key was not valid"
 
 
-# make private
 def find(json):
     find_params = CatalogEntryCatalogValidators.validate_find_json(json)
     catalog_id = find_params["catalog_id"]
