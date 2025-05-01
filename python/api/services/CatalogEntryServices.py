@@ -33,12 +33,6 @@ def create_catalog_entry_catalog(catalog_id, catalog_entry_id):
         db_session.commit()
 
 
-# catalog_entry_upload_params {
-#        "catalog": catalog,
-#        "zip_file": zip_file,
-#        "uploader_id": current_user.id,
-#        "entry_type": entry_type,
-#    }
 def create(json):
     try:
         catalog_entry_params = CatalogEntryValidators.validate_create_json(json)

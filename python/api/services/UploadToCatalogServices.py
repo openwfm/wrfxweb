@@ -7,12 +7,6 @@ from api.apiKeys import UPLOAD_API_KEYS
 import api.logging.utils as logging
 
 
-# catalog_entry_upload_params {
-#        "catalog": catalog,
-#        "zip_file": zip_file,
-#        "uploader_id": current_user.id,
-#        "entry_type": entry_type,
-#    }
 def create(json, upload_api_key):
     try:
         if upload_api_key not in UPLOAD_API_KEYS:

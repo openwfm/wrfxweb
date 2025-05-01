@@ -1,17 +1,10 @@
 from clientServer.app import app
-
 from clientServer.routes.admin.admin_utils import admin_login_required
-
 from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
-
 from clientServer.serverKeys import ADMIN_SERVICES_API_KEY
 
 from api.services import AdminServices as AdminServices
 from api.serializers import UserSerializer as UserSerializer
-
-# from api.models.User import User
-# from api.models.Admin import Admin
-
 
 from flask import render_template, request, session
 from flask_login import current_user

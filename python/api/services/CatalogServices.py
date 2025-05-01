@@ -8,14 +8,15 @@ from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
     AdminServices as AdminServices,
     CatalogAccessServices as CatalogAccessServices,
+    CatalogApiKeyServices as CatalogApiKeyServices,
 )
 import api.logging.utils as loggingUtils
+import api.encryption as encryption
 
 from sqlalchemy import select, outerjoin, or_
 import datetime
 
 
-# make private
 def find_by_id(catalog_id):
     try:
         validated_catalog_id = CatalogValidators.validate_catalog_id(catalog_id)
@@ -65,6 +66,8 @@ def create(json, user, admin_services_api_key):
         db_session.add(new_catalog)
         db_session.commit()
 
+        CatalogApiKeyServices.create(new_catalog.id, user, admin_services_api_key)
+
         if not public:
             for permission in permissions:
                 CatalogAccessServices.create(
@@ -76,7 +79,6 @@ def create(json, user, admin_services_api_key):
         return None
 
 
-# make private
 def destroy(catalog_id, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
@@ -91,7 +93,6 @@ def destroy(catalog_id, user, admin_services_api_key):
     return True
 
 
-# make private
 def update(catalog_id, json, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
@@ -123,7 +124,6 @@ def update(catalog_id, json, user, admin_services_api_key):
         return None
 
 
-# make private
 def find_all():
     return db_session.query(Catalog).all()
 

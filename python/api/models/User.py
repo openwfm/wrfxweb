@@ -7,7 +7,6 @@ import api.encryption as encryption
 class User(UserMixin, Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    # encrypted_email = db.Column(db.String(254), nullable=True)
     encrypted_email = Column(LargeBinary)
     date_created = Column(String(10), nullable=False)
 
@@ -16,10 +15,6 @@ class User(UserMixin, Base):
 
     def email(self):
         return encryption.decrypt_user_data(self.encrypted_email)
-
-    # def destroy(self):
-    #     session.delete(self)
-    #     session.commit()
 
     def __repr__(self):
         return f"<User {self.id}>"

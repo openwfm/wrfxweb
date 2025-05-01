@@ -6,7 +6,7 @@ import api.encryption as encryption
 
 def serialize_catalog_entry(entry):
     return {
-        "id": f"{entry.id}",
+        "id": sanitize_text(f"{entry.id}"),
         "entry_type": sanitize_text(entry.entry_type),
         "from_utc": sanitize_text(entry.from_utc),
         "to_utc": sanitize_text(entry.to_utc),
@@ -17,8 +17,8 @@ def serialize_catalog_entry(entry):
             encryption.decrypt_searchable_data(entry.manifest_path)
         ),
         "job_id": sanitize_text(encryption.decrypt_searchable_data(entry.job_id)),
-        "zip_size": f"{entry.zip_size}",
-        "kml_size": f"{entry.kml_size}",
+        "zip_size": sanitize_text(f"{entry.zip_size}"),
+        "kml_size": sanitize_text(f"{entry.kml_size}"),
         "processed_utc": sanitize_text(entry.processed_utc),
         "run_utc": sanitize_text(entry.run_utc),
         "zip_url": sanitize_text(encryption.decrypt_searchable_data(entry.zip_url)),
@@ -77,18 +77,18 @@ def serialize_catalog_without_entries(catalog, user, admin_services_api_key):
         return {}
     if not AdminServices.isAdmin(user, admin_services_api_key):
         return {
-            "id": catalog.id,
-            "description": catalog.description,
-            "name": catalog.name,
-            "date_created": catalog.date_created,
+            "id": sanitize_text(f"{catalog.id}"),
+            "description": sanitize_text(f"{catalog.description}"),
+            "name": sanitize_text(f"{catalog.name}"),
+            "date_created": sanitize_text(catalog.date_created),
         }
 
     return {
-        "id": catalog.id,
-        "description": catalog.description,
-        "name": catalog.name,
-        "public": catalog.public,
-        "date_created": catalog.date_created,
+        "id": sanitize_text(f"{catalog.id}"),
+        "description": sanitize_text(f"{catalog.description}"),
+        "name": sanitize_text(f"{catalog.name}"),
+        "public": sanitize_text(f"{catalog.public}"),
+        "date_created": sanitize_text(f"{catalog.date_created}"),
         "permissions": CatalogAccessSerializer.serialize_accesses(
             catalog.permissions(), user, admin_services_api_key
         ),

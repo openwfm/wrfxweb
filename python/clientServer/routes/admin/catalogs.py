@@ -5,8 +5,14 @@ from clientServer.logging import utils as loggingUtils
 from clientServer.routes.admin.admin_utils import admin_login_required
 
 from api.validators import CatalogValidators as CatalogValidators
-from api.services import CatalogServices as CatalogServices
-from api.serializers import CatalogSerializer as CatalogSerializer
+from api.services import (
+    CatalogServices as CatalogServices,
+    CatalogApiKeyServices as CatalogApiKeyServices,
+)
+from api.serializers import (
+    CatalogSerializer as CatalogSerializer,
+    CatalogApiKeySerializer as CatalogApiKeySerializer,
+)
 
 from flask import request
 from flask_login import current_user
@@ -49,6 +55,20 @@ def catalog_id(catalog_id):
     return {
         "message": "Method Not Allowed",
     }, 405
+
+
+@app.route("/admin/catalogs/<catalog_id>/api_key", methods=["GET"])
+@admin_login_required
+def catalog_api_key(catalog_id):
+    loggingUtils.log_catalog_api_access_attempt(current_user, catalog_id)
+    api_key = CatalogApiKeyServices.get_api_key(
+        catalog_id, current_user, ADMIN_SERVICES_API_KEY
+    )
+    if api_key == None:
+        return {"message": "Server encountered an error retreiving api key"}, 401
+    loggingUtils.log_catalog_api_access_success(current_user, catalog_id)
+
+    return {"api_key": CatalogApiKeySerializer.serialize_catalog_api_key(api_key)}, 200
 
 
 def delete_catalog_id(catalog_id):

@@ -3,14 +3,12 @@ from api.models.Admin import Admin
 from api.models.User import User
 from api.services import UserServices as UserServices
 from api.apiKeys import ADMIN_SERVICES_API_KEY
-from api.validators import utils as validationUtils
 from api.validators import AdminValidators as AdminValidators
 from sqlalchemy import select
 
 import datetime
 
 
-# make private
 def create(email):
     user = UserServices.find_or_create(email, ADMIN_SERVICES_API_KEY)
     if user == None:

@@ -3,10 +3,6 @@ from api.validators import CatalogEntryUploadValidators as CatalogEntryUploadVal
 from api.validators import utils as validationUtils
 
 
-# uploader_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-# catalog_id = db.Column(db.Integer, db.ForeignKey("catalog.id"))
-# user = db.relationship("User", foreign_keys="CatalogEntryUpload.uploader_id")
-# entry_type = db.Column(db.String(255), nullable=False)
 def validate_create_json(json):
     if "catalog_id" not in json:
         raise ValueError("catalog_id is required")

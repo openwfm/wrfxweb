@@ -32,7 +32,6 @@ def catalog_entry_rasters(catalog_id, catalog_entry_id):
         return {"message": "Requested Entry does not exist"}, 404
 
     manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
-    # return send_from_directory(catalog_entry.directory(), manifest_path)
     return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
 
 
@@ -49,5 +48,4 @@ def catalog_entry_simulations(catalog_id, catalog_entry_id, file_path):
         return {"message": "Requested Entry does not exist"}, 404
 
     directory = f"{FLASK_SIMULATIONS_FOLDER}/{catalog_entry.folder_name()}"
-    # return send_from_directory(catalog_entry.entry_path(), file_path)
     return send_from_directory(directory, file_path)
