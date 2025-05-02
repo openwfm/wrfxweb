@@ -14,7 +14,7 @@ export class CatalogMetaData extends HTMLElement {
               <label for='catalog-description'>description:</label>
               <p id='catalog-description'>${catalog.description}</p>
               <label for='catalog-access'>access:</label>
-              <p id='catalog-access'>${catalog.public ? "public" : "private"}</p>
+              <p id='catalog-access'>${catalog.public == "True" ? "public" : "private"}</p>
               <label for='catalog-date'>date created:</label>
               <p id='catalog-date'>${catalog.date_created}</p>
               <permissions-container mutable="false"></permissions-container>
