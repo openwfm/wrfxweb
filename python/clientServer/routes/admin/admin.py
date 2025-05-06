@@ -75,5 +75,4 @@ def serve_admin_css(filename):
 @app.route("/admin/js/<path:filename>")
 @admin_login_required
 def serve_admin_js(filename):
-    # return send_from_directory("../../fdds/admin/js", filename)
     return send_from_directory(ADMIN_JS_FOLDER, filename)
