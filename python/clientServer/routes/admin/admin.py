@@ -1,12 +1,17 @@
 from clientServer.app import app
 from clientServer.routes.admin.admin_utils import admin_login_required
 from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
-from clientServer.serverKeys import ADMIN_SERVICES_API_KEY
+from clientServer.serverKeys import (
+    ADMIN_SERVICES_API_KEY,
+    ADMIN_HTML_FOLDER,
+    ADMIN_JS_FOLDER,
+    ADMIN_CSS_FOLDER,
+)
 
 from api.services import AdminServices as AdminServices
 from api.serializers import UserSerializer as UserSerializer
 
-from flask import render_template, request, session
+from flask import render_template, request, session, send_from_directory
 from flask_login import current_user
 
 
@@ -51,7 +56,7 @@ def delete_admin(admin_id):
 @app.route("/admin")
 @admin_login_required
 def admin_index():
-    return render_template("admin/admin_panel.html")
+    return render_template(f"{ADMIN_HTML_FOLDER}/admin_panel.html")
 
 
 @app.route("/admin/reset_sessions")
@@ -59,3 +64,16 @@ def admin_index():
 def reset_sessions():
     session.clear()
     return {"message": "Sessions Successfully Reset!"}, 200
+
+
+@app.route("/admin/css/<path:filename>")
+@admin_login_required
+def serve_admin_css(filename):
+    return send_from_directory(ADMIN_CSS_FOLDER, filename)
+
+
+@app.route("/admin/js/<path:filename>")
+@admin_login_required
+def serve_admin_js(filename):
+    # return send_from_directory("../../fdds/admin/js", filename)
+    return send_from_directory(ADMIN_JS_FOLDER, filename)
