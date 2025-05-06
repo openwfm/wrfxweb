@@ -50,14 +50,32 @@ def create(catalog_id, user, admin_services_api_key):
 def get_api_key(catalog_id, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
-            return None
+            raise ValueError(
+                f"User {user.id} is not an admin and provide valid admin_api"
+            )
         catalog = CatalogServices.find_by_id(catalog_id)
         if catalog == None:
-            return None
+            raise ValueError("must provide valid catalog_id")
         catalog_api_key = find_by_catalog_id(catalog.id)
-        if catalog_api_key == None:
-            return None
         return catalog_api_key
     except Exception as e:
         loggingUtils.service_exception("Catalog", "get_api_key", e)
+        return None
+
+
+def refresh_api_key(catalog_id, user, admin_services_api_key):
+    try:
+        if not AdminServices.isAdmin(user, admin_services_api_key):
+            raise ValueError("must provide valid catalog_id")
+        catalog_api_key = get_api_key(catalog_id, user, admin_services_api_key)
+        if catalog_api_key == None:
+            catalog_api_key = create(catalog_id, user, admin_services_api_key)
+            return catalog_api_key
+        api_key = binascii.hexlify(os.urandom(32)).decode()
+        catalog_api_key.encrypted_api_key = encryption.encrypt_api_key(api_key)
+        catalog_api_key.date_created = datetime.datetime.now().strftime("%Y-%m-%d")
+        db_session.commit()
+        return catalog_api_key
+    except Exception as e:
+        loggingUtils.service_exception("Catalog", "refresh_api_key", e)
         return None

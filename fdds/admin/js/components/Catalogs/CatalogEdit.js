@@ -2,6 +2,7 @@ import {
   deleteCatalog,
   deleteEntryFromCatalog,
   getApiKey,
+  refreshCatalogApiKey,
 } from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 import { toggleVisibility } from "../../adminUtils.js";
@@ -27,6 +28,7 @@ export class CatalogEdit extends HTMLElement {
               <button id='catalog-api-key-button'>Show Upload Api Key</button>
               <div id='catalog-api-key-container' class="hidden">
                 <p id='catalog-api-key'></p>
+                <button id='catalog-api-key-refresh-button'>refresh</button>
                 <button id='catalog-api-key-hide-button'>hide</button>
               </div>
               <div id='catalog-entries-container' class="hidden">
@@ -51,6 +53,9 @@ export class CatalogEdit extends HTMLElement {
       catalogApiKeyHideButton: this.querySelector(
         "#catalog-api-key-hide-button",
       ),
+      catalogApiKeyRefreshButton: this.querySelector(
+        "#catalog-api-key-refresh-button",
+      ),
     };
   }
 
@@ -64,6 +69,7 @@ export class CatalogEdit extends HTMLElement {
       catalogEntriesContainer,
       catalogApiKeyButton,
       catalogApiKeyHideButton,
+      catalogApiKeyRefreshButton,
       catalogApiKeyContainer,
     } = this.uiElements;
     catalogContainer.onclick = () => {
@@ -91,6 +97,13 @@ export class CatalogEdit extends HTMLElement {
     catalogApiKeyHideButton.onclick = (e) => {
       e.stopPropagation();
       this.hideCatalogApiKey();
+    };
+    catalogApiKeyRefreshButton.onclick = (e) => {
+      e.stopPropagation();
+      const refreshCatalogApiKey = () => {
+        this.refreshCatalogApiKey();
+      };
+      adminControllers.confirmation.setValue(refreshCatalogApiKey);
     };
     catalogApiKeyContainer.onclick = (e) => {
       e.stopPropagation();
@@ -122,6 +135,11 @@ export class CatalogEdit extends HTMLElement {
     await deleteCatalog(this.catalog.id);
     adminControllers.entries.refreshData();
     adminControllers.catalogs.refreshData();
+  }
+
+  async refreshCatalogApiKey() {
+    await refreshCatalogApiKey(this.catalog.id);
+    await this.showCatalogApiKey();
   }
 
   populateCatalogEntries() {

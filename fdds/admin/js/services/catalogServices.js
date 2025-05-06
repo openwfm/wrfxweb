@@ -38,6 +38,14 @@ export async function getApiKey(catalogId) {
   return response_json.api_key;
 }
 
+export async function refreshCatalogApiKey(catalogId) {
+  const POST_URL = `${CATALOG_URL}/${catalogId}/api_key/refresh`;
+
+  const response_json = await postRequestFormData(POST_URL, {});
+
+  return response_json;
+}
+
 export async function getCatalogEntries() {
   const GET_URL = `${CATALOG_ENTRIES_URL}/all`;
 

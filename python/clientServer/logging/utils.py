@@ -25,6 +25,18 @@ def log_catalog_api_access_success(user, catalog_id):
     log_statement("Catalog", message, True)
 
 
+def log_catalog_api_refresh_attempt(user, catalog_id):
+    message = f"User {user.id} attempted to refresh API key for Catalog {catalog_id}"
+
+    log_statement("Catalog", message, True)
+
+
+def log_catalog_api_refresh_success(user, catalog_id):
+    message = f"User {user.id} successfully refreshed API key for Catalog {catalog_id}"
+
+    log_statement("Catalog", message, True)
+
+
 def log_login(message):
     log_statement("Login", message, True)
 

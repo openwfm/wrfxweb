@@ -71,6 +71,20 @@ def catalog_api_key(catalog_id):
     return {"api_key": CatalogApiKeySerializer.serialize_catalog_api_key(api_key)}, 200
 
 
+@app.route("/admin/catalogs/<catalog_id>/api_key/refresh", methods=["POST"])
+@admin_login_required
+def refresh_catalog_api_key(catalog_id):
+    loggingUtils.log_catalog_api_refresh_attempt(current_user, catalog_id)
+    api_key = CatalogApiKeyServices.refresh_api_key(
+        catalog_id, current_user, ADMIN_SERVICES_API_KEY
+    )
+    if api_key == None:
+        return {"message": "Server encountered an error refreshing api key"}, 401
+    loggingUtils.log_catalog_api_refresh_success(current_user, catalog_id)
+
+    return {"api_key": CatalogApiKeySerializer.serialize_catalog_api_key(api_key)}, 200
+
+
 def delete_catalog_id(catalog_id):
     CatalogServices.destroy(catalog_id, current_user, ADMIN_SERVICES_API_KEY)
     return {
