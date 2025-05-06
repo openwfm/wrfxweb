@@ -3,11 +3,10 @@ from clientServer.serverKeys import (
     JS_FOLDER,
     CSS_FOLDER,
     RESOURCE_FOLDER,
-    CATALOG_FOLDER,
-    CONF_FOLDER,
+    CONF_FILE,
 )
 
-from flask import send_from_directory
+from flask import send_from_directory, send_file
 
 
 @app.route("/js/<path:filename>")
@@ -37,9 +36,4 @@ def serve_image_loading_worker():
 
 @app.route("/conf")
 def serve_conf():
-    return send_from_directory(CONF_FOLDER, "conf.json")
-
-
-@app.route("/catalog", methods=["GET"])
-def catalog():
-    return send_from_directory(CATALOG_FOLDER, "catalog.json")
+    return send_file(CONF_FILE)

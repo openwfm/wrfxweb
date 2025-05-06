@@ -3,7 +3,7 @@ from clientServer.routes.admin.admin_utils import admin_login_required
 from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
 from clientServer.serverKeys import (
     ADMIN_SERVICES_API_KEY,
-    ADMIN_HTML_FOLDER,
+    ADMIN_HTML,
     ADMIN_JS_FOLDER,
     ADMIN_CSS_FOLDER,
 )
@@ -56,7 +56,7 @@ def delete_admin(admin_id):
 @app.route("/admin")
 @admin_login_required
 def admin_index():
-    return render_template(f"{ADMIN_HTML_FOLDER}/admin_panel.html")
+    return render_template(ADMIN_HTML)
 
 
 @app.route("/admin/reset_sessions")
