@@ -42,10 +42,17 @@ class UploadThread:
                 return
 
             loggingUtils.log_processing_catalog_entry_upload(catalog_entry_upload.id)
-
-            thread_utils.unpack_catalog_entry_upload(catalog_entry_upload)
-
+            catalog_entry = thread_utils.unpack_catalog_entry_upload(
+                catalog_entry_upload
+            )
             loggingUtils.log_processed_catalog_entry_upload(catalog_entry_upload.id)
+
+            if catalog_entry == None:
+                return
+
+            loggingUtils.log_processing_catalog_entry_pngs(catalog_entry.id)
+            catalog_entry = thread_utils.process_catalog_entry_pngs(catalog_entry)
+            loggingUtils.log_processed_catalog_entry_pngs(catalog_entry.id)
 
     def fetch_catalog_entry_upload_id(self, attempts):
         if attempts == 0:

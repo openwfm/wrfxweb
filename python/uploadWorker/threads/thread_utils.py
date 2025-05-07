@@ -33,9 +33,11 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
         update_catalog_entry_catalogs(catalog_entry, catalog_entry_upload)
         move_simulation(catalog_entry_upload, catalog_entry)
         catalog_entry_upload.process()
+        return catalog_entry
     except Exception as e:
         remove_temp_directory()
         loggingUtils.log_unpacking_error(e)
+        return None
 
 
 class UploadUnzippingError(Exception):
@@ -164,3 +166,30 @@ def remove_temp_directory():
     directory = os.listdir(TEMP_FOLDER)[0]
     temp_source = f"{TEMP_FOLDER}/{directory}"
     shutil.rmtree(temp_source)
+
+
+def unpack_catalog_entry_pngs(catalog_entry):
+    try:
+        sim_json = load_sim_json(catalog_entry)
+        create_sim_layer_and_timestamp_records(sim_json, catalog_entry)
+        catalog_entry.process()
+        return catalog_entry
+    except Exception as e:
+        remove_temp_directory()
+        loggingUtils.log_unpacking_error(e)
+        return None
+
+
+class SimJsonLoadingError(Exception):
+    def __init__(self, catalog_entry):
+        message = f"Error loading simulation json: catalog_entry_id: {catalog_entry.id}"
+        super().__init__(message)
+
+
+def load_sim_json(catalog_entry):
+    sim_json_path = catalog_entry.sim_json_path()
+    try:
+        sim_json = json.load(open(sim_json_path))
+        return sim_json
+    except Exception:
+        raise SimJsonLoadingError(catalog_entry)
