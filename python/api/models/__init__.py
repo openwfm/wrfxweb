@@ -18,3 +18,12 @@ from api.models.uploadToCatalog.UploadToCatalogDbModel import (
 from api.models.catalogApiKey.CatalogApiKeyDbModel import (
     CatalogApiKeyDbModel,
 )
+from api.models.layerType.LayerTypeDbModel import (
+    LayerTypeDbModel,
+)
+from api.models.simLayer.SimLayerDbModel import (
+    SimLayerDbModel,
+)
+from api.models.colorbar.ColorbarDbModel import (
+    ColorbarDbModel,
+)

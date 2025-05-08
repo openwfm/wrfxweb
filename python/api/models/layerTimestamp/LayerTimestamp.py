@@ -1,0 +1,31 @@
+from api.session import db_session
+import api.encryption as encryption
+from api.models.layerTimestamp.LayerTimestampDbModel import (
+    LayerTimestampDbModel,
+)
+from api.models.colorbar.Colorbar import (
+    Colorbar,
+)
+
+
+class LayerTimestamp(LayerTimestampDbModel):
+    def png_full_path(self):
+        entry_path = self.sim_layer.catalog_entry.entry_path()
+        return f"{entry_path}/{self.png_url()}"
+
+    def png_url(self):
+        return encryption.decrypt_png_url(self.encrypted_png_url)
+
+    def colorbar(self):
+        return db_session.query(Colorbar).filter_by(layer_timestamp_id=self.id).first()
+
+    def destroy(self):
+        timestamp_colorbar = self.colorbar()
+        if timestamp_colorbar != None:
+            db_session.delete(timestamp_colorbar)
+
+        db_session.delete(self)
+        db_session.commit()
+
+    def __repr__(self):
+        return f"<LayerTimestamp {self.id}>"

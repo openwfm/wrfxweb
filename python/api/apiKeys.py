@@ -21,6 +21,12 @@ CATALOG_API_AES_ENCRYPTION_NONCE = bytes.fromhex(
         "CATALOG_API_AES_ENCRYPTION_NONCE", binascii.hexlify(os.urandom(12)).decode()
     )
 )
+PNG_URL_AES_ENCRYPTION_KEY = bytes.fromhex(
+    os.getenv("PNG_URL_AES_ENCRYPTION_KEY", binascii.hexlify(os.urandom(32)).decode())
+)
+PNG_URL_AES_ENCRYPTION_NONCE = bytes.fromhex(
+    os.getenv("PNG_URL_AES_ENCRYPTION_KEY", binascii.hexlify(os.urandom(12)).decode())
+)
 FERNET_ENCRYPTION_KEY = os.getenv(
     "FERNET_ENCRYPTION_KEY", Fernet.generate_key().decode()
 ).encode()
