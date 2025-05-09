@@ -5,6 +5,13 @@ from werkzeug.utils import secure_filename
 import os
 
 
+def validate_float(float_input):
+    try:
+        return float(float_input)
+    except:
+        raise ValueError("Float input must be a float")
+
+
 def validate_text(text_input):
     if text_input == None:
         return ""
