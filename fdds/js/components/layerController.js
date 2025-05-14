@@ -447,6 +447,10 @@ export class LayerController extends HTMLElement {
     let timestampsToLoad = simVars.sortedTimestamps.filter((timestamp) => {
       return timestamp >= startDate && timestamp <= endDate;
     });
+    if (simVars.currentSimulation.includes("lidar")) {
+      timestampsToLoad.reverse();
+    }
+
     let layersToLoad = this.getLayersAndSetNumberOfFramesToLoad(
       layerNames,
       timestampsToLoad.length,
@@ -472,7 +476,11 @@ export class LayerController extends HTMLElement {
     }
 
     controllers.loadingProgress.frameLoaded(preloaded);
-    this.threadManager.loadImages(loadNow, loadLater);
+    if (simVars.currentSimulation.includes("lidar")) {
+      this.threadManager.loadImages(loadLater, loadNow);
+    } else {
+      this.threadManager.loadImages(loadNow, loadLater);
+    }
   }
 
   getLayersAndSetNumberOfFramesToLoad(layerNames, timestampsToLoad) {

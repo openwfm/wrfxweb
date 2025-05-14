@@ -34,6 +34,10 @@ python/clientServer/client_secret.json
 
 */__pycache__/*
 python/api/models/catalog/__pycache__/*
+python/api/models/catalogApiKey/__pycache__/*
+python/api/models/colorbar/__pycache__/*
+python/api/models/layerType/__pycache__/*
+python/api/models/simLayer/__pycache__/*
 python/api/models/catalogEntry/__pycache__/*
 python/api/models/catalogEntryCatalog/__pycache__/*
 python/api/models/uploadToCatalog/__pycache__/*
