@@ -12,6 +12,10 @@ button:hover {
   cursor: pointer;
 }
 
+h1 {
+  text-align: center;
+}
+
 .admin-entry {
   display: flex;
   justify-content: space-between;
@@ -103,7 +107,7 @@ button:hover {
 }
 
 /** Catalog Edit Modal */
-#catalog-edit-modal-container {
+.edit-modal {
   position: absolute;
   padding: 5px;
   z-index: 9990;
@@ -119,30 +123,25 @@ button:hover {
   border: 1px solid #5d5d5d;
 }
 
-#catalog-edit-modal-container h2 {
+.edit-modal h2 {
   text-align: center;
 }
 
 .catalog-edit-metadata {
-  display: block;
-  margin: 6px;
+  width: 300px;
+  margin: 0 auto;
+  margin-bottom: 10px;
 }
 
-.catalog-edit-metadata input {
-  position: absolute;
-  width: 140px;
-  right: 55px;
+.catalog-edit-metadata-left-align {
+  display: inline-block;
 }
 
-.catalog-edit-metadata select {
-  position: absolute;
-  width: 147px;
-  right: 55px;
-}
-
-.catalog-edit-metadata label {
-  position: relative;
-  left: 45px;
+.catalog-edit-metadata-right-align {
+  display: inline-block;
+  margin: 0;
+  float: right;
+  max-width: 177px;
 }
 
 .button-container {

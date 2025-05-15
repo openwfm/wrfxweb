@@ -5,38 +5,38 @@ export class CatalogEntryUploadModal extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-            <div id='catalog-entry-upload-modal-container' class='hidden'>
-              <h2>Upload Catalog Entry</h2>
+            <div id='catalog-entry-upload-modal-container' class='edit-modal hidden'>
+              <h2 id='upload-title'>Upload to Catalog</h2>
               <div id='catalog-information'>
-                <p id='catalog-id'></p>
-                <label for='catalog-name'>Name:</label>
-                <p id='catalog-name'></p>
-
-                <label for='catalog-description'>description:</label>
-                <p id='catalog-description'></p>
+                <div class="catalog-edit-metadata">
+                  <label for='catalog-name' class="catalog-edit-metadata-left-align">Name:</label>
+                  <p id='catalog-name'class="catalog-edit-metadata-right-align"></p>
+                </div>
+                <div class="catalog-edit-metadata">
+                  <label for='catalog-description'class="catalog-edit-metadata-left-align">Description:</label>
+                  <p id='catalog-description'class="catalog-edit-metadata-right-align"></p>
+                </div>
               </div>
               <div id='catalog-entry-upload'>
-                <div id='catalog-entry-name-container' class='hidden'>
-                  <label for='catalog-entry-name'>name:</label>
-                  <input type='text' id='catalog-entry-name'></input>
+                <div class="catalog-edit-metadata">
+                  <label for='catalog-entry-column'class="catalog-edit-metadata-left-align">Column:</label>
+                  <select id='catalog-entry-column' class="catalog-edit-metadata-right-align">
+                    <option value='Fire'>Fire</option>
+                    <option value='Fuel Moisture'>Fuel Moisture</option>
+                    <option value='Lidar'>Lidar</option>
+                    <option value='Link'>Link</option>
+                  </select>
                 </div>
-                <div id='catalog-entry-description-container' class='hidden'>
-                  <label for='catalog-entry-description'>description:</label>
-                  <input type='text' id='catalog-entry-description'></input>
+                <div class="catalog-edit-metadata">
+                  <label for='upload-catalog-entry-input' class="catalog-edit-metadata-left-align">Upload:</label>
+                  <input id='upload-catalog-entry-input' type='file' accept='.zip' class="catalog-edit-metadata-right-align"/>
                 </div>
-                <label for='catalog-entry-populate'>populate name and description from upload:</label>
-                <input type='checkbox' id='catalog-entry-populate' checked>
-                <select id='catalog-entry-column'>
-                  <option value='Fire'>Fire</option>
-                  <option value='Fuel Moisture'>Fuel Moisture</option>
-                  <option value='Lidar'>Lidar</option>
-                  <option value='Link'>Link</option>
-                </select>
-                <input id='upload-catalog-entry-input' type='file' accept='.zip'/>
                 <input id='upload-link-input' type='text' placeholder='enter url here' class='hidden'/>
-                <button id='save-catalog-entry-button'>Save Catalog Entry</button>
-                <button id='cancel-catalog-entry-button'>Cancel</button>
-                <p id="upload-error-message" class="hidden">
+                <div class="button-container">
+                  <button id='save-catalog-entry-button'>Save Catalog Entry</button>
+                  <button id='cancel-catalog-entry-button'>Cancel</button>
+                </div>
+                <p id="upload-error-message" class="hidden error-message">
                   An error occurred while saving the catalog entry. Please try again.
                 </p>
               </div>
@@ -46,19 +46,10 @@ export class CatalogEntryUploadModal extends HTMLElement {
       catalogEntryUploadModalContainer: this.querySelector(
         "#catalog-entry-upload-modal-container",
       ),
-      catalogId: this.querySelector("#catalog-id"),
       catalogName: this.querySelector("#catalog-name"),
       catalogDescription: this.querySelector("#catalog-description"),
-      catalogEntryNameContainer: this.querySelector(
-        "#catalog-entry-name-container",
-      ),
-      catalogEntryName: this.querySelector("#catalog-entry-name"),
-      catalogEntryDescriptionContainer: this.querySelector(
-        "#catalog-entry-description-container",
-      ),
-      catalogEntryDescription: this.querySelector("#catalog-entry-description"),
+
       catalogEntryColumn: this.querySelector("#catalog-entry-column"),
-      catalogEntryPopulate: this.querySelector("#catalog-entry-populate"),
       uploadCatalogEntryInput: this.querySelector(
         "#upload-catalog-entry-input",
       ),
@@ -68,6 +59,7 @@ export class CatalogEntryUploadModal extends HTMLElement {
         "#cancel-catalog-entry-button",
       ),
       uploadErrorMessage: this.querySelector("#upload-error-message"),
+      uploadTitle: this.querySelector("#upload-title"),
     };
   }
 
@@ -88,20 +80,6 @@ export class CatalogEntryUploadModal extends HTMLElement {
         uploadCatalogEntryInput.classList.remove("hidden");
       }
     };
-    const {
-      catalogEntryPopulate,
-      catalogEntryDescriptionContainer,
-      catalogEntryNameContainer,
-    } = this.uiElements;
-    catalogEntryPopulate.onchange = () => {
-      if (catalogEntryPopulate.checked) {
-        catalogEntryDescriptionContainer.classList.add("hidden");
-        catalogEntryNameContainer.classList.add("hidden");
-      } else {
-        catalogEntryDescriptionContainer.classList.remove("hidden");
-        catalogEntryNameContainer.classList.remove("hidden");
-      }
-    };
   }
 
   open(catalog) {
@@ -109,21 +87,17 @@ export class CatalogEntryUploadModal extends HTMLElement {
       catalogEntryUploadModalContainer,
       catalogName,
       catalogDescription,
-      catalogId,
-      catalogEntryName,
-      catalogEntryDescription,
       catalogEntryColumn,
       uploadErrorMessage,
+      uploadTitle,
     } = this.uiElements;
     this.catalog = catalog;
     uploadErrorMessage.classList.add("hidden");
-    catalogId.innerText = catalog.id;
     catalogName.innerText = catalog.name;
     catalogDescription.innerText = catalog.description;
-    catalogEntryName.value = "";
-    catalogEntryDescription.value = "";
     catalogEntryColumn.value = "Fire";
     catalogEntryUploadModalContainer.classList.remove("hidden");
+    uploadTitle.innerText = `Upload to Catalog ${catalog.id}`;
   }
 
   close() {
@@ -137,44 +111,26 @@ export class CatalogEntryUploadModal extends HTMLElement {
     const {
       catalogName,
       catalogDescription,
-      catalogId,
-      catalogEntryName,
-      catalogEntryDescription,
       catalogEntryColumn,
       uploadErrorMessage,
     } = this.uiElements;
 
     uploadErrorMessage.classList.add("hidden");
-    catalogId.innerText = "";
     catalogName.value = "";
     catalogDescription.value = "";
-    catalogEntryName.value = "";
-    catalogEntryDescription.value = "";
     catalogEntryColumn.value = "Fire";
   }
 
   async uploadCatalogEntry() {
-    const {
-      catalogEntryName,
-      catalogEntryDescription,
-      catalogEntryColumn,
-      uploadErrorMessage,
-      catalogEntryPopulate,
-      uploadCatalogEntryInput,
-    } = this.uiElements;
+    const { catalogEntryColumn, uploadErrorMessage, uploadCatalogEntryInput } =
+      this.uiElements;
     const catalogId = this.catalog.id;
 
     const catalogEntryParams = new FormData();
-    catalogEntryParams.append("name", catalogEntryName.value);
-    catalogEntryParams.append("description", catalogEntryDescription.value);
     catalogEntryParams.append("column", catalogEntryColumn.value);
-    catalogEntryParams.append(
-      "populateMetadataFromZip",
-      catalogEntryPopulate.checked,
-    );
     catalogEntryParams.append("zipFile", uploadCatalogEntryInput.files[0]);
-
     const response = await createCatalogEntry(catalogId, catalogEntryParams);
+
     if (response.error) {
       uploadErrorMessage.classList.remove("hidden");
     } else {

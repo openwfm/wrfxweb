@@ -8,20 +8,20 @@ export class CatalogEditModal extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-            <div id='catalog-edit-modal-container' class='hidden'>
+            <div id='catalog-edit-modal-container' class='hidden edit-modal'>
               <h2>Edit Catalog</h2>
               <p id='catalog-id'></p>
               <div class="catalog-edit-metadata">
-                <label for='catalog-name'>Name:</label>
-                <input type='text' id='catalog-name'></input>
+                <label for='catalog-name' class="catalog-edit-metadata-left-align">Name:</label>
+                <input type='text' id='catalog-name' class="catalog-edit-metadata-right-align"></input>
               </div>
               <div class="catalog-edit-metadata">
-                <label for='catalog-description'>description:</label>
-                <input type='text' id='catalog-description'></input>
+                <label for='catalog-description' class="catalog-edit-metadata-left-align">description:</label>
+                <input type='text' id='catalog-description' class="catalog-edit-metadata-right-align"></input>
               </div>
               <div class="catalog-edit-metadata">
-                <label for='permission-select'>Public/Private:</label>
-                <select id='permission-select'>
+                <label for='permission-select' class="catalog-edit-metadata-left-align">Public/Private:</label>
+                <select id='permission-select' class="catalog-edit-metadata-right-align">
                   <option value='private'>Private</option>
                   <option value='public'>Public</option>
                 </select>
@@ -33,7 +33,7 @@ export class CatalogEditModal extends HTMLElement {
               <div class="button-container">
                 <button id='save-catalog-button'>Save Catalog</button>
                 <button id='cancel-catalog-button'>Cancel</button>
-              </div class="button-container">
+              </div>
               <p id="update-error-message" class="hidden">
                 An error occurred while saving the catalog. Please try again.
               </p>

@@ -1,6 +1,5 @@
 import { CatalogPermissionEntry } from "./CatalogPermissionEntry.js";
 
-import { getPermissionsForCatalog } from "../../../services/catalogServices.js";
 import {
   sanitizeInput,
   validateEmail,
