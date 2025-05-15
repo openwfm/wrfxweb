@@ -84,22 +84,26 @@ h1 {
   text-align: center;
 }
 
-.catalog-permission-entry {
-  display: flex;
+#permissions-list {
+  list-style-type: none;
 }
 
 .catalog-permission-entry-container {
-  width: 100%;
-  display: inline-block;
+  width: 220px;
+  height: 25px;
 }
 
 .catalog-permission-entry-container p {
   display: inline-block;
+  float: left;
+  margin: 0;
+  max-width: 180px;
+  overflow-x: scroll;
 }
 .catalog-permission-entry-container button {
-  position: relative;
   display: inline-block;
-  right: 0px;
+  float: right;
+  margin: 0;
 }
 
 .error-message {
