@@ -1,3 +1,17 @@
+html {
+  margin-top: 0;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+body {
+  font-family: helvetica;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
 .admin-entry {
   display: flex;
   justify-content: space-between;
@@ -46,4 +60,93 @@
   font-size: 1rem;
   border-radius: 0.4rem;
   border: 1px solid #5d5d5d;
+}
+
+#permissions-container {
+  width: 300px;
+  border-radius: 0.4rem;
+  border: 1px solid #5d5d5d;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+#permissions-container h4 {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.add-permission-container {
+  width: wrap-content;
+  text-align: center;
+}
+
+.catalog-permission-entry {
+  display: flex;
+}
+
+.catalog-permission-entry-container {
+  width: 100%;
+  display: inline-block;
+}
+
+.catalog-permission-entry-container p {
+  display: inline-block;
+}
+.catalog-permission-entry-container button {
+  position: relative;
+  display: inline-block;
+  right: 0px;
+}
+
+.error-message {
+  color: red;
+}
+
+/** Catalog Edit Modal */
+#catalog-edit-modal-container {
+  position: absolute;
+  padding: 5px;
+  z-index: 9990;
+  width: 400px;
+  height: auto;
+  padding-bottom: 10px;
+  top: 15%;
+  left: 25%;
+  background: white;
+  line-height: normal;
+  font-size: 1rem;
+  border-radius: 0.4rem;
+  border: 1px solid #5d5d5d;
+}
+
+#catalog-edit-modal-container h2 {
+  text-align: center;
+}
+
+.catalog-edit-metadata {
+  display: block;
+  margin: 6px;
+}
+
+.catalog-edit-metadata input {
+  position: absolute;
+  width: 140px;
+  right: 55px;
+}
+
+.catalog-edit-metadata select {
+  position: absolute;
+  width: 147px;
+  right: 55px;
+}
+
+.catalog-edit-metadata label {
+  position: relative;
+  left: 45px;
+}
+
+.button-container {
+  margin-top: 15px;
+  width: wrap-content;
+  text-align: center;
 }

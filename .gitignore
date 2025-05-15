@@ -71,6 +71,9 @@ python/api/instance/
 python/api/__pycache__/*
 python/api/routes/__pycache__/*
 python/api/models/__pycache__/*
+python/api/models/colorbar/__pycache__/*
+python/api/models/layerType/__pycache__/*
+python/api/models/simLayer/__pycache__/*
 python/api/models/catalog/__pycache__/*
 python/api/logging/__pycache__/*
 python/api/models/catalogEntry/__pycache__/*

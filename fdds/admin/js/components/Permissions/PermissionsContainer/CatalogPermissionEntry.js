@@ -6,8 +6,10 @@ export class CatalogPermissionEntry extends HTMLElement {
     this.mutable = mutable;
     this.innerHTML = `
             <li class='catalog-permission-entry'>
-              <p id='permission-id'>${permission}</p>
-              <button id='delete-permission-button'>x</button>
+              <div class='catalog-permission-entry-container'>
+                <p id='permission-id'>${permission}</p>
+                <button id='delete-permission-button'>x</button>
+              </div>
             </li>
         `;
     this.uiElements = {

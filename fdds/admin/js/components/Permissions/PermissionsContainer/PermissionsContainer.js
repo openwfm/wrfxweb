@@ -17,10 +17,12 @@ export class PermissionsContainer extends HTMLElement {
     super();
     this.innerHTML = `
           <div id='permissions-container'>
-            <p>Permissions:</p>
-            <input type='text' id='add-permission-input'></input>
-            <button id='add-permission-button'>Add Permission</button>
-            <p id="permission-error-message" class="hidden">
+            <h4>Permissions:</h4>
+            <div class='add-permission-container'>
+              <input type='text' id='add-permission-input'></input>
+              <button id='add-permission-button'>Add Permission</button>
+            </div>
+            <p id="permission-error-message" class="hidden error-message">
               Invalid permission: use a properly formatted email or a domain that begins with '@'
             </p>
             <ul id='permissions-list'></ul>
