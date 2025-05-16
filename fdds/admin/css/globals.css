@@ -86,6 +86,8 @@ h1 {
 
 #permissions-list {
   list-style-type: none;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 .catalog-permission-entry-container {
@@ -135,6 +137,8 @@ h1 {
   width: 300px;
   margin: 0 auto;
   margin-bottom: 10px;
+  overflow-y: scroll;
+  height: auto;
 }
 
 .catalog-edit-metadata-left-align {
@@ -146,6 +150,11 @@ h1 {
   margin: 0;
   float: right;
   max-width: 177px;
+}
+
+.wrap {
+  max-width: 200px;
+  overflow-wrap: break-word;
 }
 
 .button-container {

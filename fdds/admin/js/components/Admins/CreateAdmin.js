@@ -8,12 +8,18 @@ export class CreateAdmin extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='create-admin-container'>
-              <div id='create-admin-form' class="hidden">
-                <input type='text' id='email-input' placeholder='Email'></input>
-                <button id='create-admin-button'>Create Admin</button>
-                <button id='cancel-create-admin-button'>Cancel</button>
+              <div id='create-admin-form' class="hidden edit-modal">
+                <h2>Create Admin</h2>
+                <div class="catalog-edit-metadata">
+                  <label for='name-input' class="catalog-edit-metadata-left-align">Name:</label>
+                  <input type='text' id='email-input' placeholder='Email' class="catalog-edit-metadata-right-align"></input>
+                </div>
+                <div class='button-container'>
+                  <button id='create-admin-button'>Create Admin</button>
+                  <button id='cancel-create-admin-button'>Cancel</button>
+                </div>
                 <div id='error-message-container' class='hidden'>
-                  <p id='error-message'></p>
+                  <p id='error-message' class='error-message'></p>
                 </div>
               </div>
               <button id='open-create-admin-button'>Create Admin</button>
@@ -46,6 +52,7 @@ export class CreateAdmin extends HTMLElement {
       this.openForm();
     };
     cancelAdminCreateButton.onclick = () => {
+      this.clearForm();
       this.closeForm();
     };
   }
@@ -56,16 +63,20 @@ export class CreateAdmin extends HTMLElement {
     let adminJson = { email: email };
     let response = await createAdmin(adminJson);
     if (response.error) {
-      this.showErrorMessage(response.error);
+      this.showErrorMessage(
+        "Server encountered an unexpected error. Please try again.",
+      );
     } else {
       this.clearForm();
       adminControllers.admins.push(response.admin);
+      this.closeForm();
     }
   }
 
   clearForm() {
-    const { emailInput } = this.uiElements;
+    const { emailInput, errorMessageContainer } = this.uiElements;
     emailInput.value = "";
+    errorMessageContainer.classList.add("hidden");
   }
 
   showErrorMessage(errorMessageText) {
@@ -75,15 +86,13 @@ export class CreateAdmin extends HTMLElement {
   }
 
   openForm() {
-    const { createAdminForm, openAdminCreateButton } = this.uiElements;
+    const { createAdminForm } = this.uiElements;
     createAdminForm.classList.remove("hidden");
-    openAdminCreateButton.classList.add("hidden");
   }
 
   closeForm() {
-    const { createAdminForm, openAdminCreateButton } = this.uiElements;
+    const { createAdminForm } = this.uiElements;
     createAdminForm.classList.add("hidden");
-    openAdminCreateButton.classList.remove("hidden");
   }
 }
 

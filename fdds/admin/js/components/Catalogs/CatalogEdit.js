@@ -26,10 +26,20 @@ export class CatalogEdit extends HTMLElement {
               <button id='edit-catalog-button'>Edit</button>
               <button id='upload-catalog-entry-button'>Upload Entry</button>
               <button id='catalog-api-key-button'>Show Upload Api Key</button>
-              <div id='catalog-api-key-container' class="hidden">
-                <p id='catalog-api-key'></p>
-                <button id='catalog-api-key-refresh-button'>refresh</button>
-                <button id='catalog-api-key-hide-button'>hide</button>
+              <div id='catalog-api-key-container' class="edit-modal hidden">
+                <h2>Catalog Api Key</h2>
+                <div class="catalog-edit-metadata">
+                  <label for='catalog-name' class="catalog-edit-metadata-left-align">Name:</label>
+                  <p id='catalog-name'class="catalog-edit-metadata-right-align">${catalog.name}</p>
+                </div>
+                <div class="catalog-edit-metadata">
+                  <label for='catalog-api-key' class="catalog-edit-metadata-left-align">Api Key:</label>
+                  <p id='catalog-api-key' class="catalog-edit-metadata-right-align wrap"></p>
+                </div>
+                <div class="button-container">
+                  <button id='catalog-api-key-refresh-button'>refresh</button>
+                  <button id='catalog-api-key-hide-button'>hide</button>
+                </div>
               </div>
               <div id='catalog-entries-container' class="hidden">
                 <p>Catalog Entries:</p>
