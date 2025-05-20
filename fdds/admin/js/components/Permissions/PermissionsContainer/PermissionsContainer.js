@@ -15,7 +15,7 @@ export class PermissionsContainer extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-          <div id='permissions-container'>
+          <div id='permissions-container' class='permissions-container'>
             <h4>Permissions:</h4>
             <div class='add-permission-container'>
               <input type='text' id='add-permission-input'></input>
@@ -24,7 +24,7 @@ export class PermissionsContainer extends HTMLElement {
             <p id="permission-error-message" class="hidden error-message">
               Invalid permission: use a properly formatted email or a domain that begins with '@'
             </p>
-            <ul id='permissions-list'></ul>
+            <ul id='permissions-list' class='permissions-list'></ul>
           </div>
     `;
     this.uiElements = {

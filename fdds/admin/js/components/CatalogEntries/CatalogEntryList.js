@@ -12,7 +12,7 @@ export class CatalogEntryList extends HTMLElement {
             <div id='catalog-entries-list-container'>
               <add-entry-to-catalog></add-entry-to-catalog>
               <h2>Catalog Entries:</h2>
-              <ul id='catalog-entries-list'></ul>
+              <ul id='catalog-entries-list' class='main-list'></ul>
             </div>
         `;
     this.uiElements = {

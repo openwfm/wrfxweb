@@ -22,10 +22,6 @@ export class CatalogEdit extends HTMLElement {
     this.innerHTML = `
             <div class='catalog-edit' id="catalog-container">
               ${this.catalogMetaData.innerHTML}
-              <button id='delete-catalog-button'>Delete</button>
-              <button id='edit-catalog-button'>Edit</button>
-              <button id='upload-catalog-entry-button'>Upload Entry</button>
-              <button id='catalog-api-key-button'>Show Upload Api Key</button>
               <div id='catalog-api-key-container' class="edit-modal hidden">
                 <h2>Catalog Api Key</h2>
                 <div class="catalog-edit-metadata">
@@ -42,6 +38,14 @@ export class CatalogEdit extends HTMLElement {
                 </div>
               </div>
               <div id='catalog-entries-container' class="hidden">
+                <button id='delete-catalog-button'>Delete</button>
+                <button id='edit-catalog-button'>Edit</button>
+                <button id='upload-catalog-entry-button'>Upload Entry</button>
+                <button id='catalog-api-key-button'>Show Upload Api Key</button>
+                <div id='permissions-container'>
+                  <p>Permissions:</p>
+                  <ul id='permissions'></ul>
+                </div>
                 <p>Catalog Entries:</p>
                 <ul id='catalog-entries' ></ul>
               </div>
@@ -53,7 +57,8 @@ export class CatalogEdit extends HTMLElement {
       uploadCatalogEntryButton: this.querySelector(
         "#upload-catalog-entry-button",
       ),
-      permissionsContainer: this.querySelector("permissions-container"),
+      permissionsContainer: this.querySelector("#permissions-container"),
+      permissions: this.querySelector("#permissions"),
       catalogContainer: this.querySelector("#catalog-container"),
       catalogEntries: this.querySelector("#catalog-entries"),
       catalogEntriesContainer: this.querySelector("#catalog-entries-container"),
@@ -74,7 +79,6 @@ export class CatalogEdit extends HTMLElement {
       deleteCatalogButton,
       editCatalogButton,
       uploadCatalogEntryButton,
-      permissionsContainer,
       catalogContainer,
       catalogEntriesContainer,
       catalogApiKeyButton,
@@ -84,6 +88,11 @@ export class CatalogEdit extends HTMLElement {
     } = this.uiElements;
     catalogContainer.onclick = () => {
       toggleVisibility(catalogEntriesContainer);
+      if (catalogEntriesContainer.classList.contains("hidden")) {
+        catalogContainer.classList.remove("list-entry-open");
+      } else {
+        catalogContainer.classList.add("list-entry-open");
+      }
     };
     deleteCatalogButton.onclick = (e) => {
       e.stopPropagation();
@@ -119,13 +128,22 @@ export class CatalogEdit extends HTMLElement {
       e.stopPropagation();
     };
 
-    if (this.catalog.public) {
+    this.renderPermissionsList();
+    this.populateCatalogEntries();
+  }
+
+  renderPermissionsList() {
+    const { permissionsContainer, permissions } = this.uiElements;
+    if (this.catalog.public == "True") {
       permissionsContainer.classList.add("hidden");
     } else {
       permissionsContainer.classList.remove("hidden");
-      permissionsContainer.renderPermissionsList(this.catalog);
+      for (let permission of this.catalog.permissions) {
+        const li = document.createElement("li");
+        li.innerText = permission.text;
+        permissions.appendChild(li);
+      }
     }
-    this.populateCatalogEntries();
   }
 
   async showCatalogApiKey() {
@@ -166,6 +184,9 @@ export class CatalogEdit extends HTMLElement {
         catalogEntryMetaData,
         removeFromCatalog,
       );
+      catalogEntryListItem.onclick = (e) => {
+        e.stopPropagation();
+      };
       catalogEntries.appendChild(catalogEntryListItem);
     }
   }

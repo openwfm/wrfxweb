@@ -4,14 +4,14 @@ export class CatalogEntryMetaData extends HTMLElement {
     this.catalogEntry = catalogEntry;
     this.innerHTML = `
             <div class='catalog-entry' id="catalog-entry-metadata-container">
-              <label for='catalog-entry-id'>id:</label>
-              <p id='catalog-entry-id'>${catalogEntry.id}</p>
-              <label for='catalog-entry-description'>description:</label>
-              <p id='catalog-name'>${catalogEntry.description}</p>
-              <label for='catalog-entry-type'>type:</label>
-              <p id='catalog-description'>${catalogEntry.entry_type}</p>
-              <label for='catalog-entry-job-id'>job_id:</label>
-              <p id='catalog-entry-job-id'>${catalogEntry.job_id}</p>
+              <label for='catalog-entry-id' class='catalog-entry-meta-label'>id:</label>
+              <p id='catalog-entry-id' class='catalog-entry-meta-index'>${catalogEntry.id}</p>
+              <label for='catalog-entry-description' class='catalog-entry-meta-label'>description:</label>
+              <p id='catalog-name' class='catalog-entry-meta'>${catalogEntry.description}</p>
+              <label for='catalog-entry-type' class='catalog-entry-meta-label'>type:</label>
+              <p id='catalog-description' class='catalog-entry-meta-type'>${catalogEntry.entry_type}</p>
+              <label for='catalog-entry-job-id' class='catalog-entry-meta-label'>job_id:</label>
+              <p id='catalog-entry-job-id' class='catalog-entry-meta'>${catalogEntry.job_id}</p>
             </div>
         `;
     this.uiElements = {

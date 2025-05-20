@@ -2,6 +2,7 @@ html {
   margin-top: 0;
   height: 100%;
   overflow-y: scroll;
+  padding: 20px;
 }
 
 body {
@@ -30,6 +31,30 @@ h1 {
   align-items: center;
   padding: 2px;
   border-bottom: 1px solid #ccc;
+}
+
+.catalog-entry-meta {
+  width: 200px;
+  margin-right: 30px;
+  margin-left: 30px;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+.catalog-entry-meta-label {
+  width: 100px;
+}
+
+.catalog-entry-meta-index {
+  width: 100px;
+}
+
+.catalog-entry-meta-type {
+  width: 100px;
+}
+
+.catalog-entry-edit {
+  padding: 10px;
 }
 
 .hidden {
@@ -66,7 +91,7 @@ h1 {
   border: 1px solid #5d5d5d;
 }
 
-#permissions-container {
+.permissions-container {
   width: 300px;
   border-radius: 0.4rem;
   border: 1px solid #5d5d5d;
@@ -74,7 +99,7 @@ h1 {
   padding: 0 10px;
 }
 
-#permissions-container h4 {
+.permissions-container h4 {
   text-align: center;
   margin: 10px 0;
 }
@@ -84,10 +109,23 @@ h1 {
   text-align: center;
 }
 
-#permissions-list {
+.permissions-list {
   list-style-type: none;
   max-height: 300px;
   overflow-y: scroll;
+}
+
+.main-list {
+  list-style-type: none;
+}
+
+.list-entry-open {
+  border-radius: 0.4rem;
+  border: 1px solid #5d5d5d;
+}
+
+.catalog-edit {
+  padding: 10px;
 }
 
 .catalog-permission-entry-container {
@@ -161,4 +199,8 @@ h1 {
   margin-top: 15px;
   width: wrap-content;
   text-align: center;
+}
+
+.removable-list-item {
+  display: inline-block;
 }
