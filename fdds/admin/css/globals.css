@@ -190,6 +190,11 @@ h1 {
   max-width: 177px;
 }
 
+.nowrap {
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
 .wrap {
   max-width: 200px;
   overflow-wrap: break-word;
