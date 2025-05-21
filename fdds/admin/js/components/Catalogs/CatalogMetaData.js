@@ -17,26 +17,13 @@ export class CatalogMetaData extends HTMLElement {
               <p id='catalog-access'>${catalog.public == "True" ? "public" : "private"}</p>
               <label for='catalog-date'>date created:</label>
               <p id='catalog-date'>${catalog.date_created}</p>
-              <permissions-container mutable="false"></permissions-container>
             </div>
         `;
     this.uiElements = {
-      permissionsContainer: this.querySelector("permissions-container"),
       catalogContainer: this.querySelector("#catalog-container"),
       catalogEntries: this.querySelector("#catalog-entries"),
       catalogEntriesContainer: this.querySelector("#catalog-entries-container"),
     };
-  }
-
-  connectedCallback() {
-    const { permissionsContainer } = this.uiElements;
-
-    if (this.catalog.public) {
-      permissionsContainer.classList.add("hidden");
-    } else {
-      permissionsContainer.classList.remove("hidden");
-      permissionsContainer.renderPermissionsList(this.catalog);
-    }
   }
 }
 

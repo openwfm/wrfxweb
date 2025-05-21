@@ -7,16 +7,25 @@ export class AddEntryToCatalog extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-            <div id="add-entry-container" class="hidden">
-              <h2>Add Entry To Catalog</h2>
-              <p id='catalog-entry-id'></p>
-              <p type='text' id='catalog-entry-job-id'></p>
-              <p type='text' id='catalog-entry-description'></p>
-              <label for='catalog-select'>Select Catalog:</label>
-              <select id="catalog-select"></select>
-              <button id='save-button'>Save Catalog</button>
-              <button id="cancel-button">Cancel</button>
-              <p id="add-error-message" class="hidden">
+            <div id="add-entry-container" class="hidden edit-modal">
+              <h2 id='catalog-entry-id'>Add Entry To Catalog</h2>
+              <div class="catalog-edit-metadata">
+                <label for='catalog-entry-job-id' class="catalog-edit-metadata-left-align">JobId:</label>
+                <p type='text' id='catalog-entry-job-id' class="catalog-edit-metadata-right-align nowrap"></p>
+              </div>
+              <div class="catalog-edit-metadata">
+                <label for='catalog-entry-description' class="catalog-edit-metadata-left-align">Description:</label>
+                <p type='text' id='catalog-entry-description' class="catalog-edit-metadata-right-align nowrap"></p>
+              </div>
+              <div class="catalog-edit-metadata">
+                <label for='catalog-select' class="catalog-edit-metadata-left-align">Select Catalog:</label>
+                <select id="catalog-select" class="catalog-edit-metadata-right-align"></select>
+              </div>
+              <div class="button-container">
+                <button id='save-button'>Save Catalog</button>
+                <button id="cancel-button">Cancel</button>
+              </div>
+              <p id="add-error-message" class="hidden error-message">
                 An error occurred while adding Entry to Catalog. Please try again.
               </p>
             </div>
@@ -71,9 +80,9 @@ export class AddEntryToCatalog extends HTMLElement {
   populateEntryMetaData(catalogEntry) {
     const { catalogEntryId, catalogEntryJobId, catalogEntryDescription } =
       this.uiElements;
-    catalogEntryId.innerText = `${catalogEntry.id}`;
-    catalogEntryJobId.innerText = `JobId: ${catalogEntry.job_id}`;
-    catalogEntryDescription.innerText = `Description: ${catalogEntry.description}`;
+    catalogEntryId.innerText = `Add Entry ${catalogEntry.id} To Catalog`;
+    catalogEntryJobId.innerText = `${catalogEntry.job_id}`;
+    catalogEntryDescription.innerText = `${catalogEntry.description}`;
   }
 
   async populateCatalogSelect() {
