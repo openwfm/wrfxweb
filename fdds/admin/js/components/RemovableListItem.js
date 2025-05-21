@@ -2,18 +2,16 @@ import "./ConfirmationModal.js";
 import { adminControllers } from "../adminControllers.js";
 
 export class RemovableListItem extends HTMLElement {
-  constructor(
-    removableListItem,
-    removeFunction,
-    itemClass = "list_item_class",
-  ) {
+  constructor(removableListItem, removeFunction, buttonText = "Delete") {
     super();
     this.listItem = removableListItem;
     this.removeFunction = removeFunction;
     this.innerHTML = `
-            <li class=${itemClass} id="list-item">
-              ${removableListItem.innerHTML}
-              <button id="delete-button">delete</button>
+            <li class="list_item_class" id="list-item">
+              <div>
+                ${removableListItem.innerHTML}
+              </div>
+              <button id="delete-button" class="removable-list-item">${buttonText}</button>
             </li>
         `;
     this.uiElements = {

@@ -18,9 +18,9 @@ export class CatalogEntryEdit extends HTMLElement {
               </div>
               <div id='catalogs-container' class="hidden">
                 <p>Catalogs:</p>
+                <button id='add-to-catalog-button'>Add To Catalog</button>
                 <ul id='catalogs'>
                 </ul>
-                <button id='add-to-catalog-button'>Add To Catalog</button>
               </div>
             </div>
         `;
@@ -40,10 +40,19 @@ export class CatalogEntryEdit extends HTMLElement {
   }
 
   connectedCallback() {
-    const { catalogEntryMetaContainer, catalogsContainer, addToCatalogButton } =
-      this.uiElements;
+    const {
+      catalogEntryMetaContainer,
+      catalogsContainer,
+      addToCatalogButton,
+      container,
+    } = this.uiElements;
     catalogEntryMetaContainer.onclick = () => {
       toggleVisibility(catalogsContainer);
+      if (catalogsContainer.classList.contains("hidden")) {
+        container.classList.remove("list-entry-open");
+      } else {
+        container.classList.add("list-entry-open");
+      }
     };
 
     addToCatalogButton.onclick = (e) => {
@@ -66,6 +75,7 @@ export class CatalogEntryEdit extends HTMLElement {
       let catalogListItem = new RemovableListItem(
         catalogMetaData,
         removeFromCatalog,
+        "Remove Entry",
       );
       catalogs.appendChild(catalogListItem);
     }

@@ -9,18 +9,29 @@ export class CreateCatalog extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='create-catalog-container'>
-              <div id='create-catalog-form' class="hidden">
-                <h3>Create Catalog</h3>
-                <input type='text' id='name-input' placeholder='name'></input>
-                <input type='text' id='description-input' placeholder='description'></input>
-                <select id='permission-select'>
-                  <option value='private'>Private</option>
-                  <option value='public'>Public</option>
-                </select>
+              <div id='create-catalog-form' class="hidden edit-modal">
+                <h2>Create Catalog</h2>
+                <div class="catalog-edit-metadata">
+                  <label for='name-input' class="catalog-edit-metadata-left-align">Name:</label>
+                  <input type='text' id='name-input' placeholder='name' class="catalog-edit-metadata-right-align"></input>
+                </div>
+                <div class="catalog-edit-metadata">
+                  <label for='description-input' class="catalog-edit-metadata-left-align">Description:</label>
+                  <input type='text' id='description-input' placeholder='description' class="catalog-edit-metadata-right-align"></input>
+                </div>
+                <div class="catalog-edit-metadata">
+                  <label for='permission-select' class="catalog-edit-metadata-left-align">Public/Private:</label>
+                  <select id='permission-select' class="catalog-edit-metadata-right-align">
+                    <option value='private'>Private</option>
+                    <option value='public'>Public</option>
+                  </select>
+                </div>
                 <permissions-container mutable="true"></permissions-container>
-                <button id='create-catalog-button'>Create Catalog</button>
-                <button id='cancel-create-catalog-button'>Cancel</button>
-                <div id='error-message-container' class='hidden'>
+                <div class="button-container">
+                  <button id='create-catalog-button'>Create Catalog</button>
+                  <button id='cancel-create-catalog-button'>Cancel</button>
+                </div>
+                <div id='error-message-container' class='hidden error-message'>
                   <p id='error-message'></p>
                 </div>
               </div>
@@ -102,11 +113,16 @@ export class CreateCatalog extends HTMLElement {
   }
 
   clearForm() {
-    const { nameInput, descriptionInput, permissionsContainer } =
-      this.uiElements;
+    const {
+      nameInput,
+      descriptionInput,
+      permissionsContainer,
+      errorMessageContainer,
+    } = this.uiElements;
     nameInput.value = "";
     descriptionInput.value = "";
     permissionsContainer.clearPermissions();
+    errorMessageContainer.classList.add("hidden");
   }
 
   showErrorMessage(errorMessageText) {
@@ -116,15 +132,14 @@ export class CreateCatalog extends HTMLElement {
   }
 
   openForm() {
-    const { createCatalogOpen, createCatalogForm } = this.uiElements;
+    const { createCatalogForm } = this.uiElements;
     createCatalogForm.classList.remove("hidden");
-    createCatalogOpen.classList.add("hidden");
   }
 
   closeForm() {
-    const { createCatalogOpen, createCatalogForm } = this.uiElements;
+    const { createCatalogForm } = this.uiElements;
+    this.clearForm();
     createCatalogForm.classList.add("hidden");
-    createCatalogOpen.classList.remove("hidden");
   }
 }
 

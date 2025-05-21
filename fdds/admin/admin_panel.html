@@ -1,35 +1,49 @@
 <!doctype html>
 <html lang="en" ng-app="fdApp">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width-device-width, initial-scale=1">
-  <title></title>
-  <link rel="stylesheet" href="admin/css/globals.css"/>
-  <link rel="stylesheet" href="css/fdapp.css"/>
-</head>
-<body">
-  <h1>Admin Panel</h1>
-  <confirmation-modal></confirmation-modal>
-  <admin-list></admin-list>
-  <catalog-list></catalog-list>
-  <catalog-entry-list></catalog-entry-list>
-  <div class="splash" id="splash-screen">
-    <h1 class="fade-in">WIRC</h1>
-  </div>
-  
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width-device-width, initial-scale=1" />
+    <title></title>
+    <link rel="stylesheet" href="css/fdapp.css" />
+    <link rel="stylesheet" href="admin/css/globals.css" />
+  </head>
+  <body>
+    <h1>Admin Panel</h1>
+    <confirmation-modal></confirmation-modal>
+    <admin-list></admin-list>
+    <catalog-list></catalog-list>
+    <catalog-entry-list></catalog-entry-list>
+    <div class="splash" id="splash-screen">
+      <h1 class="fade-in">WIRC</h1>
+    </div>
 
-  <script>
-    window.onload = () => {
-      const splash = document.querySelector('#splash-screen');
+    <script>
+      window.onload = () => {
+        const splash = document.querySelector("#splash-screen");
         setTimeout(() => {
-          splash.classList.add('hidden');
+          splash.classList.add("hidden");
         }, 500);
-    }
-  </script>
-	<script src="admin/js/components/Admins/AdminList.js" type="module"></script>
-  <script src="admin/js/components/Permissions/PermissionsContainer/PermissionsContainer.js" type="module"></script>
-	<script src="admin/js/components/Catalogs/CatalogList.js" type="module"></script>
-	<script src="admin/js/components/ConfirmationModal.js" type="module"></script>
-	<script src="admin/js/components/CatalogEntries/CatalogEntryList.js" type="module"></script>
-</body>
+      };
+    </script>
+    <script
+      src="admin/js/components/Admins/AdminList.js"
+      type="module"
+    ></script>
+    <script
+      src="admin/js/components/Permissions/PermissionsContainer/PermissionsContainer.js"
+      type="module"
+    ></script>
+    <script
+      src="admin/js/components/Catalogs/CatalogList.js"
+      type="module"
+    ></script>
+    <script
+      src="admin/js/components/ConfirmationModal.js"
+      type="module"
+    ></script>
+    <script
+      src="admin/js/components/CatalogEntries/CatalogEntryList.js"
+      type="module"
+    ></script>
+  </body>
 </html>

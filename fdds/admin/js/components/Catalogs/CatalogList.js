@@ -13,7 +13,7 @@ export class CatalogList extends HTMLElement {
             <div id='catalog-list-container'>
               <h2>Catalog List</h2>
               <create-catalog></create-catalog>
-              <ul id='catalog-list'></ul>
+              <ul id='catalog-list' class='main-list'></ul>
               <catalog-edit-modal></catalog-edit-modal>
               <catalog-entry-upload-modal></catalog-entry-upload-modal>
             </div>
@@ -49,7 +49,7 @@ export class CatalogList extends HTMLElement {
     const openModal = (catalog) => this.openEditModal(catalog);
     const openUpload = (catalog) => this.openUploadModal(catalog);
     let catalogEdit = new CatalogEdit(catalog, openModal, openUpload);
-    let catalogEditListItem = new ListItem(catalogEdit);
+    let catalogEditListItem = new ListItem(catalogEdit, "catalog-list-entry");
     catalogList.appendChild(catalogEditListItem);
   }
 

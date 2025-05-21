@@ -8,29 +8,39 @@ export class CatalogEditModal extends HTMLElement {
   constructor() {
     super();
     this.innerHTML = `
-            <div id='catalog-edit-modal-container' class='hidden'>
+            <div id='catalog-edit-modal-container' class='hidden edit-modal'>
               <h2>Edit Catalog</h2>
               <p id='catalog-id'></p>
-              <label for='catalog-name'>Name:</label>
-              <input type='text' id='catalog-name'></input>
+              <div class="catalog-edit-metadata">
+                <label for='catalog-name' class="catalog-edit-metadata-left-align">Name:</label>
+                <input type='text' id='catalog-name' class="catalog-edit-metadata-right-align"></input>
+              </div>
+              <div class="catalog-edit-metadata">
+                <label for='catalog-description' class="catalog-edit-metadata-left-align">description:</label>
+                <input type='text' id='catalog-description' class="catalog-edit-metadata-right-align"></input>
+              </div>
+              <div class="catalog-edit-metadata">
+                <label for='permission-select' class="catalog-edit-metadata-left-align">Public/Private:</label>
+                <select id='permission-select' class="catalog-edit-metadata-right-align">
+                  <option value='private'>Private</option>
+                  <option value='public'>Public</option>
+                </select>
+              </div>
 
-              <label for='catalog-description'>description:</label>
-              <input type='text' id='catalog-description'></input>
-
-              <select id='permission-select'>
-                <option value='private'>Private</option>
-                <option value='public'>Public</option>
-              </select>
-
-              <permissions-container mutable="true" class='hidden'></permissions-container>
-              <button id='save-catalog-button'>Save Catalog</button>
-              <button id='cancel-catalog-button'>Cancel</button>
+              <div class="catalog-edit-permissions-container">
+                <permissions-container mutable="true" class='hidden'></permissions-container>
+              </div>
+              <div class="button-container">
+                <button id='save-catalog-button'>Save Catalog</button>
+                <button id='cancel-catalog-button'>Cancel</button>
+              </div>
               <p id="update-error-message" class="hidden">
                 An error occurred while saving the catalog. Please try again.
               </p>
             </div>
         `;
     this.uiElements = {
+      header: this.querySelector("h2"),
       catalogEditModalContainer: this.querySelector(
         "#catalog-edit-modal-container",
       ),
@@ -65,16 +75,16 @@ export class CatalogEditModal extends HTMLElement {
       catalogEditModalContainer,
       catalogName,
       catalogDescription,
-      catalogId,
       catalogPermission,
       updateErrorMessage,
+      header,
     } = this.uiElements;
     this.catalog = catalog;
     updateErrorMessage.classList.add("hidden");
-    catalogId.innerText = catalog.id;
+    header.innerText = `Edit Catalog ${catalog.id}`;
     catalogName.value = catalog.name;
     catalogDescription.value = catalog.description;
-    if (catalog.public) {
+    if (catalog.public == "public") {
       catalogPermission.value = "public";
       this.hidePermissions();
     } else {
