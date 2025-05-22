@@ -1,4 +1,4 @@
-from api.validators import LayerTimestampValidators as LayerTimestampValidators
+from api.services import SimLayerServices as SimLayerServices
 from api.validators import utils as validationUtils
 import api.encryption as encryption
 
@@ -6,35 +6,37 @@ import api.encryption as encryption
 def validate_create_json(json):
     if "png_url" not in json:
         raise ValueError("png_url is required")
-    if "layer_timestamp_id" not in json:
+    if "timestamp" not in json:
+        raise ValueError("timestamp is required")
+    if "sim_layer_id" not in json:
         raise ValueError("layer_timestamp_id is required")
-    if "levels" not in json:
-        raise ValueError("levels is required")
-    elif not isinstance(json["levels"], list):
-        raise ValueError("levels must be a list of floats")
+    if "coords" not in json:
+        raise ValueError("coords is required")
+    elif not isinstance(json["coords"], list) or len(json["coords"]) != 2:
+        raise ValueError("coords must be a list of 2 floats")
 
     png_url = validationUtils.validate_text(json["png_url"])
     encrypted_png_url = encryption.encrypt_png_url(png_url)
 
-    layer_timestamp_id = LayerTimestampValidators.validate_id(
-        json["layer_timestamp_id"]
-    )
+    timestamp = validationUtils.validate_timestamp(json["timestamp"])
 
-    levels = [validationUtils.validate_float(level) for level in json["levels"]]
+    sim_layer = SimLayerServices.find_by_id(json["sim_layer_id"])
+    if sim_layer == None:
+        raise ValueError("[LayerTypeValidators] must provide valid sim_layer_id")
+    validated_sim_layer_id = sim_layer.id
+
+    coords = [validationUtils.validate_float(coord) for coord in json["coords"]]
 
     return {
+        "timestamp": timestamp,
         "encrypted_png_url": encrypted_png_url,
-        "layer_timestamp_id": layer_timestamp_id,
-        "levels": levels,
+        "sim_layer_id": validated_sim_layer_id,
+        "coords": coords,
     }
 
 
 def validate_id(layer_timestamp_id):
-    return layer_timestamp_id
-
-
-def validate_id(colorbar_id):
     try:
-        return validationUtils.validate_int_id(colorbar_id)
+        return validationUtils.validate_int_id(layer_timestamp_id)
     except:
-        raise ValueError("colorbar_id must be an integer")
+        raise ValueError("layer_timestamp_id must be an integer")

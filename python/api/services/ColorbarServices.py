@@ -2,11 +2,11 @@ from api.session import db_session
 import api.encryption as encryption
 from api.models.colorbar.Colorbar import Colorbar
 from api.validators import ColorbarValidators as ColorbarValidators
+from api.validators import LayerTimestampValidators as LayerTimestampValidators
 from api.validators import utils as validationUtils
 from api.apiKeys import UPLOAD_API_KEYS
 
 import api.logging.utils as logging
-import datetime
 
 
 def create(json, upload_api_key):
@@ -19,7 +19,6 @@ def create(json, upload_api_key):
             encrypted_png_url=colorbar_json["encrypted_png_url"],
             layer_timestamp_id=colorbar_json["layer_timestamp_id"],
             levels=colorbar_json["levels"],
-            date_created=datetime.datetime.now().strftime("%Y-%m-%d"),
         )
 
         db_session.add(colorbar)
@@ -36,18 +35,37 @@ def find_by_id(colorbar_id):
         validated_catalog_entry_upload_id = ColorbarValidators.validate_id(colorbar_id)
         return db_session.query(Colorbar).get(validated_catalog_entry_upload_id)
     except Exception as e:
-        logging.service_exception("Colorbar", "find", e)
+        logging.service_exception("Colorbar", "find_by_id", e)
+        return None
+
+
+def find_by_layer_timestamp_id(layer_timestamp_id):
+    try:
+        validated_layer_timestamp_id = LayerTimestampValidators.validate_id(
+            layer_timestamp_id
+        )
+        return (
+            db_session.query(Colorbar)
+            .filter_by(layer_timestamp_id=validated_layer_timestamp_id)
+            .first()
+        )
+    except Exception as e:
+        logging.service_exception("Colorbar", "find_by_layer_timestamp_id", e)
         return None
 
 
 def find_by_png_url(png_url):
-    png_url = validationUtils.validate_text(png_url)
-    encrypted_png_url = encryption.encrypt_png_url(png_url)
-    return (
-        db_session.query(Colorbar)
-        .filter_by(encrypted_png_url=encrypted_png_url)
-        .first()
-    )
+    try:
+        png_url = validationUtils.validate_text(png_url)
+        encrypted_png_url = encryption.encrypt_png_url(png_url)
+        return (
+            db_session.query(Colorbar)
+            .filter_by(encrypted_png_url=encrypted_png_url)
+            .first()
+        )
+    except Exception as e:
+        logging.service_exception("Colorbar", "find_by_png_url", e)
+        return None
 
 
 def find_or_create(json, upload_api_key):

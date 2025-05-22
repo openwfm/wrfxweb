@@ -14,4 +14,3 @@ class ColorbarDbModel(Base):
         "LayerTimestamp", foreign_keys="Colorbar.layer_timestamp_id"
     )
     levels = Column(ARRAY(Float))
-    date_created = Column(String(10), nullable=False)

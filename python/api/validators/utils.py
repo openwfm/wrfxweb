@@ -21,6 +21,11 @@ def validate_text(text_input):
     return sanitized_text
 
 
+def validate_timestamp(text_input):
+    validated_text = validate_text(text_input)
+    return validated_text
+
+
 def validate_boolean(boolean_input):
     if type(boolean_input) is not bool:
         raise ValueError("Boolean input must be true or false")

@@ -1,4 +1,4 @@
-from api.validators import LayerTimestampValidators as LayerTimestampValidators
+from api.services import LayerTimestampServices as LayerTimestampServices
 from api.validators import utils as validationUtils
 import api.encryption as encryption
 
@@ -16,9 +16,10 @@ def validate_create_json(json):
     png_url = validationUtils.validate_text(json["png_url"])
     encrypted_png_url = encryption.encrypt_png_url(png_url)
 
-    layer_timestamp_id = LayerTimestampValidators.validate_id(
-        json["layer_timestamp_id"]
-    )
+    layer_timestamp = LayerTimestampServices.find_by_id(json["layer_timestamp_id"])
+    if layer_timestamp == None:
+        raise ValueError("[ColorbarValidators] must provide valid layer_timestamp_id")
+    layer_timestamp_id = layer_timestamp.id
 
     levels = [validationUtils.validate_float(level) for level in json["levels"]]
 

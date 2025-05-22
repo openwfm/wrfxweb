@@ -20,4 +20,4 @@ class LayerTimestampDbModel(Base):
     encrypted_png_url = Column(LargeBinary)
     sim_layer_id = Column(Integer, ForeignKey("sim_layer.id"))
     sim_layer = relationship("SimLayer", foreign_keys="LayerTimestamp.sim_layer_id")
-    date_created = Column(String(10), nullable=False)
+    timestamp = Column(String(10), nullable=False)
