@@ -209,3 +209,19 @@ h1 {
 .removable-list-item {
   display: inline-block;
 }
+
+.admin-header {
+  display: block;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.admin-header h1 {
+  display: inline-block;
+}
+
+.logo-img {
+  display: inline-block;
+  height: 30px;
+  margin-right: 20px;
+}

@@ -23,6 +23,30 @@ export const map = (function buildMap() {
     center: center,
     zoom: zoom,
   });
+  // Add a custom logo to the map
+  L.LogoControl = L.Control.extend({
+    options: {
+      position: "bottomleft",
+      // control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
+    },
+    onAdd: function (map) {
+      var container = L.DomUtil.create("div", "logo-control");
+      var button = L.DomUtil.create("div", "logo-div");
+      container.appendChild(button);
+      button.id = "logo-div";
+      button.innerHTML =
+        '<img id="logo-img" height="30px" class="logo-control-img" src="imgs/logo.png">';
+      L.DomEvent.disableClickPropagation(button);
+      container.title = "WIRC";
+      // Add click event listener for redirection
+      L.DomEvent.on(button, "click", function () {
+        // URL to reroute to
+        window.location.href = "https://www.wildfirecenter.org";
+      });
+      return container;
+    },
+  });
+  new L.LogoControl().addTo(leafletMap);
 
   leafletMap.doubleClickZoom.disable();
   leafletMap.scrollWheelZoom.disable();

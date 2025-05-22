@@ -3,6 +3,7 @@ from clientServer.serverKeys import (
     JS_FOLDER,
     CSS_FOLDER,
     RESOURCE_FOLDER,
+    IMG_FOLDER,
     CONF_FILE,
 )
 
@@ -32,6 +33,11 @@ def serve_services():
 @app.route("/imageLoadingWorker.js")
 def serve_image_loading_worker():
     return send_from_directory(RESOURCE_FOLDER, "imageLoadingWorker.js")
+
+
+@app.route("/imgs/<path:filename>")
+def serve_image(filename):
+    return send_from_directory(IMG_FOLDER, filename)
 
 
 @app.route("/conf")
