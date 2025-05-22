@@ -17,3 +17,13 @@ def validate_name(name):
         return validationUtils.validate_text(name)
     except:
         raise ValueError("[LayerTypeValidator] name must be a String")
+
+
+def validate_id(layer_type_id):
+    if type(layer_type_id) is str:
+        if not layer_type_id.isdigit():
+            raise ValueError("layer_type_id must be an integer")
+        return int(layer_type_id)
+    if type(layer_type_id) is not int:
+        raise ValueError("layer_type_id must be an integer")
+    return layer_type_id

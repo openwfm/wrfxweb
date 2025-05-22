@@ -30,9 +30,17 @@ def find_by_name(name):
     try:
         validated_name = validationUtils.validate_text(name)
 
-        return db_session.query(LayerType).filter_by(name=validated_name)
+        return db_session.query(LayerType).filter_by(name=validated_name).first()
     except Exception as e:
         logging.service_exception("LayerType", "find", e)
+        return None
+
+
+def find_by_id(layer_type_id):
+    try:
+        validated_layer_type_id = LayerTypeValidators.validate_id(layer_type_id)
+        return db_session.query(LayerType).get(validated_layer_type_id)
+    except Exception:
         return None
 
 
