@@ -1,7 +1,7 @@
 from api.db import Base
 
 
-from sqlalchemy import Column, Integer, ForeignKey, LargeBinary, ARRAY, String, Float
+from sqlalchemy import Column, Integer, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 
 
@@ -13,4 +13,3 @@ class ColorbarDbModel(Base):
     layer_timestamp = relationship(
         "LayerTimestamp", foreign_keys="Colorbar.layer_timestamp_id"
     )
-    levels = Column(ARRAY(Float))

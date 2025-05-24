@@ -3,6 +3,9 @@ import api.encryption as encryption
 from api.models.layerTimestamp.LayerTimestampDbModel import (
     LayerTimestampDbModel,
 )
+from api.models.layerTimestamp.LayerTimestampCoords import (
+    LayerTimestampCoords,
+)
 from api.models.colorbar.Colorbar import (
     Colorbar,
 )
@@ -19,10 +22,23 @@ class LayerTimestamp(LayerTimestampDbModel):
     def colorbar(self):
         return db_session.query(Colorbar).filter_by(layer_timestamp_id=self.id).first()
 
+    def coords(self):
+        layer_timestamp_coords = (
+            db_session.query(LayerTimestampCoords)
+            .filter_by(layer_timestamp_id=self.id)
+            .all()
+        )
+        return sorted(
+            layer_timestamp_coords,
+            key=lambda x: x.value,
+        )
+
     def destroy(self):
         timestamp_colorbar = self.colorbar()
         if timestamp_colorbar != None:
-            db_session.delete(timestamp_colorbar)
+            timestamp_colorbar.destroy()
+        for layer_timestamp_coord in self.coords():
+            layer_timestamp_coord.destroy()
 
         db_session.delete(self)
         db_session.commit()

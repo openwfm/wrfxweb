@@ -43,6 +43,9 @@ class CatalogEntry(CatalogEntryDbModel):
             for catalog_entry_catalog in catalog_entry_catalogs
         ]
 
+    def process(self):
+        pass
+
     def destroy(self):
         catalog_entry_catalogs = (
             db_session.query(CatalogEntryCatalog)

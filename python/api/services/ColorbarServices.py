@@ -1,6 +1,7 @@
 from api.session import db_session
 import api.encryption as encryption
 from api.models.colorbar.Colorbar import Colorbar
+from api.models.colorbar.ColorbarLevels import ColorbarLevels
 from api.validators import ColorbarValidators as ColorbarValidators
 from api.validators import LayerTimestampValidators as LayerTimestampValidators
 from api.validators import utils as validationUtils
@@ -20,6 +21,12 @@ def create(json, upload_api_key):
             layer_timestamp_id=colorbar_json["layer_timestamp_id"],
             levels=colorbar_json["levels"],
         )
+
+        for i, level in enumerate(colorbar_json["levels"]):
+            colorbar_level = ColorbarLevels(
+                value=level, index=i, colorbar_id=colorbar.id
+            )
+            db_session.add(colorbar_level)
 
         db_session.add(colorbar)
         db_session.commit()

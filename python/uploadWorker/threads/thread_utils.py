@@ -40,6 +40,10 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
         return None
 
 
+def process_catalog_entry_pngs(catalog_entry):
+    pass
+
+
 class UploadUnzippingError(Exception):
     def __init__(self, catalog_entry_upload):
         message = f"Error Unzipping CatalogUpload: catalog_entry_upload_id: {catalog_entry_upload.id}"
@@ -193,3 +197,7 @@ def load_sim_json(catalog_entry):
         return sim_json
     except Exception:
         raise SimJsonLoadingError(catalog_entry)
+
+
+def create_sim_layer_and_timestamp_records(sim_json, catalog_entry):
+    pass
