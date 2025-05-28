@@ -19,7 +19,6 @@ def create(json, upload_api_key):
         colorbar = Colorbar(
             encrypted_png_url=colorbar_json["encrypted_png_url"],
             layer_timestamp_id=colorbar_json["layer_timestamp_id"],
-            levels=colorbar_json["levels"],
         )
 
         for i, level in enumerate(colorbar_json["levels"]):
