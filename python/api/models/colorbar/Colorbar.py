@@ -3,6 +3,7 @@ import api.encryption as encryption
 from api.models.colorbar.ColorbarDbModel import (
     ColorbarDbModel,
 )
+
 from api.models.colorbar.ColorbarLevels import (
     ColorbarLevels,
 )

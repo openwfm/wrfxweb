@@ -3,6 +3,12 @@ from api.models.catalog.CatalogDbModel import CatalogDbModel
 from api.models.CatalogAccess import CatalogAccess
 from api.models.catalogApiKey.CatalogApiKey import CatalogApiKey
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
+from api.models.layerType.LayerType import LayerType
+from api.models.simLayer.SimLayer import SimLayer
+from api.models.layerTimestamp.LayerTimestamp import LayerTimestamp
+from api.models.layerTimestamp.LayerTimestampCoords import LayerTimestampCoords
+from api.models.colorbar.Colorbar import Colorbar
+from api.models.colorbar.ColorbarLevels import ColorbarLevels
 
 import api.encryption as encryption
 

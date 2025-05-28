@@ -20,13 +20,15 @@ def create(json, upload_api_key):
         layer_timestamp = LayerTimestamp(
             sim_layer_id=layer_timestamp_json["sim_layer_id"],
             encrypted_png_url=layer_timestamp_json["encrypted_png_url"],
+            encrypted_kml_url=layer_timestamp_json["encrypted_kml_url"],
             timestamp=layer_timestamp_json["timestamp"],
         )
         db_session.add(layer_timestamp)
 
         for i, coord in enumerate(layer_timestamp_json["coords"]):
             layer_timestamp_coord = LayerTimestampCoords(
-                value=coord,
+                latitude=coord[0],
+                longitude=coord[1],
                 index=i,
                 layer_timestamp_id=layer_timestamp.id,
             )

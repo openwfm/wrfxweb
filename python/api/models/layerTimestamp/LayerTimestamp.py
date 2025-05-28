@@ -6,6 +6,7 @@ from api.models.layerTimestamp.LayerTimestampDbModel import (
 from api.models.layerTimestamp.LayerTimestampCoords import (
     LayerTimestampCoords,
 )
+
 from api.models.colorbar.Colorbar import (
     Colorbar,
 )
@@ -18,6 +19,9 @@ class LayerTimestamp(LayerTimestampDbModel):
 
     def png_url(self):
         return encryption.decrypt_png_url(self.encrypted_png_url)
+
+    def kml_url(self):
+        return encryption.decrypt_png_url(self.encrypted_kml_url)
 
     def colorbar(self):
         return db_session.query(Colorbar).filter_by(layer_timestamp_id=self.id).first()

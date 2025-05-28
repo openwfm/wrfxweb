@@ -11,4 +11,4 @@ class ColorbarLevelsDbModel(Base):
     value = Column(Float, nullable=False)
     index = Column(Integer, nullable=False)
     colorbar_id = Column(Integer, ForeignKey("colorbar.id"))
-    colorbar = relationship("Colorbar", foreign_keys="ColorbarLevel.colorbar_id")
+    colorbar = relationship("Colorbar", foreign_keys="ColorbarLevels.colorbar_id")

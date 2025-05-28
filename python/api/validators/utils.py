@@ -12,6 +12,13 @@ def validate_float(float_input):
         raise ValueError("Float input must be a float")
 
 
+def validate_coord(coord):
+    try:
+        return [float(coord[0]), float(coord[1])]
+    except:
+        raise ValueError("Coordinate input must be a length 2 array of floats")
+
+
 def validate_text(text_input):
     if text_input == None:
         return ""

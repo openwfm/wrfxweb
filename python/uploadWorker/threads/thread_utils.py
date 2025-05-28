@@ -41,7 +41,75 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
 
 
 def process_catalog_entry_pngs(catalog_entry):
-    pass
+    try:
+        sim_json = load_manifest(catalog_entry)
+        create_sim_layer_and_timestamp_records(sim_json, catalog_entry)
+        catalog_entry.process()
+        return catalog_entry
+    except Exception as e:
+        loggingUtils.log_unpacking_error(e)
+        return None
+
+
+class ManifestLoadingError(Exception):
+    def __init__(self, catalog_entry):
+        message = f"Error loading manifest json: catalog_entry_id: {catalog_entry.id}"
+        super().__init__(message)
+
+
+def load_manifest(catalog_entry):
+    manifest_path = catalog_entry.entry_manifest_path()
+    try:
+        manifest_json = json.load(open(manifest_path))
+        return manifest_json
+    except Exception:
+
+        raise ManifestLoadingError(catalog_entry)
+
+
+class LayerTypeCreationError(Exception):
+    def __init__(self, catalog_entry, layer_type):
+        message = f"Error creating LayerType {layer_type}: catalog_entry_upload_id: {catalog_entry.id}"
+        super().__init__(message)
+
+
+class SimLayerCreationError(Exception):
+    def __init__(self, catalog_entry):
+        message = (
+            f"Error creating SimLayer: catalog_entry_upload_id: {catalog_entry.id}"
+        )
+        super().__init__(message)
+
+
+class LayerTimestampCreationError(Exception):
+    def __init__(self, catalog_entry):
+        message = f"Error creating LayerTimestamp: catalog_entry_upload_id: {catalog_entry.id}"
+        super().__init__(message)
+
+
+class ColorbarCreationError(Exception):
+    def __init__(self, catalog_entry):
+        message = (
+            f"Error creating Colorbar: catalog_entry_upload_id: {catalog_entry.id}"
+        )
+        super().__init__(message)
+
+
+def create_sim_layer_and_timestamp_records(manifest_json, catalog_entry):
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            timestamp_json = domain_json[timestamp]
+            for layer_type in timestamp_json:
+                pass
+                # layer_json = timestamp_json[layer_type]
+                # catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
+                # if catalog_entry == None:
+                #     loggingUtils.log_catalog_entry_fail(catalog_entry_upload, job_id)
+                #     raise CatalogEntryCreationError(catalog_entry_upload)
+                # else:
+                #     loggingUtils.log_catalog_entry(catalog_entry_upload, catalog_entry)
+                #     return catalog_entry
 
 
 class UploadUnzippingError(Exception):
@@ -170,34 +238,3 @@ def remove_temp_directory():
     directory = os.listdir(TEMP_FOLDER)[0]
     temp_source = f"{TEMP_FOLDER}/{directory}"
     shutil.rmtree(temp_source)
-
-
-def unpack_catalog_entry_pngs(catalog_entry):
-    try:
-        sim_json = load_sim_json(catalog_entry)
-        create_sim_layer_and_timestamp_records(sim_json, catalog_entry)
-        catalog_entry.process()
-        return catalog_entry
-    except Exception as e:
-        remove_temp_directory()
-        loggingUtils.log_unpacking_error(e)
-        return None
-
-
-class SimJsonLoadingError(Exception):
-    def __init__(self, catalog_entry):
-        message = f"Error loading simulation json: catalog_entry_id: {catalog_entry.id}"
-        super().__init__(message)
-
-
-def load_sim_json(catalog_entry):
-    sim_json_path = catalog_entry.sim_json_path()
-    try:
-        sim_json = json.load(open(sim_json_path))
-        return sim_json
-    except Exception:
-        raise SimJsonLoadingError(catalog_entry)
-
-
-def create_sim_layer_and_timestamp_records(sim_json, catalog_entry):
-    pass

@@ -6,6 +6,8 @@ import api.encryption as encryption
 def validate_create_json(json):
     if "png_url" not in json:
         raise ValueError("png_url is required")
+    if "kml_url" not in json:
+        raise ValueError("kml_url is required")
     if "timestamp" not in json:
         raise ValueError("timestamp is required")
     if "sim_layer_id" not in json:
@@ -17,6 +19,8 @@ def validate_create_json(json):
 
     png_url = validationUtils.validate_text(json["png_url"])
     encrypted_png_url = encryption.encrypt_png_url(png_url)
+    kml_url = validationUtils.validate_text(json["kml_url"])
+    encrypted_kml_url = encryption.encrypt_png_url(kml_url)
 
     timestamp = validationUtils.validate_timestamp(json["timestamp"])
 
@@ -25,11 +29,12 @@ def validate_create_json(json):
         raise ValueError("[LayerTypeValidators] must provide valid sim_layer_id")
     validated_sim_layer_id = sim_layer.id
 
-    coords = [validationUtils.validate_float(coord) for coord in json["coords"]]
+    coords = [validationUtils.validate_coord(coord) for coord in json["coords"]]
 
     return {
         "timestamp": timestamp,
         "encrypted_png_url": encrypted_png_url,
+        "encrypted_kml_url": encrypted_kml_url,
         "sim_layer_id": validated_sim_layer_id,
         "coords": coords,
     }
