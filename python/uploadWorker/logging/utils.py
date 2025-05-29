@@ -13,7 +13,7 @@ def log_statement(area, message, standard_log):
 
 
 def log_unpacking_error(error):
-    log_statement("UploadThreadError", error, True)
+    log_statement("UploadThreadError Unpacking Png", error, True)
 
 
 def log_catalog_entry_fail(catalog_entry_upload, job_id):

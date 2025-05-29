@@ -1,8 +1,14 @@
 from api.session import db_session
 from api.models.simLayer.SimLayer import SimLayer
-from api.validators import SimLayerValidators as SimLayerValidators
-from api.validators import CatalogEntryValidators as CatalogEntryValidators
-from api.validators import utils as validationUtils
+from api.validators import (
+    SimLayerValidators as SimLayerValidators,
+    CatalogEntryValidators as CatalogEntryValidators,
+    utils as validationUtils,
+)
+from api.services import (
+    AdminServices as AdminServices,
+    LayerTimestampServices as LayerTimestampServices,
+)
 from api.apiKeys import UPLOAD_API_KEYS
 
 import api.logging.utils as logging
@@ -27,6 +33,16 @@ def create(json, upload_api_key):
     except Exception as e:
         logging.service_exception("SimLayer", "create", e)
         return None
+
+
+def delete(sim_layer, user, admin_services_api_key):
+    if not AdminServices.isAdmin(user, admin_services_api_key):
+        raise PermissionError("Invalid Admin")
+    if not isinstance(sim_layer, SimLayer):
+        raise ValueError("provided sim_layer must be of instance SimLayer")
+    for layer_timestamp in sim_layer.layer_timestamps():
+        LayerTimestampServices.delete(layer_timestamp)
+    sim_layer.destroy()
 
 
 def find_by_id(sim_layer_id):

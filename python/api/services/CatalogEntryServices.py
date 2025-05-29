@@ -1,12 +1,17 @@
 from api.session import db_session
 from api.models.catalogEntry.CatalogEntry import CatalogEntry
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
-from api.services import CatalogServices as CatalogServices
-from api.services import AdminServices as AdminServices
+from api.services import (
+    CatalogServices as CatalogServices,
+    AdminServices as AdminServices,
+    SimLayerServices as SimLayerServices,
+)
+from api.validators import (
+    CatalogEntryValidators as CatalogEntryValidators,
+    CatalogValidators as CatalogValidators,
+    utils as validationUtils,
+)
 from api.apiKeys import CLIENT_SERVER_API_KEYS, UPLOAD_API_KEYS
-from api.validators import CatalogEntryValidators as CatalogEntryValidators
-from api.validators import CatalogValidators as CatalogValidators
-from api.validators import utils as validationUtils
 import api.logging.utils as logging
 import api.encryption as encryption
 
@@ -86,6 +91,22 @@ def find_by_id(catalog_entry_id):
         return db_session.query(CatalogEntry).get(validated_catalog_entry_upload_id)
     except Exception:
         return None
+
+
+def delete_by_id(catalog_entry_id, user, admin_services_api_key):
+    try:
+        if not AdminServices.isAdmin(user, admin_services_api_key):
+            return False
+        catalog_entry = find_by_id(catalog_entry_id)
+        if catalog_entry == None:
+            return False
+        sim_layers = catalog_entry.sim_layers()
+        for sim_layer in sim_layers:
+            SimLayerServices.delete(sim_layer, user, admin_services_api_key)
+        catalog_entry.destroy()
+        return True
+    except Exception:
+        return False
 
 
 def user_entry(catalog_id, catalog_entry_id, user, client_server_api_key):

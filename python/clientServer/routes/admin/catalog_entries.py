@@ -128,6 +128,28 @@ def get_all_catalog_entries():
     }, 200
 
 
+@app.route("/admin/catalog_entries/<catalog_entry_id>", methods=["DELETE"])
+@admin_login_required
+def catalog_entry(catalog_entry_id):
+    if request.method == "DELETE":
+        return delete_catalog_entry(catalog_entry_id)
+    return {
+        "message": "Method Not Allowed",
+    }, 405
+
+
+def delete_catalog_entry(catalog_entry_id):
+    entry_deleted = CatalogEntryServices.delete_by_id(
+        catalog_entry_id, current_user, ADMIN_SERVICES_API_KEY
+    )
+
+    if entry_deleted:
+        return {
+            "message": "CatalogEntry successfully deleted!",
+        }, 200
+    return {"message": "An error occurred while deleted CatalogEntry"}, 400
+
+
 def get_catalog_entries(catalog_id):
     catalog_entries = CatalogEntryServices.admin_entries(
         catalog_id, current_user, ADMIN_SERVICES_API_KEY

@@ -105,3 +105,11 @@ export async function deleteEntryFromCatalog(catalogEntryId, catalogId) {
 
   return response_json;
 }
+
+export async function deleteCatalogEntry(catalogEntryId) {
+  const DELETE_URL = `${CATALOG_ENTRIES_URL}/${catalogEntryId}`;
+
+  const response_json = await deleteRequest(DELETE_URL);
+
+  return response_json;
+}

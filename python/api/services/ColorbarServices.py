@@ -2,12 +2,16 @@ from api.session import db_session
 import api.encryption as encryption
 from api.models.colorbar.Colorbar import Colorbar
 from api.models.colorbar.ColorbarLevels import ColorbarLevels
-from api.validators import ColorbarValidators as ColorbarValidators
-from api.validators import LayerTimestampValidators as LayerTimestampValidators
-from api.validators import utils as validationUtils
+from api.validators import (
+    ColorbarValidators as ColorbarValidators,
+    LayerTimestampValidators as LayerTimestampValidators,
+    utils as validationUtils,
+)
+from api.services import AdminServices as AdminServices
 from api.apiKeys import UPLOAD_API_KEYS
 
 import api.logging.utils as logging
+import os
 
 
 def create(json, upload_api_key):
@@ -34,6 +38,16 @@ def create(json, upload_api_key):
     except Exception as e:
         logging.service_exception("Colorbar", "create", e)
         return None
+
+
+def delete(colorbar, user, admin_services_api_key):
+    if not AdminServices.isAdmin(user, admin_services_api_key):
+        raise PermissionError("Invalid Admin")
+    if not isinstance(colorbar, Colorbar):
+        raise ValueError("provided colorbar must be of instance Colorbar")
+    png_url = colorbar.png_full_path()
+    os.remove(png_url)
+    colorbar.destroy()
 
 
 def find_by_id(colorbar_id):

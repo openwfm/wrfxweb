@@ -2,7 +2,10 @@ import { toggleVisibility } from "../../adminUtils.js";
 import { CatalogMetaData } from "../Catalogs/CatalogMetaData.js";
 import { CatalogEntryMetaData } from "./CatalogEntryMetaData.js";
 import { RemovableListItem } from "../RemovableListItem.js";
-import { deleteEntryFromCatalog } from "../../services/catalogServices.js";
+import {
+  deleteEntryFromCatalog,
+  deleteCatalogEntry,
+} from "../../services/catalogServices.js";
 import { adminControllers } from "../../adminControllers.js";
 
 export class CatalogEntryEdit extends HTMLElement {
@@ -17,6 +20,7 @@ export class CatalogEntryEdit extends HTMLElement {
                 ${this.catalogEntryMetaData.innerHTML} 
               </div>
               <div id='catalogs-container' class="hidden">
+                <button id='delete-entry-button'>Delete</button>
                 <p>Catalogs:</p>
                 <button id='add-to-catalog-button'>Add To Catalog</button>
                 <ul id='catalogs'>
@@ -36,6 +40,7 @@ export class CatalogEntryEdit extends HTMLElement {
       catalogEntryMetaContainer: this.querySelector(
         "#catalog-entry-meta-container",
       ),
+      deleteEntryButton: this.querySelector("#delete-entry-button"),
     };
   }
 
@@ -45,6 +50,7 @@ export class CatalogEntryEdit extends HTMLElement {
       catalogsContainer,
       addToCatalogButton,
       container,
+      deleteEntryButton,
     } = this.uiElements;
     catalogEntryMetaContainer.onclick = () => {
       toggleVisibility(catalogsContainer);
@@ -58,6 +64,14 @@ export class CatalogEntryEdit extends HTMLElement {
     addToCatalogButton.onclick = (e) => {
       e.stopPropagation();
       this.addEntryToCatalog(this.catalogEntry);
+    };
+
+    deleteEntryButton.onclick = (e) => {
+      e.stopPropagation();
+      const deleteEntryCallback = () => {
+        this.deleteEntry();
+      };
+      adminControllers.confirmation.setValue(deleteEntryCallback);
     };
 
     this.populateCatalogs();
@@ -79,6 +93,12 @@ export class CatalogEntryEdit extends HTMLElement {
       );
       catalogs.appendChild(catalogListItem);
     }
+  }
+
+  async deleteEntry() {
+    await deleteCatalogEntry(this.catalogEntry.id);
+    adminControllers.entries.refreshData();
+    adminControllers.catalogs.refreshData();
   }
 }
 

@@ -17,6 +17,10 @@ class LayerTimestamp(LayerTimestampDbModel):
         entry_path = self.sim_layer.catalog_entry.entry_path()
         return f"{entry_path}/{self.png_url()}"
 
+    def kml_full_path(self):
+        entry_path = self.sim_layer.catalog_entry.entry_path()
+        return f"{entry_path}/{self.kml_url()}"
+
     def png_url(self):
         return encryption.decrypt_png_url(self.encrypted_png_url)
 
