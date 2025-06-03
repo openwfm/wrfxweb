@@ -31,6 +31,7 @@ def create(json, upload_api_key):
             timestamp=layer_timestamp_json["timestamp"],
         )
         db_session.add(layer_timestamp)
+        db_session.commit()
 
         for i, coord in enumerate(layer_timestamp_json["coords"]):
             layer_timestamp_coord = LayerTimestampCoords(

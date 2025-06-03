@@ -24,7 +24,7 @@ def client_catalog_entries(catalog_id):
     methods=["GET"],
 )
 @login_required
-def catalog_entry_rasters(catalog_id, catalog_entry_id):
+def catalog_entry_rasters_v1(catalog_id, catalog_entry_id):
     catalog_entry = CatalogEntryServices.user_entry(
         catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
     )
@@ -33,6 +33,21 @@ def catalog_entry_rasters(catalog_id, catalog_entry_id):
 
     manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
     return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
+
+
+@app.route(
+    "/catalogs/<catalog_id>/entries/<catalog_entry_id>/rasters/v2",
+    methods=["GET"],
+)
+@login_required
+def catalog_entry_rasters_v2(catalog_id, catalog_entry_id):
+    catalog_entry = CatalogEntryServices.user_entry(
+        catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
+    )
+    if catalog_entry == None:
+        return {"message": "Requested Entry does not exist"}, 404
+
+    return CatalogEntrySerializer.serialize_catalog_entry_manifest(catalog_entry), 200
 
 
 @app.route(

@@ -14,7 +14,7 @@ class Colorbar(ColorbarDbModel):
         colorbar_levels = (
             db_session.query(ColorbarLevels).filter_by(colorbar_id=self.id).all()
         )
-        return sorted(colorbar_levels, key=lambda x: x.value)
+        return sorted(colorbar_levels, key=lambda x: x.index)
 
     def png_url(self):
         return encryption.decrypt_png_url(self.encrypted_png_url)

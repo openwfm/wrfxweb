@@ -47,7 +47,6 @@ def delete(colorbar, user, admin_services_api_key):
     if not isinstance(colorbar, Colorbar):
         raise ValueError("provided colorbar must be of instance Colorbar")
     png_url = colorbar.png_full_path()
-    print(png_url)
     os.remove(png_url)
     colorbar.destroy()
 

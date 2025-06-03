@@ -38,7 +38,7 @@ class LayerTimestamp(LayerTimestampDbModel):
         )
         return sorted(
             layer_timestamp_coords,
-            key=lambda x: x.value,
+            key=lambda x: x.index,
         )
 
     def destroy(self):

@@ -26,6 +26,39 @@ def serialize_catalog_entry(entry):
     }
 
 
+def inner_manifest(manifest, key):
+    if key in manifest:
+        return manifest[key]
+    inner_manifest = {}
+    manifest[key] = inner_manifest
+    return inner_manifest
+
+
+def serialize_catalog_entry_manifest(catalog_entry):
+    entry_manifest = {}
+    for sim_layer in catalog_entry.sim_layers():
+        domain = sanitize_text(f"{sim_layer.domain}")
+        layer_type = sanitize_text(sim_layer.layer_type.name)
+        domain_manifest = inner_manifest(entry_manifest, domain)
+        for layer_timestamp in sim_layer.layer_timestamps():
+            timestamp = sanitize_text(layer_timestamp.timestamp)
+            timestamp_json = inner_manifest(domain_manifest, timestamp)
+            layer_json = inner_manifest(timestamp_json, layer_type)
+
+            layer_json["kml"] = sanitize_text(layer_timestamp.kml_url())
+            layer_json["raster"] = sanitize_text(layer_timestamp.png_url())
+            layer_json["coords"] = [
+                [coord.latitude, coord.longitude] for coord in layer_timestamp.coords()
+            ]
+
+            colorbar = layer_timestamp.colorbar()
+            if colorbar != None:
+                layer_json["levels"] = [level.value for level in colorbar.levels()]
+                layer_json["colorbar"] = sanitize_text(colorbar.png_url())
+
+    return entry_manifest
+
+
 def serialize_catalog_entries(entries):
     return [serialize_catalog_entry(entry) for entry in entries]
 

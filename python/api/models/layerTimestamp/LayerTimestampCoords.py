@@ -10,4 +10,4 @@ class LayerTimestampCoords(LayerTimestampCoordsDbModel):
         db_session.commit()
 
     def __repr__(self):
-        return f"<LayerTimestampCoords {self.id} layer_timestamp_id: {self.layer_timestamp_id} value: {self.value} index: {self.value} >"
+        return f"<LayerTimestampCoords {self.id} layer_timestamp_id: {self.layer_timestamp_id} index: {self.index} >"
