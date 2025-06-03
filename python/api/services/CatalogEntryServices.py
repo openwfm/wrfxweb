@@ -105,7 +105,8 @@ def delete_by_id(catalog_entry_id, user, admin_services_api_key):
             SimLayerServices.delete(sim_layer, user, admin_services_api_key)
         catalog_entry.destroy()
         return True
-    except Exception:
+    except Exception as e:
+        logging.service_exception("CatalogEntry", "delete_by_id", e)
         return False
 
 

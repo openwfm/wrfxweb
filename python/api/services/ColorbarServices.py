@@ -24,6 +24,8 @@ def create(json, upload_api_key):
             encrypted_png_url=colorbar_json["encrypted_png_url"],
             layer_timestamp_id=colorbar_json["layer_timestamp_id"],
         )
+        db_session.add(colorbar)
+        db_session.commit()
 
         for i, level in enumerate(colorbar_json["levels"]):
             colorbar_level = ColorbarLevels(
@@ -31,7 +33,6 @@ def create(json, upload_api_key):
             )
             db_session.add(colorbar_level)
 
-        db_session.add(colorbar)
         db_session.commit()
 
         return colorbar
@@ -46,6 +47,7 @@ def delete(colorbar, user, admin_services_api_key):
     if not isinstance(colorbar, Colorbar):
         raise ValueError("provided colorbar must be of instance Colorbar")
     png_url = colorbar.png_full_path()
+    print(png_url)
     os.remove(png_url)
     colorbar.destroy()
 

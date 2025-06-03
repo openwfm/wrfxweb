@@ -137,7 +137,7 @@ def create_layer_timestamp(layer_json, sim_layer, timestamp):
     )
     if layer_timestamp == None:
         raise LayerTimestampCreationError(layer_timestamp_json)
-    return sim_layer
+    return layer_timestamp
 
 
 class ColorbarCreationError(Exception):
@@ -150,7 +150,7 @@ def create_colorbar(layer_json, layer_timestamp):
     if "colorbar" not in layer_json:
         return
     colorbar_json = {
-        "encrypted_png_url": layer_json["colorbar"],
+        "png_url": layer_json["colorbar"],
         "layer_timestamp_id": layer_timestamp.id,
         "levels": layer_json["levels"],
     }

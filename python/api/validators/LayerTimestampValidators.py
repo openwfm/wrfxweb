@@ -14,8 +14,8 @@ def validate_create_json(json):
         raise ValueError("layer_timestamp_id is required")
     if "coords" not in json:
         raise ValueError("coords is required")
-    elif not isinstance(json["coords"], list) or len(json["coords"]) != 2:
-        raise ValueError("coords must be a list of 2 floats")
+    elif not isinstance(json["coords"], list) or len(json["coords"]) != 4:
+        raise ValueError("coords must be a list of 4 floats")
 
     png_url = validationUtils.validate_text(json["png_url"])
     encrypted_png_url = encryption.encrypt_png_url(png_url)

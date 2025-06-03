@@ -9,17 +9,13 @@ from api.models.layerTimestamp.LayerTimestamp import (
 
 
 class SimLayer(SimLayerDbModel):
-    def layerTimestamps(self):
+    def layer_timestamps(self):
         return db_session.query(LayerTimestamp).filter_by(sim_layer_id=self.id).all()
 
     def destroy(self):
-        layerTimestamps = self.layerTimestamps()
+        layerTimestamps = self.layer_timestamps()
         for layerTimestamp in layerTimestamps:
-            colorbar = layerTimestamp.colorbar()
-            if colorbar != None:
-                db_session.delete(colorbar)
-            db_session.delete(layerTimestamp)
-
+            layerTimestamp.destroy()
         db_session.delete(self)
         db_session.commit()
 
