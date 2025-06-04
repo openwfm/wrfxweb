@@ -18,6 +18,10 @@ class CatalogEntry(CatalogEntryDbModel):
         manifest_path = f"{SIMULATIONS_FOLDER}/{encryption.decrypt_searchable_data(self.manifest_path)}"
         return manifest_path
 
+    def manifest_filename(self):
+        manifest = encryption.decrypt_searchable_data(self.manifest_path)
+        return manifest
+
     def uploader(self):
         if self.uploader_id == None or self.uploader_id < 1:
             return None
@@ -58,6 +62,8 @@ class CatalogEntry(CatalogEntryDbModel):
         )
         for entry in catalog_entry_catalogs:
             db_session.delete(entry)
+        for sim_layer in self.sim_layers():
+            sim_layer.destroy()
 
         db_session.delete(self)
         db_session.commit()

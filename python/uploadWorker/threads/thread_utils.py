@@ -71,6 +71,7 @@ def load_manifest(catalog_entry):
 
 
 def create_sim_layer_and_timestamp_records(manifest_json, catalog_entry):
+    created_count = 0
     for domain in manifest_json:
         domain_json = manifest_json[domain]
         for timestamp in domain_json:
@@ -83,6 +84,8 @@ def create_sim_layer_and_timestamp_records(manifest_json, catalog_entry):
                     layer_json, sim_layer, timestamp
                 )
                 create_colorbar(layer_json, layer_timestamp)
+                created_count += 1
+    return created_count
 
 
 class LayerTypeCreationError(Exception):
@@ -128,7 +131,7 @@ def create_layer_timestamp(layer_json, sim_layer, timestamp):
     layer_timestamp_json = {
         "sim_layer_id": sim_layer.id,
         "png_url": layer_json["raster"],
-        "kml_url": layer_json["kml"],
+        "kml_url": layer_json["kml"] if "kml" in layer_json else None,
         "timestamp": timestamp,
         "coords": layer_json["coords"],
     }

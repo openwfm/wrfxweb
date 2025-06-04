@@ -19,8 +19,7 @@ def validate_create_json(json):
 
     png_url = validationUtils.validate_text(json["png_url"])
     encrypted_png_url = encryption.encrypt_png_url(png_url)
-    kml_url = validationUtils.validate_text(json["kml_url"])
-    encrypted_kml_url = encryption.encrypt_png_url(kml_url)
+    encrypted_kml_url = validate_kml(json["kml_url"])
 
     timestamp = validationUtils.validate_timestamp(json["timestamp"])
 
@@ -38,6 +37,13 @@ def validate_create_json(json):
         "sim_layer_id": validated_sim_layer_id,
         "coords": coords,
     }
+
+
+def validate_kml(kml_url):
+    if kml_url != None:
+        validated_kml_url = validationUtils.validate_text(kml_url)
+        return encryption.encrypt_png_url(validated_kml_url)
+    return None
 
 
 def validate_id(layer_timestamp_id):

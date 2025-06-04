@@ -25,7 +25,9 @@ class LayerTimestamp(LayerTimestampDbModel):
         return encryption.decrypt_png_url(self.encrypted_png_url)
 
     def kml_url(self):
-        return encryption.decrypt_png_url(self.encrypted_kml_url)
+        if self.encrypted_kml_url != None:
+            return encryption.decrypt_png_url(self.encrypted_kml_url)
+        return ""
 
     def colorbar(self):
         return db_session.query(Colorbar).filter_by(layer_timestamp_id=self.id).first()

@@ -1,5 +1,6 @@
 from uploadWorker.workerKeys import TEMP_FOLDER, UPLOADS_FOLDER
 import uploadWorker.scripts.utils as script_utils
+import uploadWorker.threads.thread_utils as thread_utils
 
 
 import json
@@ -21,6 +22,11 @@ def unpack_catalog_entry_zip(upload_path, entry_type, catalog_id):
             catalog_entry_jsons, entry_type
         )
         script_utils.create_catalog_entry_catalog(catalog_entry, catalog_id)
+        manifest_json = load_manifest(unzip_directory, catalog_entry)
+        thread_utils.create_sim_layer_and_timestamp_records(
+            manifest_json, catalog_entry
+        )
+
         move_simulation(upload_path, unzip_directory, catalog_entry)
     except Exception as e:
         shutil.rmtree(unzip_directory)
@@ -54,6 +60,13 @@ def load_json(unzip_directory):
     catalog_file = f"{unzip_directory}/catalog.json"
     catalog_entry_jsons = json.load(open(catalog_file))
     return catalog_entry_jsons
+
+
+def load_manifest(unzip_directory, catalog_entry):
+    manifest_filename = catalog_entry.manifest_filename()
+    manifest_filepath = f"{unzip_directory}/{manifest_filename}"
+    manifest_json = json.load(open(manifest_filepath))
+    return manifest_json
 
 
 def move_simulation(upload_path, unzip_directory, catalog_entry):
