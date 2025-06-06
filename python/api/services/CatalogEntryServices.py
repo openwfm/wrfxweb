@@ -5,6 +5,7 @@ from api.services import (
     CatalogServices as CatalogServices,
     AdminServices as AdminServices,
     SimLayerServices as SimLayerServices,
+    LayerTimestampServices as LayerTimestampServices,
 )
 from api.validators import (
     CatalogEntryValidators as CatalogEntryValidators,
@@ -16,6 +17,8 @@ import api.logging.utils as logging
 import api.encryption as encryption
 
 from sqlalchemy import select
+import json
+import os
 
 
 def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
@@ -102,7 +105,7 @@ def delete_by_id(catalog_entry_id, user, admin_services_api_key):
             return False
         sim_layers = catalog_entry.sim_layers()
         for sim_layer in sim_layers:
-            SimLayerServices.delete(sim_layer, user, admin_services_api_key)
+            SimLayerServices.delete(sim_layer, admin_services_api_key)
         catalog_entry.destroy()
         return True
     except Exception as e:
@@ -151,6 +154,82 @@ def user_entries(catalog_id, user, client_server_api_key):
     if catalog == None:
         return []
     return catalog.entries()
+
+
+def delete_stale_timestamps(catalog_entry_id, max_age_in_days, upload_server_api_key):
+    try:
+        if upload_server_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
+        catalog_entry = find_by_id(catalog_entry_id)
+        if catalog_entry == None:
+            return
+        timestamps = catalog_entry.layer_timestamps()
+        stale_timestamps = [
+            timestamp
+            for timestamp in timestamps
+            if timestamp.age_in_days() > max_age_in_days
+        ]
+        for timestamp in stale_timestamps:
+            LayerTimestampServices.delete(timestamp, upload_server_api_key)
+
+    except Exception as e:
+        print(e)
+        logging.service_exception("CatalogEntry", "delete_stale_timestamps", e)
+        return
+
+
+def recreate_manifest(catalog_entry_id, upload_server_api_key):
+    try:
+        if upload_server_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
+        catalog_entry = find_by_id(catalog_entry_id)
+        if catalog_entry == None:
+            return
+        manifest_json = serialize_catalog_entry_manifest(catalog_entry)
+        manifest_path = catalog_entry.entry_manifest_path()
+        os.remove(manifest_path)
+        with open(manifest_path, "w") as file:
+            json.dump(manifest_json, file, indent=4)
+    except Exception as e:
+        logging.service_exception("CatalogEntry", "recreate_mainfest", e)
+        return
+
+
+def inner_manifest(manifest, key):
+    if key in manifest:
+        return manifest[key]
+    inner_manifest = {}
+    manifest[key] = inner_manifest
+    return inner_manifest
+
+
+def serialize_catalog_entry_manifest(catalog_entry):
+    entry_manifest = {}
+    for sim_layer in catalog_entry.sim_layers():
+        domain = validationUtils.sanitize_text(f"{sim_layer.domain}")
+        layer_type = validationUtils.sanitize_text(sim_layer.layer_type.name)
+        domain_manifest = inner_manifest(entry_manifest, domain)
+        for layer_timestamp in sim_layer.layer_timestamps():
+            timestamp = validationUtils.sanitize_text(layer_timestamp.timestamp)
+            timestamp_json = inner_manifest(domain_manifest, timestamp)
+            layer_json = inner_manifest(timestamp_json, layer_type)
+
+            layer_json["kml"] = validationUtils.sanitize_text(layer_timestamp.kml_url())
+            layer_json["raster"] = validationUtils.sanitize_text(
+                layer_timestamp.png_url()
+            )
+            layer_json["coords"] = [
+                [coord.latitude, coord.longitude] for coord in layer_timestamp.coords()
+            ]
+
+            colorbar = layer_timestamp.colorbar()
+            if colorbar != None:
+                layer_json["levels"] = [level.value for level in colorbar.levels()]
+                layer_json["colorbar"] = validationUtils.sanitize_text(
+                    colorbar.png_url()
+                )
+
+    return entry_manifest
 
 
 def admin_entries(catalog_id, user, admin_services_api_key):

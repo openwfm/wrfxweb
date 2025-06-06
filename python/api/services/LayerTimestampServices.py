@@ -49,18 +49,23 @@ def create(json, upload_api_key):
         return None
 
 
-def delete(layer_timestamp, user, admin_services_api_key):
-    if not AdminServices.isAdmin(user, admin_services_api_key):
-        raise PermissionError("Invalid Admin")
+def delete(layer_timestamp, upload_server_api_key):
+    if upload_server_api_key not in UPLOAD_API_KEYS:
+        raise PermissionError("Invalid UploadApiKey")
     if not isinstance(layer_timestamp, LayerTimestamp):
         raise ValueError("provided layer_timestamp must be of instance layer_timestamp")
     colorbar = layer_timestamp.colorbar()
     if colorbar != None:
-        ColorbarServices.delete(colorbar, user, admin_services_api_key)
-    png_url = layer_timestamp.png_full_path()
-    kml_url = layer_timestamp.kml_full_path()
-    os.remove(png_url)
-    os.remove(kml_url)
+        ColorbarServices.delete(colorbar, upload_server_api_key)
+    try:
+        png_url = layer_timestamp.png_full_path()
+        os.remove(png_url)
+        if layer_timestamp.encrypted_kml_url != None:
+            kml_url = layer_timestamp.kml_full_path()
+            os.remove(kml_url)
+    except Exception as e:
+        logging.service_exception("LayerTimestamp", "delete", e)
+
     layer_timestamp.destroy()
 
 

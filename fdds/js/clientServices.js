@@ -27,7 +27,7 @@ export async function getCatalogEntries(catalogId) {
 
 /** Service request for fetching a selected simulation from the menu. */
 export async function getSimulation(catalogId, entryId) {
-  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/rasters/v2`;
+  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/rasters`;
   const response_json = await getRequest(GET_URL);
 
   if (response_json.error) {

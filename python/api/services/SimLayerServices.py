@@ -36,13 +36,13 @@ def create(json, upload_api_key):
         return None
 
 
-def delete(sim_layer, user, admin_services_api_key):
-    if not AdminServices.isAdmin(user, admin_services_api_key):
-        raise PermissionError("Invalid Admin")
+def delete(sim_layer, upload_server_api_key):
+    if upload_server_api_key not in UPLOAD_API_KEYS:
+        raise PermissionError("Invalid UploadApiKey")
     if not isinstance(sim_layer, SimLayer):
         raise ValueError("provided sim_layer must be of instance SimLayer")
     for layer_timestamp in sim_layer.layer_timestamps():
-        LayerTimestampServices.delete(layer_timestamp, user, admin_services_api_key)
+        LayerTimestampServices.delete(layer_timestamp, upload_server_api_key)
     sim_layer.destroy()
 
 

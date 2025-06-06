@@ -1,10 +1,12 @@
 from api.session import db_session
 from api.models.User import User
 from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
+from api.models.layerTimestamp.LayerTimestamp import LayerTimestamp
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.models.simLayer.SimLayer import SimLayer
 from api.apiKeys import SIMULATIONS_FOLDER
 import api.encryption as encryption
+from sqlalchemy import select, outerjoin
 
 
 class CatalogEntry(CatalogEntryDbModel):
@@ -50,6 +52,17 @@ class CatalogEntry(CatalogEntryDbModel):
 
     def sim_layers(self):
         return db_session.query(SimLayer).filter_by(catalog_entry_id=self.id).all()
+
+    def layer_timestamps(self):
+        layer_timestamp_join = outerjoin(
+            LayerTimestamp, SimLayer, LayerTimestamp.sim_layer_id == SimLayer.id
+        )
+        timestamp_query = (
+            select(LayerTimestamp)
+            .select_from(layer_timestamp_join)
+            .where(layer_timestamp_join.c.sim_layer_catalog_entry_id == self.id)
+        )
+        return [row[0] for row in db_session.execute(timestamp_query)]
 
     def process(self):
         pass

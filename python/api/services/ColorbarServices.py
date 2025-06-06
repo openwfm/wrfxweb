@@ -41,9 +41,9 @@ def create(json, upload_api_key):
         return None
 
 
-def delete(colorbar, user, admin_services_api_key):
-    if not AdminServices.isAdmin(user, admin_services_api_key):
-        raise PermissionError("Invalid Admin")
+def delete(colorbar, upload_server_api_key):
+    if upload_server_api_key not in UPLOAD_API_KEYS:
+        raise PermissionError("Invalid UploadApiKey")
     if not isinstance(colorbar, Colorbar):
         raise ValueError("provided colorbar must be of instance Colorbar")
     png_url = colorbar.png_full_path()

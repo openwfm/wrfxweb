@@ -10,6 +10,7 @@ from api.models.layerTimestamp.LayerTimestampCoords import (
 from api.models.colorbar.Colorbar import (
     Colorbar,
 )
+from datetime import datetime
 
 
 class LayerTimestamp(LayerTimestampDbModel):
@@ -31,6 +32,11 @@ class LayerTimestamp(LayerTimestampDbModel):
 
     def colorbar(self):
         return db_session.query(Colorbar).filter_by(layer_timestamp_id=self.id).first()
+
+    def age_in_days(self):
+        date_format = "%Y-%m-%d_%H:%M:%S"
+        datetime_timestamp = datetime.strptime(self.timestamp, date_format)
+        return (datetime.now() - datetime_timestamp).days
 
     def coords(self):
         layer_timestamp_coords = (
