@@ -63,7 +63,7 @@ def load_json(unzip_directory):
 
 
 def load_manifest(unzip_directory, catalog_entry):
-    manifest_filename = catalog_entry.manifest_filename()
+    manifest_filename = catalog_entry.manifest_filename().split("/")[1]
     manifest_filepath = f"{unzip_directory}/{manifest_filename}"
     manifest_json = json.load(open(manifest_filepath))
     return manifest_json
