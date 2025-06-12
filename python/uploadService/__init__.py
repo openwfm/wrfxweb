@@ -1,6 +1,6 @@
 from uploadService.app import app
 
-from uploadService.utils import api_key_required
+from uploadService.utils import api_key_required, universal_api_key_required
 from uploadService.logging import utils as loggingUtils
 from uploadService.uploadServiceKeys import (
     UPLOAD_QUEUE_SERVICE_URL,
@@ -40,8 +40,16 @@ def catalog_entries(catalog_id):
     }, 405
 
 
-@app.route("/entries", methods=["POST"])
+@app.route("/server-ready/<catalog_id>", methods=["GET"])
 @api_key_required
+def catalog_server_ready(catalog_id):
+    return {
+        "message": "Success!",
+    }, 200
+
+
+@app.route("/entries", methods=["POST"])
+@universal_api_key_required
 def entries():
     if request.method == "POST":
         return upload_catalog_entry()
@@ -51,7 +59,7 @@ def entries():
 
 
 @app.route("/server-ready", methods=["GET"])
-@api_key_required
+@universal_api_key_required
 def server_ready():
     return {
         "message": "Success!",
