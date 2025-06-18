@@ -14,4 +14,5 @@ def archive_simulation(catalog_entry_id, number_of_days):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Please provide a catalog_entry_id and number_of_days to keep")
-    archive_simulation(sys.argv[1], sys.argv[2])
+    else:
+        archive_simulation(sys.argv[1], sys.argv[2])

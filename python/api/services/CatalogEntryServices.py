@@ -167,7 +167,7 @@ def delete_stale_timestamps(catalog_entry_id, max_age_in_days, upload_server_api
         stale_timestamps = [
             timestamp
             for timestamp in timestamps
-            if timestamp.age_in_days() > max_age_in_days
+            if timestamp.age_in_days() > int(max_age_in_days)
         ]
         for timestamp in stale_timestamps:
             LayerTimestampServices.delete(timestamp, upload_server_api_key)
