@@ -13,6 +13,7 @@ class CatalogEntryCreationError(Exception):
 
 def unpack_simulation(simulation_path, entry_type, catalog_id):
     catalog_file = osp.join(SIMULATIONS_FOLDER, f"{simulation_path}/catalog.json")
+    full_simulation_path = osp.join(SIMULATIONS_FOLDER, simulation_path)
     try:
         catalog_entry_jsons = json.load(open(catalog_file))
         catalog_entry = script_utils.create_catalog_entries(
@@ -23,7 +24,7 @@ def unpack_simulation(simulation_path, entry_type, catalog_id):
         manifest_json = load_manifest(simulation_path, catalog_entry)
         print(f"manifest loaded for ${catalog_entry}")
         created_layer_timestamps = thread_utils.create_sim_layer_and_timestamp_records(
-            manifest_json, catalog_entry
+            manifest_json, catalog_entry, full_simulation_path
         )
         print(
             f"{created_layer_timestamps} LayerTimestamps created for ${catalog_entry}"

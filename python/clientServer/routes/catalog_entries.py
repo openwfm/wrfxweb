@@ -1,6 +1,10 @@
 from clientServer.app import app
 from clientServer.routes.login import login_required
-from clientServer.serverKeys import CLIENT_SERVER_API_KEY, FLASK_SIMULATIONS_FOLDER
+from clientServer.serverKeys import (
+    CLIENT_SERVER_API_KEY,
+    FLASK_SIMULATIONS_FOLDER,
+    MANIFEST_FILENAME,
+)
 
 from api.services import CatalogEntryServices as CatalogEntryServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
@@ -8,6 +12,8 @@ from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from flask_login import current_user
 from flask import send_from_directory
 import api.encryption as encryption
+
+import os.path as osp
 
 
 @app.route("/catalogs/<catalog_id>/entries", methods=["GET"])
@@ -31,7 +37,9 @@ def catalog_entry_rasters_v1(catalog_id, catalog_entry_id):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
-    manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
+    # manifest_path = encryption.decrypt_searchable_data(catalog_entry.manifest_path)
+    manifest_path = osp.join(catalog_entry.folder_name(), MANIFEST_FILENAME)
+    print(f"manifest_path: {manifest_path}")
     return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
 
 

@@ -71,6 +71,16 @@ def log_processed_catalog_entry_pngs(catalog_entry_id):
     log_statement("UploadWorker", upload_message, True)
 
 
+def log_creating_catalog_entry_manifest(catalog_entry_id):
+    upload_message = f"Creating catalog_entry manifest: {catalog_entry_id}"
+    log_statement("UploadWorker", upload_message, True)
+
+
+def log_created_catalog_entry_manifest(catalog_entry_id):
+    upload_message = f"Created catalog_entry manifest: {catalog_entry_id}"
+    log_statement("UploadWorker", upload_message, True)
+
+
 def log_upload_queue_service(catalog_entry_upload_id):
     upload_message = f"catalog_entry_upload_id: {catalog_entry_upload_id}"
     log_statement("UploadQueueService", upload_message, True)

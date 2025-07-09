@@ -24,7 +24,7 @@ def unpack_catalog_entry_zip(upload_path, entry_type, catalog_id):
         script_utils.create_catalog_entry_catalog(catalog_entry, catalog_id)
         manifest_json = load_manifest(unzip_directory, catalog_entry)
         thread_utils.create_sim_layer_and_timestamp_records(
-            manifest_json, catalog_entry
+            manifest_json, catalog_entry, unzip_directory
         )
 
         move_simulation(upload_path, unzip_directory, catalog_entry)

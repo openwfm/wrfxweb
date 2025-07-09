@@ -7,6 +7,10 @@ from clientServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
     ADMIN_SERVICES_API_KEY,
 )
+from clientServer.threads.catalogEntryDeleteThread import (
+    catalog_entry_delete_queue,
+    catalog_entry_delete_thread,
+)
 
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
@@ -139,11 +143,17 @@ def catalog_entry(catalog_entry_id):
 
 
 def delete_catalog_entry(catalog_entry_id):
-    entry_deleted = CatalogEntryServices.delete_by_id(
+    entry_marked_for_deletion = CatalogEntryServices.mark_id_for_deletion(
         catalog_entry_id, current_user, ADMIN_SERVICES_API_KEY
     )
+    # catalog_entry_delete_queue.put(catalog_entry_id)
+    # if catalog_entry_delete_thread.ready():
+    #     catalog_entry_delete_thread.start()
+    # entry_deleted = CatalogEntryServices.delete_by_id(
+    #     catalog_entry_id, current_user, ADMIN_SERVICES_API_KEY
+    # )
 
-    if entry_deleted:
+    if entry_marked_for_deletion:
         return {
             "message": "CatalogEntry successfully deleted!",
         }, 200

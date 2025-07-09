@@ -12,7 +12,7 @@ from api.validators import (
     CatalogValidators as CatalogValidators,
     utils as validationUtils,
 )
-from api.apiKeys import CLIENT_SERVER_API_KEYS, UPLOAD_API_KEYS
+from api.apiKeys import CLIENT_SERVER_API_KEYS, UPLOAD_API_KEYS, ADMIN_SERVICES_API_KEY
 import api.logging.utils as logging
 import api.encryption as encryption
 
@@ -96,9 +96,24 @@ def find_by_id(catalog_entry_id):
         return None
 
 
-def delete_by_id(catalog_entry_id, user, admin_services_api_key):
+def mark_id_for_deletion(catalog_entry_id, user, admin_services_api_key):
     try:
         if not AdminServices.isAdmin(user, admin_services_api_key):
+            return False
+        catalog_entry = find_by_id(catalog_entry_id)
+        if catalog_entry == None:
+            return False
+        catalog_entry.archived = True
+        db_session.commit()
+        return True
+    except Exception as e:
+        logging.service_exception("CatalogEntry", "mark_id_for_deletion", e)
+        return False
+
+
+def delete_by_id(catalog_entry_id, admin_services_api_key):
+    try:
+        if admin_services_api_key != ADMIN_SERVICES_API_KEY:
             return False
         catalog_entry = find_by_id(catalog_entry_id)
         if catalog_entry == None:
@@ -186,8 +201,9 @@ def recreate_manifest(catalog_entry_id, upload_server_api_key):
         if catalog_entry == None:
             return
         manifest_json = serialize_catalog_entry_manifest(catalog_entry)
-        manifest_path = catalog_entry.entry_manifest_path()
-        os.remove(manifest_path)
+        manifest_path = catalog_entry.web_manifest_path()
+        if os.path.exists(manifest_path):
+            os.remove(manifest_path)
         with open(manifest_path, "w") as file:
             json.dump(manifest_json, file, indent=4)
     except Exception as e:
@@ -241,5 +257,10 @@ def admin_entries(catalog_id, user, admin_services_api_key):
 
 def admin_all_entries(user, admin_services_api_key):
     if AdminServices.isAdmin(user, admin_services_api_key):
-        return db_session.query(CatalogEntry).all()
+        catalog_entries = db_session.query(CatalogEntry).all()
+        return [
+            catalog_entry
+            for catalog_entry in catalog_entries
+            if not catalog_entry.archived
+        ]
     return []

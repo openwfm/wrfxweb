@@ -18,6 +18,7 @@ import zipfile
 import shutil
 
 import os
+import os.path as osp
 
 UPLOAD_EXTENSIONS = [".json", ".png", ".kmz"]
 
@@ -34,7 +35,7 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
         catalog_entry = create_catalog_entries(
             catalog_entry_jsons, catalog_entry_upload
         )
-        update_catalog_entry_catalogs(catalog_entry, catalog_entry_upload)
+        # update_catalog_entry_catalogs(catalog_entry, catalog_entry_upload)
         move_simulation(catalog_entry_upload, catalog_entry)
         catalog_entry_upload.process()
         return catalog_entry
@@ -47,7 +48,9 @@ def unpack_catalog_entry_upload(catalog_entry_upload):
 def process_catalog_entry_pngs(catalog_entry):
     try:
         sim_json = load_manifest(catalog_entry)
-        create_sim_layer_and_timestamp_records(sim_json, catalog_entry)
+        simulation_path = catalog_entry.entry_path()
+
+        create_sim_layer_and_timestamp_records(sim_json, catalog_entry, simulation_path)
         catalog_entry.process()
         return catalog_entry
     except Exception as e:
@@ -70,7 +73,9 @@ def load_manifest(catalog_entry):
         raise ManifestLoadingError(catalog_entry)
 
 
-def create_sim_layer_and_timestamp_records(manifest_json, catalog_entry):
+def create_sim_layer_and_timestamp_records(
+    manifest_json, catalog_entry, simulation_path
+):
     created_count = 0
     for domain in manifest_json:
         domain_json = manifest_json[domain]
@@ -78,6 +83,9 @@ def create_sim_layer_and_timestamp_records(manifest_json, catalog_entry):
             timestamp_json = domain_json[timestamp]
             for layer_type_name in timestamp_json:
                 layer_json = timestamp_json[layer_type_name]
+                raster_path = osp.join(simulation_path, layer_json["raster"])
+                if not os.path.exists(raster_path):
+                    continue
                 layer_type = create_layer_type(layer_type_name)
                 sim_layer = create_sim_layer(catalog_entry, domain, layer_type)
                 layer_timestamp = create_layer_timestamp(

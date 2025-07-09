@@ -59,10 +59,12 @@ def delete(layer_timestamp, upload_server_api_key):
         ColorbarServices.delete(colorbar, upload_server_api_key)
     try:
         png_url = layer_timestamp.png_full_path()
-        os.remove(png_url)
+        if os.path.exists:
+            os.remove(png_url)
         if layer_timestamp.encrypted_kml_url != None:
             kml_url = layer_timestamp.kml_full_path()
-            os.remove(kml_url)
+            if os.path.exists(kml_url):
+                os.remove(kml_url)
     except Exception as e:
         logging.service_exception("LayerTimestamp", "delete", e)
 

@@ -32,6 +32,7 @@ class Catalog(CatalogDbModel):
         return [
             catalog_entry_catalog.catalog_entry
             for catalog_entry_catalog in catalog_entry_catalogs
+            if not catalog_entry_catalog.catalog_entry.archived
         ]
 
     def catalog_api_key(self):

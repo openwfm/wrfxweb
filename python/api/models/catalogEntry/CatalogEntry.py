@@ -4,7 +4,7 @@ from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
 from api.models.layerTimestamp.LayerTimestamp import LayerTimestamp
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.models.simLayer.SimLayer import SimLayer
-from api.apiKeys import SIMULATIONS_FOLDER
+from api.apiKeys import SIMULATIONS_FOLDER, MANIFEST_FILENAME
 import api.encryption as encryption
 from sqlalchemy import select, outerjoin
 
@@ -23,6 +23,11 @@ class CatalogEntry(CatalogEntryDbModel):
     def manifest_filename(self):
         manifest = encryption.decrypt_searchable_data(self.manifest_path)
         return manifest
+
+    def web_manifest_path(self):
+        home_dir = self.entry_path()
+        manifest_path = f"{home_dir}/{MANIFEST_FILENAME}"
+        return manifest_path
 
     def uploader(self):
         if self.uploader_id == None or self.uploader_id < 1:
@@ -63,6 +68,24 @@ class CatalogEntry(CatalogEntryDbModel):
             .where(layer_timestamp_join.c.sim_layer_catalog_entry_id == self.id)
         )
         return [row[0] for row in db_session.execute(timestamp_query)]
+
+    def age_range_in_days(self):
+        lts = self.layer_timestamps()
+        upper_range = None
+        lower_range = None
+        for layer_timestamp in lts:
+            timestamp_age = layer_timestamp.age_in_days()
+            upper_range = (
+                timestamp_age
+                if upper_range == None
+                else max(upper_range, timestamp_age)
+            )
+            lower_range = (
+                timestamp_age
+                if lower_range == None
+                else min(lower_range, timestamp_age)
+            )
+        return [lower_range, upper_range]
 
     def process(self):
         pass

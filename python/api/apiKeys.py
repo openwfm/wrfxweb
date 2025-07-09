@@ -30,6 +30,7 @@ PNG_URL_AES_ENCRYPTION_NONCE = bytes.fromhex(
 FERNET_ENCRYPTION_KEY = os.getenv(
     "FERNET_ENCRYPTION_KEY", Fernet.generate_key().decode()
 ).encode()
+MANIFEST_FILENAME = os.getenv("MANIFEST_FILENAME", "")
 DB_LOG_FILE = os.getenv("DB_LOG_FILE", "")
 DB_DEBUG_LOGS = os.getenv("DB_DEBUG_LOGS")
 DB_INSTANCE = os.getenv("DB_INSTANCE")
