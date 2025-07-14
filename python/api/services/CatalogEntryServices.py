@@ -277,8 +277,10 @@ def process_pngs(catalog_entry_id, upload_api_key):
         if upload_api_key not in UPLOAD_API_KEYS:
             raise PermissionError("Invalid UploadApiKey")
         catalog_entry = find_by_id(catalog_entry_id)
-        create_sim_layer_and_timestamp_records(catalog_entry, upload_api_key)
-        return catalog_entry
+        created_timestamps = create_sim_layer_and_timestamp_records(
+            catalog_entry, upload_api_key
+        )
+        return created_timestamps
     except Exception as e:
         logging.service_exception("CatalogEntry", "process_entry_pngs", e)
         return None
