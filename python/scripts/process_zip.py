@@ -1,6 +1,7 @@
-from uploadWorker.workerKeys import TEMP_FOLDER, UPLOADS_FOLDER
-import uploadWorker.scripts.utils as script_utils
-import uploadWorker.threads.thread_utils as thread_utils
+from scripts.scriptKeys import TEMP_FOLDER, UPLOADS_FOLDER, ADMIN_SERVICES_API_KEY
+
+import api.services.CatalogEntryServices as CatalogEntryServices
+import scripts.utils as script_utils
 
 
 import json
@@ -21,11 +22,9 @@ def unpack_catalog_entry_zip(upload_path, entry_type, catalog_id):
         catalog_entry = script_utils.create_catalog_entries(
             catalog_entry_jsons, entry_type
         )
-        script_utils.create_catalog_entry_catalog(catalog_entry, catalog_id)
-        manifest_json = load_manifest(unzip_directory, catalog_entry)
-        thread_utils.create_sim_layer_and_timestamp_records(
-            manifest_json, catalog_entry, unzip_directory
-        )
+        CatalogEntryServices.process_pngs(catalog_entry.id, ADMIN_SERVICES_API_KEY)
+        CatalogEntryServices.create_catalog_entry_catalog(catalog_id, catalog_entry.id)
+        CatalogEntryServices.recreate_manifest(catalog_entry.id, ADMIN_SERVICES_API_KEY)
 
         move_simulation(upload_path, unzip_directory, catalog_entry)
     except Exception as e:

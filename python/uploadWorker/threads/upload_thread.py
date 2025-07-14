@@ -1,11 +1,12 @@
 from uploadWorker.app import app
 from uploadWorker.logging import utils as loggingUtils
 from uploadWorker.services.upload_queue_services import upload_queue_services
-import uploadWorker.threads.thread_utils as thread_utils
 from uploadWorker.workerKeys import UPLOAD_WORKER_API_KEY
 
-import api.services.CatalogEntryUploadServices as CatalogEntryUploadServices
-import api.services.CatalogEntryServices as CatalogEntryServices
+from api.services import (
+    CatalogEntryUploadServices as CatalogEntryUploadServices,
+    CatalogEntryServices as CatalogEntryServices,
+)
 
 import threading
 
@@ -44,8 +45,8 @@ class UploadThread:
                 return
 
             loggingUtils.log_processing_catalog_entry_upload(catalog_entry_upload.id)
-            catalog_entry = thread_utils.unpack_catalog_entry_upload(
-                catalog_entry_upload
+            catalog_entry = CatalogEntryUploadServices.unpack_by_id(
+                catalog_entry_upload.id, UPLOAD_WORKER_API_KEY
             )
             loggingUtils.log_processed_catalog_entry_upload(catalog_entry_upload.id)
 
@@ -53,15 +54,15 @@ class UploadThread:
                 return
 
             loggingUtils.log_processing_catalog_entry_pngs(catalog_entry.id)
-            thread_utils.process_catalog_entry_pngs(catalog_entry)
+            CatalogEntryServices.process_pngs(catalog_entry.id, UPLOAD_WORKER_API_KEY)
             loggingUtils.log_processed_catalog_entry_pngs(catalog_entry.id)
             loggingUtils.log_creating_catalog_entry_manifest(catalog_entry.id)
             CatalogEntryServices.recreate_manifest(
                 catalog_entry.id, UPLOAD_WORKER_API_KEY
             )
             loggingUtils.log_created_catalog_entry_manifest(catalog_entry.id)
-            thread_utils.update_catalog_entry_catalogs(
-                catalog_entry, catalog_entry_upload
+            CatalogEntryUploadServices.update_catalog_entry_catalogs(
+                catalog_entry.id, catalog_entry_upload.id, UPLOAD_WORKER_API_KEY
             )
 
     def fetch_catalog_entry_upload_id(self, attempts):

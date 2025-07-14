@@ -1,8 +1,4 @@
-from uploadWorker.workerKeys import UPLOAD_WORKER_API_KEY
-
-
 import api.services.CatalogEntryServices as CatalogEntryServices
-import api.services.CatalogEntryCatalogServices as CatalogEntryCatalogServices
 
 
 def create_catalog_entries(catalog_entry_jsons, entry_type):
@@ -32,23 +28,3 @@ def create_catalog_entries(catalog_entry_jsons, entry_type):
         else:
             print(f"created <CatalogEntry {catalog_entry.id}> for {job_id}")
             return catalog_entry
-
-
-def create_catalog_entry_catalog(catalog_entry, catalog_id):
-    if catalog_entry == None:
-        print(f"failed to create CatalogEntry")
-        return
-    create_json = {
-        "catalog_id": catalog_id,
-        "catalog_entry_id": catalog_entry.id,
-    }
-    catalog_entry_catalog = CatalogEntryCatalogServices.find_or_create(
-        create_json, UPLOAD_WORKER_API_KEY
-    )
-    if catalog_entry_catalog == None:
-        print(
-            f"failed to create CatalogEntryCatalog for {catalog_entry.entry_path()} and <Catalog {catalog_id}>"
-        )
-        return
-    print(f"Created <CatalogEntryCatalog {catalog_entry_catalog.id}>")
-    return catalog_entry_catalog

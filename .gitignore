@@ -1,6 +1,6 @@
 progress.txt
 
-logs/*
+logs/
 !.gitkeep
 node_modules/
 bower_components/
@@ -31,13 +31,10 @@ api/instance
 api/api_key.py
 api/user.db
 deployment.MD
-python/logs/*
 python/clientServer/cert.pem
 python/clientServer/key.pem
 python/uploadQueueService/queue/uploadQueue.log
-python/clientServer/logs
 python/clientServer/client_secret.json
-python/uploadService/logs/*
 python/instance/
 python/api/instance/
 

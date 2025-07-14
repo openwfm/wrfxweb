@@ -1,6 +1,6 @@
-from uploadWorker.workerKeys import SIMULATIONS_FOLDER
-import uploadWorker.scripts.utils as script_utils
-import uploadWorker.threads.thread_utils as thread_utils
+from scripts.scriptKeys import SIMULATIONS_FOLDER, ADMIN_SERVICES_API_KEY
+import api.services.CatalogEntryServices as CatalogEntryServices
+import scripts.utils as script_utils
 
 import json
 import os.path as osp
@@ -13,23 +13,25 @@ class CatalogEntryCreationError(Exception):
 
 def unpack_simulation(simulation_path, entry_type, catalog_id):
     catalog_file = osp.join(SIMULATIONS_FOLDER, f"{simulation_path}/catalog.json")
-    full_simulation_path = osp.join(SIMULATIONS_FOLDER, simulation_path)
     try:
         catalog_entry_jsons = json.load(open(catalog_file))
         catalog_entry = script_utils.create_catalog_entries(
             catalog_entry_jsons, entry_type
         )
-        script_utils.create_catalog_entry_catalog(catalog_entry, catalog_id)
-        print(f"Loading manifest for ${catalog_entry}")
-        manifest_json = load_manifest(simulation_path, catalog_entry)
-        print(f"manifest loaded for ${catalog_entry}")
-        created_layer_timestamps = thread_utils.create_sim_layer_and_timestamp_records(
-            manifest_json, catalog_entry, full_simulation_path
+        print(f"Processing timestamps for ${catalog_entry}")
+        created_layer_timestamps = CatalogEntryServices.process_pngs(
+            catalog_entry.id, ADMIN_SERVICES_API_KEY
         )
         print(
             f"{created_layer_timestamps} LayerTimestamps created for ${catalog_entry}"
         )
 
+        print(f"Creating manifest for ${catalog_entry}")
+        CatalogEntryServices.recreate_manifest(catalog_entry.id, ADMIN_SERVICES_API_KEY)
+        print(f"Created manifest for ${catalog_entry}")
+        print(f"Adding ${catalog_entry} to Catalog {catalog_id}")
+        CatalogEntryServices.create_catalog_entry_catalog(catalog_id, catalog_entry.id)
+        print(f"Added ${catalog_entry} to Catalog {catalog_id}")
     except Exception as e:
         print(f"Unpacking simulation failed {e}")
         return

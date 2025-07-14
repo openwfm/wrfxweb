@@ -2,10 +2,12 @@ from api.session import db_session
 from api.models.catalogEntry.CatalogEntry import CatalogEntry
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import (
-    CatalogServices as CatalogServices,
     AdminServices as AdminServices,
-    SimLayerServices as SimLayerServices,
+    CatalogServices as CatalogServices,
+    ColorbarServices as ColorbarServices,
     LayerTimestampServices as LayerTimestampServices,
+    LayerTypeServices as LayerTypeServices,
+    SimLayerServices as SimLayerServices,
 )
 from api.validators import (
     CatalogEntryValidators as CatalogEntryValidators,
@@ -19,6 +21,7 @@ import api.encryption as encryption
 from sqlalchemy import select
 import json
 import os
+import shutil
 
 
 def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
@@ -121,6 +124,9 @@ def delete_by_id(catalog_entry_id, admin_services_api_key):
         sim_layers = catalog_entry.sim_layers()
         for sim_layer in sim_layers:
             SimLayerServices.delete(sim_layer, admin_services_api_key)
+        catalog_entry_path = catalog_entry.entry_directory()
+        if os.path.isdir(catalog_entry_path):
+            shutil.rmtree(catalog_entry_path)
         catalog_entry.destroy()
         return True
     except Exception as e:
@@ -264,3 +270,130 @@ def admin_all_entries(user, admin_services_api_key):
             if not catalog_entry.archived
         ]
     return []
+
+
+def process_pngs(catalog_entry_id, upload_api_key):
+    try:
+        if upload_api_key not in UPLOAD_API_KEYS:
+            raise PermissionError("Invalid UploadApiKey")
+        catalog_entry = find_by_id(catalog_entry_id)
+        create_sim_layer_and_timestamp_records(catalog_entry, upload_api_key)
+        return catalog_entry
+    except Exception as e:
+        logging.service_exception("CatalogEntry", "process_entry_pngs", e)
+        return None
+
+
+class ManifestLoadingError(Exception):
+    def __init__(self, catalog_entry):
+        message = f"Error loading manifest json: catalog_entry_id: {catalog_entry.id}"
+        super().__init__(message)
+
+
+def load_manifest(catalog_entry):
+    manifest_path = catalog_entry.entry_manifest_path()
+    try:
+        manifest_json = json.load(open(manifest_path))
+        return manifest_json
+    except Exception:
+        raise ManifestLoadingError(catalog_entry)
+
+
+def create_sim_layer_and_timestamp_records(catalog_entry, upload_api_key):
+    manifest_json = load_manifest(catalog_entry)
+    simulation_path = catalog_entry.entry_path()
+    created_count = 0
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            timestamp_json = domain_json[timestamp]
+            for layer_type_name in timestamp_json:
+                layer_json = timestamp_json[layer_type_name]
+                raster_path = os.path.join(simulation_path, layer_json["raster"])
+                if not os.path.exists(raster_path):
+                    continue
+                layer_type = create_layer_type(layer_type_name, upload_api_key)
+                sim_layer = create_sim_layer(
+                    catalog_entry, domain, layer_type, upload_api_key
+                )
+                layer_timestamp = create_layer_timestamp(
+                    layer_json, sim_layer, timestamp, upload_api_key
+                )
+                create_colorbar(layer_json, layer_timestamp, upload_api_key)
+                created_count += 1
+    return created_count
+
+
+class LayerTypeCreationError(Exception):
+    def __init__(self, layer_type_name):
+        message = f"Error creating LayerType: {layer_type_name}"
+        super().__init__(message)
+
+
+def create_layer_type(layer_type_name, upload_api_key):
+    layer_type = LayerTypeServices.find_or_create(
+        {"name": layer_type_name}, upload_api_key
+    )
+    if layer_type == None:
+        raise LayerTypeCreationError(layer_type_name)
+    return layer_type
+
+
+class SimLayerCreationError(Exception):
+    def __init__(self, sim_layer_json):
+        message = f"Error creating SimLayer: {sim_layer_json}"
+        super().__init__(message)
+
+
+def create_sim_layer(catalog_entry, domain, layer_type, upload_api_key):
+    sim_layer_json = {
+        "layer_type_id": layer_type.id,
+        "catalog_entry_id": catalog_entry.id,
+        "domain": domain,
+    }
+    sim_layer = SimLayerServices.find_or_create(sim_layer_json, upload_api_key)
+    if sim_layer == None:
+        raise SimLayerCreationError(sim_layer_json)
+    return sim_layer
+
+
+class LayerTimestampCreationError(Exception):
+    def __init__(self, layer_timestamp_json):
+        message = f"Error creating LayerTimestamp: {layer_timestamp_json}"
+        super().__init__(message)
+
+
+def create_layer_timestamp(layer_json, sim_layer, timestamp, upload_api_key):
+    layer_timestamp_json = {
+        "sim_layer_id": sim_layer.id,
+        "png_url": layer_json["raster"],
+        "kml_url": layer_json["kml"] if "kml" in layer_json else None,
+        "timestamp": timestamp,
+        "coords": layer_json["coords"],
+    }
+    layer_timestamp = LayerTimestampServices.find_or_create(
+        layer_timestamp_json, upload_api_key
+    )
+    if layer_timestamp == None:
+        raise LayerTimestampCreationError(layer_timestamp_json)
+    return layer_timestamp
+
+
+class ColorbarCreationError(Exception):
+    def __init__(self, colorbar_json):
+        message = f"Error creating Colorbar: {colorbar_json}"
+        super().__init__(message)
+
+
+def create_colorbar(layer_json, layer_timestamp, upload_api_key):
+    if "colorbar" not in layer_json:
+        return
+    colorbar_json = {
+        "png_url": layer_json["colorbar"],
+        "layer_timestamp_id": layer_timestamp.id,
+        "levels": layer_json["levels"],
+    }
+    colorbar = ColorbarServices.find_or_create(colorbar_json, upload_api_key)
+    if colorbar == None:
+        raise ColorbarCreationError(colorbar_json)
+    return colorbar

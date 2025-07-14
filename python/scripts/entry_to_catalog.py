@@ -1,6 +1,6 @@
 import api.services.CatalogEntryServices as CatalogEntryServices
 import api.services.CatalogEntryCatalogServices as CatalogEntryCatalogServices
-from uploadWorker.workerKeys import UPLOAD_WORKER_API_KEY
+from scripts.scriptKeys import ADMIN_SERVICES_API_KEY
 
 
 def add_entry_to_catalog(simulation_path, catalog_id):
@@ -10,7 +10,7 @@ def add_entry_to_catalog(simulation_path, catalog_id):
         return
     create_json = {"catalog_id": catalog_id, "catalog_entry_id": catalog_entry.id}
     catalog_entry_catalog = CatalogEntryCatalogServices.find_or_create(
-        create_json, UPLOAD_WORKER_API_KEY
+        create_json, ADMIN_SERVICES_API_KEY
     )
     if catalog_entry_catalog == None:
         print(
