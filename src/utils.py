@@ -29,14 +29,14 @@ class lock():
     def __init__(self,path):
         self.lock_path = path
         logging.info('Initializing lock on %s' % self.lock_path)
-        self.lock_file=open(self.lock_path,'w',0)
+        self.lock_file=open(self.lock_path,'wb',0)
         self.locked=False
 
     def islocked(self):
         return(self.locked)
 
     def acquire(self):
-   
+
         """
         Block until exclusive lock can be acquired.
         Used before code that should be executed by one process at a time only,
@@ -54,7 +54,7 @@ class lock():
         fcntl.flock(self.lock_file,fcntl.LOCK_EX)
         logging.info('Acquired lock on %s' % self.lock_path)
         self.locked=True
-   
+
     def release(self):
         if not self.locked:
             logging.warning('lock.release: not yet locked %s' % self.lock_path)
@@ -82,7 +82,7 @@ def update_nested_dict(d,u,level=0):
     d
     {1: {8: 9, 2: 3}, 2: {4: 5}, 3: {10: 11}}
     update_nested_dict(d,u)
-    ValueError: update_nested_dict: level 1: values for common key 8 must be dictionaries 
+    ValueError: update_nested_dict: level 1: values for common key 8 must be dictionaries
     """
 
     # print ('update_nested_dict: level %s entering with d=%s u=%s' % (level,d,u))
