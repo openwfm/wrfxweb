@@ -15,6 +15,7 @@ class CatalogEntryDbModel(Base):
     job_id = Column(String(255), nullable=False)
     zip_size = Column(Integer, nullable=True)
     kml_size = Column(Integer, nullable=True)
+    kml_mode = Column(String(255), nullable=True)
     processed_utc = Column(String(255), nullable=True)
     run_utc = Column(String(255), nullable=True)
     zip_url = Column(String(255), nullable=True)

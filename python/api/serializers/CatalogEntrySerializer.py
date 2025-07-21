@@ -21,8 +21,8 @@ def serialize_catalog_entry(entry):
         "kml_size": sanitize_text(f"{entry.kml_size}"),
         "processed_utc": sanitize_text(entry.processed_utc),
         "run_utc": sanitize_text(entry.run_utc),
-        "zip_url": sanitize_text(encryption.decrypt_searchable_data(entry.zip_url)),
-        "kml_url": sanitize_text(encryption.decrypt_searchable_data(entry.kml_url)),
+        "zip_url": sanitize_text(entry.zip_filename()),
+        "kml_url": sanitize_text(entry.kml_filename(entry.kml_mode)),
     }
 
 

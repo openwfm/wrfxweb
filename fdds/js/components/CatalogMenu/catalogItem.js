@@ -1,4 +1,9 @@
-import { getSimulation, CATALOG_URL } from "../../clientServices.js";
+import {
+  getSimulation,
+  getZip,
+  getKml,
+  CATALOG_URL,
+} from "../../clientServices.js";
 //import { getSimulation } from "../../services.js";
 import { utcToLocal } from "../../util.js";
 import { simVars } from "../../simVars.js";
@@ -16,8 +21,8 @@ export class CatalogItem extends HTMLElement {
                     <div id='jobID'>job id:  </div>
                 </div>
                 <div id='links'>
-                    <a id='kml' download></a>
-                    <a id='zip' download></a>
+                    <div id='kml' class="hidden" download></div>
+                    <div id='zip' class="hidden" download></div>
                 </div>
             </li>
         `;
@@ -47,23 +52,32 @@ export class CatalogItem extends HTMLElement {
     let kmlURL = this.catEntry.kml_url;
     let kmlSize = this.catEntry.kml_size;
 
-    if (kmlURL) {
-      let mb = Math.round((10 * kmlSize) / 1048576.0) / 10;
-      const kmlLink = this.querySelector("#kml");
+    const kmlLink = this.querySelector("#kml");
+    if (kmlSize > 0) {
+      KmlLink.onclick = () => {
+        getKml(this.catalogId, this.catEntry.id);
+      };
       kmlLink.href = kmlURL;
-      kmlLink.innerText = "Download KMZ " + mb.toString() + " MB";
+      kmlLink.innerText = `Download KMZ ${kmlSize} MB`;
+      kmlLink.classList.remove("hidden");
+    } else {
+      kmlLink.classList.add("hidden");
     }
   }
 
   initializeZipURL() {
     let zipURL = this.catEntry.zip_url;
     let zipSize = this.catEntry.zip_size;
+    const zipLink = this.querySelector("#zip");
 
     if (zipURL) {
-      let mb = Math.round((10 * zipSize) / 1048576.0) / 10;
-      const zipLink = this.querySelector("#zip");
-      zipLink.href = zipURL;
-      zipLink.innerText = "Download ZIP " + mb.toString() + " MB";
+      zipLink.onclick = () => {
+        getZip(this.catalogId, this.catEntry.id);
+      };
+      zipLink.innerText = `Download ZIP ${zipSize} MB`;
+      zipLink.classList.remove("hidden");
+    } else {
+      zipLink.classList.add("hidden");
     }
   }
 

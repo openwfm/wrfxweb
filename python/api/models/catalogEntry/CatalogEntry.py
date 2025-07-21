@@ -4,9 +4,20 @@ from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
 from api.models.layerTimestamp.LayerTimestamp import LayerTimestamp
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.models.simLayer.SimLayer import SimLayer
-from api.apiKeys import SIMULATIONS_FOLDER, MANIFEST_FILENAME
+from api.apiKeys import (
+    SIMULATIONS_FOLDER,
+    MANIFEST_FILENAME,
+    DOWNLOADS_FOLDER,
+    CATALOG_FILENAME,
+)
 import api.encryption as encryption
 from sqlalchemy import select, outerjoin
+import posixpath as pxp
+import os
+
+KMZ_INC = "inc"
+KMZ_REF = "ref"
+EMPTY = ""
 
 
 class CatalogEntry(CatalogEntryDbModel):
@@ -24,6 +35,14 @@ class CatalogEntry(CatalogEntryDbModel):
         manifest = encryption.decrypt_searchable_data(self.manifest_path)
         return manifest
 
+    def entry_description(self):
+        return encryption.decrypt_searchable_data(self.description)
+
+    def entry_catalog_path(self):
+        home_dir = self.entry_path()
+        catalog_path = f"{home_dir}/{CATALOG_FILENAME}"
+        return catalog_path
+
     def web_manifest_path(self):
         home_dir = self.entry_path()
         manifest_path = f"{home_dir}/{MANIFEST_FILENAME}"
@@ -36,6 +55,43 @@ class CatalogEntry(CatalogEntryDbModel):
 
     def directory(self):
         return SIMULATIONS_FOLDER
+
+    def zip_filename(self):
+        return f"{self.folder_name()}.zip"
+
+    def zip_filepath(self):
+        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}.zip"
+
+    def zip_archive_base(self):
+        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}"
+
+    def kml_base(self):
+        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}"
+
+    def kml_inc_filename(self):
+        return f"{self.folder_name()}_inc.kmz"
+
+    def kml_ref_filename(self):
+        return f"{self.folder_name()}_ref.kmz"
+
+    def kml_filename(self, mode):
+        if mode == KMZ_INC or mode == EMPTY:
+            return self.kml_inc_filename()
+        elif mode == KMZ_REF:
+            return self.kml_ref_filename()
+        return None
+
+    def kml_filepath(self, mode):
+        filename = self.kml_filename(mode)
+        if filename == None:
+            return None
+        return f"{DOWNLOADS_FOLDER}/{filename}"
+
+    def kml_href_join(self, mode):
+        if mode == KMZ_INC or mode == EMPTY:
+            return pxp.join
+        elif mode == KMZ_REF:
+            return os.path.join
 
     def folder_name(self):
         return f"{encryption.decrypt_searchable_data(self.job_id)}"

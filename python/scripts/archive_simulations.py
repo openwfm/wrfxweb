@@ -9,6 +9,8 @@ def archive_simulation(catalog_entry_id, number_of_days):
         catalog_entry_id, number_of_days, ADMIN_SERVICES_API_KEY
     )
     CatalogEntryServices.recreate_manifest(catalog_entry_id, ADMIN_SERVICES_API_KEY)
+    CatalogEntryServices.zip_catalog_entry(catalog_entry_id, ADMIN_SERVICES_API_KEY)
+    CatalogEntryServices.kml_catalog_entry(catalog_entry_id, {}, ADMIN_SERVICES_API_KEY)
 
 
 if __name__ == "__main__":

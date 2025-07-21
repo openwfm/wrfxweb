@@ -1,6 +1,7 @@
 progress.txt
 
 logs/
+downloads/
 !.gitkeep
 node_modules/
 bower_components/
