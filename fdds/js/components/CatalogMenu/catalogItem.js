@@ -47,8 +47,8 @@ export class CatalogItem extends HTMLElement {
     let kmlURL = this.catEntry.kml_url;
     let kmlSize = this.catEntry.kml_size;
 
-    if (kmlURL) {
-      let mb = Math.round((10 * kmlSize) / 1048576.0) / 10;
+    let mb = Math.round((10 * kmlSize) / 1048576.0) / 10;
+    if (kmlURL && mb > 0) {
       const kmlLink = this.querySelector("#kml");
       kmlLink.href = kmlURL;
       kmlLink.innerText = "Download KMZ " + mb.toString() + " MB";
@@ -59,8 +59,8 @@ export class CatalogItem extends HTMLElement {
     let zipURL = this.catEntry.zip_url;
     let zipSize = this.catEntry.zip_size;
 
-    if (zipURL) {
-      let mb = Math.round((10 * zipSize) / 1048576.0) / 10;
+    let mb = Math.round((10 * zipSize) / 1048576.0) / 10;
+    if (zipURL && mb > 0) {
       const zipLink = this.querySelector("#zip");
       zipLink.href = zipURL;
       zipLink.innerText = "Download ZIP " + mb.toString() + " MB";
