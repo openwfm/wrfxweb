@@ -9,8 +9,6 @@ export class AdminEntry extends HTMLElement {
             <li class='admin-entry'>
               <label for='admin-id'>id:</label>
               <p id='admin-id'>${adminUser.id}</p>
-              <label for='admin-email'>email:</label>
-              <p id='admin-email'>${adminUser.email}</p>
               <label for='admin-date'>date created:</label>
               <p id='admin-date'>${adminUser.date_created}</p>
               <button id='delete-admin-button'>Delete</button>
