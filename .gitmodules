@@ -1,3 +1,3 @@
 [submodule "fdds/simulations"]
 	path = fdds/simulations
-	url = https://github.com/PSU-CS-Wildfire-Capstone-Sp-S-25/wrfxweb-simulations.git
+	url = git@github.com:PSU-CS-Wildfire-Capstone-Sp-S-25/wrfxweb-simulations.git
