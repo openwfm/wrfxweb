@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 UPLOAD_SERVICE_SECRET = os.getenv("UPLOAD_SERVICE_SECRET")
 UPLOAD_SERVICE_API_URL = os.getenv("UPLOAD_SERVICE_API_URL")

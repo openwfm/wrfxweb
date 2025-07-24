@@ -425,9 +425,21 @@ def make_zip(catalog_entry):
     if os.path.exists(zip_filepath):
         os.remove(zip_filepath)
     shutil.make_archive(catalog_entry.zip_archive_base(), "zip", job_path)
+    save_zip(catalog_entry)
+
+
+def save_zip(catalog_entry):
+    zip_filepath = catalog_entry.zip_filepath()
     content_size = os.path.getsize(zip_filepath) / (1024 * 1024)
     catalog_entry.zip_size = round(content_size, 1)
     db_session.commit()
+
+
+def save_zip_for_job_id(job_id):
+    catalog_entry = find_by_job_id(job_id)
+    if catalog_entry == None:
+        return
+    save_zip(catalog_entry)
 
 
 def kml_catalog_entry(catalog_entry_id, kmz_params, upload_api_key):
@@ -602,3 +614,17 @@ def make_kmz(catalog_entry, kmz_params):
     #     logging.warning(
     #         "make_kmz: accessing the file over the web failed with exception %s" % e
     #     )
+
+
+def save_kml(catalog_entry):
+    zip_filepath = catalog_entry.zip_filepath()
+    content_size = os.path.getsize(zip_filepath) / (1024 * 1024)
+    catalog_entry.zip_size = round(content_size, 1)
+    db_session.commit()
+
+
+def save_kml_for_job_id(job_id):
+    catalog_entry = find_by_job_id(job_id)
+    if catalog_entry == None:
+        return
+    save_kml(catalog_entry)
