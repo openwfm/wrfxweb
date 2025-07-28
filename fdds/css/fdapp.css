@@ -1061,3 +1061,68 @@ html, body {
     margin-left: 0px;
   }
 }
+
+
+
+#layer-controller-container {
+  position: absolute;
+  right: 20px;
+  top: 5%;
+  width: 300px;
+  max-height: 85%;
+  background: white;
+  font-size: 1.15rem;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+satellite-data-panel {
+    position: absolute;
+    z-index: 9999;
+    right: 70px;
+    bottom:5%;
+    /* bottom:30px; */
+    /* width:600px; */
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 1.15rem;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 240px;
+    min-height: 240px;
+    max-width: 30vw;
+    max-height: 30vh;
+    overflow: auto;
+    padding: 8px;
+    /* top: 50%;
+    left: 50%; */
+    /* transform: translate(-50%, -50%); */
+}
+
+.satellite-data-panel-header {
+    padding: 10px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.media-content {
+    padding: 15px;
+}
+
+#media-title {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+/* Ensure media content is responsive */
+.media-content img,
+.media-content video {
+    max-width: 100%;
+    height: auto;
+}
