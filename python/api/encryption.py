@@ -7,6 +7,7 @@ from api.apiKeys import (
     PNG_URL_AES_ENCRYPTION_KEY,
     PNG_URL_AES_ENCRYPTION_NONCE,
 )
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.fernet import Fernet
 
