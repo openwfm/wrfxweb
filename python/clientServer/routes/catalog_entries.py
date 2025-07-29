@@ -4,7 +4,6 @@ from clientServer.serverKeys import (
     CLIENT_SERVER_API_KEY,
     FLASK_SIMULATIONS_FOLDER,
     MANIFEST_FILENAME,
-    DOWNLOADS_FOLDER,
 )
 
 from api.services import CatalogEntryServices as CatalogEntryServices
@@ -68,9 +67,10 @@ def catalog_entry_zip(catalog_id, catalog_entry_id):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
+    simulation_folder = catalog_entry.entry_path()
     zip_filename = catalog_entry.zip_filename()
 
-    return send_from_directory(DOWNLOADS_FOLDER, zip_filename, as_attachment=True)
+    return send_from_directory(simulation_folder, zip_filename, as_attachment=True)
 
 
 @app.route(
@@ -85,8 +85,10 @@ def catalog_entry_kml(catalog_id, catalog_entry_id):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
+    simulation_folder = catalog_entry.entry_path()
     zip_filename = catalog_entry.zip_filename()
-    return send_from_directory(DOWNLOADS_FOLDER, zip_filename, as_attachment=True)
+
+    return send_from_directory(simulation_folder, zip_filename, as_attachment=True)
 
 
 @app.route(

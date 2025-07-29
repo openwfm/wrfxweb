@@ -21,13 +21,15 @@ from api.apiKeys import (
 )
 import api.logging.utils as logging
 import api.encryption as encryption
+import scripts.utils as script_utils
 
 from sqlalchemy import select
 import json
 import os
 import shutil
-import posixpath as pxp
 import simplekml as kml
+import glob
+import zipfile
 
 
 def find_catalog_entry_catalogs(catalog_id, catalog_entry_id):
@@ -424,7 +426,14 @@ def make_zip(catalog_entry):
     zip_filepath = catalog_entry.zip_filepath()
     if os.path.exists(zip_filepath):
         os.remove(zip_filepath)
+
+    paths = [fn for fn in glob.glob(os.path.join(job_path, "*.csv"))]
+    if len(paths) == 0:
+        return
     shutil.make_archive(catalog_entry.zip_archive_base(), "zip", job_path)
+    with zipfile.ZipFile(zip_filepath, "w", zipfile.ZIP_DEFLATED) as zipped_entry:
+        for file_to_zip in paths:
+            zipped_entry.write(file_to_zip, os.path.basename(file_to_zip))
     save_zip(catalog_entry)
 
 
@@ -474,13 +483,6 @@ def make_kmz(catalog_entry, kmz_params):
     mode = kmz_params["mode"]
     only_vars = kmz_params["only_vars"]
 
-    # logging.info("make_kmz: job_id=%s" % job_id)
-    # job_path = osp.join(osp.abspath(sys_cfg.sims_path), job_id)
-    # job_path = catalog_entry.entry_path()
-    # url_prefix = pxp.join(sys_cfg.url_root, sys_cfg.sims_url_path, job_id)
-    # logging.debug("make_kmz: job_path %s" % job_path)
-    # logging.debug("make_kmz: url_prefix %s" % url_prefix)
-
     kmz_filename = catalog_entry.kml_filename(mode)
     href_join = catalog_entry.kml_href_join(mode)
     if kmz_filename == None or href_join == None:
@@ -488,34 +490,6 @@ def make_kmz(catalog_entry, kmz_params):
     kmz_path = catalog_entry.kml_filepath(mode)
     href_prefix = catalog_entry.entry_directory()
     description = catalog_entry.entry_description()
-    # if mode == "" or mode == "inc":
-    #     kmz_filename = catalog_entry.kml_inc_filename()
-    #     # kmz_filename = job_id + "_inc.kmz"
-    #     # href_prefix = osp.abspath(job_path)
-    #     href_join = os.path.join
-    #     # logging.debug("make_kmz: kmz file will include images from %s" % href_prefix)
-    #     # logging.info("make_kmz: kmz file will include images")
-    # elif mode == "ref":
-    #     kmz_filename = catalog_entry.kml_ref_filename()
-    #     # kmz_filename = job_id + "_ref.kmz"
-    #     # href_prefix = url_prefix
-    #     href_join = pxp.join
-    #     # logging.debug("make_kmz: kmz file will link to images from %s" % href_prefix)
-    #     # logging.info("make_kmz: kmz file will link to images")
-    # else:
-    #     raise MakeKmzError(
-    #         catalog_entry, 'make_kmz: mode must be "inc" or "ref" or omitted'
-    #     )
-
-    # read the catalog and the manifest
-    # cat_path = osp.join(job_path, "catalog.json")
-    # cat = json.load(open(cat_path))
-    # if job_id not in cat:
-    #     logging.error("job id %s not in the catalog" % job_id)
-    #     sys.exit(1)
-    # cat_entry = cat[job_id]
-    # mf = json.load(open(osp.join(sys_cfg.sims_path, cat_entry["manifest_path"])))
-
     mf = json.load(catalog_entry.web_manifest_path())
 
     mdomain = max(list(map(int, list(mf.keys()))))
@@ -529,21 +503,13 @@ def make_kmz(catalog_entry, kmz_params):
         raise MakeKmzError(
             catalog_entry, f"steps needed for all up to max domain number = {mdomain}"
         )
-        # logging.error(
-        #     "make_kmz: steps needed for all up to max domain number = %s" % mdomain
-        # )
-        # sys.exit(1)
-
-    # description = cat_entry["description"]
-    # logging.info("make_kmz: job description: %s" % description)
-
     # transpose var and time in manifest, output to frame
     frame = {}
     for domain in mf:
         for ts_esmf in mf[domain]:
             for var in mf[domain][ts_esmf]:
                 if only_vars is None or var in only_vars:
-                    update_nested_dict(
+                    script_utils.update_nested_dict(
                         frame, {domain: {var: {ts_esmf: mf[domain][ts_esmf][var]}}}
                     )
 
@@ -552,7 +518,6 @@ def make_kmz(catalog_entry, kmz_params):
     for domain in sorted(frame):
         domain_folder = doc.newfolder(name=domain)
         istep = step[int(domain) - 1]
-        # logging.info("make_kmz: processing domain %s step %s" % (domain, istep))
         for var in frame[domain]:
             var_folder = domain_folder.newfolder(name=var)
             ts_esmf = sorted(frame[domain][var].keys())
@@ -594,37 +559,20 @@ def make_kmz(catalog_entry, kmz_params):
                 ground.icon.href = href_join(href_prefix, raster_path)
 
     # build output file
-    # kmz_path = osp.join(job_path, kmz_filename)
-    # logging.info("make_kmz: creating file %s" % kmz_path)
     doc.savekmz(kmz_path)
-    # url = pxp.join(url_prefix, kmz_filename)
-    # logging.info("make_kmz: file created at %s" % url)
+    save_kml(catalog_entry, mode)
 
+
+def save_kml(catalog_entry, mode):
+    kmz_path = catalog_entry.kml_filepath(mode)
     content_size = os.path.getsize(kmz_path) / (1024 * 1024)
     catalog_entry.kml_size = round(content_size, 1)
-    db_session.commit()
-    # try:
-    #     r = requests.get(url, stream=True)
-    #     content_size = int(r.headers["Content-Length"])
-    #     logging.info("make_kmz: file size is %s" % content_size)
-    #     cat[job_id]["kml_url"] = url
-    #     cat[job_id]["kml_size"] = content_size
-    #     json.dump(cat, open(cat_path, "w"), indent=4, separators=(",", ": "))
-    # except Exception as e:
-    #     logging.warning(
-    #         "make_kmz: accessing the file over the web failed with exception %s" % e
-    #     )
-
-
-def save_kml(catalog_entry):
-    zip_filepath = catalog_entry.zip_filepath()
-    content_size = os.path.getsize(zip_filepath) / (1024 * 1024)
-    catalog_entry.zip_size = round(content_size, 1)
+    catalog_entry.kml_mode = mode
     db_session.commit()
 
 
-def save_kml_for_job_id(job_id):
+def save_kml_for_job_id(job_id, mode):
     catalog_entry = find_by_job_id(job_id)
     if catalog_entry == None:
         return
-    save_kml(catalog_entry)
+    save_kml(catalog_entry, mode)

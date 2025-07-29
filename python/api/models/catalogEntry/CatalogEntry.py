@@ -7,7 +7,6 @@ from api.models.simLayer.SimLayer import SimLayer
 from api.apiKeys import (
     SIMULATIONS_FOLDER,
     MANIFEST_FILENAME,
-    DOWNLOADS_FOLDER,
     CATALOG_FILENAME,
 )
 import api.encryption as encryption
@@ -22,13 +21,13 @@ EMPTY = ""
 
 class CatalogEntry(CatalogEntryDbModel):
     def entry_path(self):
-        entry_path = (
-            f"{SIMULATIONS_FOLDER}/{encryption.decrypt_searchable_data(self.job_id)}"
+        entry_path = os.path.join(
+            SIMULATIONS_FOLDER, encryption.decrypt_searchable_data(self.job_id)
         )
         return entry_path
 
     def entry_manifest_path(self):
-        manifest_path = f"{SIMULATIONS_FOLDER}/{encryption.decrypt_searchable_data(self.manifest_path)}"
+        manifest_path = os.path.join(SIMULATIONS_FOLDER, self.manifest_filename())
         return manifest_path
 
     def manifest_filename(self):
@@ -40,12 +39,12 @@ class CatalogEntry(CatalogEntryDbModel):
 
     def entry_catalog_path(self):
         home_dir = self.entry_path()
-        catalog_path = f"{home_dir}/{CATALOG_FILENAME}"
+        catalog_path = os.path.join(home_dir, CATALOG_FILENAME)
         return catalog_path
 
     def web_manifest_path(self):
         home_dir = self.entry_path()
-        manifest_path = f"{home_dir}/{MANIFEST_FILENAME}"
+        manifest_path = os.path.join(home_dir, MANIFEST_FILENAME)
         return manifest_path
 
     def uploader(self):
@@ -60,13 +59,13 @@ class CatalogEntry(CatalogEntryDbModel):
         return f"{self.folder_name()}.zip"
 
     def zip_filepath(self):
-        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}.zip"
+        return os.path.join(self.entry_path(), self.zip_filename())
 
     def zip_archive_base(self):
-        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}"
+        return os.path.join(self.entry_path(), self.folder_name())
 
     def kml_base(self):
-        return f"{DOWNLOADS_FOLDER}/{self.folder_name()}"
+        return os.path.join(self.entry_path(), self.folder_name())
 
     def kml_inc_filename(self):
         return f"{self.folder_name()}_inc.kmz"
@@ -85,7 +84,7 @@ class CatalogEntry(CatalogEntryDbModel):
         filename = self.kml_filename(mode)
         if filename == None:
             return None
-        return f"{DOWNLOADS_FOLDER}/{filename}"
+        return os.path.join(self.entry_path(), filename)
 
     def kml_href_join(self, mode):
         if mode == KMZ_INC or mode == EMPTY:
