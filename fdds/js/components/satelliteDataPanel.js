@@ -4,7 +4,7 @@ export class satelliteDataPanel extends HTMLElement {
     constructor() {
         super();
         this.innerHTML = `
-            <div id="satellite-data-panel-container" class="feature-controller hidden" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div id="satellite-data-panel-container" class="feature-controller hidden">
                 <div id="satellite-data-panel-header">
                     <span id="media-title">Media Viewer</span>
                     <button id="close-media" class="interactive-button close-panel">×</button>
@@ -36,7 +36,7 @@ export class satelliteDataPanel extends HTMLElement {
         };
 
         const placeholder_media = `
-        <img class="satellite-img" src="https://placecats.com/300/300" alt="Satellite Image"/>
+        <img class="satellite-img" src="https://placecats.com/150/150" alt="Satellite Image"/>
         `;
         this.setMedia(placeholder_media);
     }
@@ -53,7 +53,7 @@ export class satelliteDataPanel extends HTMLElement {
     }
 
     hide() {
-        const popup = this.querySelector('satellite-data-panel');
+        const popup = this.querySelector('#satellite-data-panel-container');
         popup.classList.add('hidden');
     }
 
