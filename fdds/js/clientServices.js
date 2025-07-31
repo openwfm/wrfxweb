@@ -36,6 +36,11 @@ export async function getSimulation(catalogId, entryId) {
   return response_json;
 }
 
+export function zipUrl(catalogId, entryId) {
+  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/zip`;
+  return GET_URL;
+}
+
 /** Service request for downloading zip link from catalogItem. */
 export async function getZip(catalogId, entryId) {
   let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/zip`;
@@ -47,9 +52,14 @@ export async function getZip(catalogId, entryId) {
   return response_json;
 }
 
+export function kmlUrl(catalogId, entryId) {
+  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/kml`;
+  return GET_URL;
+}
+
 /** Service request for downloading kml link from catalogItem. */
 export async function getKml(catalogId, entryId) {
-  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/zip`;
+  let GET_URL = `${CATALOG_URL}/${catalogId}/entries/${entryId}/kml`;
   const response_json = await getRequest(GET_URL);
 
   if (response_json.error) {

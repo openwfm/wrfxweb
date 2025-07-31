@@ -48,7 +48,7 @@ def kml_entry_id(catalog_entry_id, steps, mode, only_vars):
         print(f"Encountered an error making kml for job_id {job_id}: {e}")
 
 
-def update_catalog_entry_with_kml(job_id):
+def update_catalog_entry_with_kml(job_id, mode, kml_url):
     try:
         print(f"updating catalog_entry with job_id {job_id} with kml info.")
         catalog_entry = CatalogEntryServices.find_by_job_id(job_id)
@@ -56,7 +56,7 @@ def update_catalog_entry_with_kml(job_id):
             print(f"No CatalogEntry found with job_id {job_id}")
             return
 
-        CatalogEntryServices.save_kml(catalog_entry)
+        CatalogEntryServices.save_kml(catalog_entry, mode, kml_url)
         print(
             f"updated kml info for catalog_entry_id {catalog_entry.id} at with job_id {job_id}"
         )

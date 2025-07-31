@@ -9,6 +9,7 @@ from utils import load_sys_cfg
 import posixpath as pxp
 import requests
 import subprocess
+import scripts.make_zip as api_script
 
 sys_cfg = load_sys_cfg()
 sys_cfg.sims_path = "fdds/simulations"
@@ -61,6 +62,7 @@ def make_zip(job_id):
         json.dump(cat, open(cat_path, "w"), indent=4, separators=(",", ": "))
     except:
         logging.warning("make_zip: accessing the file over the web failed")
+    api_script.update_zip_meta(job_id, url)
 
 
 if __name__ == "__main__":

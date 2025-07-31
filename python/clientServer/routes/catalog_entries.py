@@ -12,7 +12,7 @@ from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 from flask_login import current_user
 from flask import send_from_directory
 
-import os.path as osp
+import os
 
 
 @app.route("/catalogs/<catalog_id>/entries", methods=["GET"])
@@ -36,7 +36,7 @@ def catalog_entry_rasters_v1(catalog_id, catalog_entry_id):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
-    manifest_path = osp.join(catalog_entry.folder_name(), MANIFEST_FILENAME)
+    manifest_path = os.path.join(catalog_entry.folder_name(), MANIFEST_FILENAME)
     return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
 
 
@@ -66,6 +66,8 @@ def catalog_entry_zip(catalog_id, catalog_entry_id):
     )
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
+    if not catalog_entry.has_zip():
+        return {"message": "Requested Entry has no zip"}, 404
 
     simulation_folder = catalog_entry.entry_path()
     zip_filename = catalog_entry.zip_filename()
@@ -84,11 +86,13 @@ def catalog_entry_kml(catalog_id, catalog_entry_id):
     )
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
+    if not catalog_entry.has_kml():
+        return {"message": "Requested Entry has no kml"}, 404
 
     simulation_folder = catalog_entry.entry_path()
-    zip_filename = catalog_entry.zip_filename()
+    kml_filename = catalog_entry.kml_filename()
 
-    return send_from_directory(simulation_folder, zip_filename, as_attachment=True)
+    return send_from_directory(simulation_folder, kml_filename, as_attachment=True)
 
 
 @app.route(

@@ -56,13 +56,19 @@ class CatalogEntry(CatalogEntryDbModel):
         return SIMULATIONS_FOLDER
 
     def zip_filename(self):
-        return f"{self.folder_name()}.zip"
+        return encryption.decrypt_searchable_data(self.zip_url)
 
     def zip_filepath(self):
         return os.path.join(self.entry_path(), self.zip_filename())
 
     def zip_archive_base(self):
-        return os.path.join(self.entry_path(), self.folder_name())
+        return f"{self.folder_name()}.zip"
+
+    def zip_save_path(self):
+        return os.path.join(self.entry_path(), self.zip_archive_base())
+
+    def has_zip(self):
+        return self.zip_filename() != ""
 
     def kml_base(self):
         return os.path.join(self.entry_path(), self.folder_name())
@@ -73,15 +79,15 @@ class CatalogEntry(CatalogEntryDbModel):
     def kml_ref_filename(self):
         return f"{self.folder_name()}_ref.kmz"
 
-    def kml_filename(self, mode):
+    def kml_mode_filename(self, mode):
         if mode == KMZ_INC or mode == EMPTY:
             return self.kml_inc_filename()
         elif mode == KMZ_REF:
             return self.kml_ref_filename()
         return None
 
-    def kml_filepath(self, mode):
-        filename = self.kml_filename(mode)
+    def kml_mode_filepath(self, mode):
+        filename = self.kml_mode_filename(mode)
         if filename == None:
             return None
         return os.path.join(self.entry_path(), filename)
@@ -91,6 +97,15 @@ class CatalogEntry(CatalogEntryDbModel):
             return pxp.join
         elif mode == KMZ_REF:
             return os.path.join
+
+    def kml_filename(self):
+        return encryption.decrypt_searchable_data(self.kml_url)
+
+    def kml_filepath(self):
+        return os.path.join(self.entry_path(), self.kml_filename())
+
+    def has_kml(self):
+        return self.kml_filename() == None
 
     def folder_name(self):
         return f"{encryption.decrypt_searchable_data(self.job_id)}"

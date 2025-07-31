@@ -18,11 +18,22 @@ def zip_catalog_entry_id(catalog_entry_id):
 
 def zip_simulation(simulation_name):
     catalog_entry = CatalogEntryServices.find_by_job_id(simulation_name)
-    zip_simulation(catalog_entry.id)
+    if catalog_entry == None:
+        print(f"No catalog_entry with name {simulation_name}")
+        return
+    zip_catalog_entry_id(catalog_entry.id)
+
+
+def update_zip_meta(simulation_name, zip_url):
+    catalog_entry = CatalogEntryServices.find_by_job_id(simulation_name)
+    if catalog_entry == None:
+        print(f"No catalog_entry with name {simulation_name}")
+        return
+    CatalogEntryServices.save_zip_for_job_id(catalog_entry.id, zip_url)
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Please provide a catalog_entry_id")
     else:
-        zip_catalog_entry_id(sys.argv[1])
+        zip_simulation(sys.argv[1])

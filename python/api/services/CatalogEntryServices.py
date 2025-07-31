@@ -417,38 +417,39 @@ def zip_catalog_entry(catalog_entry_id, upload_api_key):
         make_zip(catalog_entry)
         return catalog_entry
     except Exception as e:
+        print(f"exception : {e}")
         logging.service_exception("CatalogEntry", "zip_catalog_entry", e)
         return None
 
 
 def make_zip(catalog_entry):
     job_path = catalog_entry.entry_path()
-    zip_filepath = catalog_entry.zip_filepath()
-    if os.path.exists(zip_filepath):
-        os.remove(zip_filepath)
-
+    if catalog_entry.has_zip():
+        zip_filepath = catalog_entry.zip_filepath()
+        if os.path.exists(zip_filepath):
+            os.remove(zip_filepath)
     paths = [fn for fn in glob.glob(os.path.join(job_path, "*.csv"))]
     if len(paths) == 0:
         return
-    shutil.make_archive(catalog_entry.zip_archive_base(), "zip", job_path)
+    zip_filepath = catalog_entry.zip_save_path()
     with zipfile.ZipFile(zip_filepath, "w", zipfile.ZIP_DEFLATED) as zipped_entry:
         for file_to_zip in paths:
             zipped_entry.write(file_to_zip, os.path.basename(file_to_zip))
-    save_zip(catalog_entry)
+    save_zip(catalog_entry, zip_filepath)
 
 
-def save_zip(catalog_entry):
-    zip_filepath = catalog_entry.zip_filepath()
-    content_size = os.path.getsize(zip_filepath) / (1024 * 1024)
+def save_zip(catalog_entry, zip_url):
+    content_size = os.path.getsize(zip_url) / (1024 * 1024)
     catalog_entry.zip_size = round(content_size, 1)
+    catalog_entry.zip_url = encryption.encrypt_searchable_data(zip_url)
     db_session.commit()
 
 
-def save_zip_for_job_id(job_id):
+def save_zip_for_job_id(job_id, zip_url):
     catalog_entry = find_by_job_id(job_id)
     if catalog_entry == None:
         return
-    save_zip(catalog_entry)
+    save_zip(catalog_entry, zip_url)
 
 
 def kml_catalog_entry(catalog_entry_id, kmz_params, upload_api_key):
@@ -483,11 +484,11 @@ def make_kmz(catalog_entry, kmz_params):
     mode = kmz_params["mode"]
     only_vars = kmz_params["only_vars"]
 
-    kmz_filename = catalog_entry.kml_filename(mode)
+    kmz_filename = catalog_entry.kml_mode_filename(mode)
     href_join = catalog_entry.kml_href_join(mode)
     if kmz_filename == None or href_join == None:
         raise MakeKmzError(catalog_entry, 'mode must be "inc" or "ref" or omitted')
-    kmz_path = catalog_entry.kml_filepath(mode)
+    kmz_path = catalog_entry.kml_mode_filepath(mode)
     href_prefix = catalog_entry.entry_directory()
     description = catalog_entry.entry_description()
     mf = json.load(catalog_entry.web_manifest_path())
@@ -560,19 +561,19 @@ def make_kmz(catalog_entry, kmz_params):
 
     # build output file
     doc.savekmz(kmz_path)
-    save_kml(catalog_entry, mode)
+    save_kml(catalog_entry, mode, kmz_path)
 
 
-def save_kml(catalog_entry, mode):
-    kmz_path = catalog_entry.kml_filepath(mode)
-    content_size = os.path.getsize(kmz_path) / (1024 * 1024)
+def save_kml(catalog_entry, mode, kml_url):
+    content_size = os.path.getsize(kml_url) / (1024 * 1024)
     catalog_entry.kml_size = round(content_size, 1)
     catalog_entry.kml_mode = mode
+    catalog_entry.kml_url = encryption.encrypt_searchable_data(kml_url)
     db_session.commit()
 
 
-def save_kml_for_job_id(job_id, mode):
+def save_kml_for_job_id(job_id, mode, kml_url):
     catalog_entry = find_by_job_id(job_id)
     if catalog_entry == None:
         return
-    save_kml(catalog_entry, mode)
+    save_kml(catalog_entry, mode, kml_url)

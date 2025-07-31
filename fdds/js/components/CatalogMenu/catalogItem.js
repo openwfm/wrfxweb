@@ -2,6 +2,8 @@ import {
   getSimulation,
   getZip,
   getKml,
+  zipUrl,
+  kmlUrl,
   CATALOG_URL,
 } from "../../clientServices.js";
 //import { getSimulation } from "../../services.js";
@@ -21,8 +23,8 @@ export class CatalogItem extends HTMLElement {
                     <div id='jobID'>job id:  </div>
                 </div>
                 <div id='links'>
-                    <div id='kml' class="hidden" download></div>
-                    <div id='zip' class="hidden" download></div>
+                    <a id='kml' class="hidden" download></a>
+                    <a id='zip' class="hidden" download></a>
                 </div>
             </li>
         `;
@@ -49,16 +51,12 @@ export class CatalogItem extends HTMLElement {
   }
 
   initializeKMLURL() {
-    let kmlURL = this.catEntry.kml_url;
+    const kmlLink = this.querySelector("#kml");
+    let hasKml = this.catEntry.has_kml == "True";
     let kmlSize = this.catEntry.kml_size;
 
-    const kmlLink = this.querySelector("#kml");
-    if (kmlSize > 0) {
-      KmlLink.onclick = () => {
-        getKml(this.catalogId, this.catEntry.id);
-      };
-
-      kmlLink.href = kmlURL;
+    if (hasKml) {
+      kmlLink.href = kmlUrl(this.catalogId, this.catEntry.id);
       kmlLink.innerText = `Download KMZ ${kmlSize} MB`;
       kmlLink.classList.remove("hidden");
     } else {
@@ -67,14 +65,12 @@ export class CatalogItem extends HTMLElement {
   }
 
   initializeZipURL() {
-    let zipURL = this.catEntry.zip_url;
-    let zipSize = this.catEntry.zip_size;
     const zipLink = this.querySelector("#zip");
+    let hasZip = this.catEntry.has_zip == "True";
+    let zipSize = this.catEntry.zip_size;
 
-    if (zipURL) {
-      zipLink.onclick = () => {
-        getZip(this.catalogId, this.catEntry.id);
-      };
+    if (hasZip) {
+      zipLink.href = zipUrl(this.catalogId, this.catEntry.id);
       zipLink.innerText = `Download ZIP ${zipSize} MB`;
       zipLink.classList.remove("hidden");
     } else {
