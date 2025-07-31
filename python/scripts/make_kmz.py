@@ -20,7 +20,7 @@ def make_kmz(job_id, steps, mode, only_vars):
             print(f"Kml creation for job_id {job_id} failed")
             return
         print(
-            f"created kml for catalog_entry_id {catalog_entry.id} at {catalog_entry.zip_filepath()}"
+            f"created kml for catalog_entry_id {catalog_entry.id} at {catalog_entry.kml_filepath()}"
         )
     except Exception as e:
         print(f"Encountered an error making kml for job_id {job_id}: {e}")

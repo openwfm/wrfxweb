@@ -202,7 +202,6 @@ def delete_stale_timestamps(catalog_entry_id, max_age_in_days, upload_server_api
             LayerTimestampServices.delete(timestamp, upload_server_api_key)
 
     except Exception as e:
-        print(e)
         logging.service_exception("CatalogEntry", "delete_stale_timestamps", e)
         return
 
@@ -417,7 +416,6 @@ def zip_catalog_entry(catalog_entry_id, upload_api_key):
         make_zip(catalog_entry)
         return catalog_entry
     except Exception as e:
-        print(f"exception : {e}")
         logging.service_exception("CatalogEntry", "zip_catalog_entry", e)
         return None
 
@@ -491,7 +489,7 @@ def make_kmz(catalog_entry, kmz_params):
     kmz_path = catalog_entry.kml_mode_filepath(mode)
     href_prefix = catalog_entry.entry_directory()
     description = catalog_entry.entry_description()
-    mf = json.load(catalog_entry.web_manifest_path())
+    mf = json.load(open(catalog_entry.entry_manifest_path()))
 
     mdomain = max(list(map(int, list(mf.keys()))))
     if steps == "":
@@ -547,7 +545,7 @@ def make_kmz(catalog_entry, kmz_params):
                         yunits=kml.Units.fraction,
                     )
                     cbo.size = kml.Size(
-                        x=150, y=300, xunits=kml.Units.pixel, yunits=kml.Units.pixel
+                        x=150, y=300, xunits=kml.Units.pixels, yunits=kml.Units.pixels
                     )
                     cbo.color = kml.Color.rgb(255, 255, 255, a=150)
                     cbo.visibility = 0
