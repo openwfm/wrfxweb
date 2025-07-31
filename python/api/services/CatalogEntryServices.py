@@ -433,13 +433,15 @@ def make_zip(catalog_entry):
     with zipfile.ZipFile(zip_filepath, "w", zipfile.ZIP_DEFLATED) as zipped_entry:
         for file_to_zip in paths:
             zipped_entry.write(file_to_zip, os.path.basename(file_to_zip))
+
     save_zip(catalog_entry, zip_filepath)
 
 
 def save_zip(catalog_entry, zip_url):
     content_size = os.path.getsize(zip_url) / (1024 * 1024)
     catalog_entry.zip_size = round(content_size, 1)
-    catalog_entry.zip_url = encryption.encrypt_searchable_data(zip_url)
+    zip_filename = os.path.basename(zip_url)
+    catalog_entry.zip_url = encryption.encrypt_searchable_data(zip_filename)
     db_session.commit()
 
 
@@ -566,7 +568,8 @@ def save_kml(catalog_entry, mode, kml_url):
     content_size = os.path.getsize(kml_url) / (1024 * 1024)
     catalog_entry.kml_size = round(content_size, 1)
     catalog_entry.kml_mode = mode
-    catalog_entry.kml_url = encryption.encrypt_searchable_data(kml_url)
+    kml_filename = os.path.basename(kml_url)
+    catalog_entry.kml_url = encryption.encrypt_searchable_data(kml_filename)
     db_session.commit()
 
 

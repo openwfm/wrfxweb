@@ -105,7 +105,7 @@ class CatalogEntry(CatalogEntryDbModel):
         return os.path.join(self.entry_path(), self.kml_filename())
 
     def has_kml(self):
-        return self.kml_filename() == None
+        return self.kml_filename() != ""
 
     def folder_name(self):
         return f"{encryption.decrypt_searchable_data(self.job_id)}"
