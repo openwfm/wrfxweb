@@ -391,3 +391,25 @@ export function dragElement(elmnt, subID='', mobileEnabled=false) {
     document.onpointermove = null;
   }
 }
+
+/** ===== Satellite Panel Management block ===== */
+/** Manages global satellite panel instances to prevent duplicates */
+export function getSatellitePanel() {
+  let satellitePanel = document.querySelector("satellite-data-panel");
+  if (!satellitePanel) {
+    // Dynamically import and create the panel
+    import("./components/satelliteDataPanel.js").then(() => {
+      satellitePanel = document.createElement("satellite-data-panel");
+      document.body.appendChild(satellitePanel);
+    });
+  }
+  return satellitePanel;
+}
+
+export function showSatellitePanel(mediaContent, title = "Satellite Data") {
+  const satellitePanel = getSatellitePanel();
+  if (satellitePanel) {
+    satellitePanel.setMedia(mediaContent);
+    satellitePanel.show(title);
+  }
+}
