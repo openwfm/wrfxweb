@@ -1126,3 +1126,65 @@ html, body {
     max-width: 100%;
     height: auto;
 }
+
+#satellite-data-panel-container {
+    position: absolute;
+    z-index: 9999;
+    /*right: 70px;*/
+    /*bottom: 5%;*/
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 1.15rem;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    min-height: 150px;
+    max-width: 20vw;
+    max-height: 20vh;
+    overflow: auto;
+    /* padding: 2px; */
+    /* top: 50%;
+    left: 50%; */
+    /* transform: translate(-50%, -50%); */
+}
+
+.satellite-data-panel-header {
+    padding: 10px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.media-content {
+    padding: 15px;
+}
+
+#media-title {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+/* Ensure media content is responsive */
+.media-content img,
+.media-content video {
+    max-width: 100%;
+    height: auto;
+}
+
+#view-raster {
+    box-sizing: border-box;
+    background: rgb(76, 175, 80);
+    color: white;
+    border: medium;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 5px;
+    transition: background-color 0.3s;
+}
