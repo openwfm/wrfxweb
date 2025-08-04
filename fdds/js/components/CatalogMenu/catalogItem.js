@@ -96,17 +96,14 @@ export class CatalogItem extends HTMLElement {
         // Set the media content and show the panel
         const mediaContent = `
                 <div class="raster-image-container">
-                    <img class="satellite-img" src="${rasterImageUrl}" alt="Raster Image for ${description}"
+                    <img class="satellite-img" src="${rasterImageUrl}" alt="Image for ${description}"
                          style="max-width: 100%; height: auto; display: block; margin: 0 auto;"
                          onerror="this.alt='Failed to load image'; this.style.display='none';" />
-                    <p style="text-align: center; margin-top: 10px; font-size: 0.9em; color: #666;">
-                        ${description}
-                    </p>
                 </div>
             `;
 
         satellitePanel.setMedia(mediaContent);
-        satellitePanel.show(`Raster Image - ${description}`);
+        satellitePanel.show(`Reference Perimeter - ${description}`);
       }
     }
   }
