@@ -24,6 +24,11 @@ def log_zip_queue_error(catalog_entry_id, error):
     log_statement("ZipQueueError", upload_error_message, True)
 
 
+def log_kml_queue_error(catalog_entry_id, error):
+    upload_error_message = f"catalog_entry_id: {catalog_entry_id}, error: {error}"
+    log_statement("KmlQueueError", upload_error_message, True)
+
+
 def log_upload(catalog_entry_upload):
     upload_message = (
         f"uploaded entry: catalog_entry_upload_id: {catalog_entry_upload.id}"

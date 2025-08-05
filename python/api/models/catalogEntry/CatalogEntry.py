@@ -128,6 +128,9 @@ class CatalogEntry(CatalogEntryDbModel):
     def sim_layers(self):
         return db_session.query(SimLayer).filter_by(catalog_entry_id=self.id).all()
 
+    def sim_vars(self):
+        return [layer.name() for layer in self.sim_layers()]
+
     def layer_timestamps(self):
         layer_timestamp_join = outerjoin(
             LayerTimestamp, SimLayer, LayerTimestamp.sim_layer_id == SimLayer.id

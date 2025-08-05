@@ -19,5 +19,8 @@ class SimLayer(SimLayerDbModel):
         db_session.delete(self)
         db_session.commit()
 
+    def name(self):
+        return self.layer_type.name
+
     def __repr__(self):
         return f"<SimLayer {self.id}>"
