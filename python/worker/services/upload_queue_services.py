@@ -1,5 +1,5 @@
-from uploadWorker.logging import utils as loggingUtils
-from uploadWorker.workerKeys import (
+from worker.logging import utils as loggingUtils
+from worker.workerKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
     UPLOAD_QUEUE_SERVICE_URL,
 )

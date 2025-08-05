@@ -1,5 +1,5 @@
 from flask import Flask
-from uploadQueueService.serviceKeys import (
+from workerQueue.serviceKeys import (
     UPLOAD_QUEUE_SERVICE_SECRET,
     UPLOAD_QUEUE_SERVICE_LOG,
 )

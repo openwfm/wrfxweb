@@ -1,6 +1,6 @@
-from uploadQueueService.app import app
+from workerQueue.app import app
 
-from uploadQueueService.serviceKeys import UPLOAD_QUEUE_SERVICE_DEBUG_LOGS
+from workerQueue.serviceKeys import UPLOAD_QUEUE_SERVICE_DEBUG_LOGS
 
 import datetime
 

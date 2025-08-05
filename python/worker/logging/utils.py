@@ -1,6 +1,6 @@
-from uploadWorker.app import app
+from worker.app import app
 
-from uploadWorker.workerKeys import UPLOAD_WORKER_DEBUG_LOGS
+from worker.workerKeys import UPLOAD_WORKER_DEBUG_LOGS
 
 import datetime
 

@@ -14,11 +14,10 @@
     "jest": "^29.7.0"
   },
   "scripts": {
-    "prestart": "npm install",
     "client": "cd python/clientServer && ../venv/bin/flask --app __init__ run --debug --port 8000",
-    "upload-service": "cd python/uploadService && ../venv/bin/flask --app __init__ run --debug --port 8001",
-    "upload-queue": "cd python/uploadQueueService && ../venv/bin/flask --app __init__ run --debug --port 8002",
-    "upload-worker": "cd python/uploadWorker && ../venv/bin/flask --app __init__ run --debug --port 8003",
+    "external-server": "cd python/externalService && ../venv/bin/flask --app __init__ run --debug --port 8001",
+    "worker-queue": "cd python/workerQueue && ../venv/bin/flask --app __init__ run --debug --port 8002",
+    "worker": "cd python/worker && ../venv/bin/flask --app __init__ run --debug --port 8003",
     "test": "jest --silent"
   }
 }

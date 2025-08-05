@@ -1,7 +1,7 @@
-from uploadQueueService.app import app
-from uploadQueueService.queue.upload_queue import upload_queue
-from uploadQueueService.services.upload_worker_services import upload_worker_services
-from uploadQueueService.serviceKeys import (
+from workerQueue.app import app
+from workerQueue.queue.upload_queue import upload_queue
+from workerQueue.services.upload_worker_services import upload_worker_services
+from workerQueue.serviceKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
 )
 from functools import wraps

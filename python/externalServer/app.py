@@ -1,5 +1,5 @@
 from flask import Flask
-from uploadService.uploadServiceKeys import (
+from externalServer.serverKeys import (
     UPLOAD_SERVICE_LOG_FILE,
     UPLOAD_SERVICE_SECRET,
 )

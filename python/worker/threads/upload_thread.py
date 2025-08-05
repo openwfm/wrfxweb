@@ -1,7 +1,7 @@
-from uploadWorker.app import app
-from uploadWorker.logging import utils as loggingUtils
-from uploadWorker.services.upload_queue_services import upload_queue_services
-from uploadWorker.workerKeys import UPLOAD_WORKER_API_KEY
+from worker.app import app
+from worker.logging import utils as loggingUtils
+from worker.services.upload_queue_services import upload_queue_services
+from worker.workerKeys import UPLOAD_WORKER_API_KEY
 
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,

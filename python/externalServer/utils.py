@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import request
-from uploadService.uploadServiceKeys import UPLOAD_SERVICE_API_KEY
+from externalServer.serverKeys import UPLOAD_SERVICE_API_KEY
 import api.services.CatalogServices as CatalogServices
 
 

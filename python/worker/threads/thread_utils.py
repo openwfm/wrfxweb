@@ -1,5 +1,5 @@
-from uploadWorker.logging import utils as loggingUtils
-from uploadWorker.workerKeys import (
+from worker.logging import utils as loggingUtils
+from worker.workerKeys import (
     TEMP_FOLDER,
     UPLOAD_WORKER_API_KEY,
 )

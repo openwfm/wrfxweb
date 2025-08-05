@@ -1,6 +1,6 @@
-from uploadService.app import app
+from externalServer.app import app
 
-from uploadService.uploadServiceKeys import UPLOAD_SERVICE_DEBUG_LOGS
+from externalServer.serverKeys import UPLOAD_SERVICE_DEBUG_LOGS
 
 import datetime
 

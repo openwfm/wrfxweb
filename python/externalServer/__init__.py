@@ -1,8 +1,8 @@
-from uploadService.app import app
+from externalServer.app import app
 
-from uploadService.utils import api_key_required, universal_api_key_required
+from externalServer.utils import api_key_required, universal_api_key_required
 
-from uploadService import routes
+from externalServer import routes
 
 
 @app.route("/server-ready/<catalog_id>", methods=["GET"])

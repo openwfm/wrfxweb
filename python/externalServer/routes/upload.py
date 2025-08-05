@@ -1,8 +1,8 @@
-from uploadService.app import app
+from externalServer.app import app
 
-from uploadService.utils import api_key_required, universal_api_key_required
-from uploadService.logging import utils as loggingUtils
-from uploadService.uploadServiceKeys import (
+from externalServer.utils import api_key_required, universal_api_key_required
+from externalServer.logging import utils as loggingUtils
+from externalServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_URL,
     UPLOAD_QUEUE_SERVICE_API_KEY,
     UPLOAD_SERVICE_API_KEY,

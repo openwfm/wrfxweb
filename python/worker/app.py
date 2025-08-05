@@ -1,5 +1,5 @@
 from flask import Flask
-from uploadWorker.workerKeys import (
+from worker.workerKeys import (
     UPLOAD_WORKER_SECRET,
     UPLOAD_WORKER_LOG,
 )
