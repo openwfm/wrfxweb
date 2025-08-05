@@ -53,7 +53,7 @@ def post_kml_catalog_entry(catalog_entry):
     try:
         catalog_entry_id = catalog_entry.id
         kml_params = request_kml_params(catalog_entry)
-        post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/enqueue/{catalog_entry_id}/kml"
+        post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/kml/enqueue/{catalog_entry_id}"
         headers = {
             "Content-type": "application/json",
             "API-Key": UPLOAD_QUEUE_SERVICE_API_KEY,

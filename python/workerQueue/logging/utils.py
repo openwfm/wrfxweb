@@ -12,10 +12,8 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
-def log_upload_worker_error(catalog_entry_upload_id, error):
-    upload_error_message = (
-        f"catalog_entry_upload_id: {catalog_entry_upload_id}, error: {error}"
-    )
+def log_upload_worker_error(error):
+    upload_error_message = f"error: {error}"
     log_statement("UploadWorkerError", upload_error_message, True)
 
 

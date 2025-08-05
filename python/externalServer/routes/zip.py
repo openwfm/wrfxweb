@@ -47,7 +47,7 @@ def zip_job_id(job_id):
 
 
 def post_zip_catalog_entry(catalog_entry_id):
-    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/enqueue/{catalog_entry_id}/zip"
+    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/zip/enqueue/{catalog_entry_id}"
     try:
         headers = {
             "Content-type": "application/json",

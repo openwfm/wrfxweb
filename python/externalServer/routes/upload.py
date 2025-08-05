@@ -114,7 +114,7 @@ def verify_zip_upload(catalog_entry_upload):
 
 
 def post_task_queue_service(catalog_entry_upload):
-    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/enqueue/{catalog_entry_upload.id}"
+    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/upload/enqueue/{catalog_entry_upload.id}"
     try:
         headers = {
             "Content-type": "application/json",

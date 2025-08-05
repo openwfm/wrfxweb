@@ -16,7 +16,7 @@ logs/
 downloads/
 uploads
 simulations/
-queue/
+workerQueue.log
 conf.json
 instance/
 
