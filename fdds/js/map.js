@@ -21,6 +21,8 @@ export const map = (function buildMap() {
     zoomControl: true,
     minZoom: 3,
     center: center,
+    zoomSnap: 0.5,
+    zoomDelta: 0.5,
     zoom: zoom,
   });
 
