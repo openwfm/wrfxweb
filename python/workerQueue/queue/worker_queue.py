@@ -3,6 +3,7 @@ from workerQueue.serviceKeys import (
 )
 import os
 from workerQueue.logging import utils as loggingUtils
+from workerQueue.services.constants import UPLOAD_ACTION, ZIP_ACTION, KML_ACTION
 
 import threading
 
@@ -17,8 +18,20 @@ class WorkerQueue:
     def enqueue_upload(self, catalog_entry_upload_id):
         with self.lock:
             with open(WORKER_QUEUE_FILE, "a") as file:
-                file.write(f"{catalog_entry_upload_id}\n")
-        loggingUtils.log_enqueue(catalog_entry_upload_id)
+                file.write(f"{UPLOAD_ACTION} {catalog_entry_upload_id}\n")
+        loggingUtils.log_upload_enqueue(catalog_entry_upload_id)
+
+    def enqueue_zip(self, catalog_entry_id):
+        with self.lock:
+            with open(WORKER_QUEUE_FILE, "a") as file:
+                file.write(f"{ZIP_ACTION} {catalog_entry_id}\n")
+        loggingUtils.log_zip_enqueue(catalog_entry_id)
+
+    def enqueue_kml(self, catalog_entry_id, kml_params):
+        with self.lock:
+            with open(WORKER_QUEUE_FILE, "a") as file:
+                file.write(f"{KML_ACTION} {catalog_entry_id} {kml_params["steps"]} {kml_params["mode"]} {kml_params["only_vars"]}\n")
+        loggingUtils.log_zip_enqueue(catalog_entry_id)
 
     def dequeue(self):
         catalog_entry_upload_id = ""

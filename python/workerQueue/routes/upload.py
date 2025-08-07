@@ -4,6 +4,8 @@ from workerQueue.services.upload_worker_services import upload_worker_services
 
 from workerQueue.utils import api_key_required
 
+from api.services import CatalogEntryUploadServices as CatalogEntryUploadServices
+
 from flask import abort
 
 
@@ -21,3 +23,8 @@ def equeue_upload(catalog_entry_upload_id):
 def validate_catalog_entry_upload_id(catalog_entry_upload_id):
     if not catalog_entry_upload_id.isdigit():
         abort(400, "Posted catalog_entry_upload_id must be an integer")
+    catalog_entry_upload = CatalogEntryUploadServices.find_by_id(
+        catalog_entry_upload_id
+    )
+    if catalog_entry_upload == None:
+        abort(400, "Posted catalog_entry_upload_id must be a valid CatalogEntryUpload")

@@ -10,10 +10,10 @@ from workerQueue import routes
 # with next upload task
 @app.route("/dequeue", methods=["GET"])
 @api_key_required
-def dequeue_upload():
+def dequeue():
     worker_queue.dequeue()
     next_task = worker_queue.peek()
     if next_task == "":
         return {"message": "Queue is Empty!"}, 204
     else:
-        return {"catalog_entry_upload_id": next_task}
+        return {"catalog_entry_upload_id": next_task}, 200

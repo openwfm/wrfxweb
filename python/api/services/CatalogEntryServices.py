@@ -1,5 +1,5 @@
 from api.session import db_session
-from api.models.catalogEntry.CatalogEntry import CatalogEntry
+from api.models.catalogEntry.CatalogEntry import CatalogEntry, KMZ_INC, KMZ_REF
 from api.models.catalogEntryCatalog.CatalogEntryCatalog import CatalogEntryCatalog
 from api.services import (
     AdminServices as AdminServices,
@@ -480,9 +480,9 @@ class MakeKmzError(Exception):
 
 
 def make_kmz(catalog_entry, kmz_params):
-    steps = kmz_params["steps"]
-    mode = kmz_params["mode"]
-    only_vars = kmz_params["only_vars"]
+    steps = verify_steps(kmz_params["steps"])
+    mode = verify_mode(kmz_params["mode"])
+    only_vars = verify_only_vars(kmz_params["only_vars"], catalog_entry)
 
     kmz_filename = catalog_entry.kml_mode_filename(mode)
     href_join = catalog_entry.kml_href_join(mode)
@@ -562,6 +562,38 @@ def make_kmz(catalog_entry, kmz_params):
     # build output file
     doc.savekmz(kmz_path)
     save_kml(catalog_entry, mode, kmz_path)
+
+
+class KMLParamError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+def verify_steps(steps):
+    if steps == None:
+        return ""
+    for step in steps.split(","):
+        if not step.isdigit():
+            raise KMLParamError("Steps must be a list of digits")
+    return steps
+
+
+def verify_mode(mode):
+    if mode == None:
+        return "inc"
+    if mode != KMZ_INC or mode != KMZ_REF:
+        raise KMLParamError(f"Mode must be {KMZ_INC} or {KMZ_REF}")
+    return mode
+
+
+def verify_only_vars(only_vars, catalog_entry):
+    if only_vars == None:
+        return only_vars
+    entry_vars = set(catalog_entry.sim_vars())
+    for only_var in only_vars.split(","):
+        if only_var not in entry_vars:
+            raise KMLParamError("only_vars must be a valid simulation variable")
+    return only_vars
 
 
 def save_kml(catalog_entry, mode, kml_url):

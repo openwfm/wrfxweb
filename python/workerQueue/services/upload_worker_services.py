@@ -3,8 +3,7 @@ from workerQueue.serviceKeys import (
     WORKER_URL,
 )
 from workerQueue.services.worker_services import WorkerServices
-
-UPLOAD_ACTION = "UPLOAD"
+from workerQueue.services.constants import UPLOAD_ACTION
 
 
 class UploadServiceVarsError(Exception):
@@ -23,7 +22,7 @@ class UploadWorkerServices(WorkerServices):
 
     def post_url(self, service_vars):
         catalog_entry_upload_id = service_vars["catalog_entry_upload_id"]
-        return f"{WORKER_URL}/{catalog_entry_upload_id}"
+        return f"{WORKER_URL}/upload/{catalog_entry_upload_id}"
 
     def log_post(self, service_vars):
         catalog_entry_upload_id = service_vars["catalog_entry_upload_id"]

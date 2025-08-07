@@ -22,8 +22,8 @@ KMZ_REF = "ref"
 @api_key_required
 def kml_catalog_entry(catalog_entry_id):
     if request.method == "POST":
-        zip_posted = post_kml_catalog_entry(catalog_entry_id)
-        if zip_posted:
+        kml_posted = post_kml_catalog_entry(catalog_entry_id)
+        if kml_posted:
             return {"message": "Catalog Entry successfully staged for Zipping"}, 200
         return {"message": "Catalog Entry unsuccessfully staged for Zipping"}, 500
 
@@ -61,49 +61,19 @@ def post_kml_catalog_entry(catalog_entry):
         response = requests.post(post_url, headers=headers, json=kml_params)
         response.raise_for_status()
         return True
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         loggingUtils.log_kml_queue_error(catalog_entry.id, f"{e}")
         return False
 
 
 def request_kml_params(catalog_entry):
-    steps = verify_steps(request.form["steps"])
-    mode = verify_mode(request.form["mode"])
-    only_vars = verify_only_vars(request.form["only_vars"], catalog_entry)
+    steps = CatalogEntryServices.verify_steps(request.form["steps"])
+    mode = CatalogEntryServices.verify_mode(request.form["mode"])
+    only_vars = CatalogEntryServices.verify_only_vars(
+        request.form["only_vars"], catalog_entry
+    )
     return {
         "steps": steps,
         "mode": mode,
         "only_vars": only_vars,
     }
-
-
-class KMLParamError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-
-def verify_steps(steps):
-    if steps == None:
-        return steps
-    for step in steps.split(","):
-        if not step.isdigit():
-            raise KMLParamError("Steps must be a list of digits")
-    return steps
-
-
-def verify_mode(mode):
-    if mode == None:
-        return "inc"
-    if mode != KMZ_INC or mode != KMZ_REF:
-        raise KMLParamError(f"Mode must be {KMZ_INC} or {KMZ_REF}")
-    return mode
-
-
-def verify_only_vars(only_vars, catalog_entry):
-    if only_vars == None:
-        return only_vars
-    entry_vars = set(catalog_entry.sim_vars())
-    for only_var in only_vars.split(","):
-        if only_var not in entry_vars:
-            raise KMLParamError("only_vars must be a valid simulation variable")
-    return only_vars
