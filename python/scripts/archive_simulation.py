@@ -34,6 +34,61 @@ def archive_simulation_dry_run(job_id, number_of_days):
         return
 
 
+def delete_imgs_not_in_manifest(job_id):
+    try:
+        manifest_urls = job_manifest_urls(job_id)
+        simulation_path = job_simulation_path(job_id)
+        for entry in os.scandir(simulation_path):
+            if entry.is_file():
+                _, extension = os.path.splitext(entry.name)
+                if extension == ".png" or extension == ".kmz":
+                    if not entry.path in manifest_urls:
+                        os.remove(entry.path)
+
+    except Exception as e:
+        print(f"Error in delete_imgs_not_in_manifest: {e}")
+        return
+
+
+def delete_imgs_not_in_manifest_dry_run(job_id):
+    try:
+        manifest_urls = job_manifest_urls(job_id)
+        simulation_path = job_simulation_path(job_id)
+        count = 0
+        for entry in os.scandir(simulation_path):
+            if entry.is_file():
+                _, extension = os.path.splitext(entry.name)
+                if extension == ".png" or extension == ".kmz":
+                    if not entry.path in manifest_urls:
+                        count += 1
+        print(f"Removing {count} files")
+    except Exception as e:
+        print(f"Error in delete_imgs_not_in_manifest_dry_run: {e}")
+        return
+
+
+def job_manifest_urls(job_id):
+    manifest_json = load_manifest(job_id)
+    simulation_path = job_simulation_path(job_id)
+    manifest_urls = set()
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            timestamp_json = domain_json[timestamp]
+            for layer_type in timestamp_json:
+                layer_json = timestamp_json[layer_type]
+
+                raster_url = os.path.join(simulation_path, layer_json["raster"])
+                manifest_urls.add(raster_url)
+                if "colorbar" in layer_json:
+                    colorbar_url = os.path.join(simulation_path, layer_json["colorbar"])
+                    manifest_urls.add(colorbar_url)
+                if "kml" in layer_json:
+                    kml_url = os.path.join(simulation_path, layer_json["kml"])
+                    manifest_urls.add(kml_url)
+    return manifest_urls
+
+
 def process_job_manifest(job_id, number_of_days, dry_run):
     manifest_json = load_manifest(job_id)
     new_manifest = {}
