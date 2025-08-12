@@ -1,8 +1,10 @@
 from clientServer.app import app
+from clientServer.serverKeys import SIMULATIONS_FOLDER
 
 from flask import send_from_directory
 
 from flask_login import current_user
+import os
 
 
 @app.route("/js/<path:filename>")
@@ -27,7 +29,10 @@ def serve_admin_js(filename):
 
 @app.route("/simulations/<path:filename>")
 def serve_simulations(filename):
-    return send_from_directory("../../fdds/simulations", filename)
+    sim_path = os.path.join(SIMULATIONS_FOLDER, filename)
+    if os.path.exists(sim_path):
+        return send_from_directory(SIMULATIONS_FOLDER, filename)
+    return {"message": "simulation filename does not exist"}, 500
 
 
 @app.route("/simulation/<path:filename>")
@@ -36,7 +41,10 @@ def serve_simulation(filename):
     # app.logger.info(
     #     f"[SimulationAccess] {current_user.email} {time_now} {filename.split('/')[0]}"
     # )
-    return send_from_directory("../../fdds/simulations", filename)
+    sim_path = os.path.join(SIMULATIONS_FOLDER, filename)
+    if os.path.exists(sim_path):
+        return send_from_directory(SIMULATIONS_FOLDER, filename)
+    return {"message": "simulation filename does not exist"}, 500
 
 
 @app.route("/threadManager.js")
