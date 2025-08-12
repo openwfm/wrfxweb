@@ -50,6 +50,43 @@ def delete_imgs_not_in_manifest(job_id):
         return
 
 
+def delete_old_fmda_imgs(job_id, number_of_days):
+    try:
+        simulation_path = job_simulation_path(job_id)
+        for entry in os.scandir(simulation_path):
+            if entry.is_file():
+                filename, extension = os.path.splitext(entry.name)
+                if extension == ".png" or extension == ".kmz":
+                    if fmda_file_to_delete(filename, number_of_days):
+                        os.remove(entry.path)
+
+    except Exception as e:
+        print(f"Error in delete_old_imgs: {e}")
+
+
+def delete_old_fmda_imgs_dry_run(job_id, number_of_days):
+    try:
+        simulation_path = job_simulation_path(job_id)
+        count = 0
+        for entry in os.scandir(simulation_path):
+            if entry.is_file():
+                filename, extension = os.path.splitext(entry.name)
+                if extension == ".png" or extension == ".kmz":
+                    if fmda_file_to_delete(filename, number_of_days):
+                        count += 1
+        print(f"Deleting {count} images")
+    except Exception as e:
+        print(f"Error in delete_old_imgs: {e}")
+
+
+def fmda_file_to_delete(filename, number_of_days):
+    timestamp = filename.split("-")[2]
+    date_format = "%Y%m%d"
+    datetime_timestamp = datetime.strptime(timestamp, date_format)
+    age = (datetime.now() - datetime_timestamp).days
+    return age > number_of_days
+
+
 def delete_imgs_not_in_manifest_dry_run(job_id):
     try:
         manifest_urls = job_manifest_urls(job_id)
