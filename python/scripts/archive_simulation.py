@@ -52,13 +52,17 @@ def delete_imgs_not_in_manifest(job_id):
 
 def delete_old_fmda_imgs(job_id, number_of_days):
     try:
+        count = 0
         simulation_path = job_simulation_path(job_id)
         for entry in os.scandir(simulation_path):
             if entry.is_file():
                 filename, extension = os.path.splitext(entry.name)
                 if extension == ".png" or extension == ".kmz":
                     if fmda_file_to_delete(filename, number_of_days):
+                        count += 1
                         os.remove(entry.path)
+                    if count % 10000 == 0:
+                        print(f"Deleted {count} imgs")
 
     except Exception as e:
         print(f"Error in delete_old_imgs: {e}")
