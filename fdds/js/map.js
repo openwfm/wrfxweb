@@ -21,6 +21,8 @@ export const map = (function buildMap() {
     zoomControl: true,
     minZoom: 3,
     center: center,
+    zoomSnap: 0.5,
+    zoomDelta: 0.5,
     zoom: zoom,
   });
   // Add a custom logo to the map
@@ -29,7 +31,7 @@ export const map = (function buildMap() {
       position: "bottomleft",
       // control position - allowed: 'topleft', 'topright', 'bottomleft', 'bottomright'
     },
-    onAdd: function (map) {
+    onAdd: function(map) {
       var container = L.DomUtil.create("div", "logo-control");
       var button = L.DomUtil.create("div", "logo-div");
       container.appendChild(button);
@@ -39,7 +41,7 @@ export const map = (function buildMap() {
       L.DomEvent.disableClickPropagation(button);
       container.title = "WIRC";
       // Add click event listener for redirection
-      L.DomEvent.on(button, "click", function () {
+      L.DomEvent.on(button, "click", function() {
         // URL to reroute to
         window.location.href = "https://www.wildfirecenter.org";
       });

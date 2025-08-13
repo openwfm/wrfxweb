@@ -10,7 +10,7 @@ from api.services import CatalogEntryServices as CatalogEntryServices
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
 from flask_login import current_user
-from flask import send_from_directory
+from flask import send_from_directory, send_file
 
 import os
 
@@ -107,5 +107,10 @@ def catalog_entry_simulations(catalog_id, catalog_entry_id, file_path):
     if catalog_entry == None:
         return {"message": "Requested Entry does not exist"}, 404
 
-    directory = f"{FLASK_SIMULATIONS_FOLDER}/{catalog_entry.folder_name()}"
-    return send_from_directory(directory, file_path)
+    img_path = os.path.join(catalog_entry.entry_path(), file_path)
+    if os.path.exists(img_path):
+        return send_file(img_path)
+    # directory = f"{FLASK_SIMULATIONS_FOLDER}/{catalog_entry.folder_name()}"
+    #
+    # return send_from_directory(directory, file_path)
+    return {"message": "simulation filename does not exist"}, 500
