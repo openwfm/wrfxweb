@@ -85,26 +85,19 @@ export class CatalogItem extends HTMLElement {
   }
 
   showRasterImage() {
-    const rasterImageUrl = this.catEntry.raster_image_url;
     const description = this.catEntry.description;
+    const manifestPath = this.catEntry.manifest_path;
+    
+    // Extract simulation name from manifest path (e.g., "palisades_example" from "palisades_example/wfc-Palisades_Reanalysis.json")
+    const simulationName = manifestPath.split('/')[0];
+    
+    // Get the existing satellite data panel
+    const satellitePanel = document.querySelector("satellite-data-panel");
 
-    if (rasterImageUrl) {
-      // Get the existing satellite data panel
-      const satellitePanel = document.querySelector("satellite-data-panel");
-
-      if (satellitePanel) {
-        // Set the media content and show the panel
-        const mediaContent = `
-                <div class="raster-image-container">
-                    <img class="satellite-img" src="${rasterImageUrl}" alt="Image for ${description}"
-                         style="max-width: 100%; height: auto; display: block; margin: 0 auto;"
-                         onerror="this.alt='Failed to load image'; this.style.display='none';" />
-                </div>
-            `;
-
-        satellitePanel.setMedia(mediaContent);
-        satellitePanel.show(`Reference Perimeter - ${description}`);
-      }
+    if (satellitePanel) {
+      // Use the new method to load images from the simulation directory
+      satellitePanel.show(`Satellite Data - ${description}`);
+      satellitePanel.loadImagesFromSimulation(simulationName);
     }
   }
 

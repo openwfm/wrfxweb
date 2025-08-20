@@ -1117,8 +1117,50 @@ body {
 #media-content {
     padding: 15px;
     overflow: auto;
-    max-height: calc(80vh - 60px);
+    max-height: calc(30vh - 60px);
+    max-width: calc(30vw - 60px);
     transition: opacity 0.3s ease;
+}
+
+#image-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.nav-button:hover {
+    background-color: #e0e0e0;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.7;
+}
+
+.nav-button:hover .nav-icon {
+    opacity: 1;
+}
+
+#image-counter {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    min-width: 60px;
+    text-align: center;
 }
 
 .satellite-img {

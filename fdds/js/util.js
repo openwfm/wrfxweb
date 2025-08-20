@@ -413,3 +413,11 @@ export function showSatellitePanel(mediaContent, title = "Satellite Data") {
     satellitePanel.show(title);
   }
 }
+
+export function showSatellitePanelFromSimulation(simulationName, title = "Satellite Data") {
+  const satellitePanel = getSatellitePanel();
+  if (satellitePanel) {
+    satellitePanel.show(title);
+    satellitePanel.loadImagesFromSimulation(simulationName);
+  }
+}
