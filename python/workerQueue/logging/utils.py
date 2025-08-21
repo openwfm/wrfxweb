@@ -62,6 +62,10 @@ def log_dequeue(catalog_entry_upload_id):
     log_statement("Dequeue", dequeue_message, True)
 
 
+def log_dequeue_error(dequeue_message):
+    log_statement("Dequeue [ERROR]", dequeue_message, True)
+
+
 def debug_log(message):
     log_statement("Debug", message, True)
 

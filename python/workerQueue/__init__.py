@@ -11,9 +11,8 @@ from workerQueue import routes
 @app.route("/dequeue", methods=["GET"])
 @api_key_required
 def dequeue():
-    worker_queue.dequeue()
-    next_task = worker_queue.peek()
-    if next_task == "":
+    task_params = worker_queue.dequeue()
+    if task_params == None:
         return {"message": "Queue is Empty!"}, 204
     else:
-        return {"catalog_entry_upload_id": next_task}, 200
+        return task_params, 200
