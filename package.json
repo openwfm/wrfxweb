@@ -17,5 +17,8 @@
     "prestart": "npm install",
     "start": "http-server -g -a localhost -p 8000 -c-1",
     "test": "jest --silent"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.28.3"
   }
 }

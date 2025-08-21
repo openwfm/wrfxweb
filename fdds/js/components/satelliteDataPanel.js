@@ -6,7 +6,8 @@ export class satelliteDataPanel extends HTMLElement {
     this.currentImageIndex = 0;
     this.images = [];
     this.simulationName = null;
-    
+    this.isLoading = false;
+
     this.innerHTML = `
             <div id="satellite-data-panel-container" class="feature-controller hidden">
                 <div id="satellite-data-panel-header">
@@ -29,6 +30,14 @@ export class satelliteDataPanel extends HTMLElement {
                     <div class="loading-spinner"></div>
                     <span>Loading image...</span>
                 </div>
+                <div id="error-display" class="hidden">
+                    <div class="error-message">
+                        <p style="color: #d32f2f; text-align: center; padding: 20px;">
+                            <strong>Error:</strong> <span id="error-text"></span>
+                        </p>
+                        <button id="retry-button" class="interactive-button">Retry</button>
+                    </div>
+                </div>
             </div>
         `;
   }
@@ -38,6 +47,7 @@ export class satelliteDataPanel extends HTMLElement {
     const closeBtn = this.querySelector("#close-media");
     const prevBtn = this.querySelector("#prev-image");
     const nextBtn = this.querySelector("#next-image");
+    const retryBtn = this.querySelector("#retry-button");
 
     // Make panel draggable
     if (panel) {
@@ -62,6 +72,11 @@ export class satelliteDataPanel extends HTMLElement {
       this.showNextImage();
     };
 
+    // Retry button handler
+    retryBtn.onclick = () => {
+      this.retryImageLoad();
+    };
+
     // Don't show placeholder by default
     this.hide();
   }
@@ -82,63 +97,147 @@ export class satelliteDataPanel extends HTMLElement {
     popup.classList.add("hidden");
   }
 
-  // New method to load images from a simulation directory
-  loadImagesFromSimulation(simulationName) {
+  // Load images from a simulation directory
+  async loadImagesFromSimulation(simulationName) {
+    if (this.isLoading) {
+      console.warn("Image loading already in progress");
+      return;
+    }
+
     console.log(`Loading images from simulation: ${simulationName}`);
     this.simulationName = simulationName;
     this.currentImageIndex = 0;
-    
-    // Fetch the list of images from the simulation's example_img directory
-    this.fetchImageList(simulationName);
+    this.images = [];
+
+    // Clear previous state
+    this.hideError();
+    this.hideImageNavigation();
+    this.showLoading();
+
+    try {
+      await this.fetchImageList(simulationName);
+    } catch (error) {
+      console.error("Failed to load images:", error);
+      this.showError(`Failed to load images: ${error.message}`);
+    } finally {
+      this.hideLoading();
+    }
   }
 
+  // Production-grade image discovery method
   async fetchImageList(simulationName) {
     try {
       console.log(`Fetching image list for simulation: ${simulationName}`);
-      
-      // For now, we'll hardcode the known images for palisades_example
-      // In a production environment, this would be an API call to get the directory listing
-      if (simulationName === "palisades_example") {
-        this.images = ["1.jpg", "2.jpg", "3.jpg", "4.jpg"];
-        console.log(`Found ${this.images.length} images for palisades_example:`, this.images);
-      } else {
-        // For other simulations, try to find images by checking common patterns
-        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-        this.images = [];
-        
-        // Try to find images by checking if they exist
-        for (let i = 1; i <= 20; i++) { // Check up to 20 images
-          for (const ext of imageExtensions) {
-            const imgPath = `simulations/${simulationName}/example_img/${i}${ext}`;
-            // In a real implementation, you'd check if the file exists
-            // For now, we'll assume they exist and add them
-            this.images.push(`${i}${ext}`);
-          }
-        }
-        
-        // Remove duplicates and sort
-        this.images = [...new Set(this.images)].sort();
-        console.log(`Found ${this.images.length} images for ${simulationName}:`, this.images);
+
+      // Try multiple strategies to discover images
+      const discoveredImages = await this.discoverImages(simulationName);
+
+      if (discoveredImages.length === 0) {
+        throw new Error("No images found in simulation directory");
       }
-      
+
+      // Sort images by timestamp if available, otherwise by filename
+      this.images = this.sortImagesByTimestamp(discoveredImages);
+
+      console.log(
+        `Found ${this.images.length} images for ${simulationName}:`,
+        this.images,
+      );
+
       if (this.images.length > 0) {
         this.showImageNavigation();
         this.displayCurrentImage();
-      } else {
-        this.showError("No images found in simulation directory");
       }
     } catch (error) {
       console.error("Error fetching image list:", error);
-      this.showError("Failed to load image list");
+      throw error;
     }
+  }
+
+  // Focused image discovery - only look in example_img directory
+  async discoverImages(simulationName) {
+    const discoveredImages = [];
+
+    // Only check the example_img directory
+    try {
+      const images = await this.scanDirectoryForImages(
+        simulationName,
+        "example_img",
+      );
+      if (images.length > 0) {
+        discoveredImages.push(...images);
+        console.log(`Found ${images.length} images in example_img/`);
+      }
+    } catch (error) {
+      console.debug("example_img directory not accessible:", error.message);
+    }
+
+    return discoveredImages;
+  }
+
+  // Scan example_img directory for numbered image files
+  async scanDirectoryForImages(simulationName, subDir) {
+    const images = [];
+    const imageExtensions = [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".bmp",
+      ".webp",
+      ".tiff",
+      ".tif",
+    ];
+
+    // Handle example_img directory with numbered images (1.jpg, 2.jpg, etc.)
+    if (subDir === "example_img") {
+      for (let i = 1; i <= 50; i++) {
+        let image_found = false; // Flag to indicate if we should end discovery
+        for (const ext of imageExtensions) {
+          const imgPath = `${i}${ext}`;
+          if (await this.checkImageExists(simulationName, subDir, imgPath)) {
+            images.push({ path: imgPath, directory: subDir, type: "numbered" });
+            image_found = true; //
+            break;
+          }
+        }
+        if (!image_found) {
+          break;
+        }
+      }
+    }
+
+    return images;
+  }
+
+  // Check if an image file exists
+  async checkImageExists(simulationName, subDir, filename) {
+    const fullPath = subDir
+      ? `simulations/${simulationName}/${subDir}/${filename}`
+      : `simulations/${simulationName}/${filename}`;
+
+    try {
+      const response = await fetch(fullPath, { method: "HEAD" });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  // Sort images by filename (numbered images)
+  sortImagesByTimestamp(images) {
+    return images.sort((a, b) => {
+      // Sort by filename for numbered images
+      return a.path.localeCompare(b.path);
+    });
   }
 
   showImageNavigation() {
     const nav = this.querySelector("#image-navigation");
     const counter = this.querySelector("#image-counter");
-    
+
     console.log(`Showing image navigation for ${this.images.length} images`);
-    
+
     if (this.images.length > 1) {
       nav.classList.remove("hidden");
       this.updateImageCounter();
@@ -149,6 +248,11 @@ export class satelliteDataPanel extends HTMLElement {
     }
   }
 
+  hideImageNavigation() {
+    const nav = this.querySelector("#image-navigation");
+    nav.classList.add("hidden");
+  }
+
   updateImageCounter() {
     const counter = this.querySelector("#image-counter");
     counter.textContent = `${this.currentImageIndex + 1} / ${this.images.length}`;
@@ -156,28 +260,41 @@ export class satelliteDataPanel extends HTMLElement {
 
   displayCurrentImage() {
     if (this.images.length === 0) return;
-    
-    const imagePath = `simulations/${this.simulationName}/example_img/${this.images[this.currentImageIndex]}`;
+
+    const currentImage = this.images[this.currentImageIndex];
+    const imagePath = this.buildImagePath(currentImage);
+
     console.log(`Displaying image: ${imagePath}`);
+
     const mediaContent = `<img src="${imagePath}" alt="Simulation Image ${this.currentImageIndex + 1}" style="max-width: 100%; height: auto;">`;
-    
     this.setMedia(mediaContent);
+  }
+
+  buildImagePath(imageInfo) {
+    // All images are in the example_img directory
+    const basePath = `simulations/${this.simulationName}`;
+    return `${basePath}/${imageInfo.directory}/${imageInfo.path}`;
   }
 
   showPreviousImage() {
     if (this.images.length === 0) return;
-    
-    this.currentImageIndex = (this.currentImageIndex - 1 + this.images.length) % this.images.length;
-    console.log(`Showing previous image: ${this.currentImageIndex + 1} / ${this.images.length}`);
+
+    this.currentImageIndex =
+      (this.currentImageIndex - 1 + this.images.length) % this.images.length;
+    console.log(
+      `Showing previous image: ${this.currentImageIndex + 1} / ${this.images.length}`,
+    );
     this.updateImageCounter();
     this.displayCurrentImage();
   }
 
   showNextImage() {
     if (this.images.length === 0) return;
-    
+
     this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
-    console.log(`Showing next image: ${this.currentImageIndex + 1} / ${this.images.length}`);
+    console.log(
+      `Showing next image: ${this.currentImageIndex + 1} / ${this.images.length}`,
+    );
     this.updateImageCounter();
     this.displayCurrentImage();
   }
@@ -197,6 +314,7 @@ export class satelliteDataPanel extends HTMLElement {
     if (img) {
       img.onload = () => {
         this.hideLoading();
+        this.hideError();
       };
       img.onerror = () => {
         this.hideLoading();
@@ -212,6 +330,7 @@ export class satelliteDataPanel extends HTMLElement {
     const content = this.querySelector("#media-content");
     loadingIndicator.classList.remove("hidden");
     content.style.opacity = "0.5";
+    this.isLoading = true;
   }
 
   hideLoading() {
@@ -219,17 +338,31 @@ export class satelliteDataPanel extends HTMLElement {
     const content = this.querySelector("#media-content");
     loadingIndicator.classList.add("hidden");
     content.style.opacity = "1";
+    this.isLoading = false;
   }
 
   showError(message) {
+    const errorDisplay = this.querySelector("#error-display");
+    const errorText = this.querySelector("#error-text");
     const content = this.querySelector("#media-content");
-    content.innerHTML = `
-            <div class="error-message">
-                <p style="color: #d32f2f; text-align: center; padding: 20px;">
-                    <strong>Error:</strong> ${message}
-                </p>
-            </div>
-        `;
+
+    errorText.textContent = message;
+    errorDisplay.classList.remove("hidden");
+    content.style.opacity = "0.5";
+  }
+
+  hideError() {
+    const errorDisplay = this.querySelector("#error-display");
+    const content = this.querySelector("#media-content");
+
+    errorDisplay.classList.add("hidden");
+    content.style.opacity = "1";
+  }
+
+  retryImageLoad() {
+    if (this.simulationName) {
+      this.loadImagesFromSimulation(this.simulationName);
+    }
   }
 
   centerPanel() {
