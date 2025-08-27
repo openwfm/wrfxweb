@@ -5,8 +5,13 @@ from worker.workerKeys import (
 )
 import requests
 
+LOGGING_AREA = "QueueServices"
 
-class UploadQueueServices:
+
+class QueueServices:
+    def post_failed_action(self, action_params):
+        return -1
+
     def get_dequeue(self):
         get_url = f"{UPLOAD_QUEUE_SERVICE_URL}/dequeue"
         try:
@@ -21,18 +26,25 @@ class UploadQueueServices:
                     "catalog_entry_upload_id"
                 ]
                 if not next_catalog_entry_upload_id.isdigit():
-                    loggingUtils.log_invalid_catalog_entry_upload(
-                        next_catalog_entry_upload_id
-                    )
+                    error = f"Invalid catalog_entry_upload_id: {next_catalog_entry_upload_id}"
+                    self.log_queue_service_error(error)
                     return -1
-                loggingUtils.log_upload_queue_service(next_catalog_entry_upload_id)
+                self.log_queue_service(
+                    f"catalog_entry_upload_id: {next_catalog_entry_upload_id}"
+                )
                 return int(next_catalog_entry_upload_id)
             elif response.status_code == 204:
-                loggingUtils.log_upload_queue_service_empty()
+                self.log_queue_service("UploadQueueService is empty")
                 return None
         except requests.exceptions.RequestException as e:
-            loggingUtils.log_upload_queue_service_error(f"{e}")
+            self.log_queue_service_error(f"{e}")
             return -1
 
+    def log_queue_service_error(self, message):
+        loggingUtils.error_log(LOGGING_AREA, message)
 
-upload_queue_services = UploadQueueServices()
+    def log_queue_service(self, message):
+        loggingUtils.standard_log(LOGGING_AREA, message)
+
+
+queue_services = QueueServices()

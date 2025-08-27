@@ -1,6 +1,6 @@
 from worker.app import app
 from worker.logging import utils as loggingUtils
-from worker.threads.upload_thread import upload_thread
+from worker.threads.action_thread import action_thread
 from worker.workerKeys import (
     UPLOAD_WORKER_API_KEY,
 )
@@ -8,6 +8,8 @@ from api.services import CatalogEntryUploadServices as CatalogEntryUploadService
 
 from functools import wraps
 from flask import request
+
+LOGGING_AREA = "WORKER API"
 
 
 def api_key_required(f):
@@ -24,22 +26,31 @@ def api_key_required(f):
 
 
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
-@app.route("/<catalog_entry_upload_id>", methods=["POST"])
-@api_key_required
-def post_upload(catalog_entry_upload_id):
-    loggingUtils.log_upload_worker_post(catalog_entry_upload_id)
-    if not catalog_entry_upload_id.isdigit():
-        return {"message": "catalog_entry_upload_id must be an integer"}, 401
-
-    upload_thread.start(int(catalog_entry_upload_id))
-
-    return {"message": "Success!"}, 200
-
-
-# when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
 @app.route("/ready", methods=["GET"])
 @api_key_required
 def service_ready():
-    if upload_thread.ready():
+    if action_thread.ready():
         return {"message": "Service is ready!"}, 200
     return {"message": "Service is busy"}, 503
+
+
+# when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
+@app.route("/start", methods=["GET"])
+@api_key_required
+def service_start():
+    if not action_thread.ready():
+        log_worker_busy()
+        return {"message": "Service is busy!"}, 204
+    log_worker_start()
+    action_thread.start()
+    return {"message": "Success"}, 200
+
+
+def log_worker_busy():
+    message = "Worker is busy"
+    loggingUtils.standard_log(LOGGING_AREA, message)
+
+
+def log_worker_start():
+    message = "Worker started"
+    loggingUtils.standard_log(LOGGING_AREA, message)
