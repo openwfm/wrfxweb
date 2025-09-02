@@ -12,6 +12,18 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
+def debug_log(area, message):
+    log_statement(f"{area} Debug", message, False)
+
+
+def error_log(area, message):
+    log_statement(f"{area} ERROR", message, True)
+
+
+def standard_log(area, message):
+    log_statement(area, message, True)
+
+
 def log_upload_worker(catalog_entry_upload_id):
     upload_message = f"catalog_entry_upload_id: {catalog_entry_upload_id}"
     log_statement("UploadWorker", upload_message, True)
@@ -66,8 +78,8 @@ def log_dequeue_error(dequeue_message):
     log_statement("Dequeue [ERROR]", dequeue_message, True)
 
 
-def debug_log(message):
-    log_statement("Debug", message, True)
+# def debug_log(message):
+#     log_statement("Debug", message, True)
 
 
 def log_error(message):

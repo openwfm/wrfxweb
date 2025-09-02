@@ -1,6 +1,6 @@
 from workerQueue.app import app
 from workerQueue.queue.worker_queue import worker_queue
-from workerQueue.services.upload_worker_services import upload_worker_services
+import workerQueue.services.worker_services as worker_services
 
 from workerQueue.utils import api_key_required
 
@@ -15,8 +15,8 @@ from flask import abort
 def equeue_upload(catalog_entry_upload_id):
     validate_catalog_entry_upload_id(catalog_entry_upload_id)
     worker_queue.enqueue_upload(catalog_entry_upload_id)
-    if upload_worker_services.ready():
-        upload_worker_services.post(catalog_entry_upload_id)
+    if worker_services.worker_ready():
+        worker_services.post_worker_start()
     return {"message": "Success!"}, 200
 
 

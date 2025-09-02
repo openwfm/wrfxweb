@@ -1,5 +1,5 @@
 from workerQueue.serviceKeys import (
-    WORKER_QUEUE_FILE, WORKER_FAILED_ACTION_FILE
+    WORKER_QUEUE_FILE, WORKER_FAILED_ACTION_FILE, INVALID_ACTION_FILE
 )
 import os
 from workerQueue.logging import utils as loggingUtils
@@ -8,9 +8,9 @@ from workerQueue.services.constants import UPLOAD_ACTION, ZIP_ACTION, KML_ACTION
 
 import threading
 
-class FailedActionLog:
+class InvalidActionLog:
     def __init__(self):
-        self.filename = WORKER_FAILED_ACTION_FILE
+        self.filename = INVALID_ACTION_FILE
         self.lock = threading.Lock()
         if not os.path.exists(self.filename):
             open(self.filename, "a").close()
@@ -24,30 +24,35 @@ class FailedActionLog:
     def log_failed_action(self, queue_line):
         log_message = f"[FailedActionLog] {queue_line}"
         loggingUtils.log_statement("UploadEnqueue", log_message, True)
+invalid_action_log = InvalidActionLog()
 
-
-failed_action_log = FailedActionLog()
-
-
-
-class WorkerQueue:
-    def __init__(self):
-        self.filename = WORKER_QUEUE_FILE
+class ActionQueue:
+    def __init__(self, file_path):
+        self.LOGGING_AREA = "ActionQueue"
+        self.filename = file_path
         self.lock = threading.Lock()
         if not os.path.exists(self.filename):
             open(self.filename, "a").close()
 
+    def enqueue_action(self, action_json):
+        queue_line = ""
+        with self.lock:
+            with open(self.filename, "a") as file:
+                file.write(f"{queue_line}\n")
+
+        self.log_enqueue(queue_line)
+
     def enqueue_upload(self, catalog_entry_upload_id):
         queue_line = f"{UPLOAD_ACTION} {catalog_entry_upload_id}"
         with self.lock:
-            with open(WORKER_QUEUE_FILE, "a") as file:
+            with open(self.filename, "a") as file:
                 file.write(f"{queue_line}\n")
         self.log_enqueue(queue_line)
 
     def enqueue_zip(self, catalog_entry_id):
         queue_line = f"{ZIP_ACTION} {catalog_entry_id}"
         with self.lock:
-            with open(WORKER_QUEUE_FILE, "a") as file:
+            with open(self.filename, "a") as file:
                 file.write(f"{queue_line}\n")
 
         self.log_enqueue(queue_line)
@@ -56,17 +61,18 @@ class WorkerQueue:
         queue_line = f"{KML_ACTION} {catalog_entry_id} {kml_params["steps"]} {kml_params["mode"]} {kml_params["only_vars"]}"
 
         with self.lock:
-            with open(WORKER_QUEUE_FILE, "a") as file:
+            with open(self.filename, "a") as file:
                 file.write(f"{queue_line}\n")
         self.log_enqueue(queue_line)
 
     def log_enqueue(self, queue_line):
-        loggingUtils.log_statement("Enqueue", queue_line, True)
+        message = f"Enqueue: {queue_line}"
+        loggingUtils.log_statement(self.LOGGING_AREA, message, True)
 
     def dequeue(self):
         queue_line = ""
         with self.lock:
-            with open(WORKER_QUEUE_FILE, "r+") as file:
+            with open(self.filename, "r+") as file:
                 lines = file.readlines()
                 if len(lines) == 0:
                     return None
@@ -77,18 +83,21 @@ class WorkerQueue:
 
         response_params = workerServices.parse_queue_line(queue_line)
         if response_params == None:
-            failed_action_log.write_failed_action(queue_line)
+            invalid_action_log.write_failed_action(queue_line)
             return self.dequeue()
         self.log_dequeue(queue_line)
         return response_params
 
     def log_dequeue(self, queue_line):
-        loggingUtils.log_statement("Dequeue", queue_line, True)
+        message = f"Dequeue: {queue_line}"
+
+        loggingUtils.standard_log(self.LOGGING_AREA, message)
 
     def peek(self):
         with self.lock:
-            with open(WORKER_QUEUE_FILE, "r") as file:
+            with open(self.filename, "r") as file:
                 return file.readline().strip("\n")
 
 
-worker_queue = WorkerQueue()
+failed_action_log = ActionQueue(WORKER_FAILED_ACTION_FILE)
+worker_queue = ActionQueue(WORKER_QUEUE_FILE)

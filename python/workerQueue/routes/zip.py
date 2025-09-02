@@ -1,6 +1,5 @@
 from workerQueue.app import app
 from workerQueue.queue.worker_queue import worker_queue
-from workerQueue.services.zip_worker_services import zip_worker_services
 
 from workerQueue.utils import api_key_required
 
@@ -11,8 +10,8 @@ from flask import abort
 @app.route("zip/enqueue/<catalog_entry_id>", methods=["POST"])
 @api_key_required
 def equeue_zip(catalog_entry_id):
-    validate_catalog_entry_id(catalog_entry_upload_id)
-    worker_queue.enqueue_upload(catalog_entry_upload_id)
+    validate_catalog_entry_id(catalog_entry_id)
+    worker_queue.enqueue_upload(catalog_entry_id)
     return {"message": "Success!"}, 200
 
 
