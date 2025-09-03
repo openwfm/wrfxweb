@@ -320,6 +320,10 @@ body {
 /*  border-radius: 0 0 0.4rem 0.4rem;*/
 /*}*/
 
+#catalog-options {
+  z-index: 9000;
+}
+
 #catalog-options li:hover {
   cursor: pointer;
 }

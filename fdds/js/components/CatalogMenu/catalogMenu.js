@@ -150,8 +150,14 @@ export class CatalogMenu extends HTMLElement {
 
   initializeCatalogSelect() {
     const catalogOptions = this.querySelector("#catalog-options");
+    this.test = 0;
     catalogOptions.onclick = () => {
-      catalogOptions.showPicker();
+      if (catalogOptions.classList.contains("open")) {
+        catalogOptions.classList.remove("open");
+      } else {
+        catalogOptions.showPicker();
+        catalogOptions.classList.add("open");
+      }
     };
     catalogOptions.onchange = () => {
       let catalog = this.catalogMap[catalogOptions.value];
