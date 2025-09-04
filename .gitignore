@@ -17,6 +17,8 @@ downloads/
 uploads
 simulations/
 workerQueue.log
+workerFailedActions.log
+invalidActions.log
 conf.json
 instance/
 
