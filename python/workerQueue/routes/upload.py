@@ -1,5 +1,6 @@
 from workerQueue.app import app
 from workerQueue.queue.worker_queue import worker_queue
+from workerQueue.actions.uploadAction import UPLOAD_ACTION
 import workerQueue.services.worker_services as worker_services
 
 from workerQueue.utils import api_key_required
@@ -10,14 +11,21 @@ from flask import abort
 
 
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
-@app.route("upload/enqueue/<catalog_entry_upload_id>", methods=["POST"])
+@app.route("/upload/enqueue/<catalog_entry_upload_id>", methods=["POST"])
 @api_key_required
 def equeue_upload(catalog_entry_upload_id):
-    validate_catalog_entry_upload_id(catalog_entry_upload_id)
-    worker_queue.enqueue_upload(catalog_entry_upload_id)
-    if worker_services.worker_ready():
-        worker_services.post_worker_start()
-    return {"message": "Success!"}, 200
+    try:
+        validate_catalog_entry_upload_id(catalog_entry_upload_id)
+        action_json = {
+            "action": UPLOAD_ACTION,
+            "catalog_entry_upload_id": catalog_entry_upload_id,
+        }
+        worker_queue.enqueue_action(action_json)
+        if worker_services.worker_ready():
+            worker_services.post_worker_start()
+        return {"message": "Success!"}, 200
+    except:
+        return {"message": "Server Error"}, 500
 
 
 def validate_catalog_entry_upload_id(catalog_entry_upload_id):

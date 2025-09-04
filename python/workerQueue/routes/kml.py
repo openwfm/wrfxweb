@@ -1,6 +1,7 @@
 from workerQueue.app import app
 from workerQueue.queue.worker_queue import worker_queue
 import workerQueue.services.worker_services as worker_services
+from workerQueue.actions.kmlAction import KML_ACTION
 
 from workerQueue.utils import api_key_required
 
@@ -10,22 +11,28 @@ from flask import abort, request
 
 
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
-@app.route("kml/enqueue/<catalog_entry_id>", methods=["POST"])
+@app.route("/kml/enqueue/<catalog_entry_id>", methods=["POST"])
 @api_key_required
 def equeue_kml(catalog_entry_id):
-    catalog_entry = validate_catalog_entry_id(catalog_entry_id)
-    kml_params = request_kml_params(catalog_entry)
-    worker_queue.enqueue_kml(catalog_entry_id, kml_params)
-    if worker_services.worker_ready():
-        worker_services.post_worker_start()
-    return {"message": "Success!"}, 200
+    try:
+        kml_params = request_kml_params(catalog_entry_id)
+        worker_queue.enqueue_action(kml_params)
+
+        if worker_services.worker_ready():
+            worker_services.post_worker_start()
+        return {"message": "Success!"}, 200
+    except:
+        return {"message": "Server Error"}, 500
 
 
-def request_kml_params(catalog_entry):
+def request_kml_params(catalog_entry_id):
     try:
         kml_params = request.get_json()
+        catalog_entry = validate_catalog_entry_id(catalog_entry_id)
 
         return {
+            "action": KML_ACTION,
+            "catalog_entry_id": catalog_entry_id,
             "steps": CatalogEntryServices.verify_steps(kml_params["steps"]),
             "mode": CatalogEntryServices.verify_mode(kml_params["mode"]),
             "only_vars": CatalogEntryServices.verify_only_vars(

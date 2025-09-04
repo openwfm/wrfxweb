@@ -7,10 +7,7 @@ from clientServer.serverKeys import (
     UPLOAD_QUEUE_SERVICE_API_KEY,
     ADMIN_SERVICES_API_KEY,
 )
-from clientServer.threads.catalogEntryDeleteThread import (
-    catalog_entry_delete_queue,
-    catalog_entry_delete_thread,
-)
+
 
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
