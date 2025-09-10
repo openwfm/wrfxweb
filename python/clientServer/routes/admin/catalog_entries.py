@@ -143,18 +143,25 @@ def delete_catalog_entry(catalog_entry_id):
     entry_marked_for_deletion = CatalogEntryServices.mark_id_for_deletion(
         catalog_entry_id, current_user, ADMIN_SERVICES_API_KEY
     )
-    # catalog_entry_delete_queue.put(catalog_entry_id)
-    # if catalog_entry_delete_thread.ready():
-    #     catalog_entry_delete_thread.start()
-    # entry_deleted = CatalogEntryServices.delete_by_id(
-    #     catalog_entry_id, current_user, ADMIN_SERVICES_API_KEY
-    # )
-
     if entry_marked_for_deletion:
+        post_delete_catalog_entry_to_queue(catalog_entry_id)
         return {
             "message": "CatalogEntry successfully deleted!",
         }, 200
     return {"message": "An error occurred while deleted CatalogEntry"}, 400
+
+
+def post_delete_catalog_entry_to_queue(catalog_entry_id):
+    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/delete/enqueue/{catalog_entry_id}"
+    try:
+        headers = {
+            "Content-type": "application/json",
+            "API-Key": UPLOAD_QUEUE_SERVICE_API_KEY,
+        }
+        response = requests.post(post_url, headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        log_upload_queue_error(catalog_entry_id, f"{e}")
 
 
 def get_catalog_entries(catalog_id):
@@ -203,7 +210,7 @@ def create_catalog_entry(catalog_id):
 
 
 def post_task_queue_service(catalog_entry_upload):
-    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/enqueue/{catalog_entry_upload.id}"
+    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/upload/enqueue/{catalog_entry_upload.id}"
     try:
         headers = {
             "Content-type": "application/json",
@@ -212,7 +219,7 @@ def post_task_queue_service(catalog_entry_upload):
         response = requests.post(post_url, headers=headers)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        loggingUtils.log_upload_queue_error(catalog_entry_upload, f"{e}")
+        log_upload_queue_error(catalog_entry_upload, f"{e}")
 
 
 class ZipVerificationException(Exception):
@@ -229,3 +236,10 @@ def verify_zip_upload(catalog_entry_upload):
         os.remove(upload_path)
         catalog_entry_upload.destroy()
         raise ZipVerificationException("Corrupted Zip File")
+
+
+def log_upload_queue_error(catalog_entry_upload, error):
+    upload_error_message = (
+        f"catalog_entry_upload_id: {catalog_entry_upload.id}, error: {error}"
+    )
+    loggingUtils.error_log("UploadQueue", upload_error_message)

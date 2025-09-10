@@ -58,7 +58,7 @@ class ActionQueue:
                     lines = file.readlines()
                     if len(lines) == 0:
                         return None
-                    queue_line = lines[0]
+                    queue_line = lines[0].strip()
                     file.seek(0)
                     file.truncate()
                     file.writelines(lines[1:])

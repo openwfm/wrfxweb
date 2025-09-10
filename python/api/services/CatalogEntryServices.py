@@ -124,7 +124,7 @@ def mark_id_for_deletion(catalog_entry_id, user, admin_services_api_key):
 
 def delete_by_id(catalog_entry_id, admin_services_api_key):
     try:
-        if admin_services_api_key != ADMIN_SERVICES_API_KEY:
+        if admin_services_api_key not in UPLOAD_API_KEYS:
             return False
         catalog_entry = find_by_id(catalog_entry_id)
         if catalog_entry == None:
@@ -138,6 +138,7 @@ def delete_by_id(catalog_entry_id, admin_services_api_key):
         catalog_entry.destroy()
         return True
     except Exception as e:
+        print(f"DELETE EXCEPTION: {e}")
         logging.service_exception("CatalogEntry", "delete_by_id", e)
         return False
 

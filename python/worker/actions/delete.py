@@ -27,9 +27,12 @@ class DeleteAction(BaseAction):
         delete_message = f"DELETE catalog_entry_id: {catalog_entry_id}"
         self.log_action(delete_message)
 
+        delete_message = f"DELETE FAILED catalog_entry_id: {catalog_entry_id}"
         with app.app_context():
-            CatalogEntryServices.delete_by_id(catalog_entry_id, UPLOAD_WORKER_API_KEY)
-        delete_message = f"DELETE COMPLETE catalog_entry_id: {catalog_entry_id}"
+            if CatalogEntryServices.delete_by_id(
+                catalog_entry_id, UPLOAD_WORKER_API_KEY
+            ):
+                delete_message = f"DELETE COMPLETE catalog_entry_id: {catalog_entry_id}"
         self.log_action(delete_message)
 
 

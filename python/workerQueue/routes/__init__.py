@@ -1,1 +1,1 @@
-from workerQueue.routes import upload, zip, kml
+from workerQueue.routes import upload, zip, kml, delete

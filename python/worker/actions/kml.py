@@ -18,7 +18,12 @@ class KMLAction(BaseAction):
             mode = json["mode"]
             only_vars = json["only_vars"]
             catalog_entry_id = json["catalog_entry_id"]
-            kmz_params = {"steps": steps, "mode": mode, "only_vars": only_vars, "catalog_entry_id": catalog_entry_id}
+            kmz_params = {
+                "steps": steps,
+                "mode": mode,
+                "only_vars": only_vars,
+                "catalog_entry_id": catalog_entry_id,
+            }
             return kmz_params
         except:
             self.raise_validation_error("invalid_kml_json")
@@ -26,7 +31,10 @@ class KMLAction(BaseAction):
     def process(self, json):
         kml_json = self.validate_json(json)
         catalog_entry_id = kml_json["catalog_entry_id"]
-        kml_message = f"KML catalog_entry_id: {catalog_entry_id} steps: {kml_json["steps"]} mode: {kml_json["mode"]} only_vars: {kml_json["only_vars"]}"
+        steps = kml_json["steps"]
+        mode = kml_json["mode"]
+        only_vars = kml_json["only_vars"]
+        kml_message = f"KML catalog_entry_id: {catalog_entry_id} steps: {steps} mode: {mode} only_vars: {only_vars}"
         self.log_action(kml_message)
         with app.app_context():
             catalog_entry = CatalogEntryServices.find_by_id(catalog_entry_id)
@@ -39,5 +47,6 @@ class KMLAction(BaseAction):
             if catalog_entry == None:
                 self.raise_action_error(f"No catalog_entry with id: {catalog_entry_id}")
             self.log_action(f"KML Complete for catalog_entry_id: {catalog_entry_id}")
+
 
 kml_action = KMLAction()

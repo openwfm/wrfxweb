@@ -13,6 +13,15 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
+def standard_log(area, message):
+    log_statement(area, message, True)
+
+
+def error_log(area, message):
+    area = f"{area} ERROR"
+    log_statement(area, message, True)
+
+
 def log_catalog_api_access_attempt(user, catalog_id):
     message = f"User {user.id} attempted to access API key for Catalog {catalog_id}"
 

@@ -4,12 +4,18 @@ from worker.threads.action_thread import action_thread
 from worker.workerKeys import (
     UPLOAD_WORKER_API_KEY,
 )
+from worker.threads.action_thread import action_thread
+
 from api.services import CatalogEntryUploadServices as CatalogEntryUploadServices
 
 from functools import wraps
 from flask import request
 
+
 LOGGING_AREA = "WORKER API"
+
+
+action_thread.start()
 
 
 def api_key_required(f):
@@ -35,7 +41,7 @@ def service_ready():
 
 
 # when an enque, check if busy, if busy, add to queue. if not busy, post to worker, set to busy.
-@app.route("/start", methods=["GET"])
+@app.route("/start", methods=["POST"])
 @api_key_required
 def service_start():
     if not action_thread.ready():

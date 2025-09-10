@@ -18,9 +18,12 @@ LOGGING_AREA = "WorkerServices"
 
 
 def worker_ready():
-    response = requests.get(GET_WORKER_READY_URL, headers=WORKER_REQUEST_HEADERS)
-    response.raise_for_status()
-    return response.status_code == 200
+    try:
+        response = requests.get(GET_WORKER_READY_URL, headers=WORKER_REQUEST_HEADERS)
+        response.raise_for_status()
+        return response.status_code == 200
+    except:
+        return False
 
 
 def post_worker_start():
