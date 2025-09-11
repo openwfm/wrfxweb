@@ -29,6 +29,12 @@ class InvalidActionLog:
 invalid_action_log = InvalidActionLog()
 
 
+class EnqueueActionError(Exception):
+    def __init__(self):
+        message = "EnqueueActionError"
+        super().__init__(message)
+
+
 class ActionQueue:
     def __init__(self, file_path):
         self.LOGGING_AREA = "ActionQueue"
@@ -49,6 +55,7 @@ class ActionQueue:
         except:
             message = f"Enqueue Error: {action_json}"
             loggingUtils.error_log(self.LOGGING_AREA, message)
+            raise EnqueueActionError()
 
     def dequeue(self):
         queue_line = ""

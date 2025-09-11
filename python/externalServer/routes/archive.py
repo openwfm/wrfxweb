@@ -20,11 +20,18 @@ LOGGING_AREA = "ArchiveRoutes"
 @app.route("/entries/<catalog_entry_id>/archive", methods=["POST"])
 @universal_api_key_required
 def archive_catalog_entry(catalog_entry_id):
-    if request.method == "POST":
-        archive_posted = post_archive_catalog_entry(catalog_entry_id)
-        if archive_posted:
-            return {"message": "Catalog Entry successfully staged for Archive"}, 200
-        return {"message": "Catalog Entry unsuccessfully staged for Archive"}, 500
+    try:
+        if request.method == "POST":
+            catalog_entry = CatalogEntryServices.find_by_id(catalog_entry_id)
+            if catalog_entry == None:
+                return {"message": "No CatalogEntry with job id"}, 500
+            archive_posted = post_archive_catalog_entry(catalog_entry)
+            if archive_posted:
+                return {"message": "Catalog Entry successfully staged for Archive"}, 200
+            return {"message": "Catalog Entry unsuccessfully staged for Archive"}, 500
+    except Exception as e:
+        loggingUtils.error_log(LOGGING_AREA, e)
+        return {"message": "Server encountered an error"}, 500
 
     return {
         "message": "Method Not Allowed",
