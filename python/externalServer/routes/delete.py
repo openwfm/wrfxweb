@@ -14,40 +14,42 @@ from api.services import (
 from flask import request
 import requests
 
+LOGGING_AREA = "Delete Routes"
 
-@app.route("/entries/<catalog_entry_id>/zip", methods=["POST"])
+
+@app.route("/entries/<catalog_entry_id>/delete", methods=["POST"])
 @universal_api_key_required
-def zip_catalog_entry(catalog_entry_id):
+def delete_catalog_entry(catalog_entry_id):
     if request.method == "POST":
-        zip_posted = post_zip_catalog_entry(catalog_entry_id)
-        if zip_posted:
-            return {"message": "Catalog Entry successfully staged for Zipping"}, 200
-        return {"message": "Catalog Entry unsuccessfully staged for Zipping"}, 500
+        post_delete = post_delete_catalog_entry(catalog_entry_id)
+        if post_delete:
+            return {"message": "Catalog Entry successfully staged for Deletion"}, 200
+        return {"message": "Catalog Entry unsuccessfully staged for Deletion"}, 500
 
     return {
         "message": "Method Not Allowed",
     }, 405
 
 
-@app.route("/jobs/<job_id>/zip", methods=["POST"])
+@app.route("/jobs/<job_id>/delete", methods=["POST"])
 @universal_api_key_required
-def zip_job_id(job_id):
+def delete_job_id(job_id):
     if request.method == "POST":
         catalog_entry = CatalogEntryServices.find_by_job_id(job_id)
         if catalog_entry == None:
             return {"message": "No CatalogEntry with job id"}, 500
-        zip_posted = post_zip_catalog_entry(catalog_entry.id)
+        zip_posted = post_delete_catalog_entry(catalog_entry.id)
         if zip_posted:
-            return {"message": "Catalog Entry successfully staged for Zipping"}, 200
-        return {"message": "Catalog Entry unsuccessfully staged for Zipping"}, 500
+            return {"message": "Catalog Entry successfully staged for Deletion"}, 200
+        return {"message": "Catalog Entry unsuccessfully staged for Deletion"}, 500
 
     return {
         "message": "Method Not Allowed",
     }, 405
 
 
-def post_zip_catalog_entry(catalog_entry_id):
-    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/zip/enqueue/{catalog_entry_id}"
+def post_delete_catalog_entry(catalog_entry_id):
+    post_url = f"{UPLOAD_QUEUE_SERVICE_URL}/delete/enqueue/{catalog_entry_id}"
     try:
         headers = {
             "Content-type": "application/json",
@@ -57,5 +59,10 @@ def post_zip_catalog_entry(catalog_entry_id):
         response.raise_for_status()
         return True
     except requests.exceptions.RequestException as e:
-        loggingUtils.log_zip_queue_error(catalog_entry_id, f"{e}")
+        log_delete_error(catalog_entry_id, f"{e}")
         return False
+
+
+def log_delete_error(catalog_entry_id, error):
+    error_message = f"catalog_entry_id: {catalog_entry_id}, error: {error}"
+    loggingUtils.error_log(LOGGING_AREA, error_message)

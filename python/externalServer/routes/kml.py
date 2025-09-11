@@ -24,8 +24,8 @@ def kml_catalog_entry(catalog_entry_id):
     if request.method == "POST":
         kml_posted = post_kml_catalog_entry(catalog_entry_id)
         if kml_posted:
-            return {"message": "Catalog Entry successfully staged for Zipping"}, 200
-        return {"message": "Catalog Entry unsuccessfully staged for Zipping"}, 500
+            return {"message": "Catalog Entry successfully staged for Kml"}, 200
+        return {"message": "Catalog Entry unsuccessfully staged for Kml"}, 500
 
     return {
         "message": "Method Not Allowed",
@@ -39,8 +39,8 @@ def kml_job_id(job_id):
         catalog_entry = CatalogEntryServices.find_by_job_id(job_id)
         if catalog_entry == None:
             return {"message": "No CatalogEntry with job id"}, 500
-        zip_posted = post_kml_catalog_entry(catalog_entry)
-        if zip_posted:
+        kml_posted = post_kml_catalog_entry(catalog_entry)
+        if kml_posted:
             return {"message": "Catalog Entry successfully staged for Kml"}, 200
         return {"message": "Catalog Entry unsuccessfully staged for Kml"}, 500
 

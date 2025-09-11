@@ -21,25 +21,25 @@ from api.services import (
 
 from api.serializers import CatalogEntrySerializer as CatalogEntrySerializer
 
-from flask import request
+from flask import request, abort
 import requests
 import zipfile
 import os
 
+LOGGING_AREA = "UploadRoutes"
 
-@app.route("/catalogs/<catalog_id>/entries", methods=["GET", "POST"])
+
+@app.route("/entries/catalogs/<catalog_id>", methods=["GET"])
 @api_key_required
 def catalog_entries(catalog_id):
     if request.method == "GET":
         return get_catalog_entries(catalog_id)
-    elif request.method == "POST":
-        return upload_catalog_entry_to_catalog(catalog_id)
     return {
         "message": "Method Not Allowed",
     }, 405
 
 
-@app.route("/entries", methods=["POST"])
+@app.route("/entries/upload", methods=["POST"])
 @universal_api_key_required
 def entries():
     if request.method == "POST":
@@ -58,23 +58,25 @@ def get_catalog_entries(catalog_id):
     }, 200
 
 
-def upload_catalog_entry_to_catalog(catalog_id):
+def upload_catalog_entry():
     try:
-        catalog_entry_upload = upload_zip()
+        upload_params = verify_upload_params()
+
+        catalog_entry_upload = upload_zip(upload_params)
         if catalog_entry_upload == None:
             return {"message": "An error occurred while uploading file"}, 400
-        upload_to_catalog_params = {
-            "catalog_entry_upload_id": catalog_entry_upload.id,
-            "catalog_id": catalog_id,
-        }
-        UploadToCatalogServices.find_or_create(
-            upload_to_catalog_params, UPLOAD_SERVICE_API_KEY
-        )
-
-        loggingUtils.log_upload(catalog_entry_upload)
+        for catalog_id in upload_params["catalog_ids"]:
+            upload_to_catalog_params = {
+                "catalog_entry_upload_id": catalog_entry_upload.id,
+                "catalog_id": catalog_id,
+            }
+            UploadToCatalogServices.find_or_create(
+                upload_to_catalog_params, UPLOAD_SERVICE_API_KEY
+            )
+        log_upload(catalog_entry_upload)
         post_task_queue_service(catalog_entry_upload)
     except Exception as e:
-        loggingUtils.log_error(e)
+        loggingUtils.error_log(LOGGING_AREA, e)
         return {"message": "An error occurred while uploading file"}, 400
 
     return {
@@ -82,12 +84,27 @@ def upload_catalog_entry_to_catalog(catalog_id):
     }, 200
 
 
-def upload_zip():
-    zip_file = request.files["zipFile"]
-    entry_form = request.form["column"]
+def verify_upload_params():
+    try:
+        zip_file = request.files["zipFile"]
+        column = request.form["column"]
+        catalog_ids = []
+        if "catalog_ids" in request.form:
+            catalog_ids = request.form["catalog_ids"].split(" ")
+            for catalog_id in catalog_ids:
+                if not catalog_id.isdigit():
+                    abort(500, "catalog_ids must be a space separated list of ints")
+        return {"zip_file": zip_file, "column": column, "catalog_ids": catalog_ids}
+    except:
+        abort(500, "Must provide a zipFile and column parameter")
+
+
+def upload_zip(upload_params):
+    zip_file = upload_params["zip_file"]
+    entry_type = upload_params["column"]
     catalog_entry_params = {
         "zip_file": zip_file,
-        "entry_type": entry_form,
+        "entry_type": entry_type,
         "uploader_id": 0,
     }
     catalog_entry_upload = CatalogEntryUploadServices.create(
@@ -126,17 +143,8 @@ def post_task_queue_service(catalog_entry_upload):
         loggingUtils.log_upload_queue_error(catalog_entry_upload, f"{e}")
 
 
-def upload_catalog_entry():
-    try:
-        catalog_entry_upload = upload_zip()
-        if catalog_entry_upload == None:
-            return {"message": "An error occurred while uploading file"}, 400
-        loggingUtils.log_upload(catalog_entry_upload)
-        post_task_queue_service(catalog_entry_upload)
-    except Exception as e:
-        loggingUtils.log_error(e)
-        return {"message": "An error occurred while uploading file"}, 400
-
-    return {
-        "message": "Entry Successfully Created!",
-    }, 200
+def log_upload(catalog_entry_upload):
+    upload_message = (
+        f"uploaded entry: catalog_entry_upload_id: {catalog_entry_upload.id}"
+    )
+    loggingUtils.standard_log(LOGGING_AREA, upload_message)

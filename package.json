@@ -15,7 +15,7 @@
   },
   "scripts": {
     "client": "cd python/clientServer && ../venv/bin/flask --app __init__ run --debug --port 8000",
-    "external-server": "cd python/externalService && ../venv/bin/flask --app __init__ run --debug --port 8001",
+    "external-server": "cd python/externalServer && ../venv/bin/flask --app __init__ run --debug --port 8001",
     "worker-queue": "cd python/workerQueue && ../venv/bin/flask --app __init__ run --debug --port 8002",
     "worker": "cd python/worker && ../venv/bin/flask --app __init__ run --debug --port 8003",
     "test": "jest --silent"

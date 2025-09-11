@@ -1,1 +1,1 @@
-from externalServer.routes import upload, zip, kml
+from externalServer.routes import upload, zip, kml, delete, archive

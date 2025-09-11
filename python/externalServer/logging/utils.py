@@ -12,6 +12,15 @@ def log_statement(area, message, standard_log):
         app.logger.info(f"[{area}] {message} : {time_now}")
 
 
+def standard_log(area, message):
+    log_statement(area, message, True)
+
+
+def error_log(area, message):
+    area = f"{area} ERROR"
+    log_statement(area, message, True)
+
+
 def log_upload_queue_error(catalog_entry_upload, error):
     upload_error_message = (
         f"catalog_entry_upload_id: {catalog_entry_upload.id}, error: {error}"
@@ -27,13 +36,6 @@ def log_zip_queue_error(catalog_entry_id, error):
 def log_kml_queue_error(catalog_entry_id, error):
     upload_error_message = f"catalog_entry_id: {catalog_entry_id}, error: {error}"
     log_statement("KmlQueueError", upload_error_message, True)
-
-
-def log_upload(catalog_entry_upload):
-    upload_message = (
-        f"uploaded entry: catalog_entry_upload_id: {catalog_entry_upload.id}"
-    )
-    log_statement("Upload", upload_message, True)
 
 
 def debug_log(message):
