@@ -2,7 +2,7 @@ from clientServer.app import app
 from clientServer.routes.login import login_required
 from clientServer.serverKeys import (
     CLIENT_SERVER_API_KEY,
-    FLASK_SIMULATIONS_FOLDER,
+    SIMULATIONS_FOLDER,
     MANIFEST_FILENAME,
 )
 
@@ -30,14 +30,17 @@ def client_catalog_entries(catalog_id):
 )
 @login_required
 def catalog_entry_rasters_v1(catalog_id, catalog_entry_id):
-    catalog_entry = CatalogEntryServices.user_entry(
-        catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
-    )
-    if catalog_entry == None:
-        return {"message": "Requested Entry does not exist"}, 404
+    try:
+        catalog_entry = CatalogEntryServices.user_entry(
+            catalog_id, catalog_entry_id, current_user, CLIENT_SERVER_API_KEY
+        )
+        if catalog_entry == None:
+            return {"message": "Requested Entry does not exist"}, 404
 
-    manifest_path = os.path.join(catalog_entry.folder_name(), MANIFEST_FILENAME)
-    return send_from_directory(FLASK_SIMULATIONS_FOLDER, manifest_path)
+        manifest_path = os.path.join(catalog_entry.folder_name(), MANIFEST_FILENAME)
+        return send_from_directory(SIMULATIONS_FOLDER, manifest_path)
+    except:
+        return {"message": "Server Error"}, 500
 
 
 @app.route(
@@ -110,7 +113,4 @@ def catalog_entry_simulations(catalog_id, catalog_entry_id, file_path):
     img_path = os.path.join(catalog_entry.entry_path(), file_path)
     if os.path.exists(img_path):
         return send_file(img_path)
-    # directory = f"{FLASK_SIMULATIONS_FOLDER}/{catalog_entry.folder_name()}"
-    #
-    # return send_from_directory(directory, file_path)
     return {"message": "simulation filename does not exist"}, 500
