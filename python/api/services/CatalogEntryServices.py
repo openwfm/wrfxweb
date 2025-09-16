@@ -138,7 +138,6 @@ def delete_by_id(catalog_entry_id, admin_services_api_key):
         catalog_entry.destroy()
         return True
     except Exception as e:
-        print(f"DELETE EXCEPTION: {e}")
         logging.service_exception("CatalogEntry", "delete_by_id", e)
         return False
 
@@ -571,7 +570,7 @@ class KMLParamError(Exception):
 
 
 def verify_steps(steps):
-    if steps == None:
+    if steps == None or steps == "":
         return ""
     for step in steps.split(","):
         if not step.isdigit():
@@ -582,7 +581,7 @@ def verify_steps(steps):
 def verify_mode(mode):
     if mode == None:
         return "inc"
-    if mode != KMZ_INC or mode != KMZ_REF:
+    if mode != KMZ_INC and mode != KMZ_REF:
         raise KMLParamError(f"Mode must be {KMZ_INC} or {KMZ_REF}")
     return mode
 

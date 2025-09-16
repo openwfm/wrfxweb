@@ -29,17 +29,20 @@ def request_kml_params(catalog_entry_id):
     try:
         kml_params = request.get_json()
         catalog_entry = validate_catalog_entry_id(catalog_entry_id)
+        steps = CatalogEntryServices.verify_steps(kml_params["steps"])
+        if steps == "":
+            steps = None
 
         return {
             "action": KML_ACTION,
             "catalog_entry_id": catalog_entry_id,
-            "steps": CatalogEntryServices.verify_steps(kml_params["steps"]),
+            "steps": steps,
             "mode": CatalogEntryServices.verify_mode(kml_params["mode"]),
             "only_vars": CatalogEntryServices.verify_only_vars(
                 kml_params["only_vars"], catalog_entry
             ),
         }
-    except Exception:
+    except:
         abort(400, "Posted kml params must include steps, mode, and only_vars")
 
 

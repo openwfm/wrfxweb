@@ -53,7 +53,7 @@ class ActionQueue:
             message = f"Enqueue: {queue_line}"
             loggingUtils.standard_log(self.LOGGING_AREA, message)
         except:
-            message = f"Enqueue Error: {action_json}"
+            message = f"Enqueue: {action_json}"
             loggingUtils.error_log(self.LOGGING_AREA, message)
             raise EnqueueActionError()
 

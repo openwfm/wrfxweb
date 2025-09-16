@@ -72,7 +72,7 @@ class ActionThread:
     def post_failed_action(self, attempts, action_params):
         if attempts == 0:
             self.thread_error(
-                f"post_failed_action: Could not connect to queue service after {attempts} attempts"
+                f"post_failed_action: Could not connect to queue service after {REFETCH_ATTEMPTS} attempts"
             )
             return
         post_success = queue_services.post_failed_action(action_params)

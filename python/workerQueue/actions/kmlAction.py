@@ -14,8 +14,14 @@ class KMLAction(BaseAction):
         action = line_vars[0]
         catalog_entry_id = line_vars[1]
         steps = line_vars[2]
+        if steps == "None":
+            steps = None
         mode = line_vars[3]
+        if mode == "None":
+            mode = None
         only_vars = line_vars[4]
+        if only_vars == "None":
+            only_vars = None
         action_json = {
             "action": action,
             "catalog_entry_id": catalog_entry_id,
@@ -44,11 +50,14 @@ class KMLAction(BaseAction):
                 self.raise_invalid_action_json(action_json)
             catalog_entry = CatalogEntryServices.find_by_id(catalog_entry_id)
             steps = CatalogEntryServices.verify_steps(action_json["steps"])
+            if steps == "":
+                steps = None
             mode = CatalogEntryServices.verify_mode(action_json["mode"])
             only_vars = CatalogEntryServices.verify_only_vars(
                 action_json["only_vars"], catalog_entry
             )
             return {
+                "action": KML_ACTION,
                 "catalog_entry_id": catalog_entry_id,
                 "steps": steps,
                 "mode": mode,
