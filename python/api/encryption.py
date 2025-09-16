@@ -1,7 +1,6 @@
 from api.apiKeys import (
     AES_ENCRYPTION_KEY,
     AES_ENCRYPTION_NONCE,
-    FERNET_ENCRYPTION_KEY,
     CATALOG_API_AES_ENCRYPTION_KEY,
     CATALOG_API_AES_ENCRYPTION_NONCE,
     PNG_URL_AES_ENCRYPTION_KEY,
@@ -9,14 +8,11 @@ from api.apiKeys import (
 )
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.fernet import Fernet
 
 
 aesgcm = AESGCM(AES_ENCRYPTION_KEY)
 aesgcm_catalog = AESGCM(CATALOG_API_AES_ENCRYPTION_KEY)
 aesgcm_png_url = AESGCM(PNG_URL_AES_ENCRYPTION_KEY)
-
-fernet = Fernet(FERNET_ENCRYPTION_KEY)
 
 
 def encrypt_user_data(user_data):

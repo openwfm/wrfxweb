@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 import binascii
-from cryptography.fernet import Fernet
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
@@ -27,9 +26,6 @@ PNG_URL_AES_ENCRYPTION_KEY = bytes.fromhex(
 PNG_URL_AES_ENCRYPTION_NONCE = bytes.fromhex(
     os.getenv("PNG_URL_AES_ENCRYPTION_KEY", binascii.hexlify(os.urandom(12)).decode())
 )
-FERNET_ENCRYPTION_KEY = os.getenv(
-    "FERNET_ENCRYPTION_KEY", Fernet.generate_key().decode()
-).encode()
 MANIFEST_FILENAME = os.getenv("MANIFEST_FILENAME", "")
 CATALOG_FILENAME = os.getenv("CATALOG_FILENAME", "")
 DB_LOG_FILE = os.getenv("DB_LOG_FILE", "")
