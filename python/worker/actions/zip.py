@@ -15,9 +15,9 @@ class ZipAction(BaseAction):
     def validate_json(self, json):
         try:
             catalog_entry_id = json["catalog_entry_id"]
-            return {"catalog_entry_upload_id": catalog_entry_id}
+            return {"catalog_entry_id": catalog_entry_id}
         except:
-            self.raise_validation_error("Invalid catalog_entry_upload_id")
+            self.raise_validation_error("Invalid catalog_entry_id")
 
     def process(self, json):
         zip_json = self.validate_json(json)

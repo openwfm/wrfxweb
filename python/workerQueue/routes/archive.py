@@ -28,7 +28,7 @@ def equeue_archive(catalog_entry_id):
 def request_archive_params(catalog_entry_id):
     try:
         archive_params = request.get_json()
-        catalog_entry = validate_catalog_entry_id(catalog_entry_id)
+        validate_catalog_entry_id(catalog_entry_id)
         number_of_days = archive_params["number_of_days"]
 
         return {

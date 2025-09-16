@@ -21,7 +21,7 @@ def dequeue():
 
 
 # called if worker encounters error
-@app.route("/fail", methods=["GET"])
+@app.route("/fail", methods=["POST"])
 @api_key_required
 def worker_fail():
     action_json = request.get_json()
