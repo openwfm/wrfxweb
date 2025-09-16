@@ -21,6 +21,15 @@ def create_catalog_entries(catalog_entry_jsons, entry_type):
         )
         catalog_entry_json["job_id"] = job_id
         catalog_entry_json["uploader_id"] = 0
+        if entry_type == None:
+            description = catalog_entry_json["description"]
+            if "GACC" in description or "FM" in description:
+                entry_type = "fm"
+            elif "Lidar" in description:
+                entry_type = "lidar"
+            else:
+                entry_type = "fire"
+
         catalog_entry_json["entry_type"] = entry_type
 
         catalog_entry = CatalogEntryServices.find_or_create(catalog_entry_json)
