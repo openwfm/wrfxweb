@@ -9,6 +9,51 @@ import json
 import sys
 
 
+def remove_imgs_not_in_manifest(job_id, dry_run=1):
+    try:
+        imgs_in_manifest = imgs_in_job_manifest(job_id)
+        simulation_path = os.path.join(SIMULATIONS_FOLDER, job_id)
+        count = 0
+        imgs_to_delete = 0
+        with os.scandir(simulation_path) as entries:
+            for entry in entries:
+                if entry.is_file() and entry.name.lower().endswith("png"):
+                    if not entry.name in imgs_in_manifest:
+                        imgs_to_delete += 1
+                        if dry_run == 0:
+                            os.remove(entry.path)
+                    count += 1
+                    if count % 10000 == 0:
+                        print(f"Processed {count} pngs")
+        if dry_run == 0:
+            print(f"Removed {imgs_to_delete} of {count} total pngs")
+        else:
+            print(f"{imgs_to_delete} of {count} total pngs to be removed")
+
+    except Exception as e:
+        print(f"Error in removing pngs not in manifest: {e}")
+        return
+
+
+def imgs_in_job_manifest(job_id):
+    manifest_json = load_manifest(job_id)
+    imgs_in_manifest = set()
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            timestamp_json = domain_json[timestamp]
+            for layer_type in timestamp_json:
+                layer_json = timestamp_json[layer_type]
+                if "colorbar" in layer_json:
+                    imgs_in_manifest.add(layer_json["colorbar"])
+                if "kml" in layer_json:
+                    imgs_in_manifest.add(sanitize_text(layer_json["kml"]))
+                if "raster" in layer_json:
+                    imgs_in_manifest.add(layer_json["raster"])
+
+    return imgs_in_manifest
+
+
 def archive_simulation(job_id, number_of_days):
     try:
         manifest_json = process_job_manifest(job_id, number_of_days, False)
