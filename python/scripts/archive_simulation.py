@@ -37,6 +37,7 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
     new_manifest = {}
     archive_count = 0
     delete_count = 0
+    simulation_timestamp_count = 0
     for domain in manifest_json:
         domain_json = manifest_json[domain]
         for timestamp in domain_json:
@@ -49,6 +50,7 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
                     else:
                         delete_timestamp_urls(job_id, layer_json)
                 elif timestamp_age_in_days(timestamp) <= simulation_days:
+                    simulation_timestamp_count += 1
                     new_domain_json = inner_manifest(new_manifest, domain)
                     new_timestamp_json = inner_manifest(new_domain_json, timestamp)
                     new_layer_json = inner_manifest(new_timestamp_json, layer_type)
@@ -64,7 +66,7 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
                     archive_count += 1
     if dry_run:
         print(
-            f"Will archive {archive_count} timestamp urls and delete {delete_count} timestamp urls"
+            f"Will preserve {simulation_timestamp_count} timestamp urls, archive {archive_count} timestamp urls, and delete {delete_count} timestamp urls"
         )
     return new_manifest
 
