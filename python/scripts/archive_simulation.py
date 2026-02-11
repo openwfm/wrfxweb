@@ -18,11 +18,15 @@ def archive_simulation(job_id, days_to_archive, simulation_days, dry_run=1):
             job_id, days_to_archive, simulation_days, dry_run
         )
         manifest_path = job_manifest_path(job_id)
-        archive_manifest_path = archive_job_manifest_path(job_id)
-        if os.path.exists(manifest_path):
-            os.rename(manifest_path, archive_manifest_path)
-        with open(manifest_path, "w") as file:
-            json.dump(manifest_json, file, indent=4)
+        archive_manifest_path = archive_job_manifest_path(job_id, dry_run)
+        if not dry_run:
+            if os.path.exists(manifest_path):
+                os.rename(manifest_path, archive_manifest_path)
+            with open(manifest_path, "w") as file:
+                json.dump(manifest_json, file, indent=4)
+        else:
+            with open(archive_manifest_path, "w") as file:
+                json.dump(manifest_json, file, indent=4)
     except Exception as e:
         print(f"Error in recreate_manifest: {e}")
         return
@@ -71,9 +75,12 @@ def job_manifest_path(job_id):
     return manifest_path
 
 
-def archive_job_manifest_path(job_id):
+def archive_job_manifest_path(job_id, dry_run):
     date = datetime.now().strftime("%Y%m%d")
-    manifest_filename = f"{job_id}_{date}.json"
+    if dry_run:
+        manifest_filename = f"{job_id}_{dry_run}.json"
+    else:
+        manifest_filename = f"{job_id}_{date}.json"
     manifest_path = os.path.join(SIMULATIONS_FOLDER, job_id, manifest_filename)
     return manifest_path
 
