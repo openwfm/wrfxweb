@@ -29,6 +29,7 @@ def archive_simulation(job_id, days_to_archive, simulation_days, dry_run=1):
                 os.rename(catalog_path, archive_catalog_path)
         with open(manifest_path, "w") as file:
             json.dump(manifest_json, file, indent=4)
+        with open(catalog_path, "w") as file:
             json.dump(catalog_json, file, indent=4)
     except Exception as e:
         print(f"Error in recreate_manifest: {e}")
