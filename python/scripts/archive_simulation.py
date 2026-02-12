@@ -84,8 +84,9 @@ def process_catalog(job_id, manifest_json, dry_run):
         for timestamp in domain_json:
             from_utc = min_timestamp(from_utc, timestamp)
             to_utc = max_timestamp(to_utc, timestamp)
-    catalog_json["from_utc"] = from_utc
-    catalog_json["to_utc"] = to_utc
+    catalog_job_json = catalog_json[job_id]
+    catalog_job_json["from_utc"] = from_utc
+    catalog_job_json["to_utc"] = to_utc
     if dry_run:
         print(f"Updating catalog.json from_utc: {from_utc}, to_utc: {to_utc}")
 
