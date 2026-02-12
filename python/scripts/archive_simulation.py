@@ -17,16 +17,19 @@ def archive_simulation(job_id, days_to_archive, simulation_days, dry_run=1):
         manifest_json = process_job_manifest(
             job_id, days_to_archive, simulation_days, dry_run
         )
-        manifest_path = job_manifest_path(job_id)
-        archive_manifest_path = archive_job_manifest_path(job_id, dry_run)
+        catalog_json = process_catalog(job_id, manifest_json)
+        manifest_path = job_manifest_path(job_id, dry_run)
+        catalog_path = job_catalog_path(job_id, dry_run)
         if not dry_run:
             if os.path.exists(manifest_path):
+                archive_manifest_path = archive_job_manifest_path(job_id)
                 os.rename(manifest_path, archive_manifest_path)
-            with open(manifest_path, "w") as file:
-                json.dump(manifest_json, file, indent=4)
-        else:
-            with open(archive_manifest_path, "w") as file:
-                json.dump(manifest_json, file, indent=4)
+            if os.path.exists(catalog_path):
+                archive_catalog_path = archive_job_catalog_path(job_id)
+                os.rename(catalog_path, archive_catalog_path)
+        with open(manifest_path, "w") as file:
+            json.dump(manifest_json, file, indent=4)
+            json.dump(catalog_json, file, indent=4)
     except Exception as e:
         print(f"Error in recreate_manifest: {e}")
         return
@@ -71,24 +74,54 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
     return new_manifest
 
 
-def job_manifest_path(job_id):
-    manifest_filename = f"{job_id}.json"
-    manifest_path = os.path.join(SIMULATIONS_FOLDER, job_id, manifest_filename)
-    return manifest_path
+def process_catalog(job_id, manifest_json):
+    catalog_json = load_catalog(job_id)
+    from_utc = ""
+    to_utc = ""
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            from_utc = min_timestamp(from_utc, timestamp)
+            to_utc = max_timestamp(to_utc, timestamp)
+    catalog_json["from_utc"] = from_utc
+    catalog_json["to_utc"] = to_utc
+    return catalog_json
 
 
-def archive_job_manifest_path(job_id, dry_run):
-    date = datetime.now().strftime("%Y%m%d")
+def job_manifest_path(job_id, dry_run):
     if dry_run:
-        manifest_filename = f"{job_id}_{dry_run}.json"
+        manifest_filename = f"{job_id}_dry_run.json"
     else:
-        manifest_filename = f"{job_id}_{date}.json"
+        manifest_filename = f"{job_id}.json"
     manifest_path = os.path.join(SIMULATIONS_FOLDER, job_id, manifest_filename)
     return manifest_path
+
+
+def job_catalog_path(job_id, dry_run):
+    if dry_run:
+        catalog_filename = f"catalog_dry_run.json"
+    else:
+        catalog_filename = f"catalog.json"
+    catalog_path = os.path.join(SIMULATIONS_FOLDER, job_id, catalog_filename)
+    return catalog_path
+
+
+def archive_job_manifest_path(job_id):
+    date = datetime.now().strftime("%Y%m%d")
+    manifest_filename = f"{job_id}_{date}.json"
+    manifest_path = os.path.join(SIMULATIONS_FOLDER, job_id, manifest_filename)
+    return manifest_path
+
+
+def archive_job_catalog_path(job_id):
+    date = datetime.now().strftime("%Y%m%d")
+    catalog_filename = f"catalog_{date}.json"
+    catalog_path = os.path.join(SIMULATIONS_FOLDER, job_id, catalog_filename)
+    return catalog_path
 
 
 def load_manifest(job_id):
-    manifest_path = job_manifest_path(job_id)
+    manifest_path = job_manifest_path(job_id, 0)
     try:
         manifest_json = json.load(open(manifest_path))
         return manifest_json
@@ -97,10 +130,38 @@ def load_manifest(job_id):
         return {}
 
 
+def load_catalog(job_id):
+    catalog_path = job_catalog_path(job_id, 0)
+    try:
+        catalog_json = json.load(open(catalog_path))
+        return catalog_json
+    except Exception as e:
+        print(f"Problem loading manifest at {catalog_path}: {e}")
+        return {}
+
+
 def timestamp_age_in_days(timestamp):
     date_format = "%Y-%m-%d_%H:%M:%S"
     datetime_timestamp = datetime.strptime(timestamp, date_format)
     return (datetime.now() - datetime_timestamp).days
+
+
+def min_timestamp(timestamp_1, timestamp_2):
+    date_format = "%Y-%m-%d_%H:%M:%S"
+    timestamp_1_datetime = datetime.strptime(timestamp_1, date_format)
+    timestamp_2_datetime = datetime.strptime(timestamp_2, date_format)
+    if timestamp_1_datetime < timestamp_2_datetime:
+        return timestamp_1
+    return timestamp_2
+
+
+def max_timestamp(timestamp_1, timestamp_2):
+    date_format = "%Y-%m-%d_%H:%M:%S"
+    timestamp_1_datetime = datetime.strptime(timestamp_1, date_format)
+    timestamp_2_datetime = datetime.strptime(timestamp_2, date_format)
+    if timestamp_1_datetime > timestamp_2_datetime:
+        return timestamp_1
+    return timestamp_2
 
 
 def delete_timestamp_urls(job_id, layer_json):
