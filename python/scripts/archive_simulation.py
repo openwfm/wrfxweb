@@ -150,6 +150,11 @@ def timestamp_age_in_days(timestamp):
 
 
 def min_timestamp(timestamp_1, timestamp_2):
+    if timestamp_1 == "":
+        return timestamp_2
+    if timestamp_2 == "":
+        return timestamp_1
+
     date_format = "%Y-%m-%d_%H:%M:%S"
     timestamp_1_datetime = datetime.strptime(timestamp_1, date_format)
     timestamp_2_datetime = datetime.strptime(timestamp_2, date_format)
@@ -159,6 +164,11 @@ def min_timestamp(timestamp_1, timestamp_2):
 
 
 def max_timestamp(timestamp_1, timestamp_2):
+    if timestamp_1 == "":
+        return timestamp_2
+    if timestamp_2 == "":
+        return timestamp_1
+
     date_format = "%Y-%m-%d_%H:%M:%S"
     timestamp_1_datetime = datetime.strptime(timestamp_1, date_format)
     timestamp_2_datetime = datetime.strptime(timestamp_2, date_format)
