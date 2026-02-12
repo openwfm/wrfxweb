@@ -17,7 +17,7 @@ def archive_simulation(job_id, days_to_archive, simulation_days, dry_run=1):
         manifest_json = process_job_manifest(
             job_id, days_to_archive, simulation_days, dry_run
         )
-        catalog_json = process_catalog(job_id, manifest_json)
+        catalog_json = process_catalog(job_id, manifest_json, dry_run)
         manifest_path = job_manifest_path(job_id, dry_run)
         catalog_path = job_catalog_path(job_id, dry_run)
         if not dry_run:
@@ -74,7 +74,7 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
     return new_manifest
 
 
-def process_catalog(job_id, manifest_json):
+def process_catalog(job_id, manifest_json, dry_run):
     catalog_json = load_catalog(job_id)
     from_utc = ""
     to_utc = ""
@@ -85,6 +85,9 @@ def process_catalog(job_id, manifest_json):
             to_utc = max_timestamp(to_utc, timestamp)
     catalog_json["from_utc"] = from_utc
     catalog_json["to_utc"] = to_utc
+    if dry_run:
+        print(f"Updating catalog.json from_utc: {from_utc}, to_utc: {to_utc}")
+
     return catalog_json
 
 
