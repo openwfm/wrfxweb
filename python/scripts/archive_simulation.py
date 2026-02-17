@@ -1,4 +1,4 @@
-from scripts.scriptKeys import (
+from scriptKeys import (
     SIMULATIONS_FOLDER,
 )
 
