@@ -36,6 +36,34 @@ def archive_simulation(job_id, days_to_archive, simulation_days, dry_run=1):
         return
 
 
+def delete_imgs_not_in_manifest(job_id, dry_run=1):
+    try:
+        delete_count = 0
+        keep_count = 0
+        manifest_urls = job_manifest_urls(job_id)
+        simulation_path = job_simulation_path(job_id)
+        for entry in os.scandir(simulation_path):
+            if entry.is_file():
+                _, extension = os.path.splitext(entry.name)
+                if extension == ".png" or extension == ".kmz":
+                    if not entry.path in manifest_urls:
+                        if not dry_run:
+                            os.remove(entry.path)
+                        delete_count += 1
+                    else:
+                        keep_count += 1
+        if dry_run:
+            print(
+                f"Will delete {delete_count} files and keep {keep_count} files from {job_id}"
+            )
+        else:
+            print(
+                f"Deleted {delete_count} files and keep {keep_count} files from {job_id}"
+            )
+    except Exception as e:
+        print(f"Error in delete_imgs_not_in_manifest: {e}")
+
+
 def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
     manifest_json = load_manifest(job_id)
     new_manifest = {}
@@ -70,7 +98,7 @@ def process_job_manifest(job_id, days_to_archive, simulation_days, dry_run):
                     archive_count += 1
     if dry_run:
         print(
-            f"Will preserve {simulation_timestamp_count} timestamp urls, archive {archive_count} timestamp urls, and delete {delete_count} timestamp urls"
+            f"{job_id}: Will preserve {simulation_timestamp_count} timestamp urls, archive {archive_count} timestamp urls, and delete {delete_count} timestamp urls"
         )
     return new_manifest
 
@@ -210,6 +238,28 @@ def delete_url(job_id, url_to_delete):
 def job_simulation_path(job_id):
     simulation_path = os.path.join(SIMULATIONS_FOLDER, job_id)
     return simulation_path
+
+
+def job_manifest_urls(job_id):
+    manifest_json = load_manifest(job_id)
+    simulation_path = job_simulation_path(job_id)
+    manifest_urls = set()
+    for domain in manifest_json:
+        domain_json = manifest_json[domain]
+        for timestamp in domain_json:
+            timestamp_json = domain_json[timestamp]
+            for layer_type in timestamp_json:
+                layer_json = timestamp_json[layer_type]
+
+                raster_url = os.path.join(simulation_path, layer_json["raster"])
+                manifest_urls.add(raster_url)
+                if "colorbar" in layer_json:
+                    colorbar_url = os.path.join(simulation_path, layer_json["colorbar"])
+                    manifest_urls.add(colorbar_url)
+                if "kml" in layer_json:
+                    kml_url = os.path.join(simulation_path, layer_json["kml"])
+                    manifest_urls.add(kml_url)
+    return manifest_urls
 
 
 if __name__ == "__main__":
