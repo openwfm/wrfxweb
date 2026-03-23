@@ -49,6 +49,8 @@ def delete_imgs_not_in_manifest(job_id, dry_run=1):
                     if not entry.path in manifest_urls:
                         if not dry_run:
                             os.remove(entry.path)
+                            if delete_count % 10000 == 0:
+                                print(f"deleted {delete_count} files")
                         delete_count += 1
                     else:
                         keep_count += 1
