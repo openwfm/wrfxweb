@@ -82,7 +82,7 @@ export class AddWrfxctrlAccess extends HTMLElement {
       );
     } else {
       this.clearForm();
-      adminControllers.admins.push(response.admin);
+      adminControllers.wrfxctrlAccesses.refreshData();
       this.closeForm();
     }
   }

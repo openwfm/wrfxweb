@@ -29,7 +29,7 @@ export class WrfxctrlAccessEntry extends HTMLElement {
 
   async deleteAccess() {
     await deleteWrfxctrlAccess(this.access.id);
-    adminControllers.wrfxctrlAccesses.remove(this.access);
+    adminControllers.wrfxctrlAccesses.refreshData();
   }
 }
 
