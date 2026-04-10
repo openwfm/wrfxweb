@@ -11,7 +11,7 @@ from clientServer.serverKeys import (
 from api.services import AdminServices as AdminServices
 from api.serializers import UserSerializer as UserSerializer
 
-from flask import render_template, request, session, send_from_directory
+from flask import render_template, request, session, send_from_directory, send_file
 from flask_login import current_user
 
 
@@ -56,7 +56,7 @@ def delete_admin(admin_id):
 @app.route("/admin")
 @admin_login_required
 def admin_index():
-    return render_template(ADMIN_HTML)
+    return send_file(ADMIN_HTML)
 
 
 @app.route("/admin/reset_sessions")
