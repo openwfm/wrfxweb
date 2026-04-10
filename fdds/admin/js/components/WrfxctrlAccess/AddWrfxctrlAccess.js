@@ -1,6 +1,10 @@
 import { createWrfxctrlAccess } from "../../services/wrfxctrlServices.js";
-import { sanitizeInput } from "../../adminUtils.js";
 import { adminControllers } from "../../adminControllers.js";
+import {
+  sanitizeInput,
+  validateEmail,
+  validateDomain,
+} from "../../adminUtils.js";
 
 export class AddWrfxctrlAccess extends HTMLElement {
   /** ===== Initialization block ===== */
@@ -63,7 +67,15 @@ export class AddWrfxctrlAccess extends HTMLElement {
     const { emailInput } = this.uiElements;
     let email = sanitizeInput(emailInput.value);
     let adminJson = { email: email };
-    let response = await createAccess(adminJson);
+
+    if (!validateEmail(email) && !validateDomain(email)) {
+      this.showErrorMessage(
+        "Invalid permission: use a properly formatted email or a domain that begins with '@'",
+      );
+      return;
+    }
+
+    let response = await createWrfxctrlAccess(adminJson);
     if (response.error) {
       this.showErrorMessage(
         "Server encountered an unexpected error. Please try again.",
@@ -98,4 +110,4 @@ export class AddWrfxctrlAccess extends HTMLElement {
   }
 }
 
-window.customElements.define("add-wrfxctrl-access", AddWrfxctrlAccess);
+window.customElements.define("add-wrfxctrlaccess", AddWrfxctrlAccess);

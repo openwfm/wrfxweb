@@ -9,7 +9,7 @@ export class AdminList extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='admin-list-container'>
-              <h2>Admin List</h2>
+              <h2>Admins</h2>
               <create-admin></create-admin>
               <ul id='admin-list'></ul>
             </div>

@@ -11,7 +11,7 @@ export class CatalogList extends HTMLElement {
     super();
     this.innerHTML = `
             <div id='catalog-list-container'>
-              <h2>Catalog List</h2>
+              <h2>Catalogs</h2>
               <create-catalog></create-catalog>
               <ul id='catalog-list' class='main-list'></ul>
               <catalog-edit-modal></catalog-edit-modal>

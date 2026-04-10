@@ -10,7 +10,7 @@ export class WrfxctrlAccessList extends HTMLElement {
     this.innerHTML = `
             <div id='wrfxctrl-access-list-container'>
               <h2>Wrfxctrl Access</h2>
-              <add-wrfxctrl-access></add-wrfxctrl-access>
+              <add-wrfxctrlaccess></add-wrfxctrlaccess>
               <ul id='wrfxctrl-access-list'></ul>
             </div>
         `;

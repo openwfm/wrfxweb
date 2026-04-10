@@ -1,4 +1,4 @@
-import { deleteWrfxctrlAccess } from "../../services/wrfxctrlAccessServices.js";
+import { deleteWrfxctrlAccess } from "../../services/wrfxctrlServices.js";
 import { adminControllers } from "../../adminControllers.js";
 
 export class WrfxctrlAccessEntry extends HTMLElement {
@@ -33,4 +33,4 @@ export class WrfxctrlAccessEntry extends HTMLElement {
   }
 }
 
-window.customElements.define("wrfxctrl-access-entry", WrfxctrlAccessEntry);
+window.customElements.define("wrfxctrlaccess-entry", WrfxctrlAccessEntry);
