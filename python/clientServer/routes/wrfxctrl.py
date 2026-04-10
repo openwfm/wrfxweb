@@ -37,7 +37,7 @@ def wrfxctrl_access():
             }, 200
         elif request.method == "POST":
             access_json = request.get_json()
-            wrfxctrl_access = WrfxctrlAccessServices.create(access_json["permission"])
+            wrfxctrl_access = WrfxctrlAccessServices.create(access_json["email"])
             return {
                 "wrfxctrl_access": WrfxctrlAccessSerializer.serialize_access(
                     wrfxctrl_access

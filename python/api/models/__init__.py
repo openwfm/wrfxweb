@@ -1,9 +1,5 @@
-from api.models import (
-    Admin,
-    CatalogAccess,
-    User,
-    UserFeedback,
-)
+from api.models import Admin, CatalogAccess, User, UserFeedback
+from api.models.wrfxctrlAccess import WrfxctrlAccess
 from api.models.catalog.CatalogDbModel import CatalogDbModel
 from api.models.catalogEntry.CatalogEntryDbModel import CatalogEntryDbModel
 from api.models.catalogEntryUpload.CatalogEntryUploadDbModel import (

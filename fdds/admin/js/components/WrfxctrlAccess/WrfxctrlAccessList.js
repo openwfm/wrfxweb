@@ -26,10 +26,10 @@ export class WrfxctrlAccessList extends HTMLElement {
         this.createWrfxctrlAccess(access),
       );
     });
-    this.getAdmins();
+    this.getAccesses();
   }
 
-  async getAccessess() {
+  async getAccesses() {
     let accesses = await getWrfxctrlAccesses();
     adminControllers.wrfxctrlAccesses.setValue(accesses);
   }

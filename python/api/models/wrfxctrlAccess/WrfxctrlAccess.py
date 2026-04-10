@@ -10,7 +10,7 @@ class WrfxctrlAccess(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
     encrypted_domain = Column(LargeBinary)
-    user = relationship("User", foreign_keys="CatalogAccess.user_id")
+    user = relationship("User", foreign_keys="WrfxctrlAccess.user_id")
 
     def user_email(self):
         return self.user.email

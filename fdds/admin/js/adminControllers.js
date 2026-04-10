@@ -92,7 +92,7 @@ class DataController extends Controller {
   }
 
   async getValue() {
-    if (this.value == undefined) {
+    if (this.value == null) {
       const initialData = await this.getRequest();
       this.value = initialData;
     }

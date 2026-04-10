@@ -17,7 +17,7 @@ export async function getWrfxctrlAccesses() {
   if (response_json.error) {
     return [];
   }
-  return response_json.admins;
+  return response_json.wrfxctrl_accesses;
 }
 
 export async function deleteWrfxctrlAccess(accessId) {
