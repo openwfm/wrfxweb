@@ -6,12 +6,25 @@ import api.encryption as encryption
 
 from api.services import UserServices as UserServices
 from api.services import AdminServices as AdminServices
+from api.validators import utils as validationUtils
 
 from sqlalchemy import select, or_
 
 
 def find_by_user(user_id):
-    return db_session.query(WrfxctrlAccess).filter_by(user_id=user_id).first()
+    try:
+        user_id = validationUtils.validate_int_id(user_id)
+        return db_session.query(WrfxctrlAccess).filter_by(user_id=user_id).first()
+    except:
+        return None
+
+
+def find_by_id(access_id):
+    try:
+        access_id = validationUtils.validate_int_id(access_id)
+        return db_session.query(WrfxctrlAccess).get(access_id)
+    except:
+        return None
 
 
 def user_has_access(user):
@@ -29,6 +42,8 @@ def user_has_access(user):
 
 
 def find_by_domain(domain):
+    if not validationUtils.is_valid_email(domain):
+        return None
     encrypted_domain = encryption.encrypt_user_data(domain)
     return (
         db_session.query(WrfxctrlAccess)
@@ -37,20 +52,19 @@ def find_by_domain(domain):
     )
 
 
-def create(permission, user, admin_services_api_key):
+def create(permission):
     try:
-        if not AdminServices.isAdmin(user, admin_services_api_key):
-            return None
-
         if permission[0] == "@":
             return create_for_domain(permission)
-        return create_for_user(permission, admin_services_api_key)
+        return create_for_user(permission)
     except:
         return None
 
 
-def create_for_user(email, admin_services_api_key):
-    user = UserServices.find_or_create(email, admin_services_api_key)
+def create_for_user(email):
+    user = UserServices.find_or_create(email, ADMIN_SERVICES_API_KEY)
+    if user == None:
+        return None
     new_wrfxctrl_access = find_by_user(user.id)
     if new_wrfxctrl_access:
         return new_wrfxctrl_access
@@ -63,6 +77,8 @@ def create_for_user(email, admin_services_api_key):
 
 
 def create_for_domain(domain):
+    if not validationUtils.is_valid_email(domain):
+        return None
     encrypted_domain = encryption.encrypt_user_data(domain)
     new_wrfxctrl_access = find_by_domain(domain)
     if new_wrfxctrl_access:
@@ -77,14 +93,23 @@ def create_for_domain(domain):
 
 def destroy_for_user(user_id):
     wrfxctrl_access = find_by_user(user_id)
-    db_session.delete(wrfxctrl_access)
-    db_session.commit()
+    if wrfxctrl_access:
+        db_session.delete(wrfxctrl_access)
+        db_session.commit()
 
 
 def destroy_for_domain(domain):
     wrfxctrl_access = find_by_domain(domain)
-    db_session.delete(wrfxctrl_access)
-    db_session.commit()
+    if wrfxctrl_access:
+        db_session.delete(wrfxctrl_access)
+        db_session.commit()
+
+
+def destroy_by_id(access_id):
+    wrfxctrl_access = find_by_id(access_id)
+    if wrfxctrl_access:
+        db_session.delete(wrfxctrl_access)
+        db_session.commit()
 
 
 def find_all():

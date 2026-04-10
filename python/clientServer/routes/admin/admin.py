@@ -11,7 +11,7 @@ from clientServer.serverKeys import (
 from api.services import AdminServices as AdminServices
 from api.serializers import UserSerializer as UserSerializer
 
-from flask import render_template, request, session, send_from_directory, send_file
+from flask import request, session, send_from_directory, send_file
 from flask_login import current_user
 
 

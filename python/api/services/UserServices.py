@@ -8,30 +8,49 @@ from sqlalchemy import select
 
 
 def create(email, user_services_key):
-    if (
-        not validationUtils.is_valid_email(email)
-        or user_services_key not in USER_SERVICES_KEYS
-    ):
+    try:
+        if (
+            not validationUtils.is_valid_email(email)
+            or user_services_key not in USER_SERVICES_KEYS
+        ):
+            return None
+        email_cipher = encryption.encrypt_user_data(email)
+        date = datetime.datetime.now().strftime("%Y-%m-%d")
+        user = User(encrypted_email=email_cipher, date_created=date)
+        db_session.add(user)
+        db_session.commit()
+        return user
+    except:
         return None
-    email_cipher = encryption.encrypt_user_data(email)
-    date = datetime.datetime.now().strftime("%Y-%m-%d")
-    user = User(encrypted_email=email_cipher, date_created=date)
-    db_session.add(user)
-    db_session.commit()
-    return user
 
 
 def find_or_create(email, user_services_key):
-    user = find(email)
-    if user is None:
-        user = create(email, user_services_key)
-    return user
+    try:
+        if not validationUtils.is_valid_email(email):
+            return None
+        user = find(email)
+        if user is None:
+            user = create(email, user_services_key)
+        return user
+    except:
+        return None
 
 
 def find(email):
-    email_cipher = encryption.encrypt_user_data(email)
-    return db_session.scalar(select(User).where(User.encrypted_email == email_cipher))
+    try:
+        if not validationUtils.is_valid_email(email):
+            return None
+        email_cipher = encryption.encrypt_user_data(email)
+        return db_session.scalar(
+            select(User).where(User.encrypted_email == email_cipher)
+        )
+    except:
+        return None
 
 
 def find_by_id(user_id):
-    return db_session.query(User).get(user_id)
+    try:
+        user_id = validationUtils.validate_int_id(user_id)
+        return db_session.query(User).get(user_id)
+    except:
+        return None

@@ -1,5 +1,6 @@
 import { debounceInIntervals } from "./adminUtils.js";
 import { getCatalogEntries, getCatalogs } from "./services/catalogServices.js";
+import { getWrfxctrlAccesses } from "./services/wrfxctrlServices.js";
 
 export const controllerEvents = {
   QUIET: "QUIET",
@@ -105,4 +106,5 @@ export const adminControllers = {
   catalogs: new DataController(getCatalogs),
   confirmation: new FunctionController(),
   entries: new DataController(getCatalogEntries),
+  wrfxctrlAccesses: new DataController(getWrfxctrlAccesses),
 };
