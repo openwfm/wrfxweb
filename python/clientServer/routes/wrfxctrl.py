@@ -17,7 +17,7 @@ def wrfxctrl_build():
     if request.method == "GET":
         if not WrfxctrlAccessServices.user_has_access(current_user):
             abort(403)
-        return redirect(urljoin(WRFXCTRL_BASE_URL, "start"))
+        return redirect(urljoin(WRFXCTRL_BASE_URL, "submit"))
 
     elif request.method == "POST":
         return {"message": "success!"}, 200
