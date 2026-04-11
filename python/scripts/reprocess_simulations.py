@@ -91,9 +91,9 @@ def load_manifest(simulation_path, catalog_entry):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 1:
-        unpack_simulations(None)
-    elif len(sys.argv) == 2:
-        unpack_simulations(sys.argv[1])
-    elif len(sys.argv) == 4:
-        unpack_simulation(sys.argv[1], sys.argv[2], int(sys.argv[3]))
+    if len(sys.argv) != 3:
+        print("Usage: python process_simulation.py <job_id> <catalog_id>")
+        sys.exit(1)
+    job_id = sys.argv[1]
+    catalog_id = sys.argv[2]
+    unpack_simulation(job_id, None, catalog_id)
