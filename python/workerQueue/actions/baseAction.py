@@ -1,8 +1,12 @@
 import workerQueue.logging.utils as loggingUtils
+from workerQueue.serviceKeys import SIMULATIONS_FOLDER
 from api.services import (
     CatalogEntryUploadServices as CatalogEntryUploadServices,
     CatalogEntryServices as CatalogEntryServices,
+    CatalogServices as CatalogServices,
 )
+
+import os
 
 
 class ActionError(Exception):
@@ -33,6 +37,20 @@ class BaseAction:
         message = f"invalid queue_line: {queue_line}"
         loggingUtils.error_log(self.LOGGING_AREA, message)
         raise ActionError()
+
+    def validate_catalog_id(self, catalog_id):
+        if not catalog_id.isdigit():
+            return False
+        catalog = CatalogServices.find_by_id(catalog_id)
+        if catalog == None:
+            return False
+        return True
+
+    def validate_job_id(self, job_id):
+        full_job_path = os.path.join(SIMULATIONS_FOLDER, job_id)
+        if not os.path.exists(full_job_path):
+            return False
+        return True
 
     def validate_catalog_entry_id(self, catalog_entry_id):
         if not catalog_entry_id.isdigit():

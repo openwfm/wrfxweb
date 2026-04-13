@@ -3,6 +3,10 @@ from workerQueue.actions.kmlAction import KML_ACTION, kmlAction
 from workerQueue.actions.deleteAction import DELETE_ACTION, deleteAction
 from workerQueue.actions.archiveAction import ARCHIVE_ACTION, archiveAction
 from workerQueue.actions.zipAction import ZIP_ACTION, zipAction
+from workerQueue.actions.processUploadAction import (
+    PROCESS_UPLOAD_ACTION,
+    processUploadAction,
+)
 
 ACTIONS_DICT = {
     UPLOAD_ACTION: uploadAction,
@@ -10,6 +14,7 @@ ACTIONS_DICT = {
     DELETE_ACTION: deleteAction,
     ARCHIVE_ACTION: archiveAction,
     ZIP_ACTION: zipAction,
+    PROCESS_UPLOAD_ACTION: processUploadAction,
 }
 
 
