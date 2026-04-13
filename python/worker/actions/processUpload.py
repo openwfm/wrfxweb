@@ -15,7 +15,7 @@ class ProcessUploadAction(BaseAction):
         try:
             catalog_id = json["catalog_id"]
             job_id = json["job_id"]
-            return {"catalog_entry_upload_id": catalog_id, "job_id": job_id}
+            return {"catalog_id": catalog_id, "job_id": job_id}
         except:
             self.raise_validation_error("Invalid catalog_id or job_id")
 

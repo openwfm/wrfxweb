@@ -25,6 +25,13 @@ def find_by_id(catalog_id):
         return None
 
 
+def find_public_catalogs():
+    try:
+        return db_session.query(Catalog).where(Catalog.public == True).all()
+    except:
+        return []
+
+
 def user_has_access(catalog_id, user):
     catalog = find_by_id(catalog_id)
 

@@ -29,9 +29,12 @@ def unpack_simulation(simulation_path, entry_type, catalog_id):
         catalog_entry = create_catalog_entry(simulation_path, entry_type)
         if catalog_entry == None:
             return
-        print(f"Adding ${catalog_entry} to Catalog {catalog_id}")
-        CatalogEntryServices.create_catalog_entry_catalog(catalog_id, catalog_entry.id)
-        print(f"Added ${catalog_entry} to Catalog {catalog_id}")
+        if catalog_id != None:
+            print(f"Adding ${catalog_entry} to Catalog {catalog_id}")
+            CatalogEntryServices.create_catalog_entry_catalog(
+                catalog_id, catalog_entry.id
+            )
+            print(f"Added ${catalog_entry} to Catalog {catalog_id}")
     except Exception as e:
         print(f"Unpacking simulation failed {e}")
         return
@@ -91,9 +94,11 @@ def load_manifest(simulation_path, catalog_entry):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python process_simulation.py <job_id> <catalog_id>")
+    if len(sys.argv) != 3 or len(sys.argv) != 2:
+        print(
+            "Usage: python process_simulation.py <job_id> <catalog_id> or process_simulation.py <job_id>"
+        )
         sys.exit(1)
     job_id = sys.argv[1]
-    catalog_id = sys.argv[2]
+    catalog_id = sys.argv[2] if len(sys.argv) != 3 else None
     unpack_simulation(job_id, None, catalog_id)
