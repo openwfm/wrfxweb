@@ -39,7 +39,7 @@ class BaseAction:
         raise ActionError()
 
     def validate_catalog_id(self, catalog_id):
-        if not catalog_id.isdigit():
+        if not str(catalog_id).isdigit():
             return False
         catalog = CatalogServices.find_by_id(catalog_id)
         if catalog == None:

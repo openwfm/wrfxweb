@@ -13,7 +13,7 @@ class ProcessUploadAction(BaseAction):
         line_vars = queue_line.split(" ")
         action = line_vars[0]
         job_id = line_vars[1]
-        catalog_id = line_vars[2] if len(line_vars == 3) else None
+        catalog_id = line_vars[2] if len(line_vars) == 3 else None
         action_json = {"action": action, "job_id": job_id, "catalog_id": catalog_id}
         return self.validate_action_json(action_json)
 
@@ -22,9 +22,9 @@ class ProcessUploadAction(BaseAction):
         catalog_id = action_json["catalog_id"]
         job_id = action_json["job_id"]
         if catalog_id == None:
-            queue_line = f"{PROCESS_UPLOAD_ACTION} {job_id} {catalog_id}"
-        else:
             queue_line = f"{PROCESS_UPLOAD_ACTION} {job_id}"
+        else:
+            queue_line = f"{PROCESS_UPLOAD_ACTION} {job_id} {catalog_id}"
         return queue_line
 
     def validate_action_json(self, action_json):

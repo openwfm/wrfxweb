@@ -18,7 +18,7 @@ UPLOAD_ACTION = "UPLOAD"
 ZIP_ACTION = "ZIP"
 ARCHIVE_ACTION = "ARCHIVE"
 DELETE_ACTION = "DELETE"
-PROCESS_ACTION = "PROCESS_ACTION"
+PROCESS_UPLOAD_ACTION = "PROCESS_UPLOAD"
 
 
 ACTIONS_DICT = {
@@ -27,7 +27,7 @@ ACTIONS_DICT = {
     ZIP_ACTION: zip_action,
     ARCHIVE_ACTION: archive_action,
     DELETE_ACTION: delete_action,
-    PROCESS_ACTION: process_upload_action,
+    PROCESS_UPLOAD_ACTION: process_upload_action,
 }
 
 

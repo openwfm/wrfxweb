@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 
-# Check if the number of arguments is not equal to 2
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <job_id> <catalog_id>"
+if [ "$#" -eq 1 ]; then
+  curl \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"job_id\":\"$1\"}" \
+    --header "API-Key: $UPLOAD_QUEUE_SERVICE_API_KEY" \
+    $UPLOAD_QUEUE_SERVICE_URL/upload/process/enqueue
+elif [ "$#" -eq 2 ]; then
+  curl \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{\"job_id\":\"$1\"}" \
+    --header "API-Key: $UPLOAD_QUEUE_SERVICE_API_KEY" \
+    $UPLOAD_QUEUE_SERVICE_URL/upload/process/enqueue/$2
+else
+    echo "Usage: $0 <job_id> or $0 <job_id> <catalog_id>"
     exit 1
 fi
-
-python/venv/bin/python python/scripts/reprocess_simulations.py $1 $2
