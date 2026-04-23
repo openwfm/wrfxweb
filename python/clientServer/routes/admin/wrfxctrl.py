@@ -1,27 +1,9 @@
 from clientServer.app import app
 from clientServer.routes.admin.admin_utils import admin_login_required
-from clientServer.routes.login import login_required
-from clientServer.serverKeys import WRFXCTRL_BASE_URL
 from api.services import WrfxctrlAccessServices as WrfxctrlAccessServices
 from api.serializers import WrfxctrlAccessSerializer as WrfxctrlAccessSerializer
-from api.services import AdminServices as AdminServices
 
-from flask_login import current_user
-from flask import abort, request, redirect
-from urllib.parse import urljoin
-
-
-@app.route("/jobs/build", methods=["GET", "POST"])
-@login_required
-def wrfxctrl_build():
-    if request.method == "GET":
-        if not WrfxctrlAccessServices.user_has_access(current_user):
-            abort(403)
-        return redirect(urljoin(WRFXCTRL_BASE_URL, "submit"))
-
-    elif request.method == "POST":
-        return {"message": "success!"}, 200
-    abort(405)
+from flask import abort, request
 
 
 @app.route("/jobs/access", methods=["GET", "POST"])

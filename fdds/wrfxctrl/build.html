@@ -1,0 +1,135 @@
+<!doctype html>
+<head>
+  <title>WRFx - start a fire simulation</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dropdown.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/modal.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dimmer.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/form.min.css"
+  />
+  <link rel="stylesheet" href="/jobs/style.css" />
+  <link rel="stylesheet" href="/jobs/jquery.datetimepicker.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""
+  />
+  <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+  <script src="/jobs/jquery.datetimepicker.js"></script>
+  <script
+    src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""
+  ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dropdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/transition.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/modal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/dimmer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/form.min.js"></script>
+  <script src="https://www.mapquestapi.com/sdk/leaflet/v2.2/mq-map.js?key=3rdoGP1zhCE27Q69RXFiR0A3foqbvoZd"></script>
+</head>
+
+<body>
+  <div>
+    <div class="ui one column stackable center aligned page grid">
+      <div class="column twelve wide">
+        <h1>Initiate a fire simulation</h1>
+
+        <br />
+        <br />
+
+        <form id="simulation_form" class="ui form" method="POST">
+          <simulation-description></simulation-description>
+
+          <h2 class="ui header">Step 2: Ignition location and time</h2>
+
+          <simulation-start-and-end-times></simulation-start-and-end-times>
+          <cycle-start></cycle-start>
+
+          <p>
+            Select fire location by <b>clicking on the map</b> or filling out
+            the boxes below
+          </p>
+
+          <div id="map"></div>
+
+          <single-ignition></single-ignition>
+          <validation-errors></validation-errors>
+          <br />
+
+          <br />
+          <ignition-profile></ignition-profile>
+
+          <br />
+          <br />
+          <br />
+
+          <ignition-button></ignition-button>
+        </form>
+        <a href="/jobs" class="ui right floated blue button">Home</a>
+
+        <div>
+          <p>
+            <a href="https://wildfirecenter.org/" target="_blank"
+              >SJSU WIRC, Fire Modeling Group,
+              <script>
+                document.write(new Date().getFullYear());
+              </script></a
+            >
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/jobs/js/appState.js" type="module"></script>
+  <script src="/jobs/js/buildMap.js" type="module"></script>
+  <script src="/jobs/js/components/ignitionMarker.js" type="module"></script>
+  <script src="/jobs/ignitionTime.js" type="module"></script>
+  <script
+    src="/jobs/js/components/singleIgnition/singleIgnition.js"
+    type="module"
+  ></script>
+  <script
+    src="/jobs/js/components/simulationDescription/simulationDescription.js"
+    type="module"
+  ></script>
+  <script
+    src="/jobs/js/components/ignitionProfile/ignitionProfile.js"
+    type="module"
+  ></script>
+  <script
+    src="/jobs/js/components/simulationStartAndEndTimes/simulationStartAndEndTimesUI/simulationStartAndEndTimesUI.js"
+    type="module"
+  ></script>
+
+  <script
+    src="/jobs/js/components/validationErrors/validationErrors.js"
+    type="module"
+  ></script>
+  <script
+    src="/jobs/js/components/ignitionButton/ignitionButton.js"
+    type="module"
+  ></script>
+  <script src="/jobs/build.js"></script>
+</body>

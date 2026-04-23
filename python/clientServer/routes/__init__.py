@@ -4,6 +4,6 @@ from clientServer.routes import (
     user_feedback,
     catalogs,
     catalog_entries,
-    wrfxctrl,
 )
+from clientServer.routes.wrfxctrl import wrfxctrl
 from clientServer.routes.admin import admin

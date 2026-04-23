@@ -1,0 +1,277 @@
+h1 {
+  text-align: center;
+}
+h2 {
+  text-align: left;
+}
+
+body {
+  padding-top: 24px;
+  font-size: 1.2em;
+  text-align: left;
+}
+
+body.wait * {
+  cursor: wait !important;
+}
+
+.leaflet-container.pointer-cursor-enabled {
+  cursor: pointer;
+}
+
+#acknowledgement {
+  font-size: small;
+  position: fixed;
+  right: 20px;
+  bottom: 10px;
+}
+
+a .action-button {
+  margin: 20px 20px 20px 20px;
+}
+
+#map {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+div .fixed-height-grid {
+  height: 200px;
+}
+
+.not-valid-warning {
+  display: none;
+  margin-top: 5px;
+  padding: 9px;
+  border-style: solid;
+  border-color: red;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  color: red;
+}
+
+.ignition-times-labels {
+  display: inline-block;
+  font-weight: bold;
+  padding-bottom: 0px !important;
+}
+
+.activate-warning {
+  display: inline-block;
+}
+
+.marker-button {
+  display: inline-block;
+  vertical-align: top;
+  margin: auto;
+  margin-top: 20px;
+  width: 40px;
+  font-size: 2em;
+  border-color: #cccccc;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  background-color: white;
+}
+
+.leaflet-popup-tip {
+  display: none;
+  width: 0px;
+  height: 0px;
+  border: 0px;
+}
+
+.leaflet-popup {
+  bottom: 2px !important;
+}
+
+.interactive-button {
+  opacity: 50%;
+  cursor: pointer;
+}
+
+.interactive-button:hover {
+  opacity: 100%;
+}
+
+.marker-buttons {
+  height: 70px;
+}
+
+.marker-button:hover {
+  border-color: #a6a6a6;
+  cursor: pointer;
+}
+
+.ignition-id {
+  display: inline-block;
+  margin: auto;
+  margin-top: 0px;
+  padding: 0.63em 1em;
+  background-color: white;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  border-color: #cccccc;
+}
+
+.hidden {
+  display: none;
+}
+
+.active-field-button {
+  display: inline-block;
+  margin: auto;
+  padding: 0.63em 1em;
+  border-color: #cccccc;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  background-color: white;
+}
+
+.active-field-button:hover {
+  border-color: #a6a6a6;
+  cursor: pointer;
+}
+
+#markers {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.ignition-markers {
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.menu {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.ignition-marker {
+  padding: 5px;
+}
+
+.error-modal .mask {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  height: 110vh;
+  width: 100vw;
+  background: #1a1a1a;
+  margin: 0px;
+  opacity: 50%;
+}
+
+.error-modal .error-box {
+  position: fixed;
+  z-index: 2000;
+  opacity: 100%!;
+  height: 500px;
+  width: 550px;
+  padding: 10px;
+  background: #ffffff;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #1a1a1a;
+}
+
+.error-modal .validation-errors-list {
+  max-height: 430px;
+  overflow-y: auto;
+}
+
+.error-box ul {
+  padding-left: 30px;
+  padding-right: 10px;
+}
+
+.error-box h3 {
+  font-size: 1.5rem;
+}
+
+.validation-error {
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+}
+
+.validation-error .validation-error-header {
+  display: block;
+  font-weight: bolder;
+}
+
+.validation-error .validation-error-message {
+  display: block;
+}
+
+.close-button {
+  position: absolute;
+  right: 15px;
+  top: 7px;
+  color: darkgray;
+  font-size: 1.2em;
+}
+
+.close-button:hover {
+  color: black;
+  cursor: pointer;
+}
+
+/*#ignition-times {
+  max-height: 150px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}*/
+
+/*#ignition-type-field {*/
+/*  display: inline-block;*/
+/*  width: 200px;*/
+/*}*/
+
+#buffer-type-field {
+  display: inline-block;
+  width: 200px;
+}
+
+#ignition-times-count-field {
+  display: inline-block;
+  width: 300px;
+}
+
+/* from github.com/ardhi/Leaflet.MousePosition */
+.leaflet-container .leaflet-control-mouseposition {
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 5px #bbb;
+  padding: 0 5px;
+  margin: 0;
+  color: #333;
+  font:
+    11px/1.5 "Helvetica Neue",
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.mq-logo-control {
+  display: none;
+}
+
+.two .fields .hidden {
+  display: none!;
+}
+
+.rerun-button {
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<title>Fire forecasting controller</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.css"/>
+ <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  
+<div class="ui one column stackable center aligned page grid">
+   <div class="column twelve wide">
+     <h1>Fire forecasting control system</h1>
+     
+     <p style="text-align:left">Welcome to the WRFx controller website, an experimental system built to initiate
+        fire simulations using the <a href="http://github.com/openwfm/wrfxpy">wrfxpy</a>
+        system.  The  <a href="http://github.com/openwfm/wrfxpy">wrfxpy</a> system in turn relies
+        on <a href="http://github.com/openwfm/WRF-SFIRE">WRF-SFIRE</a> to perform the numerical
+        simulation itself.  The results of the simulation will appear on the integrated visualization
+        system <a href="http://demo.openwfm.org">wrfxweb</a>.
+      </p>
+      
+      <h2>System status</h2>
+      
+        <table class="ui celled table">
+          <tbody>
+            <tr>
+              <td>
+                <div class="ui label">Cluster</div>
+              </td>
+              <td> {{ cluster.hostname }} </td>
+            </tr>
+            <tr>
+              <td><div class="ui label">Nodes</div></td>
+              <td> {{ cluster.nodes }} </td>
+            </tr>
+            <tr>
+              <td><div class="ui label">Cores per node</div></td>
+              <td> {{ cluster.ppn }} </td>
+            </tr>
+            <tr>
+              <td><div class="ui label">Free nodes</div></td>
+              <td> {{ cluster.free_nodes }} </td>
+            </tr>
+          </tbody>
+         </table>
+        
+         <div class="ui two column grid">
+          <div class="center aligned row">
+          <div class="column"> 
+          <a class="ui massive negative button action-button" href="{{ urls['submit'] }}">
+            <i class="fire icon"></i>Start a new fire
+          </a>
+          </div>
+
+          <div class="column"> 
+          <a class="ui massive blue button action-button" href="{{ urls['overview'] }}">
+            <i class="browser icon"></i>Show current jobs
+          </a>
+          </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div id="acknowledgement">
+     <p>
+     <a href="https://wildfirecenter.org/" target="_blank">SJSU WIRC, Fire Modeling Group, <script>document.write(new Date().getFullYear())</script></a>
+     </p>
+  </div>
+</div>

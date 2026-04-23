@@ -1,6 +1,11 @@
 from clientServer.app import app
 from clientServer.routes.admin.admin_utils import admin_login_required
-from clientServer.routes.admin import catalogs, catalog_permissions, catalog_entries
+from clientServer.routes.admin import (
+    catalogs,
+    catalog_permissions,
+    catalog_entries,
+    wrfxctrl,
+)
 from clientServer.serverKeys import (
     ADMIN_SERVICES_API_KEY,
     ADMIN_HTML,
