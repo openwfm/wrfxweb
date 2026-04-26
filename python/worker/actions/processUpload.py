@@ -26,8 +26,8 @@ class ProcessUploadAction(BaseAction):
         upload_message = f"PROCESS_UPLOAD job_id: {job_id} catalog_id: {catalog_id}"
         self.log_action(upload_message)
         with app.app_context():
-            script.unpack_simulation(job_id, None, catalog_id)
-
+            catalog_entry = script.unpack_simulation(job_id, None, catalog_id)
+            script.link_catalog_entry_to_wrfxctrl_job(catalog_entry)
         process_upload_message = (
             f"PROCESS_UPLOAD COMPLETE job_id: {job_id} catalog_id: {catalog_id}"
         )

@@ -1,5 +1,6 @@
 from scripts.scriptKeys import SIMULATIONS_FOLDER, ADMIN_SERVICES_API_KEY
 import api.services.CatalogEntryServices as CatalogEntryServices
+import api.services.WrfxctrlJobServices as WrfxctrlJobServices
 import scripts.utils as script_utils
 
 import json
@@ -35,8 +36,18 @@ def unpack_simulation(simulation_path, entry_type, catalog_id):
                 catalog_id, catalog_entry.id
             )
             print(f"Added ${catalog_entry} to Catalog {catalog_id}")
+        return catalog_entry
     except Exception as e:
         print(f"Unpacking simulation failed {e}")
+        return
+
+
+def link_catalog_entry_to_wrfxctrl_job(catalog_entry):
+    try:
+        job_id = catalog_entry.job_id
+        WrfxctrlJobServices.add_catalog_entry_by_job_id(job_id, catalog_entry.id)
+    except Exception as e:
+        print(f"Linking CatalogEntry failed {e}")
         return
 
 
