@@ -9,6 +9,7 @@ from api.services import (
     AdminServices as AdminServices,
     CatalogAccessServices as CatalogAccessServices,
     CatalogApiKeyServices as CatalogApiKeyServices,
+    UserServices as UserServices,
 )
 import api.logging.utils as loggingUtils
 import api.encryption as encryption
@@ -30,6 +31,16 @@ def find_public_catalogs():
         return db_session.query(Catalog).where(Catalog.public == True).all()
     except:
         return []
+
+
+def user_id_has_access(catalog_id, user_id):
+    try:
+        user = UserServices.find_by_id(user_id)
+        if user == None:
+            raise ValueError(f"user_id {user_id} must be a valid User")
+        return user_has_access(catalog_id, user_id)
+    except:
+        return False
 
 
 def user_has_access(catalog_id, user):

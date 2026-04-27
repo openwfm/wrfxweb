@@ -12,6 +12,22 @@ from api.validators import utils as validationUtils
 from api.validators import UserValidators as UserValidators
 
 from sqlalchemy import select, or_
+from enum import StrEnum
+
+
+class WrfxctrlStatus(StrEnum):
+    WAITING = "waiting"
+    RUNNING = "running"
+    FAILED = "failed"
+    COMPLETE = "complete"
+
+
+WRFXCTRL_JOB_STATUSES = [
+    WrfxctrlStatus.WAITING,
+    WrfxctrlStatus.RUNNING,
+    WrfxctrlStatus.FAILED,
+    WrfxctrlStatus.COMPLETE,
+]
 
 
 def find_by_user_id(user_id):
@@ -52,22 +68,37 @@ def find_by_job_id(job_id):
         return None
 
 
-def find_or_create(user_id, job_id):
+def find_or_create(user_id, job_id, catalog_id):
     try:
         wrfxctrl_job = find_by_user_id_and_job_id(user_id, job_id)
         if wrfxctrl_job != None:
             return wrfxctrl_job
-        return create(user_id, job_id)
+        return create(user_id, job_id, catalog_id)
     except:
         return None
 
 
-def create(user_id, job_id):
+def create(user_id, job_id, catalog_id):
     try:
         user_id = UserValidators.validate_user_id(user_id)
+        catalog = CatalogServices.find_by_id(catalog_id)
+        if catalog == None:
+            raise ValueError(
+                f"catalog_id {catalog_id} does not correspond to a Catalog"
+            )
+        if not CatalogServices.user_id_has_access(catalog_id, user_id):
+            raise ValueError(f"User {user_id} must have access to catalog {catalog_id}")
+        if catalog.public:
+            raise ValueError(f"Catalog {catalog_id} is public")
+
         job_id = validationUtils.validate_text(job_id)
 
-        new_wrfxctrl_job = WrfxctrlJob(user_id=user_id, job_id=job_id)
+        new_wrfxctrl_job = WrfxctrlJob(
+            user_id=user_id,
+            job_id=job_id,
+            status=WrfxctrlStatus.WAITING,
+            catalog_id=catalog_id,
+        )
         db_session.add(new_wrfxctrl_job)
         db_session.commit()
 
@@ -156,6 +187,40 @@ def add_catalog_entry(wrfxctrl_job_id, catalog_entry_id):
             )
 
         wrfxctrl_job.catalog_entry_id = catalog_entry.id
+        CatalogEntryServices.create_catalog_entry_catalog(
+            wrfxctrl_job.catalog_id, catalog_entry.id
+        )
+
+        db_session.commit()
+        return wrfxctrl_job
+    except:
+        return None
+
+
+def update_status_by_job_id(job_id, status):
+    try:
+        wrfxctrl_job = find_by_job_id(job_id)
+        if wrfxctrl_job == None:
+            raise ValueError(f"job_id {job_id} must be a valid WrfxctrlJob")
+        if status not in WRFXCTRL_JOB_STATUSES:
+            raise ValueError(f"status {status} is not a valid WrfxctrlJob status")
+        wrfxctrl_job.status = status
+        db_session.commit()
+        return wrfxctrl_job
+    except:
+        return None
+
+
+def update_status(wrfxctrl_job_id, status):
+    try:
+        wrfxctrl_job = find_by_id(wrfxctrl_job_id)
+        if wrfxctrl_job == None:
+            raise ValueError(
+                f"wrfxctrl_job_id {wrfxctrl_job_id} must be a valid WrfxctrlJob"
+            )
+        if status not in WRFXCTRL_JOB_STATUSES:
+            raise ValueError(f"status {status} is not a valid WrfxctrlJob status")
+        wrfxctrl_job.status = status
         db_session.commit()
         return wrfxctrl_job
     except:

@@ -16,6 +16,17 @@ def serialize_catalog(catalog):
     }
 
 
+def serialize_catalog_without_entries(catalog):
+    if catalog == None:
+        return {}
+    return {
+        "id": sanitize_text(f"{catalog.id}"),
+        "description": sanitize_text(f"{catalog.description}"),
+        "name": sanitize_text(f"{catalog.name}"),
+        "date_created": sanitize_text(f"{catalog.date_created}"),
+    }
+
+
 def serialize_catalogs(catalogs):
     return [serialize_catalog(catalog) for catalog in catalogs]
 

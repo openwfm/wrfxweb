@@ -1,6 +1,7 @@
 from scripts.scriptKeys import SIMULATIONS_FOLDER, ADMIN_SERVICES_API_KEY
 import api.services.CatalogEntryServices as CatalogEntryServices
 import api.services.WrfxctrlJobServices as WrfxctrlJobServices
+from api.services.WrfxctrlJobServices import WrfxctrlStatus
 import scripts.utils as script_utils
 
 import json
@@ -46,6 +47,7 @@ def link_catalog_entry_to_wrfxctrl_job(catalog_entry):
     try:
         job_id = catalog_entry.job_id
         WrfxctrlJobServices.add_catalog_entry_by_job_id(job_id, catalog_entry.id)
+        WrfxctrlJobServices.update_status_by_job_id(job_id, WrfxctrlStatus.COMPLETE)
     except Exception as e:
         print(f"Linking CatalogEntry failed {e}")
         return
