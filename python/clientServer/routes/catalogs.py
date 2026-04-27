@@ -16,3 +16,12 @@ def client_catalogs():
     serialized_catalogs = CatalogSerializer.serialize_catalogs(catalogs)
 
     return {"message": "api successful", "catalogs": serialized_catalogs}, 200
+
+
+@app.route("/catalogs/no_entries", methods=["GET"])
+@login_required
+def client_catalogs_no_entries():
+    catalogs = CatalogServices.user_catalogs(current_user, CLIENT_SERVER_API_KEY)
+    serialized_catalogs = CatalogSerializer.serialize_catalogs_without_entries(catalogs)
+
+    return {"message": "api successful", "catalogs": serialized_catalogs}, 200

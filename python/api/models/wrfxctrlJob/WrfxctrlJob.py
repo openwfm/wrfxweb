@@ -12,6 +12,7 @@ class WrfxctrlJob(Base):
     catalog_entry = relationship(
         "CatalogEntry", foreign_keys="WrfxctrlJob.catalog_entry_id"
     )
+    submit_time = Column(String(255), nullable=False)
     catalog_id = Column(Integer, ForeignKey("catalog.id"), nullable=False)
     catalog = relationship("Catalog", foreign_keys="WrfxctrlJob.catalog_id")
     job_id = Column(String(255), nullable=False)

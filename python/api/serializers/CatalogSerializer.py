@@ -13,6 +13,7 @@ def serialize_catalog(catalog):
         "name": sanitize_text(f"{catalog.name}"),
         "date_created": sanitize_text(f"{catalog.date_created}"),
         "entries": CatalogEntrySerializer.serialize_catalog_entries(catalog.entries()),
+        "public": f"{catalog.public}",
     }
 
 
@@ -24,11 +25,16 @@ def serialize_catalog_without_entries(catalog):
         "description": sanitize_text(f"{catalog.description}"),
         "name": sanitize_text(f"{catalog.name}"),
         "date_created": sanitize_text(f"{catalog.date_created}"),
+        "public": f"{catalog.public}",
     }
 
 
 def serialize_catalogs(catalogs):
     return [serialize_catalog(catalog) for catalog in catalogs]
+
+
+def serialize_catalogs_without_entries(catalogs):
+    return [serialize_catalog_without_entries(catalog) for catalog in catalogs]
 
 
 def serialize_catalogs_with_permissions(catalogs, user, admin_services_api_key):

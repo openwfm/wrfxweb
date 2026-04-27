@@ -15,6 +15,7 @@ def serialize_wrfxctrl_job(wrfxctrl_job):
         "catalog_entry": CatalogEntrySerializer.serialize_catalog_entry(
             wrfxctrl_job.catalog_entry
         ),
+        "submit_time": sanitize_text(f"{wrfxctrl_job.submit_time}"),
     }
 
 

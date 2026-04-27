@@ -1,8 +1,5 @@
 from api.session import db_session
 from api.models.wrfxctrlJob.WrfxctrlJob import WrfxctrlJob
-from api.apiKeys import ADMIN_SERVICES_API_KEY
-
-import api.encryption as encryption
 
 from api.services import UserServices as UserServices
 from api.services import AdminServices as AdminServices
@@ -11,8 +8,8 @@ from api.services import CatalogEntryServices as CatalogEntryServices
 from api.validators import utils as validationUtils
 from api.validators import UserValidators as UserValidators
 
-from sqlalchemy import select, or_
 from enum import StrEnum
+from datetime import datetime
 
 
 class WrfxctrlStatus(StrEnum):
@@ -92,12 +89,14 @@ def create(user_id, job_id, catalog_id):
             raise ValueError(f"Catalog {catalog_id} is public")
 
         job_id = validationUtils.validate_text(job_id)
+        submit_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         new_wrfxctrl_job = WrfxctrlJob(
             user_id=user_id,
             job_id=job_id,
             status=WrfxctrlStatus.WAITING,
             catalog_id=catalog_id,
+            submit_time=submit_time,
         )
         db_session.add(new_wrfxctrl_job)
         db_session.commit()
