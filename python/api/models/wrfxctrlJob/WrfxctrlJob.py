@@ -17,3 +17,4 @@ class WrfxctrlJob(Base):
     catalog = relationship("Catalog", foreign_keys="WrfxctrlJob.catalog_id")
     job_id = Column(String(255), nullable=False)
     status = Column(String(255), nullable=True)
+    description = Column(String(255), nullable=False)

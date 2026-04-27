@@ -23,8 +23,6 @@ export class AddCatalog extends AppStateSubscriber {
       let catalogOption = this.createCatalogOption(catalog);
       catalogDropdown.appendChild(catalogOption);
     }
-
-    console.log(catalogs);
   }
 
   createCatalogOption(catalog) {

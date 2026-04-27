@@ -1,0 +1,47 @@
+<!doctype html>
+<title>WRFx - simulation overview</title>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/checkbox.min.css"
+/>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.12.0/moment.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/components/checkbox.min.js"></script>
+<script src="/jobs/js/jquery.tablesort.min.js"></script>
+<body>
+  <overview></overview>
+
+  <script src="/jobs/js/components/overview/Overview.js" type="module"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      var sdata = $("table").tablesort().data("tablesort");
+      sdata.sort($("#sim-started-at"), "desc");
+    });
+
+    cb_all_func = function (boxval) {
+      if (boxval.checked == true) {
+        $("#RemoveButton").removeClass("disabled");
+        $("#CancelButton").removeClass("disabled");
+        $("#overview input[type=checkbox]").checkBox("changeCheckStatus", true);
+      } else {
+        $("#overview input[type=checkbox]").checkBox(
+          "changeCheckStatus",
+          false,
+        );
+      }
+      $("input:checkbox").prop("checked", $(this).prop("checked"));
+    };
+
+    cb_func = function (boxval) {
+      if (boxval.checked == true) {
+        $("#RemoveButton").removeClass("disabled");
+        $("#CancelButton").removeClass("disabled");
+      }
+    };
+  </script>
+</body>
