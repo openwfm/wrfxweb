@@ -22,7 +22,6 @@ export class IgnitionButton extends HTMLElement {
     };
     form.addEventListener("formdata", ({ formData }) => {
       let formJson = errorState.buildJson();
-      console.log(formJson);
       for (let key of Object.keys(formJson)) {
         formData.append(key, formJson[key]);
       }

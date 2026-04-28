@@ -38,7 +38,7 @@ def user_id_has_access(catalog_id, user_id):
         user = UserServices.find_by_id(user_id)
         if user == None:
             raise ValueError(f"user_id {user_id} must be a valid User")
-        return user_has_access(catalog_id, user_id)
+        return user_has_access(catalog_id, user)
     except:
         return False
 

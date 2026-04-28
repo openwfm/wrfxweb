@@ -65,20 +65,21 @@ def find_by_job_id(job_id):
         return None
 
 
-def find_or_create(user_id, job_id, catalog_id):
+def find_or_create(user_id, job_id, catalog_id, description):
     try:
         wrfxctrl_job = find_by_user_id_and_job_id(user_id, job_id)
         if wrfxctrl_job != None:
             return wrfxctrl_job
-        return create(user_id, job_id, catalog_id)
+        return create(user_id, job_id, catalog_id, description)
     except:
         return None
 
 
-def create(user_id, job_id, catalog_id):
+def create(user_id, job_id, catalog_id, description):
     try:
         user_id = UserValidators.validate_user_id(user_id)
         catalog = CatalogServices.find_by_id(catalog_id)
+        description = validationUtils.validate_text(description)
         if catalog == None:
             raise ValueError(
                 f"catalog_id {catalog_id} does not correspond to a Catalog"
@@ -97,6 +98,7 @@ def create(user_id, job_id, catalog_id):
             status=WrfxctrlStatus.WAITING,
             catalog_id=catalog_id,
             submit_time=submit_time,
+            description=description,
         )
         db_session.add(new_wrfxctrl_job)
         db_session.commit()

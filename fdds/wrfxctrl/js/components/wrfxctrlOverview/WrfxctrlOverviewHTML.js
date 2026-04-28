@@ -1,4 +1,4 @@
-export const overviewHTML = `
+export const wrfxctrlOverviewHTML = `
   <div class="ui one column stackable center aligned page grid">
     <div class="column sixteen wide">
       <form class="ui form" id="overview" method="POST">
