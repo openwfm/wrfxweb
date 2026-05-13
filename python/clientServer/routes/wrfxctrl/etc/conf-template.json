@@ -1,0 +1,11 @@
+{
+  "host": "127.0.0.1",
+  "port": "5000",
+  "debug": "False",
+  "wrfxweb_url": "http://host.domain/root",
+  "wrfxpy_path": "/home/USER/wrfxpy",
+  "jobs_path": "/home/USER/jobs",
+  "logs_path": "/home/USER/logs",
+  "sims_path": "/home/USER/sims",
+  "geogrid_root": "/home/USER/wksp_fmda/CONUS"
+}

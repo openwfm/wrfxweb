@@ -1,0 +1,5 @@
+{
+  "nodes" : 18,
+  "ppn" : 64,
+  "qsys" : "ember"
+}
