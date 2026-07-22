@@ -219,5 +219,6 @@ def validate_job_json(job_json, user):
     validated_job_json["domain_center_lat"] = domain_lat
     validated_job_json["domain_center_lon"] = domain_lon
     validated_job_json["catalog_id"] = validate_catalog_id(job_json["catalog_id"], user)
+    validated_job_json["profile"] = validate_string(job_json["profile"])
 
     return validated_job_json
