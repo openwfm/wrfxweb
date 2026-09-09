@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from clientServer.routes.wrfxctrl.utils import to_esmf, to_utc, rm, str_to_bool
+from clientServer.routes.wrfxctrl.wrfxctrl_config import profiles
 from datetime import datetime, timedelta
 import numpy as np
 import pytz
@@ -28,9 +29,10 @@ import os
 import os.path as osp
 import stat
 import subprocess
-import glob
 import logging
 import simplekml
+
+DEFAULT_PROFILE = "1d-1km-HRRR"
 
 
 def select_grib_source(start_time):
@@ -152,35 +154,6 @@ def delete_simulation_files(sim_id, conf):
     rm(list(simulation_paths(sim_id, conf).values()))
 
 
-def load_simulations(sims_path):
-    """
-    Load all simulations stored in the simulations/ directory.
-
-    :params sims_path: path to jsons with simulation states
-    :return: a dictionary of simulations
-    """
-
-    logging.info("Loading simulation states from %s" % sims_path)
-    files = glob.glob(sims_path + "/*.json")
-    simulations = {}
-    for f in files:
-        logging.info("load_simulations: loading file %s" % f)
-        try:
-            sim_info = json.load(open(f))
-            if "job_id" not in sim_info:
-                # older files do not have job_id, redo from the visualization link
-                link = sim_info["visualization_link"]
-                sim_info["job_id"] = link[link.find("wfc-") :]
-                logging.debug("Added missing job_id " + sim_info["job_id"])
-            sim_id = sim_info["id"]
-            simulations[sim_id] = sim_info
-            logging.info("load_simulations: loaded simulation id %s" % sim_id)
-        except ValueError:
-            logging.error("load_simulations: failed to reload simulation %s" % f)
-            os.rename(f, f + ".error")
-    return simulations
-
-
 def rerun_simulation(sim_id, conf):
     try:
         path = simulation_paths(sim_id, conf)
@@ -206,6 +179,13 @@ def rerun_simulation(sim_id, conf):
         logging.error("Rerunning simulation for sim id %s failed" % sim_id)
 
 
+def simulation_profile(profile):
+    profile = profiles[profile]
+    if profile == None:
+        profile = profiles[DEFAULT_PROFILE]
+    return profile
+
+
 def create_simulation(info, conf, cluster):
     """
     Build a simulation JSON configuration based on profiles and execute
@@ -216,24 +196,15 @@ def create_simulation(info, conf, cluster):
     :param cluster: a cluster object that conveys information about the computing environment
     :return: the simulation info object
     """
-    now = datetime.utcnow()
-    sim_id = "from-web-%04d-%02d-%02d_%02d-%02d-%02d" % (
-        now.year,
-        now.month,
-        now.day,
-        now.hour,
-        now.minute,
-        now.second,
-    )
-
+    sim_id = info["sim_id"]
+    job_id = info["job_id"]
     # get paths of all files created
     path = simulation_paths(sim_id, conf)
     log_path = path["log_path"]
     json_path = path["json_path"]
     run_script = path["run_script"]
-
     # store simulation configuration
-    profile = info["profile"]
+    profile = simulation_profile(info["profile"])
     print("profile = %s" % json.dumps(profile, indent=4, separators=(",", ": ")))
     sim_descr = info["description"]
     sim_info = {
@@ -253,7 +224,6 @@ def create_simulation(info, conf, cluster):
     cfg = json.load(open(template))
     print("Job template %s:" % template)
     print(json.dumps(cfg, indent=4, separators=(",", ": ")))
-
     if "fmda_geogrid_path" in info:
         geogrid_path = osp.join(conf["geogrid_root"], info["fmda_geogrid_path"])
         if osp.exists(geogrid_path):
@@ -299,7 +269,7 @@ def create_simulation(info, conf, cluster):
         )
 
     # build wrfpy_id and the visualization link
-    job_id = "wfc-%s-%s-%s" % (sim_id, to_esmf(start_utc), to_esmf(end_utc))
+    # job_id = "wfc-%s-%s-%s" % (sim_id, to_esmf(start_utc), to_esmf(end_utc))
     sim_info["job_id"] = job_id
     sim_info["visualization_link"] = osp.join(conf["wrfxweb_url"], "?job_id=" + job_id)
     cfg["job_id"] = job_id
@@ -422,25 +392,25 @@ def create_simulation(info, conf, cluster):
     print("script file %s:" % run_script)
     print(json.dumps(cfg, indent=4, separators=(",", ": ")))
 
-    # drop a shell script that will run the file
-    with open(run_script, "w") as f:
-        f.write("#!/usr/bin/env bash\n")
-        # f.write('/usr/bin/env\n')
-        f.write("export PYTHONPATH=src\n")
-        f.write("cd " + conf["wrfxpy_path"] + "\n")
-        f.write("LOG=" + osp.abspath(log_path) + "\n")
-        f.write("nohup ./forecast.sh " + osp.abspath(json_path) + " &> $LOG \n")
-
-    # make it executable
-    st = os.stat(run_script)
-    os.chmod(run_script, st.st_mode | stat.S_IEXEC)
-
-    # execute the fire forecast and reroute into the log file provided
-    print("Running %s" % run_script)
-    proc = subprocess.Popen(
-        run_script, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True
-    )
-    print("Ready")
+    # # drop a shell script that will run the file
+    # with open(run_script, "w") as f:
+    #     f.write("#!/usr/bin/env bash\n")
+    #     # f.write('/usr/bin/env\n')
+    #     f.write("export PYTHONPATH=src\n")
+    #     f.write("cd " + conf["wrfxpy_path"] + "\n")
+    #     f.write("LOG=" + osp.abspath(log_path) + "\n")
+    #     f.write("nohup ./forecast.sh " + osp.abspath(json_path) + " &> $LOG \n")
+    #
+    # # make it executable
+    # st = os.stat(run_script)
+    # os.chmod(run_script, st.st_mode | stat.S_IEXEC)
+    #
+    # # execute the fire forecast and reroute into the log file provided
+    # print("Running %s" % run_script)
+    # proc = subprocess.Popen(
+    #     run_script, shell=True, stdin=None, stdout=None, stderr=None, close_fds=True
+    # )
+    # print("Ready")
 
     return sim_info
 

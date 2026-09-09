@@ -32,8 +32,6 @@ from clientServer.serverKeys import (
     WRFXCTRL_OVERVIEW_HTML,
     WRFXCTRL_JS_FOLDER,
     WRFXCTRL_FOLDER,
-    WRFXCTRL_SERVER_URL,
-    WRFXCTRL_API_KEY,
 )
 from api.services import WrfxctrlAccessServices as WrfxctrlAccessServices
 from api.services import WrfxctrlJobServices as WrfxctrlJobServices
@@ -41,7 +39,9 @@ from api.serializers import WrfxctrlAccessSerializer as WrfxctrlAccessSerializer
 from api.serializers import WrfxctrlJobSerializer as WrfxctrlJobSerializer
 
 from clientServer.routes.wrfxctrl.utils import Dict, validate_job_json
-from clientServer.routes.wrfxctrl.wrfxctrl_config import profiles
+from clientServer.routes.wrfxctrl.wrfxctrl_config import profiles, conf, cluster
+from clientServer.routes.wrfxctrl.simulation import create_simulation
+import clientServer.routes.wrfxctrl.jobJsonValidator as jobJsonValidator
 from flask_login import current_user
 from flask import (
     send_file,
@@ -102,24 +102,33 @@ def build():
     elif request.method == "POST":
         try:
             sim_cfg = request.form.copy()
-            validated_job_json = validate_job_json(sim_cfg, current_user)
+            # validated_job_json = validate_job_json(sim_cfg, current_user)
 
-            post_url = f"{WRFXCTRL_SERVER_URL}/jobs/enqueue"
-            headers = {
-                "Content-type": "application/json",
-                "API-Key": WRFXCTRL_API_KEY,
-            }
-            response = requests.post(post_url, headers=headers, json=validated_job_json)
-            response.raise_for_status()
+            validated_job_json = jobJsonValidator.validate_job_json(
+                sim_cfg, current_user
+            )
+            # post_url = f"{WRFXCTRL_SERVER_URL}/jobs/enqueue"
+            # headers = {
+            #     "Content-type": "application/json",
+            #     "API-Key": WRFXCTRL_API_KEY,
+            # }
+            # response = requests.post(post_url, headers=headers, json=validated_job_json)
+            # response.raise_for_status()
+            #
+            # response_json = response.json()
+            # job_id = response_json["job_id"]
+            # description = validated_job_json["description"]
+            # catalog_id = validated_job_json["catalog_id"]
 
-            response_json = response.json()
-            job_id = response_json["job_id"]
+            job_id = validated_job_json["job_id"]
             description = validated_job_json["description"]
             catalog_id = validated_job_json["catalog_id"]
 
             WrfxctrlJobServices.find_or_create(
                 current_user.id, job_id, catalog_id, description
             )
+
+            sim_info = create_simulation(validated_job_json, conf, cluster)
 
             return redirect("/jobs/overview")
         except:
