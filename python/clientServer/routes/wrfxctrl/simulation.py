@@ -217,6 +217,7 @@ def create_simulation(info, conf, cluster):
         "iofields": str_to_bool(info["iofields"]),
         "use_realtime": str_to_bool(info["use_realtime"]),
         "use_tign_ignition": False,
+        "catalog_id": info["catalog_id"],
     }
 
     # build a new job template
