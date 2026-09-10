@@ -19,7 +19,7 @@ JOB_JSON_TEMPLATE = {
     "ignition_time": "",
     "domain": "Single domain",
     "profile": DEFAULT_PROFILE,
-    "iofields": "false",
+    "iofields": "true",
     "use_realtime": "false",
     "ignition_perimeter_lats": "[]",
     "ignition_perimeter_lons": "[]",
