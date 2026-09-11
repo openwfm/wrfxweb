@@ -234,7 +234,7 @@ def create_simulation(info, conf, cluster):
     cfg["iofields"] = str_to_bool(info["iofields"])
     cfg["use_realtime"] = str_to_bool(info["use_realtime"])
     cfg["use_tign_ignition"] = sim_info["use_tign_ignition"]
-    cfg["catalog_id"] = sim_info["catalog_id"]
+    cfg["wrfxweb_catalog_id"] = sim_info["catalog_id"]
     cfg["template"] = template
     cfg["profile"] = profile
     cfg["grid_code"] = sim_id

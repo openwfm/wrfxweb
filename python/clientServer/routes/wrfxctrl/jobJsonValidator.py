@@ -109,7 +109,7 @@ def validate_catalog_id(catalog_id, user):
         raise ValueError(
             f"catalog_id {catalog_id} must be a Catalog user has access to"
         )
-    return catalog_id
+    return catalog.id
 
 
 def validate_job_json(job_json, user):
